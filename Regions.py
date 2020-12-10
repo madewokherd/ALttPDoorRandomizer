@@ -162,7 +162,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Cave', 'East DM Ledge Drop']),
         create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave']),
         create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Ledge Drop', 'Fairy Ascension Cave (Top)']),
-        create_lw_region(player, 'Fairy Ascension Plateau', None, ['East DM Ledge Drop', 'Fairy Ascension Cave (Bottom)']),
+        create_lw_region(player, 'Fairy Ascension Plateau', None, ['Fairy Ascension Plateau Drop', 'Fairy Ascension Cave (Bottom)']),
         create_lw_region(player, 'East Death Mountain (Bottom Left)', None, ['Broken Bridge (West)', 'East Death Mountain WS']),
         create_lw_region(player, 'East Death Mountain (Bottom)', None, ['Broken Bridge (East)', 'Paradox Cave (Bottom)', 'Paradox Cave (Middle)', 'Hookshot Fairy', 'Spiral Cave (Bottom)', 'Fairy Ascension Rocks', 'East Death Mountain Teleporter']),
         create_lw_region(player, 'Death Mountain Floating Island (Light World)', ['Floating Island']),
