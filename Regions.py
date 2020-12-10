@@ -5,27 +5,96 @@ from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
 def create_regions(world, player):
     world.regions += [
         create_menu_region(player, 'Menu', None, ['Links House S&Q', 'Sanctuary S&Q', 'Old Man S&Q']),
-        create_lw_region(player, 'Light World', ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest'],
-                         ["Blinds Hideout", "Hyrule Castle Secret Entrance Drop", 'Zoras River', 'Kings Grave Outer Rocks', 'Dam',
-                          'Links House', 'Tavern North', 'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',
-                          'Blacksmiths Hut', 'Bat Cave Drop Ledge', 'Bat Cave Cave', 'Sick Kids House', 'Hobo Bridge', 'Lost Woods Hideout Drop', 'Lost Woods Hideout Stump',
-                          'Lumberjack Tree Tree', 'Lumberjack Tree Cave', 'Mini Moldorm Cave', 'Ice Rod Cave', 'Lake Hylia Central Island Pier',
-                          'Bonk Rock Cave', 'Library', 'Potion Shop', 'Two Brothers House (East)', 'Desert Palace Stairs', 'Eastern Palace', 'Master Sword Meadow',
-                          'Sanctuary', 'Sanctuary Grave', 'Death Mountain Entrance Rock', 'Flute Spot 1', 'Dark Desert Teleporter', 'East Hyrule Teleporter', 'South Hyrule Teleporter', 'Kakariko Teleporter',
-                          'Elder House (East)', 'Elder House (West)', 'North Fairy Cave', 'North Fairy Cave Drop', 'Lost Woods Gamble', 'Snitch Lady (East)', 'Snitch Lady (West)', 'Tavern (Front)',
-                          'Bush Covered House', 'Light World Bomb Hut', 'Kakariko Shop', 'Long Fairy Cave', 'Good Bee Cave', '20 Rupee Cave', 'Cave Shop (Lake Hylia)', 'Waterfall of Wishing', 'Hyrule Castle Main Gate',
-                          'Bonk Fairy (Light)', '50 Rupee Cave', 'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy', 'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid']),
-        create_lw_region(player, 'Death Mountain Entrance', None, ['Old Man Cave (West)', 'Death Mountain Entrance Drop']),
-        create_lw_region(player, 'Lake Hylia Central Island', None, ['Capacity Upgrade', 'Lake Hylia Central Island Teleporter']),
+        create_menu_region(player, 'Flute Sky', None, ['Flute Spot 1', 'Flute Spot 2', 'Flute Spot 3', 'Flute Spot 4', 'Flute Spot 5', 'Flute Spot 6', 'Flute Spot 7', 'Flute Spot 8']),
+        
+        create_lw_region(player, 'Lost Woods Area', ['Mushroom'], ['Lost Woods Gamble', 'Lost Woods Hideout Drop', 'Lost Woods Hideout Stump', 'Lost Woods NW', 'Lost Woods SW', 'Lost Woods SC', 'Lost Woods SE', 'Lost Woods EN']),#
+        create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal'], ['Meadow SC']),
+        create_lw_region(player, 'Lumberjack Area', None, ['Lumberjack Tree Tree', 'Lumberjack Tree Cave', 'Lumberjack House', 'Lumberjack WN', 'Lumberjack SW']),
+        create_lw_region(player, 'DM Ascent Area', None, ['Death Mountain Entrance Rock', 'DM Ascent NW', 'DM Ascent SE']),
+        create_lw_region(player, 'Death Mountain Entrance', None, ['Old Man Cave (West)', 'Death Mountain Entrance Drop']),#
+        create_lw_region(player, 'Death Mountain Return Ledge', None, ['Death Mountain Return Cave (West)', 'Death Mountain Return Ledge Drop']),#
+        create_lw_region(player, 'Lost Woods Pass West Area', None, ['Lost Woods Pass NW', 'Lost Woods Pass SW']),
+        create_lw_region(player, 'Lost Woods Pass East Top Area', None, ['Kakariko Teleporter (Hammer)', 'Lost Woods Pass NE']),
+        create_lw_region(player, 'Lost Woods Pass East Bottom Area', None, ['Kakariko Teleporter (Rock)', 'Lost Woods Pass SE']),
+        create_lw_region(player, 'Kakariko Fortune Area', None, ['Fortune Teller (Light)', 'Kakariko Fortune NE', 'Kakariko Fortune EN', 'Kakariko Fortune ES', 'Kakariko Fortune SC']),
+        create_lw_region(player, 'Kakariko Pond Area', None, ['Kakariko Pond NE', 'Kakariko Pond WN', 'Kakariko Pond WS', 'Kakariko Pond SW', 'Kakariko Pond SE', 'Kakariko Pond EN', 'Kakariko Pond ES', 'Kakariko Pond Whirlpool']),
+        create_lw_region(player, 'Sanctuary Area', None, ['Sanctuary', 'Sanctuary WS', 'Sanctuary EC'])
+        create_lw_region(player, 'Bonk Rock Ledge', None, ['Bonk Rock Cave', 'Sanctuary WN', 'Bonk Rock Ledge Drop'])
+        create_lw_region(player, 'Graveyard Area', None, ['Sanctuary Grave', 'Kings Grave Outer Rocks', 'Graveyard WC', 'Graveyard EC'])
+        create_lw_region(player, 'Graveyard Ledge', None, ['Graveyard Cave', 'Graveyard Ledge Drop']),#
+        create_lw_region(player, 'Kings Grave Area', None, ['Kings Grave', 'Kings Grave Inner Rocks']),#
+        create_lw_region(player, 'Useless Fairy Area', None, ['North Fairy Cave', 'North Fairy Cave Drop', 'Useless Fairy Water Drop', 'Useless Fairy WC', 'Useless Fairy SW']),
+        create_lw_region(player, 'Useless Fairy East Ledge', None, ['Useless Fairy Water Drop', 'Useless Fairy SE', 'Useless Fairy EC', 'Useless Fairy ES']),#
+        create_lw_region(player, 'Useless Fairy Water', None, ['Useless Fairy West Pier', 'Useless Fairy East Pier', 'Useless Fairy EN', 'Useless Fairy SC', 'Useless Fairy Whirlpool']),#
+        create_lw_region(player, 'Potion Shop Area', None, ['Potion Shop', 'Potion Shop Water Drop', 'Potion Shop Rock (South)', 'Potion Shop WC', 'Potion Shop WS']),#
+        create_lw_region(player, 'Potion Shop Northeast', None, ['Potion Shop Water Drop', 'Potion Shop Rock (North)', 'Potion Shop EC']),#
+        create_lw_region(player, 'Potion Shop Water', None, ['Potion Shop WN', 'Potion Shop EN']),
+        create_lw_region(player, 'Zora Warning Area', None, ['Zora Warning Water Drop', 'Zora Warning WC', 'Zora Warning NE']),#
+        create_lw_region(player, 'Zora Warning Water', None, ['Zora Warning WN']),
+        create_lw_region(player, 'Zora Approach Area', None, ['Waterfall of Wishing', 'Zora Approach SE', 'Zora Approach NE', 'Zora Whirlpool']),#
+        create_lw_region(player, 'Zoras River', ['King Zora', 'Zora\'s Ledge', 'Zoras River SW']),#
+        create_lw_region(player, 'Kakariko Area', ['Bottle Merchant'], ['Kakariko Well Drop', 'Kakariko Well Cave', 'Blinds Hideout', 'Elder House (West)', 'Elder House (East)',
+                        'Snitch Lady (West)', 'Snitch Lady (East)', 'Chicken House', 'Sick Kids House', 'Bush Covered House', 'Light World Bomb Hut',
+                        'Kakariko Shop', 'Tavern (Front)', 'Tavern North', 'Kakariko NW', 'Kakariko NC', 'Kakariko NE', 'Kakariko ES', 'Kakariko SE']),
+        create_lw_region(player, 'Blacksmith Area', None, ['Blacksmiths Hut', 'Bat Cave Ledge', 'Bat Cave Cave', 'Blacksmith WS'])
+        create_lw_region(player, 'Bat Cave Ledge', None, ['Bat Cave Drop']),
+        create_lw_region(player, 'Forgotten Forest Area', None, ['Forgotten Forest NW', 'Forgotten Forest NE', 'Forgotten Forest ES']),
+        create_lw_region(player, 'Hyrule Castle Area', None, ['Hyrule Castle Secret Entrance Drop', 'Top of Pyramid', 'Hyrule Castle Inner East Rock', 'Hyrule Castle EN', 'Hyrule Castle SW', 'Hyrule Castle SE']),
+        create_lw_region(player, 'Hyrule Castle Courtyard', None, ['Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Entrance (South)', 'Top of Pyramid']),
+        create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (West)', 'Agahnims Tower', 'Hyrule Castle Entrance (East)', 'Hyrule Castle Ledge Drop', 'Hyrule Castle Ledge Courtyard Drop']),#
+        create_lw_region(player, 'Hyrule Castle East Entry', None, ['Hyrule Castle Outer East Rock', 'Hyrule Castle ES']),
+        create_lw_region(player, 'Wooden Bridge Area', None, ['Wooden Bridge Water Drop', 'Wooden Bridge NW', 'Wooden Bridge NE', 'Wooden Bridge SW']),#
+        create_lw_region(player, 'Wooden Bridge Water', None, ['Wooden Bridge Water NC']),
+        create_lw_region(player, 'Sand Dune Area', None, ['Sand Dune NW', 'Sand Dune WN', 'Sand Dune SC']),
+        create_lw_region(player, 'Eastern Palace Area', None, ['Sahasrahlas Hut', 'Eastern Palace', 'Eastern Palace SW', 'Eastern Palace SE']),
+        create_lw_region(player, 'Eastern Nook Area', None, ['Long Fairy Cave', 'East Hyrule Teleporter', 'Eastern Nook NE']),
+        create_lw_region(player, 'Maze Race Area', None, ['Maze Race ES']),
+        create_lw_region(player, 'Maze Race Ledge', ['Maze Race'], ['Two Brothers House (West)', 'Maze Race Ledge Drop']),#
+        create_lw_region(player, 'Kakariko Suburb Area', None, ['Library', 'Two Brothers House (East)', 'Kakariko Gamble Game', 'Kakariko Suburb NE', 'Kakariko Suburb WS', 'Kakariko Suburb ES']),
+        create_lw_region(player, 'Flute Boy Area', ['Flute Spot'], ['Flute Boy SC']),
+        create_lw_region(player, 'Flute Boy Pass', None, ['Flute Boy WS', 'Flute Boy SW']),
+        create_lw_region(player, 'Cave 45 Area', None, ['Cave 45 NW', 'Cave 45 NC', 'Cave 45 EC']),
+        create_lw_region(player, 'Cave 45 Ledge', None, ['Cave 45', 'Cave 45 Ledge Drop']),#
+        create_lw_region(player, 'C Whirlpool Area', None, ['C Whirlpool Rock (Bottom)', 'South Hyrule Teleporter', 'C Whirlpool', 'C Whirlpool EN', 'C Whirlpool EC', 'C Whirlpool ES', 'C Whirlpool SC']),
+        create_lw_region(player, 'C Whirlpool Outer Area', None, ['C Whirlpool Rock (Top)', 'C Whirlpool WC', 'C Whirlpool NW']),
+        create_lw_region(player, 'Central Bonk Rock Area', None, ['Bonk Fairy (Light)', 'Central Bonk Rock NW', 'Central Bonk Rock SW', 'Central Bonk Rock EN', 'Central Bonk Rock EC', 'Central Bonk Rock ES']),
+        create_lw_region(player, 'Links House Area', None, ['Links House', 'Links House NE', 'Links House WN', 'Links House WC', 'Links House WS', 'Links House SC', 'Links House ES']),
+        create_lw_region(player, 'Stone Bridge Area', None, ['Stone Bridge NC', 'Stone Bridge EN', 'Stone Bridge WS', 'Stone Bridge SC']),
+        create_lw_region(player, 'Stone Bridge Water', None, ['Stone Bridge WC', 'Stone Bridge EC']),#
+        create_lw_region(player, 'Hobo Bridge', ['Hobo'], ['Hobo EC']),
+        create_lw_region(player, 'Tree Line Area', None, ['Lake Hylia Fairy', 'Tree Line WN', 'Tree Line NW', 'Tree Line SE']),
+        create_lw_region(player, 'Tree Line Water', None, ['Tree Line WC', 'Tree Line SC']),
+        create_lw_region(player, 'Desert Area', None, ['Aginahs Cave', 'Desert Palace Stairs', 'Desert ES']),
+        create_lw_region(player, 'Desert Ledge', ['Desert Ledge'], ['Desert Palace Entrance (West)', 'Desert Ledge Outer Rocks', 'Desert Ledge Drop']),#
+        create_lw_region(player, 'Desert Palace Entrance (North) Spot', None, ['Desert Palace Entrance (North)', 'Desert Ledge Inner Rocks']),#
+        create_lw_region(player, 'Desert Checkerboard Ledge', None, ['Checkerboard Cave', 'Checkerboard Ledge Drop']),#
+        create_lw_region(player, 'Desert Palace Stairs', None, ['Desert Palace Entrance (South)']),
+        create_lw_region(player, 'Desert Palace Mouth', None, ['Desert Palace Entrance (East)', 'Desert Palace Mouth Drop']),#
+        create_lw_region(player, 'Desert Palace Transporter Ledge', None, ['Desert Palace Transporter Ledge Drop', 'Desert Teleporter']),#
+        create_lw_region(player, 'Bombos Tablet Ledge', ['Bombos Tablet'], ['Bombos Tablet Ledge Drop', 'Desert EC']),#
+        create_lw_region(player, 'Purple Chest Area', ['Purple Chest'], ['Desert Fairy', '50 Rupee Cave', 'Purple Chest WS', 'Purple Chest EC', 'Purple Chest ES']),
+        create_lw_region(player, 'Purple Chest Ledge', None, ['Purple Chest Ledge Drop', 'Purple Chest WC']),#
+        create_lw_region(player, 'Dam Area', ['Sunken Treasure'], ['Dam', 'Dam WC', 'Dam WS', 'Dam NC', 'Dam EC']),
+        create_lw_region(player, 'Statues Area', None, ['Light Hype Fairy', 'Statues NC', 'Statues WN', 'Statues WC', 'Statues WS', 'Statues SC']),
+        create_lw_region(player, 'South Pass Area', None, ['South Pass WC', 'South Pass NC', 'South Pass ES']),
+        create_lw_region(player, 'Lake Hylia Area', None, ['Lake Hylia Fortune Teller', 'Cave Shop (Lake Hylia)', 'Lake Hylia Water Drop', 'Lake Hylia NW']),
+        create_lw_region(player, 'Lake Hylia South Shore', None, ['Mini Moldorm Cave', 'Lake Hylia Water Drop', 'Lake Hylia WS', 'Lake Hylia ES']),#
+        create_lw_region(player, 'Lake Hylia Northeast Bank', None, ['Lake Hylia Water Drop', 'Lake Hylia NE']),#
+        create_lw_region(player, 'Lake Hylia Central Island', None, ['Capacity Upgrade', 'Lake Hylia Water Drop', 'Lake Hylia Teleporter']),#
+        create_lw_region(player, 'Lake Hylia Island', ['Lake Hylia Island'], ['Lake Hylia Water Drop']),#
+        create_lw_region(player, 'Lake Hylia Water', None, ['Lake Hylia Central Island Pier', 'Lake Hylia West Pier', 'Lake Hylia East Pier', 'Lake Hylia Whirlpool', 'Lake Hylia NC', 'Lake Hylia EC']),
+        create_lw_region(player, 'Octoballoon Area', None, ['Octoballoon Water Drop', 'Octoballoon WS', 'Octoballoon NE']),
+        create_lw_region(player, 'Octoballoon Water', None, ['Octoballoon Pier', 'Octoballoon Whirlpool', 'Octoballoon WC']),
+        create_lw_region(player, 'Octoballoon Water Ledge', None, ['Octoballoon Water Drop', 'Octoballoon NW']),#
+        create_lw_region(player, 'Ice Rod Cave Area', None, ['Ice Rod Cave', 'Good Bee Cave', '20 Rupee Cave', 'Ice Rod Water Drop', 'Ice Rod Cave SE']),
+        create_lw_region(player, 'Ice Rod Cave Water', None, ['Ice Rod Cave Pier', 'Ice Rod Cave SW']),
         create_cave_region(player, 'Blinds Hideout', 'a bounty of five items', ["Blind\'s Hideout - Top",
                                                                         "Blind\'s Hideout - Left",
                                                                         "Blind\'s Hideout - Right",
                                                                         "Blind\'s Hideout - Far Left",
                                                                         "Blind\'s Hideout - Far Right"]),
         create_cave_region(player, 'Hyrule Castle Secret Entrance', 'a drop\'s exit', ['Link\'s Uncle', 'Secret Passage'], ['Hyrule Castle Secret Entrance Exit']),
-        create_lw_region(player, 'Zoras River', ['King Zora', 'Zora\'s Ledge']),
         create_cave_region(player, 'Waterfall of Wishing', 'a cave with two chests', ['Waterfall Fairy - Left', 'Waterfall Fairy - Right']),
-        create_lw_region(player, 'Kings Grave Area', None, ['Kings Grave', 'Kings Grave Inner Rocks']),
         create_cave_region(player, 'Kings Grave', 'a cave with a chest', ['King\'s Tomb']),
         create_cave_region(player, 'North Fairy Cave', 'a drop\'s exit', None, ['North Fairy Cave Exit']),
         create_cave_region(player, 'Dam', 'the dam', ['Floodgate', 'Floodgate Chest']),
@@ -58,18 +127,14 @@ def create_regions(world, player):
                                                                      'Kakariko Well - Right', 'Kakariko Well - Bottom'], ['Kakariko Well (top to bottom)']),
         create_cave_region(player, 'Kakariko Well (bottom)', 'a drop\'s exit', None, ['Kakariko Well Exit']),
         create_cave_region(player, 'Blacksmiths Hut', 'the smith', ['Blacksmith', 'Missing Smith']),
-        create_lw_region(player, 'Bat Cave Drop Ledge', None, ['Bat Cave Drop']),
         create_cave_region(player, 'Bat Cave (right)', 'a drop\'s exit', ['Magic Bat'], ['Bat Cave Door']),
         create_cave_region(player, 'Bat Cave (left)', 'a drop\'s exit', None, ['Bat Cave Exit']),
         create_cave_region(player, 'Sick Kids House', 'the sick kid', ['Sick Kid']),
-        create_lw_region(player, 'Hobo Bridge', ['Hobo']),
         create_cave_region(player, 'Lost Woods Hideout (top)', 'a drop\'s exit', ['Lost Woods Hideout'], ['Lost Woods Hideout (top to bottom)']),
         create_cave_region(player, 'Lost Woods Hideout (bottom)', 'a drop\'s exit', None, ['Lost Woods Hideout Exit']),
         create_cave_region(player, 'Lumberjack Tree (top)', 'a drop\'s exit', ['Lumberjack Tree'], ['Lumberjack Tree (top to bottom)']),
         create_cave_region(player, 'Lumberjack Tree (bottom)', 'a drop\'s exit', None, ['Lumberjack Tree Exit']),
-        create_lw_region(player, 'Cave 45 Ledge', None, ['Cave 45']),
         create_cave_region(player, 'Cave 45', 'a cave with an item', ['Cave 45']),
-        create_lw_region(player, 'Graveyard Ledge', None, ['Graveyard Cave']),
         create_cave_region(player, 'Graveyard Cave', 'a cave with an item', ['Graveyard Cave']),
         create_cave_region(player, 'Checkerboard Cave', 'a cave with an item', ['Checkerboard Cave']),
         create_cave_region(player, 'Long Fairy Cave', 'a fairy fountain'),
@@ -84,33 +149,33 @@ def create_regions(world, player):
         create_cave_region(player, 'Library', 'the library', ['Library']),
         create_cave_region(player, 'Kakariko Gamble Game', 'a game of chance'),
         create_cave_region(player, 'Potion Shop', 'the potion shop', ['Potion Shop']),
-        create_lw_region(player, 'Lake Hylia Island', ['Lake Hylia Island']),
         create_cave_region(player, 'Capacity Upgrade', 'the queen of fairies'),
         create_cave_region(player, 'Two Brothers House', 'a connector', None, ['Two Brothers House Exit (East)', 'Two Brothers House Exit (West)']),
-        create_lw_region(player, 'Maze Race Ledge', ['Maze Race'], ['Two Brothers House (West)']),
         create_cave_region(player, '50 Rupee Cave', 'a cave with some cash'),
-        create_lw_region(player, 'Desert Ledge', ['Desert Ledge'], ['Desert Palace Entrance (North) Rocks', 'Desert Palace Entrance (West)']),
-        create_lw_region(player, 'Desert Ledge (Northeast)', None, ['Checkerboard Cave']),
-        create_lw_region(player, 'Desert Palace Stairs', None, ['Desert Palace Entrance (South)']),
-        create_lw_region(player, 'Desert Palace Lone Stairs', None, ['Desert Palace Stairs Drop', 'Desert Palace Entrance (East)']),
-        create_lw_region(player, 'Desert Palace Entrance (North) Spot', None, ['Desert Palace Entrance (North)', 'Desert Ledge Return Rocks']),
-        create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal']),
         create_cave_region(player, 'Lost Woods Gamble', 'a game of chance'),
-        create_lw_region(player, 'Hyrule Castle Courtyard', None, ['Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Entrance (South)']),
-        create_lw_region(player, 'Hyrule Castle Ledge', None, ['Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (West)', 'Agahnims Tower', 'Hyrule Castle Ledge Courtyard Drop']),
         create_dungeon_region(player, 'Sewer Drop', 'a drop\'s exit', None, ['Sewer Drop']),  # This exists only to be referenced for access checks
 
+        create_lw_region(player, 'Death Mountain', None, ['Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)', 'Death Mountain Return Cave (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'Death Mountain ES', 'Death Mountain Teleporter']),
+        create_lw_region(player, 'Death Mountain (Top)', ['Ether Tablet'], ['Tower of Hera', 'Death Mountain Drop', 'Death Mountain EN']),
+        create_lw_region(player, 'Spectacle Rock Ledge', ['Spectacle Rock'], ['Spectacle Rock Drop']),
+        create_lw_region(player, 'East Death Mountain (Top West)', None, ['DM Hammer Bridge (West)', 'East Death Mountain WN']),
+        create_lw_region(player, 'East Death Mountain (Top)', None, ['Paradox Cave (Top)', 'DM Hammer Bridge (East)', 'East Death Mountain Spiral Drop', 'East Death Mountain Fairy Drop', 'East Death Mountain EN']),#
+        create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Cave', 'Spiral Cave Ledge Drop']),
+        create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave']),
+        create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Ledge Drop', 'Fairy Ascension Cave (Top)']),
+        create_lw_region(player, 'Fairy Ascension Plateau', None, ['Fairy Ascension Plateau Drop', 'Fairy Ascension Cave (Bottom)']),
+        create_lw_region(player, 'East Death Mountain (Bottom Left)', None, ['Broken Bridge (West)', 'East Death Mountain WS']),
+        create_lw_region(player, 'East Death Mountain (Bottom)', None, ['Broken Bridge (East)', 'Paradox Cave (Bottom)', 'Paradox Cave (Middle)', 'Hookshot Fairy', 'Spiral Cave (Bottom)', 'Fairy Ascension Rocks', 'East Death Mountain Teleporter']),
+        create_lw_region(player, 'Death Mountain Floating Island (Light World)', ['Floating Island']),
+        create_lw_region(player, 'Death Mountain TR Pegs', None, ['Death Mountain TR Pegs WN', 'Turtle Rock Teleporter']),
         create_cave_region(player, 'Old Man Cave', 'a connector', ['Old Man'], ['Old Man Cave Exit (East)']),
         create_cave_region(player, 'Old Man Cave Ledge', 'a connector', None, ['Old Man Cave Exit (West)', 'Old Man Cave Dropdown']),
         create_cave_region(player, 'Old Man House', 'a connector', None, ['Old Man House Exit (Bottom)', 'Old Man House Front to Back']),
         create_cave_region(player, 'Old Man House Back', 'a connector', None, ['Old Man House Exit (Top)', 'Old Man House Back to Front']),
-        create_lw_region(player, 'Death Mountain', None, ['Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)', 'Death Mountain Return Cave (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'Broken Bridge (West)', 'Death Mountain Teleporter']),
         create_cave_region(player, 'Death Mountain Return Cave', 'a connector', None, ['Death Mountain Return Cave Exit (West)', 'Death Mountain Return Cave Exit (East)']),
-        create_lw_region(player, 'Death Mountain Return Ledge', None, ['Death Mountain Return Ledge Drop', 'Death Mountain Return Cave (West)']),
         create_cave_region(player, 'Spectacle Rock Cave (Top)', 'a connector', ['Spectacle Rock Cave'], ['Spectacle Rock Cave Drop', 'Spectacle Rock Cave Exit (Top)']),
         create_cave_region(player, 'Spectacle Rock Cave (Bottom)', 'a connector', None, ['Spectacle Rock Cave Exit']),
         create_cave_region(player, 'Spectacle Rock Cave (Peak)', 'a connector', None, ['Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave Exit (Peak)']),
-        create_lw_region(player, 'East Death Mountain (Bottom)', None, ['Broken Bridge (East)', 'Paradox Cave (Bottom)', 'Paradox Cave (Middle)', 'East Death Mountain Teleporter', 'Hookshot Fairy', 'Fairy Ascension Rocks', 'Spiral Cave (Bottom)']),
         create_cave_region(player, 'Hookshot Fairy', 'fairies deep in a cave'),
         create_cave_region(player, 'Paradox Cave Front', 'a connector', None, ['Paradox Cave Push Block Reverse', 'Paradox Cave Exit (Bottom)', 'Light World Death Mountain Shop']),
         create_cave_region(player, 'Paradox Cave Chest Area', 'a connector', ['Paradox Cave Lower - Far Left',
@@ -123,39 +188,93 @@ def create_regions(world, player):
                            ['Paradox Cave Push Block', 'Paradox Cave Bomb Jump']),
         create_cave_region(player, 'Paradox Cave', 'a connector', None, ['Paradox Cave Exit (Middle)', 'Paradox Cave Exit (Top)', 'Paradox Cave Drop']),
         create_cave_region(player, 'Light World Death Mountain Shop', 'a common shop'),
-        create_lw_region(player, 'East Death Mountain (Top)', None, ['Paradox Cave (Top)', 'Death Mountain (Top)', 'Spiral Cave Ledge Access', 'East Death Mountain Drop', 'Turtle Rock Teleporter', 'Fairy Ascension Ledge']),
-        create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Cave', 'Spiral Cave Ledge Drop']),
         create_cave_region(player, 'Spiral Cave (Top)', 'a connector', ['Spiral Cave'], ['Spiral Cave (top to bottom)', 'Spiral Cave Exit (Top)']),
         create_cave_region(player, 'Spiral Cave (Bottom)', 'a connector', None, ['Spiral Cave Exit']),
-        create_lw_region(player, 'Fairy Ascension Plateau', None, ['Fairy Ascension Drop', 'Fairy Ascension Cave (Bottom)']),
         create_cave_region(player, 'Fairy Ascension Cave (Bottom)', 'a connector', None, ['Fairy Ascension Cave Climb', 'Fairy Ascension Cave Exit (Bottom)']),
         create_cave_region(player, 'Fairy Ascension Cave (Drop)', 'a connector', None, ['Fairy Ascension Cave Pots']),
         create_cave_region(player, 'Fairy Ascension Cave (Top)', 'a connector', None, ['Fairy Ascension Cave Exit (Top)', 'Fairy Ascension Cave Drop']),
-        create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Ledge Drop', 'Fairy Ascension Cave (Top)']),
-        create_lw_region(player, 'Death Mountain (Top)', ['Ether Tablet'], ['East Death Mountain (Top)', 'Tower of Hera', 'Death Mountain Drop']),
-        create_lw_region(player, 'Spectacle Rock', ['Spectacle Rock'], ['Spectacle Rock Drop']),
-
-        create_dw_region(player, 'East Dark World', ['Pyramid'], ['Pyramid Fairy', 'South Dark World Bridge', 'Palace of Darkness', 'Dark Lake Hylia Drop (East)', 'Dark Lake Hylia Teleporter',
-                                                           'Hyrule Castle Ledge Mirror Spot', 'Dark Lake Hylia Fairy', 'Palace of Darkness Hint', 'East Dark World Hint', 'Pyramid Hole', 'Northeast Dark World Broken Bridge Pass']),
-        create_dw_region(player, 'Northeast Dark World', ['Catfish'], ['West Dark World Gap', 'Dark World Potion Shop', 'East Dark World Broken Bridge Pass']),
+        create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
+        
+        create_dw_region(player, 'Skull Woods Forest', None, ['Skull Woods First Section Hole (East)', 'Skull Woods First Section Hole (West)', 'Skull Woods First Section Hole (North)',
+                        'Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Bush Rock (East)', 'Skull Woods SE']),
+        create_dw_region(player, 'Skull Woods Portal Entry', None, ['Skull Woods Bush Rock (West)', 'Skull Woods SC']),
+        create_dw_region(player, 'Skull Woods Forest (West)', None, ['Skull Woods Second Section Hole', 'Skull Woods Second Section Door (West)', 'Skull Woods Final Section']),
+        create_dw_region(player, 'Skull Woods Forgotten Path (Southwest)', None, ['Skull Woods Forgotten Bush (West)', 'Skull Woods SW']),
+        create_dw_region(player, 'Skull Woods Forgotten Path (Northeast)', None, ['Skull Woods Forgotten Bush (East)', 'Skull Woods WN']),
+        create_dw_region(player, 'Dark Lumberjack Area', None, ['Dark World Lumberjack Shop', 'Dark Lumberjack WN', 'Dark Lumberjack SW']),
+        create_dw_region(player, 'Bumper Cave Area', None, ['Bumper Cave Entrance Rock', 'Bumper Cave NW', 'Bumper Cave SE']),
+        create_dw_region(player, 'Bumper Cave Entrance', None, ['Bumper Cave (Bottom)', 'Bumper Cave Entrance Mirror Spot', 'Bumper Cave Ledge Drop']),
+        create_dw_region(player, 'Bumper Cave Ledge', ['Bumper Cave Ledge'], ['Bumper Cave (Top)', 'Bumper Cave Ledge Mirror Spot', 'Bumper Cave Ledge Drop']),
+        create_dw_region(player, 'Skull Woods Pass West Area', None, ['Skull Woods Pass NW', 'Skull Woods Pass SW', 'Skull Woods Pass Bush Row (West)']),
+        create_dw_region(player, 'Skull Woods Pass East Top Area', None, ['Skull Woods Pass Rock (Top)', 'Skull Woods Pass Bush Row (East)', 'Skull Woods Pass NE']),
+        create_dw_region(player, 'Skull Woods Pass East Bottom Area', None, ['Skull Woods Pass Rock (Bottom)', 'Skull Woods Pass SE']),
+        create_dw_region(player, 'Dark Fortune Area', None, ['Fortune Teller (Dark)', 'Dark Fortune NE', 'Dark Fortune EN', 'Dark Fortune ES', 'Dark Fortune SC']),
+        create_dw_region(player, 'Outcast Pond Area', None, ['Outcast Pond NE', 'Outcast Pond WN', 'Outcast Pond WS', 'Outcast Pond SW', 'Outcast Pond SE', 'Outcast Pond EN', 'Outcast Pond ES']),
+        create_dw_region(player, 'Shield Shop Area', None, ['Red Shield Shop', 'Shield Shop NW', 'Shield Shop NE']),
+        create_dw_region(player, 'Dark Chapel Area', None, ['Dark Sanctuary Hint', 'Dark Chapel WN', 'Dark Chapel WS', 'Dark Chapel EC'])
+        create_dw_region(player, 'Dark Graveyard Area', None, ['Graveyard Ledge Mirror Spot', 'Kings Grave Mirror Spot', 'Dark Graveyard WC', 'Dark Graveyard ES'])
+        create_dw_region(player, 'Qirn Jump Area', None, ['Qirn Jump Water Drop', 'Qirn Jump WC', 'Qirn Jump SW']),
+        create_dw_region(player, 'Qirn Jump East Ledge', None, ['Qirn Jump Water Drop', 'Qirn Jump SE', 'Qirn Jump EC', 'Qirn Jump ES']),#
+        create_dw_region(player, 'Qirn Jump Water', None, ['Qirn Jump Pier', 'Qirn Jump EN', 'Qirn Jump SC', 'Qirn Jump Whirlpool']),
+        create_dw_region(player, 'Dark Witch Area', None, ['Dark World Potion Shop', 'Dark Witch Water Drop', 'Dark Witch Rock (South)', 'Dark Witch WC', 'Dark Witch WS']),#
+        create_dw_region(player, 'Dark Witch Northeast', None, ['Dark Witch Water Drop', 'Dark Witch Rock (North)', 'Dark Witch EC']),#
+        create_dw_region(player, 'Dark Witch Water', None, ['Dark Witch WN', 'Dark Witch EN']),
+        create_dw_region(player, 'Catfish Approach Area', None, ['Catfish Approach Water Drop', 'Catfish Approach WC', 'Catfish Approach NE']),#
+        create_dw_region(player, 'Catfish Approach Water', None, ['Catfish Approach WN']),
+        create_dw_region(player, 'Catfish Area', ['Catfish'], ['Catfish SE']),#
+        create_dw_region(player, 'Village of Outcasts Area', None, ['Chest Game', 'Thieves Town', 'C-Shaped House', 'Brewery', 'Village of Outcasts Pegs', 'Village of Outcasts NW', 'Village of Outcasts NC', 'Village of Outcasts NE', 'Village of Outcasts ES', 'Village of Outcasts SE']),
+        create_dw_region(player, 'Dark Grassy Lawn', None, ['Dark World Shop', 'Kakariko Mirror Spot', 'Grassy Lawn Pegs']),
+        create_dw_region(player, 'Hammer Peg Entry', None, ['Peg Area Rocks (West)', 'Hammer Pegs WS'])
+        create_dw_region(player, 'Hammer Peg Area', ['Dark Blacksmith Ruins'], ['Dark World Hammer Peg Cave', 'Bat Cave Ledge Mirror Spot', 'Peg Area Rocks (East)']),
+        create_dw_region(player, 'Pyramid Area', ['Pyramid'], ['Pyramid Fairy', 'Pyramid Hole', 'HC Ledge Mirror Spot', 'HC Courtyard Mirror Spot', 'HC Area Mirror Spot', 'HC East Entry Mirror Spot', 'Pyramid ES']),
+        create_dw_region(player, 'Pyramid Exit Ledge', None, ['Pyramid Entrance', 'Pyramid Exit Drop']),
+        create_dw_region(player, 'Broken Bridge Area', None, ['Broken Bridge Hammer Rock (South)', 'Broken Bridge Water Drop', 'Broken Bridge SW']),#
+        create_dw_region(player, 'Broken Bridge Northeast', None, ['West Dark World Gap', 'Broken Bridge Hammer Rock (North)', 'Broken Bridge Water Drop', 'Broken Bridge NE']),#
+        create_dw_region(player, 'Broken Bridge West', None, ['Broken Bridge Water Drop', 'Broken Bridge NW']),#
+        create_dw_region(player, 'Broken Bridge Water', None, ['Broken Bridge Water NC']),
+        create_dw_region(player, 'Dark Dune Area', None, ['Dark Dune NW', 'Dark Dune WN', 'Dark Dune SC']),
+        create_dw_region(player, 'Palace of Darkness Area', None, ['Palace of Darkness Hint', 'Palace of Darkness', 'Palace of Darkness SW', 'Palace of Darkness SE']),
+        create_dw_region(player, 'Palace of Darkness Nook Area', None, ['East Dark World Hint', 'Palace of Darkness Nook NE']),
+        create_dw_region(player, 'Dig Game Area', ['Digging Game'], ['Dig Game Drop To Ledge', 'Dig Game ES']),
+        create_dw_region(player, 'Dig Game Ledge', None, ['Maze Race Mirror Spot', 'Dig Game Ledge Drop', 'Dig Game EC']),#
+        create_dw_region(player, 'Frog Area', ['Frog'], ['Frog Ledge Drop', 'Frog NE']),
+        create_dw_region(player, 'Archery Game Area', None, ['Archery Game', 'Archery Game Rock', 'Frog WC', 'Frog WS', 'Frog ES']),
+        create_dw_region(player, 'Stumpy Area', ['Stumpy'], ['Stumpy SC']),
+        create_dw_region(player, 'Stumpy Pass', None, ['Stumpy WS', 'Stumpy SW']),
+        create_dw_region(player, 'Circle of Bushes Area', None, ['Cave 45 Mirror Spot', 'Circle of Bushes NW', 'Circle of Bushes NC', 'Circle of Bushes EC']),
+        create_dw_region(player, 'Dark C Whirlpool Area', None, ['South Hyrule Teleporter', 'Dark C Whirlpool Rock (Bottom)', 'Dark C Whirlpool EN', 'Dark C Whirlpool EC', 'Dark C Whirlpool ES', 'Dark C Whirlpool SC']),
+        create_dw_region(player, 'Dark C Whirlpool Outer Area', None, ['Dark C Whirlpool Rock (Top)', 'Dark C Whirlpool WC', 'Dark C Whirlpool NW']),
+        create_dw_region(player, 'Dark Bonk Rock Area', None, ['Bonk Fairy (Dark)', 'Dark Bonk Rock NW', 'Dark Bonk Rock SW', 'Dark Bonk Rock EN', 'Dark Bonk Rock EC', 'Dark Bonk Rock ES']),
+        create_dw_region(player, 'Big Bomb Shop Area', None, ['Big Bomb Shop', 'Big Bomb Shop NE', 'Big Bomb Shop WN', 'Big Bomb Shop WC', 'Big Bomb Shop WS', 'Big Bomb Shop SC', 'Big Bomb Shop ES']),
+        create_dw_region(player, 'Hammer Bridge North Area', None, ['Hammer Bridge Pegs (North)', 'Hammer Bridge Water Drop', 'Hammer Bridge NC', 'Hammer Bridge EN']),
+        create_dw_region(player, 'Hammer Bridge South Area', None, ['Hammer Bridge Pegs (South)', 'Hammer Bridge WS', 'Hammer Bridge SC']),
+        create_dw_region(player, 'Hammer Bridge Water', None, ['Hammer Bridge Pier', 'Hobo Mirror Spot', 'Hammer Bridge EC']),#
+        create_dw_region(player, 'Dark Tree Line Area', None, ['Dark Lake Hylia Fairy', 'Dark Tree Line WN', 'Dark Tree Line NW', 'Dark Tree Line SE']),
+        create_dw_region(player, 'Dark Tree Line Water', None, ['Dark Tree Line WC', 'Dark Tree Line SC']),
+        create_dw_region(player, 'Misery Mire Area', None, ['Mire Shed', 'Misery Mire', 'Dark Desert Fairy', 'Dark Desert Hint', 'Checkboard Mirror Spot', 'Desert Ledge Mirror Spot', 'DP Stairs Mirror Spot', 'DP Entrance (North) Mirror Spot']),
+        create_dw_region(player, 'Dark Purple Chest Area', None, ['Bombos Tablet Mirror Spot', 'Purple Chest Mirror Spot', 'Dark Purple Chest EC', 'Dark Purple Chest ES']),
+        create_dw_region(player, 'Swamp Palace Area', None, ['Swamp Palace', 'Swamp Palace WC', 'Swamp Palace WS', 'Swamp Palace NC', 'Swamp Palace EC']),
+        create_dw_region(player, 'Hype Cave Area', None, ['Hype Cave', 'Hype Cave NC', 'Hype Cave WN', 'Hype Cave WC', 'Hype Cave WS', 'Hype Cave SC']),
+        create_dw_region(player, 'Dark South Pass Area', None, ['Dark South Pass WC', 'Dark South Pass NC', 'Dark South Pass ES']),
+        create_dw_region(player, 'Dark Lake Hylia Area', None, ['Dark Lake Hylia Shop', 'Dark Lake Hylia NW', 'Dark Lake Hylia Water Drop']),
+        create_dw_region(player, 'Dark Lake Hylia Northeast Bank', None, ['Dark Lake Hylia NE', 'Dark Lake Hylia Water Drop']),#
+        create_dw_region(player, 'Dark Lake Hylia Ledge (West)', None, ['Dark Lake Hylia Water Drop', 'Dark Lake Hylia WS']),
+        create_dw_region(player, 'Dark Lake Hylia Ledge (East)', None, ['Dark Lake Hylia Water Drop', 'Dark Lake Hylia ES']),
+        create_dw_region(player, 'Dark Lake Hylia Water', None, ['Lake Hylia Island Mirror Spot', 'Dark Lake Hylia Northeast Pier', 'Dark Lake Hylia NC', 'Dark Lake Hylia EC']),
+        create_dw_region(player, 'Ice Palace Area', None, ['Ice Palace', 'Lake Hylia Central Island Mirror Spot']),
+        create_dw_region(player, 'Southeast DW Area', None, ['Southeast DW Water Drop', 'Southeast DW WS', 'Southeast DW NE']),
+        create_dw_region(player, 'Southeast DW Water', None, ['Southeast DW Pier', 'Southeast DW Whirlpool', 'Southeast DW WC']),
+        create_dw_region(player, 'Southeast DW Water Ledge', None, ['Southeast DW Water Drop', 'Southeast DW NW']),#
+        create_dw_region(player, 'Dark Shopping Mall Area', None, ['Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Spike Cave', 'Dark Shopping Mall Water Drop', 'Dark Shopping Mall SE']),
+        create_dw_region(player, 'Dark Shopping Mall Water', None, ['Dark Shopping Mall Pier', 'Dark Shopping Mall SW']),
         create_cave_region(player, 'Palace of Darkness Hint', 'a storyteller'),
         create_cave_region(player, 'East Dark World Hint', 'a storyteller'),
-        create_dw_region(player, 'South Dark World', ['Stumpy', 'Digging Game', 'Bombos Tablet'], ['Dark Lake Hylia Drop (South)', 'Hype Cave', 'Swamp Palace', 'Village of Outcasts Heavy Rock', 'Maze Race Mirror Spot',
-                                                                                           'Cave 45 Mirror Spot', 'East Dark World Bridge', 'Big Bomb Shop', 'Archery Game', 'Bonk Fairy (Dark)', 'Dark Lake Hylia Shop']),
         create_cave_region(player, 'Big Bomb Shop', 'the bomb shop'),
         create_cave_region(player, 'Archery Game', 'a game of skill'),
-        create_dw_region(player, 'Dark Lake Hylia', None, ['Lake Hylia Island Mirror Spot', 'East Dark World Pier', 'Dark Lake Hylia Ledge']),
-        create_dw_region(player, 'Dark Lake Hylia Central Island', None, ['Ice Palace', 'Lake Hylia Central Island Mirror Spot']),
-        create_dw_region(player, 'Dark Lake Hylia Ledge', None, ['Dark Lake Hylia Ledge Drop', 'Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Spike Cave']),
         create_cave_region(player, 'Dark Lake Hylia Ledge Hint', 'a storyteller'),
         create_cave_region(player, 'Dark Lake Hylia Ledge Spike Cave', 'a spiky hint'),
         create_cave_region(player, 'Hype Cave', 'a bounty of five items', ['Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left',
                                                                    'Hype Cave - Bottom', 'Hype Cave - Generous Guy']),
-        create_dw_region(player, 'West Dark World', ['Frog'], ['Village of Outcasts Drop', 'East Dark World River Pier', 'Brewery', 'C-Shaped House', 'Chest Game', 'Thieves Town', 'Graveyard Ledge Mirror Spot', 'Kings Grave Mirror Spot', 'Bumper Cave Entrance Rock',
-                                                       'Skull Woods Forest', 'Village of Outcasts Pegs', 'Village of Outcasts Eastern Rocks', 'Red Shield Shop', 'Dark Sanctuary Hint', 'Fortune Teller (Dark)', 'Dark World Lumberjack Shop']),
-        create_dw_region(player, 'Dark Grassy Lawn', None, ['Grassy Lawn Pegs', 'Dark World Shop']),
-        create_dw_region(player, 'Hammer Peg Area', ['Dark Blacksmith Ruins'], ['Bat Cave Drop Ledge Mirror Spot', 'Dark World Hammer Peg Cave', 'Peg Area Rocks']),
-        create_dw_region(player, 'Bumper Cave Entrance', None, ['Bumper Cave (Bottom)', 'Bumper Cave Entrance Mirror Spot', 'Bumper Cave Entrance Drop']),
         create_cave_region(player, 'Fortune Teller (Dark)', 'a fortune teller'),
         create_cave_region(player, 'Village of Outcasts Shop', 'a common shop'),
         create_cave_region(player, 'Dark Lake Hylia Shop', 'a common shop'),
@@ -169,34 +288,25 @@ def create_regions(world, player):
         create_cave_region(player, 'Red Shield Shop', 'the rare shop'),
         create_cave_region(player, 'Dark Sanctuary Hint', 'a storyteller'),
         create_cave_region(player, 'Bumper Cave', 'a connector', None, ['Bumper Cave Exit (Bottom)', 'Bumper Cave Exit (Top)']),
-        create_dw_region(player, 'Bumper Cave Ledge', ['Bumper Cave Ledge'], ['Bumper Cave Ledge Drop', 'Bumper Cave (Top)', 'Bumper Cave Ledge Mirror Spot']),
-        create_dw_region(player, 'Skull Woods Forest', None, ['Skull Woods First Section Hole (East)', 'Skull Woods First Section Hole (West)', 'Skull Woods First Section Hole (North)',
-                                                      'Skull Woods First Section Door', 'Skull Woods Second Section Door (East)']),
-        create_dw_region(player, 'Skull Woods Forest (West)', None, ['Skull Woods Second Section Hole', 'Skull Woods Second Section Door (West)', 'Skull Woods Final Section']),
-        create_dw_region(player, 'Dark Desert',  None, ['Misery Mire', 'Mire Shed', 'Desert Ledge (Northeast) Mirror Spot', 'Desert Ledge Mirror Spot', 'Desert Palace Stairs Mirror Spot',
-                                                'Desert Palace Entrance (North) Mirror Spot', 'Dark Desert Hint', 'Dark Desert Fairy']),
         create_cave_region(player, 'Mire Shed', 'a cave with two chests', ['Mire Shed - Left', 'Mire Shed - Right']),
         create_cave_region(player, 'Dark Desert Hint', 'a storyteller'),
-        create_dw_region(player, 'Dark Death Mountain (West Bottom)', None, ['Spike Cave', 'Spectacle Rock Mirror Spot', 'Dark Death Mountain Fairy']),
-        create_dw_region(player, 'Dark Death Mountain (Top)', None, ['Dark Death Mountain Drop (East)', 'Dark Death Mountain Drop (West)', 'Ganons Tower', 'Superbunny Cave (Top)',
-                                                                     'Hookshot Cave', 'East Death Mountain (Top) Mirror Spot', 'Turtle Rock']),
-        create_dw_region(player, 'Dark Death Mountain Ledge', None, ['Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge (West)', 'Mimic Cave Mirror Spot', 'Spiral Cave Mirror Spot']),
-        create_dw_region(player, 'Dark Death Mountain Isolated Ledge', None, ['Isolated Ledge Mirror Spot', 'Turtle Rock Isolated Ledge Entrance']),
+        create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
+        create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
+
+        create_dw_region(player, 'Dark Death Mountain (West Bottom)', None, ['Spike Cave', 'Dark Death Mountain Fairy', 'Spectacle Rock Mirror Spot']),
+        create_dw_region(player, 'Dark Death Mountain (Top West)', None, ['Ganons Tower', 'Dark Death Mountain Drop (West)', 'Dark Death Mountain EN']),
+        create_dw_region(player, 'Dark Death Mountain (Top East)', None, ['Superbunny Cave (Top)', 'Hookshot Cave', 'Dark Death Mountain Drop (East)', 'East Dark Death Mountain WN', 'East Dark Death Mountain EN']),
         create_dw_region(player, 'Dark Death Mountain (East Bottom)', None, ['Superbunny Cave (Bottom)', 'Cave Shop (Dark Death Mountain)', 'Fairy Ascension Mirror Spot']),
+        create_dw_region(player, 'Dark Death Mountain Ledge', None, ['Dark Death Mountain Ledge (East)', 'Dark Death Mountain Ledge (West)', 'Mimic Cave Mirror Spot', 'Spiral Cave Mirror Spot']),
+        create_dw_region(player, 'Dark Death Mountain Isolated Ledge', None, ['Turtle Rock Isolated Ledge Entrance', 'Isolated Ledge Mirror Spot']),
+        create_dw_region(player, 'Dark Death Mountain Floating Island', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance', 'Floating Island Mirror Spot']),
+        create_dw_region(player, 'Turtle Rock Area', None, ['Turtle Rock', 'TR Pegs Area Mirror Spot', 'Turtle Rock WN']), #TODO: Add mirror spot when stuck in TR Ent after boss kill?
+        create_dw_region(player, 'Turtle Rock Ledge', None, ['Turtle Rock Ledge Drop']),
         create_cave_region(player, 'Superbunny Cave', 'a connector', ['Superbunny Cave - Top', 'Superbunny Cave - Bottom'],
                            ['Superbunny Cave Exit (Top)', 'Superbunny Cave Exit (Bottom)']),
         create_cave_region(player, 'Spike Cave', 'Spike Cave', ['Spike Cave']),
         create_cave_region(player, 'Hookshot Cave', 'a connector', ['Hookshot Cave - Top Right', 'Hookshot Cave - Top Left', 'Hookshot Cave - Bottom Right', 'Hookshot Cave - Bottom Left'],
                            ['Hookshot Cave Exit (South)', 'Hookshot Cave Exit (North)']),
-        create_dw_region(player, 'Death Mountain Floating Island (Dark World)', None, ['Floating Island Drop', 'Hookshot Cave Back Entrance', 'Floating Island Mirror Spot']),
-        create_lw_region(player, 'Death Mountain Floating Island (Light World)', ['Floating Island']),
-        create_dw_region(player, 'Turtle Rock (Top)', None, ['Turtle Rock Drop']),
-        create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave']),
-        create_cave_region(player, 'Mimic Cave', 'Mimic Cave', ['Mimic Cave']),
-
-        create_cave_region(player, 'Pyramid', 'a drop\'s exit', ['Ganon'], ['Ganon Drop']),
-        create_cave_region(player, 'Bottom of Pyramid', 'a drop\'s exit', None, ['Pyramid Exit']),
-        create_dw_region(player, 'Pyramid Ledge', None, ['Pyramid Entrance', 'Pyramid Drop']),
     ]
 
 
