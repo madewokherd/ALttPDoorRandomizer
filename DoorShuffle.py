@@ -1791,6 +1791,8 @@ def create_doors_for_inaccessible_region(inaccessible_region, world, player):
     region = world.get_region(inaccessible_region, player)
     for ext in region.exits:
         create_door(world, player, ext.name, region.name)
+        if ext.connected_region is None:
+            print("ERROR: Exit not connected to any region: " + ext.name)
         if ext.connected_region.name.endswith(' Portal'):
             for more_exts in ext.connected_region.exits:
                 create_door(world, player, more_exts.name, ext.connected_region.name)
