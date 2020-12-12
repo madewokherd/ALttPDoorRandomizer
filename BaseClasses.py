@@ -709,7 +709,7 @@ class CollectionState(object):
         return self.has('Fire Rod', player) or self.has('Lamp', player)
 
     def can_flute(self, player):
-        lw = self.world.get_region('Light World', player)
+        lw = self.world.get_region('Kakariko Area', player)
         return self.has('Ocarina', player) and lw.can_reach(self) and self.is_not_bunny(lw, player)
 
     def can_melt_things(self, player):
@@ -1443,7 +1443,7 @@ class Sector(object):
                 self.branch_factor -= cnt_dead - 1
             for region in self.regions:
                 for ent in region.entrances:
-                    if (ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and ent.parent_region.name != 'Menu') or ent.parent_region.name == 'Sewer Drop':
+                    if (ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and ent.parent_region.name != 'Menu' and ent.parent_region.name != 'Flute Sky') or ent.parent_region.name == 'Sewer Drop':
                         self.branch_factor += 1
                         break  # you only ever get one allowance for an entrance region, multiple entrances don't help
         return self.branch_factor

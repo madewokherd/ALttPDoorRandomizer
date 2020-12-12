@@ -236,7 +236,7 @@ def create_regions(world, player):
         create_dw_region(player, 'Palace of Darkness Area', None, ['Palace of Darkness Hint', 'Palace of Darkness', 'Eastern Palace Mirror Spot', 'Palace of Darkness SW', 'Palace of Darkness SE']),
         create_dw_region(player, 'Palace of Darkness Nook Area', None, ['East Dark World Hint', 'Eastern Nook Mirror Spot', 'Palace of Darkness Nook NE']),
         create_dw_region(player, 'Dig Game Area', ['Digging Game'], ['Dig Game Drop To Ledge', 'Maze Race Mirror Spot', 'Dig Game ES']),
-        create_dw_region(player, 'Dig Game Ledge', None, ['Maze Race Mirror Spot', 'Dig Game Ledge Drop', 'Dig Game EC'])
+        create_dw_region(player, 'Dig Game Ledge', None, ['Maze Race Mirror Spot', 'Dig Game Ledge Drop', 'Dig Game EC']),
         create_dw_region(player, 'Frog Area', ['Frog'], ['Frog Ledge Drop', 'Kakariko Suburb Mirror Spot', 'Frog NE']),
         create_dw_region(player, 'Archery Game Area', None, ['Archery Game', 'Archery Game Rock', 'Kakariko Suburb Mirror Spot', 'Frog WC', 'Frog WS', 'Frog ES']),
         create_dw_region(player, 'Stumpy Area', ['Stumpy'], ['Flute Boy Mirror Spot', 'Stumpy SC']),

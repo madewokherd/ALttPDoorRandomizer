@@ -460,13 +460,9 @@ def default_rules(world, player):
     set_rule(world.get_entrance('HC Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Hyrule Castle Main Gate (South)', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: (state.has_Pearl(player) and state.has('Flippers', player) or state.has_Mirror(player)))  # Overworld Bunny Revival
     set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player) and state.has_Mirror(player))
-    set_rule(world.get_entrance('Dark Lake Hylia Drop (South)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # ToDo any fake flipper set up?
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Fairy', player), lambda state: state.has_Pearl(player)) # bomb required
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Spike Cave', player), lambda state: state.can_lift_rocks(player) and state.has_Pearl(player))
-    set_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))  # Fake Flippers
-    set_rule(world.get_entrance('Village of Outcasts Heavy Rock', player), lambda state: state.has_Pearl(player) and state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Hype Cave', player), lambda state: state.has_Pearl(player)) # bomb required
     set_rule(world.get_entrance('Brewery', player), lambda state: state.has_Pearl(player)) # bomb required
     set_rule(world.get_entrance('Thieves Town', player), lambda state: state.has_Pearl(player)) # bunny cannot pull
@@ -482,7 +478,6 @@ def default_rules(world, player):
     set_rule(world.get_entrance('DM Ascent Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Bat Cave Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Dark World Hammer Peg Cave', player), lambda state: state.has_Pearl(player) and state.has('Hammer', player))
-    set_rule(world.get_entrance('Village of Outcasts Eastern Rocks', player), lambda state: state.has_Pearl(player) and state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Peg Area Rocks (West)', player), lambda state: state.has_Pearl(player) and state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Peg Area Rocks (East)', player), lambda state: state.has_Pearl(player) and state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Village of Outcasts Pegs', player), lambda state: state.has_Pearl(player) and state.has('Hammer', player))
@@ -508,9 +503,9 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Isolated Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Superbunny Cave Exit (Bottom)', player), lambda state: False)  # Cannot get to bottom exit from top. Just exists for shuffling
     set_rule(world.get_entrance('Floating Island Mirror Spot', player), lambda state: state.has_Mirror(player))
-    set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))  # sword required to cast magic (!)
+    set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock Ledge', 'Region', player))  # sword required to cast magic (!)
 
-    #
+    # New OW Shuffle Rules
     set_rule(world.get_entrance('Lost Woods Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Lumberjack Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('DM Ascent Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -584,18 +579,17 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), lambda state: state.has_Pearl(player) and state.can_lift_rocks(player))
 
     set_rule(world.get_entrance('Useless Fairy Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Potion Shop Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Zora Warning Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Wooden Bridge Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Octoballoon Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Qirn Jump Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
-    set_rule(world.get_entrance('Dark Witch Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
-    set_rule(world.get_entrance('Catfish Approach Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Broken Bridge Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Hammer Bridge Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Dark Lake Hylia Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Southeast DW Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+
+    set_rule(world.get_entrance('Ice Rod Cave SW', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Dark Shopping Mall SW', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
 
     set_rule(world.get_entrance('C Whirlpool', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Useless Fairy Whirlpool', player), lambda state: state.has('Flippers', player))
@@ -614,6 +608,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Flute Spot 6', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Flute Spot 7', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Flute Spot 8', player), lambda state: state.can_flute(player))
+    # End of New OW Shuffle Rules
 
     set_rule(world.get_entrance('Pyramid Hole', player), lambda state: state.has('Beat Agahnim 2', player) or world.open_pyramid[player])
     set_rule(world.get_entrance('Ganons Tower', player), lambda state: False) # This is a safety for the TR function below to not require GT entrance in its key logic.
@@ -775,13 +770,11 @@ def inverted_rules(world, player):
 
 def no_glitches_rules(world, player):
     if world.mode[player] != 'inverted':
-        add_rule(world.get_entrance('Zoras River', player), lambda state: state.has('Flippers', player) or state.can_lift_rocks(player))
-        add_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has('Flippers', player))  # can be fake flippered to
-        add_rule(world.get_entrance('Hobo Bridge', player), lambda state: state.has('Flippers', player))
-        add_rule(world.get_entrance('Dark Lake Hylia Drop (East)', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
-        add_rule(world.get_entrance('Dark Lake Hylia Teleporter', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player) and (state.has('Hammer', player) or state.can_lift_rocks(player)))
-        add_rule(world.get_entrance('Dark Lake Hylia Ledge Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
-        add_rule(world.get_entrance('East Dark World River Pier', player), lambda state: state.has('Flippers', player))
+        # TODO: move some OW fake flipper situations here, new Water Drop Exits will need to be created
+        add_rule(world.get_entrance('Potion Shop Water Drop', player), lambda state: state.has('Flippers', player))
+        add_rule(world.get_entrance('Zora Warning Water Drop', player), lambda state: state.has('Flippers', player))
+        add_rule(world.get_entrance('Dark Witch Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+        add_rule(world.get_entrance('Catfish Approach Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     else:
         add_rule(world.get_entrance('Zoras River', player), lambda state: state.has_Pearl(player) and (state.has('Flippers', player) or state.can_lift_rocks(player)))
         add_rule(world.get_entrance('Lake Hylia Central Island Pier', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))  # can be fake flippered to
@@ -901,7 +894,7 @@ def swordless_rules(world, player):
 
     if world.mode[player] != 'inverted':
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
-        set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock (Top)', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
+        set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_Pearl(player) and state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock Ledge', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
         set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_Pearl(player) and state.has_misery_mire_medallion(player))  # sword not required to use medallion for opening in swordless (!)
         set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has('Hammer', player) and state.has_Mirror(player))
     else:
