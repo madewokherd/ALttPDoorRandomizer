@@ -2866,102 +2866,103 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Hobo EC', 'Stone Bridge Water'),
 
                          # Whirlpool Connections
-                         ('C Whirlpool', 'Useless Fairy Water'),#
-                         ('Useless Fairy Whirlpool', 'C Whirlpool Area'),#
-                         ('Lake Hylia Whirlpool', 'Zora Approach Area'),#
-                         ('Zora Whirlpool', 'Lake Hylia Water'),#
-                         ('Kakariko Pond Whirlpool', 'Octoballoon Water'),#
-                         ('Octoballoon Whirlpool', 'Kakariko Pond Area'),#
-                         ('Qirn Jump Whirlpool', 'Southeast DW Water'),#
-                         ('Southeast DW Whirlpool', 'Qirn Jump Water'),#
+                         ('C Whirlpool', 'Useless Fairy Water'),
+                         ('Useless Fairy Whirlpool', 'C Whirlpool Area'),
+                         ('Lake Hylia Whirlpool', 'Zora Approach Area'),
+                         ('Zora Whirlpool', 'Lake Hylia Water'),
+                         ('Kakariko Pond Whirlpool', 'Octoballoon Water'),
+                         ('Octoballoon Whirlpool', 'Kakariko Pond Area'),
+                         ('Qirn Jump Whirlpool', 'Southeast DW Water'),
+                         ('Southeast DW Whirlpool', 'Qirn Jump Water'),
 
                          # Intra-tile OW Connections
                          ('Death Mountain Entrance Rock', 'Death Mountain Entrance'),
                          ('Death Mountain Entrance Drop', 'DM Ascent Area'),
                          ('Bonk Rock Ledge Drop', 'Sanctuary Area'),
-                         ('Kings Grave Outer Rocks', 'Kings Grave Area'),#
-                         ('Kings Grave Inner Rocks', 'Graveyard Area'),#
+                         ('Kings Grave Outer Rocks', 'Kings Grave Area'),
+                         ('Kings Grave Inner Rocks', 'Graveyard Area'),
                          ('Graveyard Ledge Drop', 'Graveyard Area'),
-                         ('Useless Fairy Water Drop', 'Useless Fairy Water'),#
+                         ('Useless Fairy Water Drop', 'Useless Fairy Water'),
                          ('Useless Fairy West Pier', 'Useless Fairy Area'),
                          ('Useless Fairy East Pier', 'Useless Fairy East Bank'),
-                         ('Potion Shop Water Drop', 'Potion Shop Water'),#
-                         ('Potion Shop Rock (South)', 'Potion Shop Northeast'),#
-                         ('Potion Shop Rock (North)', 'Potion Shop Area'),#
-                         ('Zora Warning Water Drop', 'Zora Warning Water'),#
-                         ('Bat Cave Ledge Peg', 'Bat Cave Ledge'),#
-                         ('Hyrule Castle Main Gate (South)', 'Hyrule Castle Courtyard'),#mirror
-                         ('Hyrule Castle Main Gate (North)', 'Hyrule Castle Area'),#mirror
+                         ('Potion Shop Water Drop', 'Potion Shop Water'),
+                         ('Potion Shop Rock (South)', 'Potion Shop Northeast'),
+                         ('Potion Shop Rock (North)', 'Potion Shop Area'),
+                         ('Zora Warning Water Drop', 'Zora Warning Water'),
+                         ('Bat Cave Ledge Peg', 'Bat Cave Ledge'),
+                         ('Hyrule Castle Main Gate (South)', 'Hyrule Castle Courtyard'),
+                         ('Hyrule Castle Main Gate (North)', 'Hyrule Castle Area'),
                          ('Hyrule Castle Ledge Drop', 'Hyrule Castle Area'),
                          ('Hyrule Castle Ledge Courtyard Drop', 'Hyrule Castle Courtyard'),
-                         ('Hyrule Castle Inner East Rock', 'Hyrule Castle East Entry'),#
-                         ('Hyrule Castle Outer East Rock', 'Hyrule Castle Area'),#
-                         ('Wooden Bridge Water Drop', 'Wooden Bridge Water'),#
+                         ('Hyrule Castle Inner East Rock', 'Hyrule Castle East Entry'),
+                         ('Hyrule Castle Outer East Rock', 'Hyrule Castle Area'),
+                         ('Wooden Bridge Water Drop', 'Wooden Bridge Water'),
                          ('Maze Race Ledge Drop', 'Maze Race Area'),
                          ('Cave 45 Ledge Drop', 'Cave 45 Area'),
-                         ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'),#
-                         ('C Whirlpool Rock (Top)', 'C Whirlpool Area'),#
-                         ('Desert Palace Statue Move', 'Desert Palace Stairs'),#
+                         ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'),
+                         ('C Whirlpool Rock (Top)', 'C Whirlpool Area'),
+                         ('Desert Palace Statue Move', 'Desert Palace Stairs'),
                          ('Desert Ledge Drop', 'Desert Area'),
-                         ('Desert Ledge Outer Rocks', 'Desert Palace Entrance (North) Spot'),#
-                         ('Desert Ledge Inner Rocks', 'Desert Ledge'),#
+                         ('Desert Ledge Outer Rocks', 'Desert Palace Entrance (North) Spot'),
+                         ('Desert Ledge Inner Rocks', 'Desert Ledge'),
                          ('Purple Chest Ledge Drop', 'Purple Chest Area'),
-                         ('Lake Hylia Water Drop', 'Lake Hylia Water'),#
+                         ('Lake Hylia Water Drop', 'Lake Hylia Water'),
                          ('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'),
                          ('Lake Hylia West Pier', 'Lake Hylia Area'),
                          ('Lake Hylia East Pier', 'Lake Hylia Northeast Bank'),
-                         ('Octoballoon Water Drop', 'Octoballoon Water'),#
+                         ('Octoballoon Water Drop', 'Octoballoon Water'),
                          ('Octoballoon Pier', 'Octoballoon Area'),
 
                          ('West Death Mountain Drop', 'West Death Mountain (Bottom)'),
                          ('Spectacle Rock Drop', 'West Death Mountain (Top)'),
-                         ('DM Hammer Bridge (West)', 'East Death Mountain (Top East)'),#
+                         ('DM Hammer Bridge (West)', 'East Death Mountain (Top West)'),
+                         ('DM Hammer Bridge (East)', 'East Death Mountain (Top East)'),
                          ('East Death Mountain Spiral Drop', 'Spiral Cave Ledge'),
                          ('East Death Mountain Fairy Drop', 'Fairy Ascension Ledge'),
                          ('Fairy Ascension Ledge Drop', 'Fairy Ascension Plateau'),
                          ('Fairy Ascension Plateau Drop', 'East Death Mountain (Bottom)'),
-                         ('Fairy Ascension Rocks', 'Fairy Ascension Plateau'),#
-                         ('Broken Bridge (West)', 'East Death Mountain (Bottom)'),#
-                         ('Broken Bridge (East)', 'East Death Mountain (Bottom Left)'),#
+                         ('Fairy Ascension Rocks', 'Fairy Ascension Plateau'),
+                         ('Broken Bridge (West)', 'East Death Mountain (Bottom)'),
+                         ('Broken Bridge (East)', 'East Death Mountain (Bottom Left)'),
                          
-                         ('Skull Woods Bush Rock (West)', 'Skull Woods Forest'),#
-                         ('Skull Woods Bush Rock (East)', 'Skull Woods Portal Entry'),#
-                         ('Skull Woods Forgotten Bush (West)', 'Skull Woods Forgotten Path (Northeast)'),#
-                         ('Skull Woods Forgotten Bush (East)', 'Skull Woods Forgotten Path (Southwest)'),#
-                         ('Bumper Cave Entrance Rock', 'Bumper Cave Entrance'),#
+                         ('Skull Woods Bush Rock (West)', 'Skull Woods Forest'),
+                         ('Skull Woods Bush Rock (East)', 'Skull Woods Portal Entry'),
+                         ('Skull Woods Forgotten Bush (West)', 'Skull Woods Forgotten Path (Northeast)'),
+                         ('Skull Woods Forgotten Bush (East)', 'Skull Woods Forgotten Path (Southwest)'),
+                         ('Bumper Cave Entrance Rock', 'Bumper Cave Entrance'),
                          ('Bumper Cave Ledge Drop', 'Bumper Cave Area'),
-                         ('Skull Woods Pass Bush Row (West)', 'Skull Woods Pass East Top Area'),#
-                         ('Skull Woods Pass Bush Row (East)', 'Skull Woods Pass West Area'),#
-                         ('Skull Woods Pass Rock (Top)', 'Skull Woods Pass East Bottom Area'),#
-                         ('Skull Woods Pass Rock (Bottom)', 'Skull Woods Pass East Top Area'),#
-                         ('Qirn Jump Water Drop', 'Qirn Jump Water'),#
+                         ('Skull Woods Pass Bush Row (West)', 'Skull Woods Pass East Top Area'),
+                         ('Skull Woods Pass Bush Row (East)', 'Skull Woods Pass West Area'),
+                         ('Skull Woods Pass Rock (Top)', 'Skull Woods Pass East Bottom Area'),
+                         ('Skull Woods Pass Rock (Bottom)', 'Skull Woods Pass East Top Area'),
+                         ('Qirn Jump Water Drop', 'Qirn Jump Water'),
                          ('Qirn Jump Pier', 'Qirn Jump East Bank'),
-                         ('Dark Witch Water Drop', 'Dark Witch Water'),#
-                         ('Dark Witch Rock (North)', 'Dark Witch Area'),#
-                         ('Dark Witch Rock (South)', 'Dark Witch Northeast'),#
-                         ('Catfish Approach Water Drop', 'Catfish Approach Water'),#
-                         ('Village of Outcasts Pegs', 'Dark Grassy Lawn'),#
-                         ('Grassy Lawn Pegs', 'Village of Outcasts Area'),#
-                         ('Peg Area Rocks (West)', 'Hammer Peg Area'),#
-                         ('Peg Area Rocks (East)', 'Hammer Peg Entry'),#
+                         ('Dark Witch Water Drop', 'Dark Witch Water'),
+                         ('Dark Witch Rock (North)', 'Dark Witch Area'),
+                         ('Dark Witch Rock (South)', 'Dark Witch Northeast'),
+                         ('Catfish Approach Water Drop', 'Catfish Approach Water'),
+                         ('Village of Outcasts Pegs', 'Dark Grassy Lawn'),
+                         ('Grassy Lawn Pegs', 'Village of Outcasts Area'),
+                         ('Peg Area Rocks (West)', 'Hammer Peg Area'),
+                         ('Peg Area Rocks (East)', 'Hammer Peg Entry'),
                          ('Pyramid Exit Drop', 'Pyramid Area'),
-                         ('Broken Bridge Hammer Rock (South)', 'Broken Bridge Northeast'),#
-                         ('Broken Bridge Hammer Rock (North)', 'Broken Bridge Area'),#
+                         ('Broken Bridge Hammer Rock (South)', 'Broken Bridge Northeast'),
+                         ('Broken Bridge Hammer Rock (North)', 'Broken Bridge Area'),
                          ('Broken Bridge Hookshot Gap', 'Broken Bridge West'),
-                         ('Broken Bridge Water Drop', 'Broken Bridge Water'),#
-                         ('Dig Game Drop To Ledge', 'Dig Game Ledge'),#
+                         ('Broken Bridge Water Drop', 'Broken Bridge Water'),
+                         ('Dig Game Drop To Ledge', 'Dig Game Ledge'),
                          ('Dig Game Ledge Drop', 'Dig Game Area'),
                          ('Frog Ledge Drop', 'Archery Game Area'),
-                         ('Archery Game Rock', 'Frog Area'),#
-                         ('Dark C Whirlpool Rock (Bottom)', 'Dark C Whirlpool Outer Area'),#
-                         ('Dark C Whirlpool Rock (Top)', 'Dark C Whirlpool Area'),#
-                         ('Hammer Bridge Pegs (North)', 'Hammer Bridge South Area'),#
-                         ('Hammer Bridge Pegs (South)', 'Hammer Bridge North Area'),#
-                         ('Hammer Bridge Water Drop', 'Hammer Bridge Water'),#
+                         ('Archery Game Rock', 'Frog Area'),
+                         ('Dark C Whirlpool Rock (Bottom)', 'Dark C Whirlpool Outer Area'),
+                         ('Dark C Whirlpool Rock (Top)', 'Dark C Whirlpool Area'),
+                         ('Hammer Bridge Pegs (North)', 'Hammer Bridge South Area'),
+                         ('Hammer Bridge Pegs (South)', 'Hammer Bridge North Area'),
+                         ('Hammer Bridge Water Drop', 'Hammer Bridge Water'),
                          ('Hammer Bridge Pier', 'Hammer Bridge North Area'),
-                         ('Dark Lake Hylia Water Drop', 'Dark Lake Hylia Water'),#
+                         ('Dark Lake Hylia Water Drop', 'Dark Lake Hylia Water'),
                          ('Dark Lake Hylia Northeast Pier', 'Dark Lake Hylia Northeast Bank'),
-                         ('Southeast DW Water Drop', 'Southeast DW Water'),#
+                         ('Southeast DW Water Drop', 'Southeast DW Water'),
                          ('Southeast DW Pier', 'Southeast DW Area'),
 
                          ('Dark Death Mountain Drop (West)', 'Dark Death Mountain (West Bottom)'),
@@ -2970,22 +2971,23 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Turtle Rock Ledge Drop', 'Turtle Rock Area'),
                          
                          # Portal Connections
-                         ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),#
-                         ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area'),#
-                         ('Top of Pyramid', 'Pyramid Area'),#
-                         ('East Hyrule Teleporter', 'Palace of Darkness Nook Area'),#
-                         ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),#
-                         ('Desert Teleporter', 'Misery Mire Area'),#
-                         ('Lake Hylia Teleporter', 'Ice Palace Area'),#
+                         ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),
+                         ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area'),
+                         ('Top of Pyramid', 'Pyramid Area'),
+                         ('East Hyrule Teleporter', 'Palace of Darkness Nook Area'),
+                         ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
+                         ('Desert Teleporter', 'Misery Mire Area'),
+                         ('Lake Hylia Teleporter', 'Ice Palace Area'),
                          ('West Death Mountain Teleporter', 'Dark Death Mountain (West Bottom)'),
-                         ('East Death Mountain Teleporter', 'Dark Death Mountain (East Bottom)'),#
-                         ('Turtle Rock Teleporter', 'Turtle Rock Ledge'),#
+                         ('East Death Mountain Teleporter', 'Dark Death Mountain (East Bottom)'),
+                         ('Turtle Rock Teleporter', 'Turtle Rock Ledge'),
 
                          # Mirror Connections
                          ('Lost Woods Mirror Spot', 'Lost Woods Area'),
                          ('Lumberjack Mirror Spot', 'Lumberjack Area'),
-                         ('Bumper Cave Entrance Mirror Spot', 'Death Mountain Entrance'),
-                         ('Bumper Cave Ledge Mirror Spot', 'Death Mountain Return Ledge'),
+                         ('DM Ascent Mirror Spot', 'DM Ascent Area'),
+                         ('DM Ascent Entrance Mirror Spot', 'Death Mountain Entrance'),
+                         ('DM Ascent Ledge Mirror Spot', 'Death Mountain Return Ledge'),
                          ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
                          ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
                          ('Lost Woods East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
@@ -3009,6 +3011,7 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('HC Area Mirror Spot', 'Hyrule Castle Area'),
                          ('HC East Entry Mirror Spot', 'Hyrule Castle East Entry'),
                          ('Wooden Bridge Mirror Spot', 'Wooden Bridge Area'),
+                         ('Sand Dune Mirror Spot', 'Sand Dune Area'),
                          ('Eastern Palace Mirror Spot', 'Eastern Palace Area'),
                          ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
                          ('Maze Race Mirror Spot', 'Maze Race Ledge'),
@@ -3021,7 +3024,7 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Central Bonk Rock Mirror Spot', 'Central Bonk Rock Area'),
                          ('Links House Mirror Spot', 'Links House Area'),
                          ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
-                         ('Hobo Mirror Spot', 'Stone Bridge Water'),#
+                         ('Hobo Mirror Spot', 'Stone Bridge Water'),
                          ('Tree Line Mirror Spot', 'Tree Line Area'),
                          ('Desert Ledge Mirror Spot', 'Desert Ledge'),
                          ('Checkerboard Mirror Spot', 'Desert Checkerboard Ledge'),
@@ -3040,7 +3043,9 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Octoballoon Mirror Spot', 'Octoballoon Area'),
                          ('Ice Rod Cave Mirror Spot', 'Ice Rod Cave Area'),
                          ('Spectacle Rock Mirror Spot', 'Spectacle Rock Ledge'),
-                         ('East Death Mountain (Top) Mirror Spot', 'East Death Mountain (Top East)'),
+                         ('West Death Mountain (Top) Mirror Spot', 'West Death Mountain (Top)'),
+                         ('East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top West)'),
+                         ('East Death Mountain (Top East) Mirror Spot', 'East Death Mountain (Top East)'),
                          ('Spiral Cave Mirror Spot', 'Spiral Cave Ledge'),
                          ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
                          ('Isolated Ledge Mirror Spot', 'Fairy Ascension Ledge'),
