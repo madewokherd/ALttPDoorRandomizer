@@ -481,8 +481,6 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Desert Palace Statue Move', player), lambda state: state.has('Book of Mudora', player))
     set_rule(world.get_entrance('Desert Ledge Outer Rocks', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Desert Ledge Inner Rocks', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Desert Palace Entrance (North) Rocks', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Desert Ledge Return Rocks', player), lambda state: state.can_lift_rocks(player))  # should we decide to place something that is not a dungeon end up there at some point
     set_rule(world.get_entrance('Purple Chest Rocks (North)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Purple Chest Rocks (South)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('DM Hammer Bridge (West)', player), lambda state: state.has('Hammer', player))
