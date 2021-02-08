@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '185a0f74ab0e2ce8899c8d7d309ca68c'
+RANDOMIZERBASEHASH = 'bffd4e834049ca5f5295601436fc6009'
 
 
 class JsonRom(object):
@@ -284,14 +284,23 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
     with open(options_path, 'w') as f:
         json.dump(options, f)
 
-    subprocess.check_call([os.path.abspath(enemizercli),
-                           '--rom', baserom_path,
-                           '--seed', str(world.rom_seeds[player]),
-                           '--base', basepatch_path,
-                           '--randomizer', randopatch_path,
-                           '--enemizer', options_path,
-                           '--output', enemizer_output_path],
-                          cwd=os.path.dirname(enemizercli), stdout=subprocess.DEVNULL)
+    try:
+        subprocess.run([os.path.abspath(enemizercli),
+                               '--rom', baserom_path,
+                               '--seed', str(world.rom_seeds[player]),
+                               '--base', basepatch_path,
+                               '--randomizer', randopatch_path,
+                               '--enemizer', options_path,
+                               '--output', enemizer_output_path],
+                              cwd=os.path.dirname(enemizercli),
+                              check=True,
+                              capture_output=True)
+    except subprocess.CalledProcessError as e:
+        from Main import EnemizerError
+        enemizerMsg  = world.fish.translate("cli","cli","Enemizer returned exit code: ") + str(e.returncode) + "\n"
+        enemizerMsg += world.fish.translate("cli","cli","enemizer.nothing.applied")
+        logging.error(f'Enemizer error output: {e.stderr.decode("utf-8")}\n')
+        raise EnemizerError(enemizerMsg)
 
     with open(enemizer_basepatch_path, 'r') as f:
         for patch in json.load(f):
@@ -676,7 +685,7 @@ def patch_rom(world, rom, player, team, enemized):
     for door in world.doors:
         if door.dest is not None and isinstance(door.dest, Door) and\
              door.player == player and door.type in [DoorType.Normal, DoorType.SpiralStairs,
-                                                     DoorType.Open, DoorType.StraightStairs]:
+                                                     DoorType.Open, DoorType.StraightStairs, DoorType.Ladder]:
             rom.write_bytes(door.getAddress(), door.dest.getTarget(door))
     for paired_door in world.paired_doors[player]:
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
@@ -684,13 +693,15 @@ def patch_rom(world, rom, player, team, enemized):
     if world.doorShuffle[player] != 'vanilla':
 
         for builder in world.dungeon_layouts[player].values():
-            if builder.pre_open_stonewall:
-                if builder.pre_open_stonewall.name == 'Desert Wall Slide NW':
+            for stonewall in builder.pre_open_stonewalls:
+                if stonewall.name == 'Desert Wall Slide NW':
                     dr_flags |= DROptions.Open_Desert_Wall
+                elif stonewall.name == 'PoD Bow Statue Down Ladder':
+                    dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
-            if opposite_door and opposite_door.roomIndex > -1:
+            if opposite_door and isinstance(opposite_door, Door) and opposite_door.roomIndex > -1:
                 dungeon_name = opposite_door.entrance.parent_region.dungeon.name
                 dungeon_id = boss_indicator[dungeon_name][0]
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
@@ -1375,38 +1386,42 @@ def patch_rom(world, rom, player, team, enemized):
     rom.write_bytes(0x6D2FB, [0x00, 0x00, 0xf7, 0xff, 0x02, 0x0E])
     rom.write_bytes(0x6D313, [0x00, 0x00, 0xe4, 0xff, 0x08, 0x0E])
 
-    rom.write_byte(0x18004E, 0) # Escape Fill (nothing)
-    write_int16(rom, 0x180183, 300) # Escape fill rupee bow
-    rom.write_bytes(0x180185, [0,0,0]) # Uncle respawn refills (magic, bombs, arrows)
-    rom.write_bytes(0x180188, [0,0,0]) # Zelda respawn refills (magic, bombs, arrows)
-    rom.write_bytes(0x18018B, [0,0,0]) # Mantle respawn refills (magic, bombs, arrows)
+    rom.write_byte(0x18004E, 0)  # Escape Fill (nothing)
+    write_int16(rom, 0x180183, 300)  # Escape fill rupee bow
+    rom.write_bytes(0x180185, [0, 0, 0])  # Uncle respawn refills (magic, bombs, arrows)
+    rom.write_bytes(0x180188, [0, 0, 0])  # Zelda respawn refills (magic, bombs, arrows)
+    rom.write_bytes(0x18018B, [0, 0, 0])  # Mantle respawn refills (magic, bombs, arrows)
     bow_max, bomb_max, magic_max = 0, 0, 0
+    bow_small, magic_small = 0, 0
     if world.mode[player] == 'standard':
         if uncle_location.item is not None and uncle_location.item.name in ['Bow', 'Progressive Bow']:
-            rom.write_byte(0x18004E, 1) # Escape Fill (arrows)
-            write_int16(rom, 0x180183, 300) # Escape fill rupee bow
-            rom.write_bytes(0x180185, [0,0,70]) # Uncle respawn refills (magic, bombs, arrows)
-            rom.write_bytes(0x180188, [0,0,10]) # Zelda respawn refills (magic, bombs, arrows)
-            rom.write_bytes(0x18018B, [0,0,10]) # Mantle respawn refills (magic, bombs, arrows)
-            bow_max = 70
+            rom.write_byte(0x18004E, 1)  # Escape Fill (arrows)
+            write_int16(rom, 0x180183, 300)  # Escape fill rupee bow
+            rom.write_bytes(0x180185, [0, 0, 70])  # Uncle respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x180188, [0, 0, 10])  # Zelda respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x18018B, [0, 0, 10])  # Mantle respawn refills (magic, bombs, arrows)
+            bow_max, bow_small = 70, 10
         elif uncle_location.item is not None and uncle_location.item.name in ['Bombs (10)']:
-            rom.write_byte(0x18004E, 2) # Escape Fill (bombs)
-            rom.write_bytes(0x180185, [0,50,0]) # Uncle respawn refills (magic, bombs, arrows)
-            rom.write_bytes(0x180188, [0,3,0]) # Zelda respawn refills (magic, bombs, arrows)
-            rom.write_bytes(0x18018B, [0,3,0]) # Mantle respawn refills (magic, bombs, arrows)
+            rom.write_byte(0x18004E, 2)  # Escape Fill (bombs)
+            rom.write_bytes(0x180185, [0, 50, 0])  # Uncle respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x180188, [0, 3, 0])  # Zelda respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x18018B, [0, 3, 0])  # Mantle respawn refills (magic, bombs, arrows)
             bomb_max = 50
         elif uncle_location.item is not None and uncle_location.item.name in ['Cane of Somaria', 'Cane of Byrna', 'Fire Rod']:
-            rom.write_byte(0x18004E, 4) # Escape Fill (magic)
-            rom.write_bytes(0x180185, [0x80,0,0]) # Uncle respawn refills (magic, bombs, arrows)
-            rom.write_bytes(0x180188, [0x20,0,0]) # Zelda respawn refills (magic, bombs, arrows)
-            rom.write_bytes(0x18018B, [0x20,0,0]) # Mantle respawn refills (magic, bombs, arrows)
-            magic_max = 0x80
+            rom.write_byte(0x18004E, 4)  # Escape Fill (magic)
+            rom.write_bytes(0x180185, [0x80, 0, 0])  # Uncle respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x180188, [0x20, 0, 0])  # Zelda respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x18018B, [0x20, 0, 0])  # Mantle respawn refills (magic, bombs, arrows)
+            magic_max, magic_small = 0x80, 0x20
         if world.doorShuffle[player] == 'crossed':
             # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180185, [max(0x20, magic_max), max(3, bomb_max), max(10, bow_max)])
             rom.write_bytes(0x180188, [0x20, 3, 10])  # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0x20, 3, 10])  # Mantle respawn refills (magic, bombs, arrows)
-
+        elif world.doorShuffle[player] == 'basic':  # just in case a bomb is needed to get to a chest
+            rom.write_bytes(0x180185, [max(0x00, magic_max), max(3, bomb_max), max(0, bow_max)])
+            rom.write_bytes(0x180188, [magic_small, 3, bow_small])  # Zelda respawn refills (magic, bombs, arrows)
+            rom.write_bytes(0x18018B, [magic_small, 3, bow_small])  # Mantle respawn refills (magic, bombs, arrows)
 
     # patch swamp: Need to enable permanent drain of water as dam or swamp were moved
     rom.write_byte(0x18003D, 0x01 if world.swamp_patch_required[player] else 0x00)
