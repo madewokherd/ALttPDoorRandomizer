@@ -2848,6 +2848,7 @@ Isolated_LH_Doors = ['Kings Grave',
 mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Sanctuary S&Q', 'Sanctuary'),
                          ('Old Man S&Q', 'Old Man House'),
+                         
                          ('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Flute Spot 2', 'Potion Shop Area'),
                          ('Flute Spot 3', 'Kakariko Area'),
