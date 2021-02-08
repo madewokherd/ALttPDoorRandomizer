@@ -514,6 +514,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Hammer Bridge Pegs (North)', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Hammer Bridge Pegs (South)', player), lambda state: state.has_Pearl(player) and state.has('Hammer', player))
     
+    set_rule(world.get_entrance('Flute Away', player), lambda state: state.can_flute(player))
+    
     set_rule(world.get_entrance('Useless Fairy Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Useless Fairy East Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Wooden Bridge Water Drop', player), lambda state: state.has('Flippers', player))

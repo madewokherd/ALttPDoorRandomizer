@@ -2994,6 +2994,8 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Dark Death Mountain Drop (East)', 'Dark Death Mountain (East Bottom)'),
                          ('Floating Island Drop', 'Dark Death Mountain (Top East)'),
                          ('Turtle Rock Ledge Drop', 'Turtle Rock Area'),
+
+                         ('Flute Away', 'Flute Sky'),
                          
                          # Portal Connections
                          ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),

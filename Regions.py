@@ -58,7 +58,7 @@ def create_regions(world, player):
         create_lw_region(player, 'C Whirlpool Area', None, ['C Whirlpool Rock (Bottom)', 'South Hyrule Teleporter', 'C Whirlpool EN', 'C Whirlpool EC', 'C Whirlpool ES', 'C Whirlpool SC', 'C Whirlpool']),
         create_lw_region(player, 'C Whirlpool Outer Area', None, ['C Whirlpool Rock (Top)', 'C Whirlpool WC', 'C Whirlpool NW']),
         create_lw_region(player, 'Central Bonk Rock Area', None, ['Bonk Fairy (Light)', 'Central Bonk Rock NW', 'Central Bonk Rock SW', 'Central Bonk Rock EN', 'Central Bonk Rock EC', 'Central Bonk Rock ES']),
-        create_lw_region(player, 'Links House Area', None, ['Links House', 'Links House NE', 'Links House WN', 'Links House WC', 'Links House WS', 'Links House SC', 'Links House ES']),
+        create_lw_region(player, 'Links House Area', None, ['Links House', 'Links House NE', 'Links House WN', 'Links House WC', 'Links House WS', 'Links House SC', 'Links House ES', 'Flute Away']),
         create_lw_region(player, 'Stone Bridge Area', None, ['Stone Bridge NC', 'Stone Bridge EN', 'Stone Bridge WS', 'Stone Bridge SC']),
         create_lw_region(player, 'Stone Bridge Water', None, ['Stone Bridge WC', 'Stone Bridge EC']),
         create_lw_region(player, 'Hobo Bridge', ['Hobo'], ['Hobo EC']),
