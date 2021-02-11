@@ -273,21 +273,22 @@ def main(args, seed=None, fish=None):
                       "mode": world.mode[player],                                     # 3
                       "goal": world.goal[player],                                     # 4
                       "timer": str(world.timer),                                      # 5
-                      "shuffle": world.shuffle[player],                               # 6
-                      "doorShuffle": world.doorShuffle[player],                       # 7
-                      "algorithm": world.algorithm,                                   # 8
-                      "mscb": mcsb_name,                                              # 9
-                      "retro": world.retro[player],                                   # A
-                      "progressive": world.progressive,                               # B
-                      "hints": 'True' if world.hints[player] else 'False'             # C
+                      "owShuffle": world.owShuffle[player],                           # 6
+                      "shuffle": world.shuffle[player],                               # 7
+                      "doorShuffle": world.doorShuffle[player],                       # 8
+                      "algorithm": world.algorithm,                                   # 9
+                      "mscb": mcsb_name,                                              # A
+                      "retro": world.retro[player],                                   # B
+                      "progressive": world.progressive,                               # C
+                      "hints": 'True' if world.hints[player] else 'False'             # D
                     }
-                    #                  0  1  2  3  4 5  6  7  8 9 A B C
-                    outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s_%s-%s%s%s%s%s' % (
-                      #  0          1      2      3    4     5    6      7     8        9         A     B           C
-                      # _noglitches_normal-normal-open-ganon-ohko_simple_basic-balanced-keysanity-retro-prog_swords-nohints
-                      # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity-retro
-                      # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity      -prog_swords
-                      # _noglitches_normal-normal-open-ganon     _simple_basic-balanced-keysanity                  -nohints
+                    #                  0  1  2  3  4 5  6  7  8  9 A B C D
+                    outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s_%s_%s-%s%s%s%s%s' % (
+                      #  0          1      2      3    4     5    6    7      8     9        A         B     C           D
+                      # _noglitches_normal-normal-open-ganon-ohko_full_simple_basic-balanced-keysanity-retro-prog_swords-nohints
+                      # _noglitches_normal-normal-open-ganon     _full_simple_basic-balanced-keysanity-retro
+                      # _noglitches_normal-normal-open-ganon     _full_simple_basic-balanced-keysanity      -prog_swords
+                      # _noglitches_normal-normal-open-ganon     _full_simple_basic-balanced-keysanity                  -nohints
                       outfilestuffs["logic"], # 0
 
                       outfilestuffs["difficulty"],             # 1
@@ -296,14 +297,15 @@ def main(args, seed=None, fish=None):
                       outfilestuffs["goal"],                   # 4
                       "" if outfilestuffs["timer"] in ['False', 'none', 'display'] else "-" + outfilestuffs["timer"], # 5
 
-                      outfilestuffs["shuffle"],     # 6
-                      outfilestuffs["doorShuffle"], # 7
-                      outfilestuffs["algorithm"],   # 8
-                      outfilestuffs["mscb"],        # 9
+                      outfilestuffs["owShuffle"],     # 6
+                      outfilestuffs["shuffle"],     # 7
+                      outfilestuffs["doorShuffle"], # 8
+                      outfilestuffs["algorithm"],   # 9
+                      outfilestuffs["mscb"],        # A
 
-                      "-retro" if outfilestuffs["retro"] == "True" else "", # A
-                      "-prog_" + outfilestuffs["progressive"] if outfilestuffs["progressive"] in ['off', 'random'] else "", # B
-                      "-nohints" if not outfilestuffs["hints"] == "True" else "")) if not args.outputname else '' # C
+                      "-retro" if outfilestuffs["retro"] == "True" else "", # B
+                      "-prog_" + outfilestuffs["progressive"] if outfilestuffs["progressive"] in ['off', 'random'] else "", # C
+                      "-nohints" if not outfilestuffs["hints"] == "True" else "")) if not args.outputname else '' # D
                     rom.write_to_file(output_path(f'{outfilebase}{outfilepname}{outfilesuffix}.sfc'))
 
         if world.players > 1:
@@ -354,7 +356,7 @@ def main(args, seed=None, fish=None):
 
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
+    ret = World(world.players, world.owShuffle, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
                 world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
     ret.teams = world.teams
