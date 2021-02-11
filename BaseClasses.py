@@ -1804,6 +1804,7 @@ class Spoiler(object):
     def __init__(self, world):
         self.world = world
         self.hashes = {}
+        self.overworlds = {}
         self.entrances = {}
         self.doors = {}
         self.doorTypes = {}
@@ -1817,6 +1818,12 @@ class Spoiler(object):
         self.metadata = {}
         self.shops = []
         self.bosses = OrderedDict()
+
+    def set_overworld(self, entrance, exit, direction, player):
+        if self.world.players == 1:
+            self.overworlds[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
+        else:
+            self.overworlds[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
 
     def set_entrance(self, entrance, exit, direction, player):
         if self.world.players == 1:
@@ -1955,6 +1962,7 @@ class Spoiler(object):
     def to_json(self):
         self.parse_data()
         out = OrderedDict()
+        out['Overworld'] = list(self.overworlds.values())
         out['Entrances'] = list(self.entrances.values())
         out['Doors'] = list(self.doors.values())
         out['Lobbies'] = list(self.lobbies.values())
@@ -2038,6 +2046,10 @@ class Spoiler(object):
                 # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly
                 outfile.write('\n\nEntrances:\n\n')
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","entrances",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","entrances",entry['exit'])) for entry in self.entrances.values()]))
+            if self.overworlds:
+                # overworlds: overworld transitions;
+                outfile.write('\n\nOverworld:\n\n')
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
             outfile.write('\n\nMedallions:\n')
             for dungeon, medallion in self.medallions.items():
                 outfile.write(f'\n{dungeon}: {medallion} Medallion')
