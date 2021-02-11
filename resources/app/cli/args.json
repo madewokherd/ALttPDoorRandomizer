@@ -104,6 +104,14 @@
       "vt26"
     ]
   },
+  "ow_shuffle": {
+    "choices": [
+      "vanilla",
+      "simple",
+      "full",
+      "crossed"
+    ]
+  },
   "shuffle": {
     "choices": [
       "vanilla",

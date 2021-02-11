@@ -10,6 +10,7 @@ from source.gui.startinventory.overview import startinventory_page
 from source.gui.custom.overview import custom_page
 from source.gui.loadcliargs import loadcliargs, loadadjustargs
 from source.gui.randomize.item import item_page
+from source.gui.randomize.overworld import overworld_page
 from source.gui.randomize.entrando import entrando_page
 from source.gui.randomize.enemizer import enemizer_page
 from source.gui.randomize.dungeon import dungeon_page
@@ -107,6 +108,7 @@ def guiMain(args=None):
     # Randomize notebook page:
     #  make notebook pages: Item, Entrances, Enemizer, Dungeon Shuffle, Multiworld, Game Options, Generation Setup
     #   Item:             Item Randomizer settings
+    #   Overworld:        Overworld Randomizer settings
     #   Entrances:        Entrance Randomizer settings
     #   Enemizer:         Enemy Randomizer settings
     #   Dungeon Shuffle:  Dungeon Door Randomizer settings
@@ -121,6 +123,10 @@ def guiMain(args=None):
     # Item Randomizer
     self.pages["randomizer"].pages["item"] = item_page(self.pages["randomizer"].notebook)
     self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["item"], text="Items")
+
+    # Overworld Randomizer
+    self.pages["randomizer"].pages["overworld"] = overworld_page(self.pages["randomizer"].notebook)
+    self.pages["randomizer"].notebook.add(self.pages["randomizer"].pages["overworld"], text="Overworld")
 
     # Entrance Randomizer
     self.pages["randomizer"].pages["entrance"] = entrando_page(self.pages["randomizer"].notebook)

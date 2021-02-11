@@ -87,7 +87,7 @@ def parse_cli(argv, no_defaults=False):
         for player in range(1, multiargs.multi + 1):
             playerargs = parse_cli(shlex.split(getattr(ret,f"p{player}")), True)
 
-            for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality',
+            for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality', 'ow_shuffle',
                          'shuffle', 'door_shuffle', 'intensity', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
                          'retro', 'accessibility', 'hints', 'beemizer', 'experimental', 'dungeon_counters',
@@ -124,6 +124,7 @@ def parse_settings():
         # Shuffle Ganon defaults to TRUE
         "openpyramid": False,
         "shuffleganon": True,
+        "ow_shuffle": "vanilla",
         "shuffle": "vanilla",
 
         "shufflepots": False,

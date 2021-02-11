@@ -1,0 +1,12 @@
+{
+  "widgets": {
+    "overworldshuffle": {
+      "type": "selectbox",
+      "default": "vanilla",
+      "options": [
+        "vanilla",
+        "full"
+      ]
+    }
+  }
+}

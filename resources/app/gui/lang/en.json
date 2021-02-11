@@ -109,6 +109,12 @@
     "randomizer.enemizer.enemizercli.online": "(get online)",
 
 
+    "randomizer.overworld.overworldshuffle": "Overworld Shuffle",
+    "randomizer.overworld.overworldshuffle.vanilla": "Vanilla",
+    "randomizer.overworld.overworldshuffle.simple": "Simple",
+    "randomizer.overworld.overworldshuffle.full": "Full",
+    "randomizer.overworld.overworldshuffle.crossed": "Crossed",
+    
     "randomizer.entrance.openpyramid": "Pre-open Pyramid Hole",
     "randomizer.entrance.shuffleganon": "Include Ganon's Tower and Pyramid Hole in shuffle pool",
 

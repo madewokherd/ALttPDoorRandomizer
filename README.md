@@ -122,6 +122,12 @@ Use to batch generate multiple seeds with same settings. If a seed number is pro
 Show the help message and exit.
 
 ```
+--ow_shuffle <mode>     
+```
+
+For specifying the overworld shuffle you want as above. (default: vanilla)
+
+```
 --door_shuffle <mode>     
 ```
 

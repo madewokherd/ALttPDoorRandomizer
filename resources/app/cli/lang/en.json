@@ -6,6 +6,7 @@
     "version": "Version",
     "seed": "Seed",
     "player": "Player",
+    "shuffling.overworld": "Shuffling overworld",
     "shuffling.world": "Shuffling the World about",
     "shuffling.dungeons": "Shuffling dungeons",
     "shuffling.pots": "Shuffling pots",
@@ -191,6 +192,16 @@
       "entrance randomizer including significant technical limitations.",
       "The dungeon variants only mix up dungeons and keep the rest of",
       "the overworld vanilla."
+    ],
+    "ow_shuffle": [
+      "Select Overworld Shuffling Algorithm. (default: %(default)s)",
+      "Vanilla:        All overworld transitions are connected the same",
+      "                way they were in the base game.",
+      "Simple:         Overworld retains the same vanilla shape, but some overworld",
+      "                screens will be swapped with their opposite world version.",
+      "Full:           Overworld screen transitions will lead to other",
+      "                overworld screens from the same world.",
+      "Crossed:        Overworld screen transitions can lead to any other overworld screen."
     ],
     "door_shuffle": [
       "Select Door Shuffling Algorithm. (default: %(default)s)",

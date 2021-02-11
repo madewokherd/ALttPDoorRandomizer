@@ -39,7 +39,7 @@ def main(args, seed=None, fish=None):
     start = time.perf_counter()
 
     # initialize the world
-    world = World(args.multi, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
+    world = World(args.multi, args.ow_shuffle, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
                   args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
                   args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
     logger = logging.getLogger('')

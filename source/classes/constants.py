@@ -69,6 +69,9 @@ SETTINGSTOPROCESS = {
       "accessibility": "accessibility",
       "sortingalgo": "algorithm"
     },
+    "overworld": {
+      "overworldshuffle": "ow_shuffle"
+    },
     "entrance": {
       "openpyramid": "openpyramid",
       "shuffleganon": "shuffleganon",

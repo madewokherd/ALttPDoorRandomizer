@@ -18,10 +18,11 @@ from RoomData import Room
 
 class World(object):
 
-    def __init__(self, players, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
+    def __init__(self, players, owShuffle, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
                  timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
+        self.owShuffle = owShuffle.copy()
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
         self.intensity = {}
@@ -1926,6 +1927,7 @@ class Spoiler(object):
                          'retro': self.world.retro,
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
+                         'ow_shuffle': self.world.owShuffle,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
                          'intensity': self.world.intensity,
@@ -1991,6 +1993,7 @@ class Spoiler(object):
                 outfile.write('Goal:                            %s\n' % self.metadata['goal'][player])
                 outfile.write('Difficulty:                      %s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:              %s\n' % self.metadata['item_functionality'][player])
+                outfile.write('Overworld Shuffle:               %s\n' % self.metadata['ow_shuffle'][player])
                 outfile.write('Entrance Shuffle:                %s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:                    %s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:                       %s\n' % self.metadata['intensity'][player])
