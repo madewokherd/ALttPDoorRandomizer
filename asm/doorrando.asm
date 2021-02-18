@@ -44,3 +44,4 @@ warnpc $288000
 
 ; deals with own hooks
 incsrc keydropshuffle.asm
+incsrc owrando.asm
