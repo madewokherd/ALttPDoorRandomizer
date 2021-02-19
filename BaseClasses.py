@@ -2178,8 +2178,9 @@ class Pot(object):
         self.flags = flags
 
 
-# byte 0: DDDE EEEE (DR, ER)
+# byte 0: DDOO EEEE (DR, OR, ER)
 dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0}
+or_mode = {"basic": 1, "full": 2, "crossed": 3, "vanilla": 0}
 er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, "restricted_legacy": 8,
            "full_legacy": 9, "madness_legacy": 10, "insanity_legacy": 11, "dungeonsfull": 7, "dungeonssimple": 6}
 
@@ -2216,7 +2217,7 @@ class Settings(object):
     @staticmethod
     def make_code(w, p):
         code = bytes([
-            (dr_mode[w.doorShuffle[p]] << 5) | er_mode[w.shuffle[p]],
+            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 4) | er_mode[w.shuffle[p]],
 
             (logic_mode[w.logic[p]] << 5) | (world_mode[w.mode[p]] << 3)
             | (sword_mode[w.swords[p]] << 1) | (1 if w.retro[p] else 0),
@@ -2248,8 +2249,9 @@ class Settings(object):
         def r(d):
             return {y: x for x, y in d.items()}
 
-        args.shuffle[p] = r(er_mode)[settings[0] & 0x1F]
-        args.door_shuffle[p] = r(dr_mode)[(settings[0] & 0xE0) >> 5]
+        args.shuffle[p] = r(er_mode)[settings[0] & 0x0F]
+        args.ow_shuffle[p] = r(or_mode)[(settings[0] & 0x30) >> 4]
+        args.door_shuffle[p] = r(dr_mode)[(settings[0] & 0xC0) >> 6]
         args.logic[p] = r(logic_mode)[(settings[1] & 0xE0) >> 5]
         args.mode[p] = r(world_mode)[(settings[1] & 0x18) >> 3]
         args.swords[p] = r(sword_mode)[(settings[1] & 0x6) >> 1]
