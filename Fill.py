@@ -555,7 +555,7 @@ def balance_money_progression(world):
         checked_locations = []
         for player in range(1, world.players+1):
             kiki_payable = state.prog_items[('Moon Pearl', player)] > 0 or world.mode[player] == 'inverted'
-            if kiki_payable and world.get_region('East Dark World', player) in state.reachable_regions[player]:
+            if kiki_payable and world.get_region('Palace of Darkness Area', player) in state.reachable_regions[player]:
                 if not kiki_paid[player]:
                     kiki_check[player] = True
                     sphere_costs[player] += 110
@@ -577,7 +577,7 @@ def balance_money_progression(world):
             if kiki_check[loc_player] and not kiki_paid[loc_player] and kiki_required(state, location):
                 locked_by_money[loc_player].add(location)
                 location_free = False
-            if location_free:
+            if location_free and location.item:
                 state.collect(location.item, True, location)
                 unchecked_locations.remove(location)
                 if location.item.name.startswith('Rupee'):
