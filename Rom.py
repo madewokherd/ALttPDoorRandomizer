@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'd987a81ba4db37ba9a50730a08616eb1'
+RANDOMIZERBASEHASH = '38cca21e806916ddc09c251a1da899ad'
 
 
 class JsonRom(object):
@@ -589,6 +589,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if world.pot_contents[player]:
         write_pots_to_rom(rom, world.pot_contents[player])
 
+    # patch overworld edges
+    if world.owShuffle[player] == 'full':
+        rom.write_byte(0x150002, 2)
+    
     # patch entrance/exits/holes
     for region in world.regions:
         for exit in region.exits:
