@@ -16,7 +16,7 @@ from BaseClasses import CollectionState, ShopType, Region, Location, OWEdge, Doo
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
-from Regions import location_table
+from Regions import location_table, shop_to_location_table
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
@@ -312,8 +312,10 @@ def patch_enemizer(world, player, rom, baserom_path, enemizercli, random_sprite_
 
     if world.get_dungeon("Thieves Town", player).boss.enemizer_name == "Blind":
         rom.write_byte(0x04DE81, 0x6)  # maiden spawn
-        # restore blind spawn code
-        rom.write_bytes(0xEA081, [0xaf, 0xcc, 0xf3, 0x7e, 0xc9, 0x6, 0xf0, 0x24,
+        # restore blind spawn code - necessary because the old enemizer clobbers this stuff
+        # this line could be commented out if ijwu's enemizer is used exclusively
+        # if keeping this line, note the jump to the dr_baserom's enemizer section
+        rom.write_bytes(0xEA081, [0x5c, 0x00, 0x80, 0xb7, 0xc9, 0x6, 0xf0, 0x24,
                                   0xad, 0x3, 0x4, 0x29, 0x20, 0xf0, 0x1d])
         rom.write_byte(0x200101, 0)  # Do not close boss room door on entry.
 
@@ -736,6 +738,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         aga_portal = world.get_portal('Agahnims Tower', player)
         gt_portal = world.get_portal('Ganons Tower', player)
         aga_portal.exit_offset, gt_portal.exit_offset = gt_portal.exit_offset, aga_portal.exit_offset
+        aga_portal.default = False
+        gt_portal.default = False
 
     for portal in world.dungeon_portals[player]:
         if not portal.default:
@@ -1122,17 +1126,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # set up goals for treasure hunt
     rom.write_bytes(0x180165, [0x0E, 0x28] if world.treasure_hunt_icon[player] == 'Triforce Piece' else [0x0D, 0x28])
-    rom.write_byte(0x180167, world.treasure_hunt_count[player] % 256)
-    rom.write_byte(0x180194, 1) # Must turn in triforced pieces (instant win not enabled)
+    if world.goal[player] == 'triforcehunt':
+        rom.write_byte(0x180167, int(world.treasure_hunt_count[player]) % 256)
+    rom.write_byte(0x180194, 1)  # Must turn in triforced pieces (instant win not enabled)
 
-    rom.write_bytes(0x180213, [0x00, 0x01]) # Not a Tournament Seed
+    rom.write_bytes(0x180213, [0x00, 0x01])  # Not a Tournament Seed
 
     gametype = 0x04 # item
-    if world.shuffle[player] != 'vanilla':
-        gametype |= 0x02 # entrance
+    if world.shuffle[player] != 'vanilla' or world.doorShuffle[player] != 'vanilla' or world.keydropshuffle[player]:
+        gametype |= 0x02  # entrance/door
     if enemized:
-        gametype |= 0x01 # enemizer
-    rom.write_byte(0x180211, gametype) # Game type
+        gametype |= 0x01  # enemizer
+    rom.write_byte(0x180211, gametype)  # Game type
 
     # assorted fixes
     rom.write_byte(0x1800A2, 0x01)  # remain in real dark world when dying in dark world dungeon before killing aga1
@@ -1351,6 +1356,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_byte(0x13f0f6+x, room.position(portal.door).value)
             rom.write_byte(0x13f0f7+x, room.kind(portal.door).value)
 
+    # Bitfield - enable text box to show with free roaming items
+    #
+    # ---o bmcs
+    # o - enabled for outside dungeon items
+    # b - enabled for inside big keys
+    # m - enabled for inside maps
+    # c - enabled for inside compasses
+    # s - enabled for inside small keys
     rom.write_byte(0x18016A, 0x10 | ((0x01 if world.keyshuffle[player] else 0x00)
                                      | (0x02 if world.compassshuffle[player] else 0x00)
                                      | (0x04 if world.mapshuffle[player] else 0x00)
@@ -1367,6 +1380,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     else:
         rom.write_byte(0x18003C, 0x00)
 
+     # Bitfield - enable free items to show up in menu
+     #
+     # ----dcba
+     # d - Compass
+     # c - Map
+     # b - Big Key
+     # a - Small Key
+     #
     rom.write_byte(0x180045, ((0x01 if world.keyshuffle[player] else 0x00)
                               | (0x02 if world.bigkeyshuffle[player] else 0x00)
                               | (0x04 if world.mapshuffle[player] else 0x00)
@@ -1468,7 +1489,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
 
     # allow smith into multi-entrance caves in appropriate shuffles
-    if world.shuffle[player] in ['restricted', 'full', 'crossed', 'insanity']:
+    if world.shuffle[player] in ['restricted', 'full', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
         rom.write_byte(0x18004C, 0x01)
 
     # set correct flag for hera basement item
@@ -1559,7 +1580,10 @@ def write_custom_shops(rom, world, player):
                 break
             if world.shopsanity[player] or shop.type == ShopType.TakeAny:
                 rom.write_byte(0x186560 + shop.sram_address + index, 1)
-            item_id = ItemFactory(item['item'], player).code
+            loc_item = world.get_location(shop_to_location_table[shop.region.name][index], player).item
+            if not loc_item:
+                loc_item = ItemFactory(item['item'], player)
+            item_id = loc_item.code
             price = int16_as_bytes(item['price'])
             replace = ItemFactory(item['replacement'], player).code if item['replacement'] else 0xFF
             replace_price = int16_as_bytes(item['replacement_price'])
@@ -2007,15 +2031,15 @@ def write_strings(rom, world, player, team):
 
     prog_bow_locs = world.find_items('Progressive Bow', player)
     distinguished_prog_bow_loc = next((location for location in prog_bow_locs if location.item.code == 0x65), None)
+    progressive_silvers = world.difficulty_requirements[player].progressive_bow_limit >= 2 or world.swords[player] == 'swordless'
     if distinguished_prog_bow_loc:
         prog_bow_locs.remove(distinguished_prog_bow_loc)
-        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my'))
+        silverarrow_hint = (' %s?' % hint_text(distinguished_prog_bow_loc).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
         tt['ganon_phase_3_no_silvers'] = 'Did you find the silver arrows%s' % silverarrow_hint
 
     if any(prog_bow_locs):
-        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my'))
+        silverarrow_hint = (' %s?' % hint_text(random.choice(prog_bow_locs)).replace('Ganon\'s', 'my')) if progressive_silvers else '?\nI think not!'
         tt['ganon_phase_3_no_silvers_alt'] = 'Did you find the silver arrows%s' % silverarrow_hint
-
 
     crystal5 = world.find_items('Crystal 5', player)[0]
     crystal6 = world.find_items('Crystal 6', player)[0]
@@ -2025,7 +2049,15 @@ def write_strings(rom, world, player, team):
     tt['sahasrahla_bring_courage'] = 'I lost my family heirloom in %s' % greenpendant.hint_text
 
     tt['sign_ganons_tower'] = ('You need %d crystal to enter.' if world.crystals_needed_for_gt[player] == 1 else 'You need %d crystals to enter.') % world.crystals_needed_for_gt[player]
-    tt['sign_ganon'] = ('You need %d crystal to beat Ganon.' if world.crystals_needed_for_ganon[player] == 1 else 'You need %d crystals to beat Ganon.') % world.crystals_needed_for_ganon[player]
+
+    ganon_crystals_singular = 'You need %d crystal to beat Ganon.'
+    ganon_crystals_plural = 'You need %d crystals to beat Ganon.'
+
+    if world.goal[player] == 'ganon':
+        ganon_crystals_singular = 'To beat Ganon you must collect %d crystal and defeat his minion at the top of his tower.'
+        ganon_crystals_plural = 'To beat Ganon you must collect %d crystals and defeat his minion at the top of his tower.'
+
+    tt['sign_ganon'] = (ganon_crystals_singular if world.crystals_needed_for_ganon[player] == 1 else ganon_crystals_plural) % world.crystals_needed_for_ganon[player]
 
     if world.goal[player] in ['dungeons']:
         tt['sign_ganon'] = 'You need to complete all the dungeons.'
@@ -2042,7 +2074,7 @@ def write_strings(rom, world, player, team):
         tt['ganon_fall_in_alt'] = 'Why are you even here?\n You can\'t even hurt me! Get the Triforce Pieces.'
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'
         tt['sign_ganon'] = 'Go find the Triforce pieces... Ganon is invincible!'
-        tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % world.treasure_hunt_count[player]
+        tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
     elif world.goal[player] in ['pedestal']:
         tt['ganon_fall_in_alt'] = 'Why are you even here?\n You can\'t even hurt me! Your goal is at the pedestal.'
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'

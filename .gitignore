@@ -24,6 +24,9 @@ weights/
 /MultiMystery/
 /Players/
 /QUsb2Snes/
+/output/
+
+base2current.json
 
 resources/user/*
 !resources/user/.gitkeep
@@ -35,3 +38,4 @@ get-pip.py
 venv
 test
 *.code-workspace
+*.zspr
