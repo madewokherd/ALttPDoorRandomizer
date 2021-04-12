@@ -16,12 +16,20 @@ jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 org $aaa000
 OWCoordIndex: ; Horizontal 1st
 db 2, 2, 0, 0 ; Coordinate Index $20-$23
+OWOppCoordIndex: ; Horizontal 1st
+db 0, 0, 2, 2 ; Coordinate Index $20-$23
 OWBGIndex: ; Horizontal 1st
 db 0, 0, 6, 6 ; BG Scroll Index $e2-$ea
+OWOppBGIndex: ; Horizontal 1st
+db 6, 6, 0, 0 ; BG Scroll Index $e2-$ea
 OWCameraIndex: ; Horizontal 1st
 db 4, 4, 0, 0 ; Camera Index $0618-$61f
+OWOppCameraIndex: ; Horizontal 1st
+db 0, 0, 4, 4 ; Camera Index $0618-$61f
 OWOppSlotOffset: ; Amount to offset OW Slot
 db 8, -8, 1, -1 ; OW Slot x2 $700
+OWOppDirectionOffset: ; Amount to offset coord calc
+db $10, $f0, $02, $fe
 OWEdgeTransition:
 {
     php
@@ -183,13 +191,33 @@ OWNewDestination:
     sep #$10 : ldy $418
     ;;22	e0	e2	61c	61e - X
     ;;20	e6	e8	618	61a - Y
-    ldx OWCoordIndex,y : lda $20,x : and #$01ff : pha
-    lda $06 : and #$01ff : !sub 1,s : pha : lda $06 : sta $20,x ;set coord, a = diff
-    ldx OWBGIndex,y : lda $e2,x : !add 1,s : sta $e2,x
-    ldx OWCameraIndex,y : lda $618,x : !add 1,s : sta $618,x
-    ldx OWCameraIndex,y : lda $61a,x : !add 1,s : sta $61a,x
+    ldx OWCoordIndex,y : lda $20,x : and #$fe00 : pha : lda $20,x : and #$01ff : pha ;s1 = relative cur, s3 = ow cur
+    lda $06 : and #$fe00 : !sub 3,s : pha ;set coord, s1 = ow diff, s3 = relative cur, s5 = ow cur
+    lda $06 : and #$01ff : !sub 3,s : pha ;s1 = rel diff, s3 = ow diff, s5 = relative cur, s7 = ow cur
+    lda $06 : sta $20,x ;set coord
+    ldx OWBGIndex,y : lda $e2,x : !add 1,s : !add 3,s : sta $e2,x
+    ldx OWCameraIndex,y : lda $618,x : !add 1,s : !add 3,s : sta $618,x
+    ldx OWCameraIndex,y : lda $61a,x : !add 1,s : !add 3,s : sta $61a,x
     pla : lsr : pha : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
-    pla : pla : sep #$30
+    pla : pla : lsr : pha : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
+    pla : pla : pla
+
+    ;opposite coord stuff
+    rep #$30 : lda OWOppDirectionOffset,y : and #$00ff : pha
+    cpy #$0002 : !bge +
+        lda $700 : and #$00f0 : pha : lda $04 : asl : and #$00f0 : !sub 1,s : tax : pla : txa
+        !sub 1,s : tax : pla : txa : asl : asl : asl : asl : pha : bra ++
+    + lda $700 : and #$000f : pha : lda $04 : asl : and #$000f : !sub 1,s : !add 3,s
+    sep #$10 : tax : phx : ldx #$0 : phx : rep #$10 : pla : plx : plx : pha
+    
+    ++ ;ldy #$0
+    ldx OWOppCoordIndex,y : lda $20,x : !add 1,s : sta $20,x ;set coord
+    ldx OWOppBGIndex,y : lda $e2,x : !add 1,s : sta $e2,x
+    ldx OWOppCameraIndex,y : lda $618,x : !add 1,s : sta $618,x
+    ldx OWOppCameraIndex,y : lda $61a,x : !add 1,s : sta $61a,x
+    ldx OWOppBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x : pla
+
+    sep #$30 ;: ldy $418 : 
     lda OWOppSlotOffset,y : !add $04 : asl : sta $700
     ;;;tempfixes
     ;;lda #$08e8 : sta $0e
@@ -439,7 +467,7 @@ dw $0000, $4001, $0000, $0000
 dw $0000, $0000, $0000, $4a01
 dw $0000, $4101, $0000, $0000
 
-org $aab800
+org $aab800 ;PC 153800
 OWNorthEdges:
 ;Min Coord, Max Coord, Width, Midpoint, OW Slot/OWID, Dest Index
 dw $00a0, $00a0, $0000, $00a0, $0000, $0040 ;Lost Woods
@@ -560,8 +588,8 @@ dw $0350, $0390, $0040, $0370, $5861, $0031
 dw $0670, $06a8, $0038, $068c, $5b63, $0032
 dw $0898, $09b0, $0118, $0924, $5b64, $0033
 dw $0a40, $0ba0, $0160, $0af0, $6565, $0034
-dw $0c70, $0c90, $0020, $0c80, $5f66, $0035
-dw $0f70, $0f80, $0010, $0f78, $5f67, $0036
+dw $0c70, $0c90, $0020, $0c80, $5e66, $0035
+dw $0f70, $0f80, $0010, $0f78, $5e67, $0036
 dw $0430, $0468, $0038, $044c, $6a6a, $0037
 dw $04d8, $04f8, $0020, $04e8, $6a6a, $0038
 dw $0688, $06b0, $0028, $069c, $6b6b, $0039

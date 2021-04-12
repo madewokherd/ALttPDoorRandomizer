@@ -12,7 +12,7 @@ import subprocess
 import bps.apply
 import bps.io
 
-from BaseClasses import CollectionState, ShopType, Region, Location, Door, DoorType, RegionType, PotItem
+from BaseClasses import CollectionState, ShopType, Region, Location, OWEdge, Door, DoorType, RegionType, PotItem
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '5c4f3e34c9179f6fea697a01bef48724'
+RANDOMIZERBASEHASH = 'a456755918d95d4bc1cbcc209242332a'
 
 
 class JsonRom(object):
@@ -590,8 +590,13 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         write_pots_to_rom(rom, world.pot_contents[player])
 
     # patch overworld edges
-    if world.owShuffle[player] == 'full':
-        rom.write_byte(0x150002, 2)
+    if world.owShuffle[player] != 'vanilla':
+        if world.owShuffle[player] == 'full':
+            rom.write_byte(0x150002, 2)
+        
+        for edge in world.owedges:
+            if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
+                rom.write_byte(edge.getAddress() + 0x0a, edge.getTarget())
     
     # patch entrance/exits/holes
     for region in world.regions:

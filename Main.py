@@ -14,6 +14,7 @@ from KeyDoorShuffle import validate_key_placement
 from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
+from OWEdges import create_owedges
 from OverworldShuffle import link_overworld
 from EntranceShuffle import link_entrances, link_inverted_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
@@ -115,6 +116,7 @@ def main(args, seed=None, fish=None):
             create_regions(world, player)
         else:
             create_inverted_regions(world, player)
+        create_owedges(world, player)
         create_dungeon_regions(world, player)
         create_shops(world, player)
         create_doors(world, player)
@@ -444,6 +446,11 @@ def copy_world(world):
     ret.state.prog_items = world.state.prog_items.copy()
     ret.state.stale = {player: True for player in range(1, world.players + 1)}
 
+    ret.owedges = world.owedges
+    for edge in ret.owedges:
+        transition = ret.check_for_owedge(edge.name, edge.player)
+        if transition is not None:
+            transition.dest = edge
     ret.doors = world.doors
     for door in ret.doors:
         entrance = ret.check_for_entrance(door.name, door.player)

@@ -71,6 +71,8 @@ class World(object):
         self.dynamic_locations = []
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
+        self.owedges = []
+        self._owedge_cache = {}
         self.doors = []
         self._door_cache = {}
         self.paired_doors = {}
@@ -153,9 +155,19 @@ class World(object):
             for r_location in region.locations:
                 self._location_cache[r_location.name, r_location.player] = r_location
 
+    def initialize_owedges(self, edges):
+        for edge in edges:
+            self._owedge_cache[(edge.name, edge.player)] = edge
+
     def initialize_doors(self, doors):
         for door in doors:
             self._door_cache[(door.name, door.player)] = door
+
+    def remove_owedge(self, edge, player):
+        if (edge.name, player) in self._owedge_cache.keys():
+            del self._owedge_cache[(edge.name, player)]
+        if edge in self.owedges:
+            self.owedges.remove(edge)
 
     def remove_door(self, door, player):
         if (door.name, player) in self._door_cache.keys():
@@ -177,6 +189,18 @@ class World(object):
                     assert not region.world  # this should only happen before initialization
                     return region
             raise RuntimeError('No such region %s for player %d' % (regionname, player))
+
+    def get_owedge(self, edgename, player):
+        if isinstance(edgename, OWEdge):
+            return edgename
+        try:
+            return self._owedge_cache[(edgename, player)]
+        except KeyError:
+            for edge in self.owedges:
+                if edge.name == edgename and edge.player == player:
+                    self._owedge_cache[(edgename, player)] = edge
+                    return edge
+            raise RuntimeError('No such edge %s for player %d' % (edgename, player))
 
     def get_entrance(self, entrance, player):
         if isinstance(entrance, Entrance):
@@ -240,6 +264,18 @@ class World(object):
                     self._portal_cache[(portal_name, player)] = portal
                     return portal
             raise RuntimeError('No such portal %s for player %d' % (portal_name, player))
+
+    def check_for_owedge(self, edgename, player):
+        if isinstance(edgename, OWEdge):
+            return edgename
+        try:
+            return self._owedge_cache[(edgename, player)]
+        except KeyError:
+            for edge in self.owedges:
+                if edge.name == edgename and edge.player == player:
+                    self._owedge_cache[(edgename, player)] = edge
+                    return edge
+            return None
 
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
@@ -1377,6 +1413,60 @@ class Door(object):
             self.passage = True
         else:
             self.passage = False
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def __str__(self):
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+
+class OWEdge(object):
+    def __init__(self, player, name, owIndex, direction, edge_id, owSlotIndex=0xff):
+        self.player = player
+        self.name = name
+        self.type = DoorType.Open
+        self.direction = direction
+        self.deadEnd = False
+
+        # rom properties
+        self.owIndex = owIndex
+        if owSlotIndex == 0xff:
+            self.owSlotIndex = owIndex
+        else:
+            self.owSlotIndex = owSlotIndex
+        self.shiftX = 78
+        self.shiftY = 78
+        self.zeroHzCam = False
+        self.zeroVtCam = False
+        self.edge_id = edge_id
+
+        # logical properties
+        # self.connected = False  # combine with Dest?
+        self.dest = None
+        self.dependents = []
+        self.dead = False
+
+    def getAddress(self):
+        base_address = {
+            Direction.North: 0x153800,
+            Direction.South: 0x153800 + (0x41 * 12),
+            Direction.West: 0x153800 + (0x82 * 12),
+            Direction.East: 0x153800 + (0xcc * 12),
+        }
+        return base_address[self.direction] + (self.edge_id * 12)
+
+    def getTarget(self):
+        return self.dest.edge_id
+
+    def dead_end(self):
+        self.deadEnd = True
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
