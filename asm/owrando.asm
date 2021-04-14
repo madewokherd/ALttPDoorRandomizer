@@ -198,8 +198,9 @@ OWNewDestination:
     ldx OWBGIndex,y : lda $e2,x : !add 1,s : !add 3,s : sta $e2,x
     ldx OWCameraIndex,y : lda $618,x : !add 1,s : !add 3,s : sta $618,x
     ldx OWCameraIndex,y : lda $61a,x : !add 1,s : !add 3,s : sta $61a,x
-    pla : lsr : pha : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
-    pla : pla : lsr : pha : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
+    pla : asl : php : ror : plp : ror
+    pha : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
+    pla : ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
     pla : pla : pla
 
     ;opposite coord stuff
@@ -211,11 +212,12 @@ OWNewDestination:
     sep #$10 : tax : phx : ldx #$0 : phx : rep #$10 : pla : plx : plx : pha
     
     ++ ;ldy #$0
-    ldx OWOppCoordIndex,y : lda $20,x : !add 1,s : sta $20,x ;set coord
+    sep #$10 : ldx OWOppCoordIndex,y : lda $20,x : !add 1,s : sta $20,x ;set coord
     ldx OWOppBGIndex,y : lda $e2,x : !add 1,s : sta $e2,x
     ldx OWOppCameraIndex,y : lda $618,x : !add 1,s : sta $618,x
     ldx OWOppCameraIndex,y : lda $61a,x : !add 1,s : sta $61a,x
-    ldx OWOppBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x : pla
+    ldx OWOppBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
+    lda $610,y : !add 1,s : sta $610,y : pla
 
     sep #$30 ;: ldy $418 : 
     lda OWOppSlotOffset,y : !add $04 : asl : sta $700

@@ -48,14 +48,16 @@ def connect_two_way(world, entrancename, exitname, player):
     exit.connect(entrance.parent_region)
     x = world.check_for_owedge(entrancename, player)
     y = world.check_for_owedge(exitname, player)
-    if x is not None:
+    if x is not None and y is not None:
         x.dest = y
-    if y is not None:
         y.dest = x
+    elif x is None:
+        logging.getLogger('').error('%s is not a valid edge.', entrancename)
+    elif y is None:
+        logging.getLogger('').error('%s is not a valid edge.', exitname)
 
     world.spoiler.set_overworld(exitname, entrancename, 'both', player)
 
-# these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
                     #('Links House NE', 'Lost Woods Pass SW')
@@ -68,6 +70,7 @@ temporary_mandatory_connections = [
                          ('Stone Bridge WC', 'Hobo EC'),
                         ]
 
+# these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
 mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Flute Spot 2', 'Potion Shop Area'),
                          ('Flute Spot 3', 'Kakariko Area'),
