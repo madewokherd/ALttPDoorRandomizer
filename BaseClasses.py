@@ -1462,6 +1462,16 @@ class OWEdge(object):
         self.zeroVtCam = False
         self.edge_id = edge_id
 
+        self.midpoint = 0x0
+        self.linkOpp = 0x0
+        self.scrollPos = 0x0
+        self.scrollOpp = 0x0
+        self.camPos = 0x0
+        self.camOpp = 0x0
+        self.vramLoc = 0x0
+        self.unknownX = 0x0
+        self.unknownY = 0x0
+
         # logical properties
         # self.connected = False  # combine with Dest?
         self.dest = None
@@ -1471,17 +1481,37 @@ class OWEdge(object):
     def getAddress(self):
         base_address = {
             Direction.North: 0x153800,
-            Direction.South: 0x153800 + (0x42 * 12),
-            Direction.West: 0x153800 + (0x84 * 12),
-            Direction.East: 0x153800 + (0xcf * 12),
+            Direction.South: 0x153800 + (0x42 * 26),
+            Direction.West: 0x153800 + (0x84 * 26),
+            Direction.East: 0x153800 + (0xcf * 26),
         }
-        return base_address[self.direction] + (self.edge_id * 12)
+        return base_address[self.direction] + (self.edge_id * 26)
 
     def getTarget(self):
         return self.dest.edge_id
 
     def dead_end(self):
         self.deadEnd = True
+
+    def coordInfo(self, vram_loc, scrollY, scrollX, linkY, linkX, camY, camX, unkY, unkX):
+        if self.direction in [Direction.North, Direction.South]:
+            self.midpoint = linkX
+            self.linkOpp = linkY
+            self.scrollPos = scrollX
+            self.scrollOpp = scrollY
+            self.camPos = camX
+            self.camOpp = camY
+        elif self.direction in [Direction.West, Direction.East]:
+            self.midpoint = linkY
+            self.linkOpp = linkX
+            self.scrollPos = scrollY
+            self.scrollOpp = scrollX
+            self.camPos = camY
+            self.camOpp = camX
+        self.vramLoc = vram_loc
+        self.unknownX = unkX
+        self.unknownY = unkY
+        return self
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
