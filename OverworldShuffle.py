@@ -1,4 +1,5 @@
 import random
+from BaseClasses import OWEdge, WorldType, Direction, Terrain
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -11,14 +12,29 @@ def link_overworld(world, player):
 
     # if we do not shuffle, set default connections
     if world.owShuffle[player] == 'vanilla':
-        for exitname, destname in default_overworld_connections:
+        for exitname, destname in default_connections:
             connect_two_way(world, exitname, destname, player)
     elif world.owShuffle[player] == 'full':
-        for exitname, destname in default_overworld_connections:
-            connect_two_way(world, exitname, destname, player)
+        remaining_edges = list()
+        for exitname, destname in default_connections:
+            remaining_edges.append(exitname)
+            remaining_edges.append(destname)
+
+        #for exitname, destname in default_connections:
+            #connect_two_way(world, exitname, destname, player)
+        if world.mode[player] == 'standard':
+            for exitname, destname in standard_connections:
+                connect_two_way(world, exitname, destname, player)
+                remaining_edges.remove(exitname)
+                remaining_edges.remove(destname)
+
         #TODO: Remove, just for testing
         for exitname, destname in test_connections:
             connect_two_way(world, exitname, destname, player)
+            remaining_edges.remove(exitname)
+            remaining_edges.remove(destname)
+        
+        connect_remaining(world, remaining_edges, player)
     else:
         raise NotImplementedError('Shuffling not supported yet')
 
@@ -57,6 +73,114 @@ def connect_two_way(world, entrancename, exitname, player):
         logging.getLogger('').error('%s is not a valid edge.', exitname)
 
     world.spoiler.set_overworld(exitname, entrancename, 'both', player)
+
+def connect_edges(world, edges, targets, player):
+    """This works inplace"""
+    random.shuffle(edges)
+    random.shuffle(targets)
+    while edges:
+        edge = edges.pop()
+        target = targets.pop()
+        connect_two_way(world, edge, target, player)
+
+def connect_remaining(world, edges, player):
+    lw_edges = list()
+    dw_edges = list()
+    for edgename in edges:
+        edge = world.check_for_owedge(edgename, player)
+        if edge.worldType == WorldType.Dark:
+            dw_edges.append(edge)
+        else:
+            lw_edges.append(edge)
+    
+    land_edges = list()
+    water_edges = list()
+    for edge in lw_edges:
+        if edge.terrain == Terrain.Land:
+            land_edges.append(edge)
+        else:
+            water_edges.append(edge)
+
+    north_edges = list()
+    south_edges = list()
+    west_edges = list()
+    east_edges = list()
+    for edge in land_edges:
+        if edge.direction == Direction.North:
+            north_edges.append(edge.name)
+        elif edge.direction == Direction.South:
+            south_edges.append(edge.name)
+        elif edge.direction == Direction.West:
+            west_edges.append(edge.name)
+        else:
+            east_edges.append(edge.name)
+
+    #lw land edges
+    connect_edges(world, north_edges, south_edges, player)
+    connect_edges(world, west_edges, east_edges, player)
+
+    north_edges = list()
+    south_edges = list()
+    west_edges = list()
+    east_edges = list()
+    for edge in water_edges:
+        if edge.direction == Direction.North:
+            north_edges.append(edge.name)
+        elif edge.direction == Direction.South:
+            south_edges.append(edge.name)
+        elif edge.direction == Direction.West:
+            west_edges.append(edge.name)
+        else:
+            east_edges.append(edge.name)
+
+    #lw water edges
+    connect_edges(world, north_edges, south_edges, player)
+    connect_edges(world, west_edges, east_edges, player)
+
+    land_edges = list()
+    water_edges = list()
+    for edge in dw_edges:
+        if edge.terrain == Terrain.Land:
+            land_edges.append(edge)
+        else:
+            water_edges.append(edge)
+    
+    north_edges = list()
+    south_edges = list()
+    west_edges = list()
+    east_edges = list()
+    for edge in land_edges:
+        if edge.direction == Direction.North:
+            north_edges.append(edge.name)
+        elif edge.direction == Direction.South:
+            south_edges.append(edge.name)
+        elif edge.direction == Direction.West:
+            west_edges.append(edge.name)
+        else:
+            east_edges.append(edge.name)
+    
+    #dw land edges
+    connect_edges(world, north_edges, south_edges, player)
+    connect_edges(world, west_edges, east_edges, player)
+
+    north_edges = list()
+    south_edges = list()
+    west_edges = list()
+    east_edges = list()
+    for edge in water_edges:
+        if edge.direction == Direction.North:
+            north_edges.append(edge.name)
+        elif edge.direction == Direction.South:
+            south_edges.append(edge.name)
+        elif edge.direction == Direction.West:
+            west_edges.append(edge.name)
+        else:
+            east_edges.append(edge.name)
+    
+    #dw water edges
+    connect_edges(world, north_edges, south_edges, player)
+    connect_edges(world, west_edges, east_edges, player)
+
 
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
@@ -309,144 +433,144 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ]
 
 # non shuffled overworld
-default_overworld_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
-                                ('Lost Woods SC', 'Lost Woods Pass NE'),
-                                ('Lost Woods SE', 'Kakariko Fortune NE'),
-                                ('Lost Woods EN', 'Lumberjack WN'),
-                                ('Lumberjack SW', 'DM Ascent NW'),
-                                ('DM Ascent SE', 'Kakariko Pond NE'),
-                                ('Lost Woods Pass SW', 'Kakariko NW'),
-                                ('Lost Woods Pass SE', 'Kakariko NC'),
-                                ('Kakariko Fortune SC', 'Kakariko NE'),
-                                ('Kakariko Fortune EN', 'Kakariko Pond WN'),
-                                ('Kakariko Fortune ES', 'Kakariko Pond WS'),
-                                ('Kakariko Pond SW', 'Forgotten Forest NW'),
-                                ('Kakariko Pond SE', 'Forgotten Forest NE'),
-                                ('Kakariko Pond EN', 'Sanctuary WN'),
-                                ('Kakariko Pond ES', 'Sanctuary WS'),
-                                ('Forgotten Forest ES', 'Hyrule Castle WN'),
-                                ('Sanctuary EC', 'Graveyard WC'),
-                                ('Graveyard EC', 'Useless Fairy WC'),
-                                ('Useless Fairy SW', 'Wooden Bridge NW'),
-                                ('Useless Fairy SC', 'Wooden Bridge NC'),
-                                ('Useless Fairy SE', 'Wooden Bridge NE'),
-                                ('Useless Fairy EN', 'Potion Shop WN'),
-                                ('Useless Fairy EC', 'Potion Shop WC'),
-                                ('Useless Fairy ES', 'Potion Shop WS'),
-                                ('Potion Shop EN', 'Zora Warning WN'),
-                                ('Potion Shop EC', 'Zora Warning WC'),
-                                ('Zora Warning NE', 'Zora Approach SE'),
-                                ('Kakariko SE', 'Kakariko Suburb NE'),
-                                ('Kakariko ES', 'Blacksmith WS'),
-                                ('Hyrule Castle SW', 'Central Bonk Rock NW'),
-                                ('Hyrule Castle SE', 'Links House NE'),
-                                ('Hyrule Castle ES', 'Sand Dune WN'),
-                                ('Wooden Bridge SW', 'Sand Dune NW'),
-                                ('Sand Dune SC', 'Stone Bridge NC'),
-                                ('Eastern Palace SW', 'Tree Line NW'),
-                                ('Eastern Palace SE', 'Eastern Nook NE'),
-                                ('Maze Race ES', 'Kakariko Suburb WS'),
-                                ('Kakariko Suburb ES', 'Flute Boy WS'),
-                                ('Flute Boy SW', 'Cave 45 NW'),
-                                ('Flute Boy SC', 'Cave 45 NC'),
-                                ('Cave 45 EC', 'C Whirlpool WC'),
-                                ('C Whirlpool NW', 'Central Bonk Rock SW'),
-                                ('C Whirlpool SC', 'Dam NC'),
-                                ('C Whirlpool EN', 'Statues WN'),
-                                ('C Whirlpool EC', 'Statues WC'),
-                                ('C Whirlpool ES', 'Statues WS'),
-                                ('Central Bonk Rock EN', 'Links House WN'),
-                                ('Central Bonk Rock EC', 'Links House WC'),
-                                ('Central Bonk Rock ES', 'Links House WS'),
-                                ('Links House SC', 'Statues NC'),
-                                ('Links House ES', 'Stone Bridge WS'),
-                                ('Stone Bridge SC', 'Lake Hylia NW'),
-                                ('Stone Bridge EN', 'Tree Line WN'),
-                                ('Stone Bridge EC', 'Tree Line WC'),
-                                ('Tree Line SC', 'Lake Hylia NC'),
-                                ('Tree Line SE', 'Lake Hylia NE'),
-                                ('Desert EC', 'Purple Chest WC'),
-                                ('Desert ES', 'Purple Chest WS'),
-                                ('Purple Chest EC', 'Dam WC'),
-                                ('Purple Chest ES', 'Dam WS'),
-                                ('Dam EC', 'South Pass WC'),
-                                ('Statues SC', 'South Pass NC'),
-                                ('South Pass ES', 'Lake Hylia WS'),
-                                ('Lake Hylia EC', 'Octoballoon WC'),
-                                ('Lake Hylia ES', 'Octoballoon WS'),
-                                ('Octoballoon NW', 'Ice Rod Cave SW'),
-                                ('Octoballoon NE', 'Ice Rod Cave SE'),
-                                ('West Death Mountain EN', 'East Death Mountain WN'),
-                                ('West Death Mountain ES', 'East Death Mountain WS'),
-                                ('East Death Mountain EN', 'Death Mountain TR Pegs WN'),
+default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
+                        ('Lost Woods SC', 'Lost Woods Pass NE'),
+                        ('Lost Woods SE', 'Kakariko Fortune NE'),
+                        ('Lost Woods EN', 'Lumberjack WN'),
+                        ('Lumberjack SW', 'DM Ascent NW'),
+                        ('DM Ascent SE', 'Kakariko Pond NE'),
+                        ('Lost Woods Pass SW', 'Kakariko NW'),
+                        ('Lost Woods Pass SE', 'Kakariko NC'),
+                        ('Kakariko Fortune SC', 'Kakariko NE'),
+                        ('Kakariko Fortune EN', 'Kakariko Pond WN'),
+                        ('Kakariko Fortune ES', 'Kakariko Pond WS'),
+                        ('Kakariko Pond SW', 'Forgotten Forest NW'),
+                        ('Kakariko Pond SE', 'Forgotten Forest NE'),
+                        ('Kakariko Pond EN', 'Sanctuary WN'),
+                        ('Kakariko Pond ES', 'Sanctuary WS'),
+                        ('Forgotten Forest ES', 'Hyrule Castle WN'),
+                        ('Sanctuary EC', 'Graveyard WC'),
+                        ('Graveyard EC', 'Useless Fairy WC'),
+                        ('Useless Fairy SW', 'Wooden Bridge NW'),
+                        ('Useless Fairy SC', 'Wooden Bridge NC'),
+                        ('Useless Fairy SE', 'Wooden Bridge NE'),
+                        ('Useless Fairy EN', 'Potion Shop WN'),
+                        ('Useless Fairy EC', 'Potion Shop WC'),
+                        ('Useless Fairy ES', 'Potion Shop WS'),
+                        ('Potion Shop EN', 'Zora Warning WN'),
+                        ('Potion Shop EC', 'Zora Warning WC'),
+                        ('Zora Warning NE', 'Zora Approach SE'),
+                        ('Kakariko SE', 'Kakariko Suburb NE'),
+                        ('Kakariko ES', 'Blacksmith WS'),
+                        ('Hyrule Castle SW', 'Central Bonk Rock NW'),
+                        ('Hyrule Castle SE', 'Links House NE'),
+                        ('Hyrule Castle ES', 'Sand Dune WN'),
+                        ('Wooden Bridge SW', 'Sand Dune NW'),
+                        ('Sand Dune SC', 'Stone Bridge NC'),
+                        ('Eastern Palace SW', 'Tree Line NW'),
+                        ('Eastern Palace SE', 'Eastern Nook NE'),
+                        ('Maze Race ES', 'Kakariko Suburb WS'),
+                        ('Kakariko Suburb ES', 'Flute Boy WS'),
+                        ('Flute Boy SW', 'Cave 45 NW'),
+                        ('Flute Boy SC', 'Cave 45 NC'),
+                        ('Cave 45 EC', 'C Whirlpool WC'),
+                        ('C Whirlpool NW', 'Central Bonk Rock SW'),
+                        ('C Whirlpool SC', 'Dam NC'),
+                        ('C Whirlpool EN', 'Statues WN'),
+                        ('C Whirlpool EC', 'Statues WC'),
+                        ('C Whirlpool ES', 'Statues WS'),
+                        ('Central Bonk Rock EN', 'Links House WN'),
+                        ('Central Bonk Rock EC', 'Links House WC'),
+                        ('Central Bonk Rock ES', 'Links House WS'),
+                        ('Links House SC', 'Statues NC'),
+                        ('Links House ES', 'Stone Bridge WS'),
+                        ('Stone Bridge SC', 'Lake Hylia NW'),
+                        ('Stone Bridge EN', 'Tree Line WN'),
+                        ('Stone Bridge EC', 'Tree Line WC'),
+                        ('Tree Line SC', 'Lake Hylia NC'),
+                        ('Tree Line SE', 'Lake Hylia NE'),
+                        ('Desert EC', 'Purple Chest WC'),
+                        ('Desert ES', 'Purple Chest WS'),
+                        ('Purple Chest EC', 'Dam WC'),
+                        ('Purple Chest ES', 'Dam WS'),
+                        ('Dam EC', 'South Pass WC'),
+                        ('Statues SC', 'South Pass NC'),
+                        ('South Pass ES', 'Lake Hylia WS'),
+                        ('Lake Hylia EC', 'Octoballoon WC'),
+                        ('Lake Hylia ES', 'Octoballoon WS'),
+                        ('Octoballoon NW', 'Ice Rod Cave SW'),
+                        ('Octoballoon NE', 'Ice Rod Cave SE'),
+                        ('West Death Mountain EN', 'East Death Mountain WN'),
+                        ('West Death Mountain ES', 'East Death Mountain WS'),
+                        ('East Death Mountain EN', 'Death Mountain TR Pegs WN'),
 
-                                ('Skull Woods SW', 'Skull Woods Pass NW'),
-                                ('Skull Woods SC', 'Skull Woods Pass NE'),
-                                ('Skull Woods SE', 'Dark Fortune NE'),
-                                ('Skull Woods EN', 'Dark Lumberjack WN'),
-                                ('Dark Lumberjack SW', 'Bumper Cave NW'),
-                                ('Bumper Cave SE', 'Outcast Pond NE'),
-                                ('Skull Woods Pass SW', 'Village of Outcasts NW'),
-                                ('Skull Woods Pass SE', 'Village of Outcasts NC'),
-                                ('Dark Fortune SC', 'Village of Outcasts NE'),
-                                ('Dark Fortune EN', 'Outcast Pond WN'),
-                                ('Dark Fortune ES', 'Outcast Pond WS'),
-                                ('Outcast Pond SW', 'Shield Shop NW'),
-                                ('Outcast Pond SE', 'Shield Shop NE'),
-                                ('Outcast Pond EN', 'Dark Chapel WN'),
-                                ('Outcast Pond ES', 'Dark Chapel WS'),
-                                ('Dark Chapel EC', 'Dark Graveyard WC'),
-                                ('Dark Graveyard ES', 'Qirn Jump WC'),
-                                ('Qirn Jump SW', 'Broken Bridge NW'),
-                                ('Qirn Jump SC', 'Broken Bridge NC'),
-                                ('Qirn Jump SE', 'Broken Bridge NE'),
-                                ('Qirn Jump EN', 'Dark Witch WN'),
-                                ('Qirn Jump EC', 'Dark Witch WC'),
-                                ('Qirn Jump ES', 'Dark Witch WS'),
-                                ('Dark Witch EN', 'Catfish Approach WN'),
-                                ('Dark Witch EC', 'Catfish Approach WC'),
-                                ('Catfish Approach NE', 'Catfish SE'),
-                                ('Village of Outcasts SE', 'Frog NE'),
-                                ('Village of Outcasts ES', 'Hammer Pegs WS'),
-                                ('Pyramid SW', 'Dark Bonk Rock NW'),
-                                ('Pyramid SE', 'Big Bomb Shop NE'),
-                                ('Pyramid ES', 'Dark Dune WN'),
-                                ('Broken Bridge SW', 'Dark Dune NW'),
-                                ('Dark Dune SC', 'Hammer Bridge NC'),
-                                ('Palace of Darkness SW', 'Dark Tree Line NW'),
-                                ('Palace of Darkness SE', 'Palace of Darkness Nook NE'),
-                                ('Dig Game EC', 'Frog WC'),
-                                ('Dig Game ES', 'Frog WS'),
-                                ('Frog ES', 'Stumpy WS'),
-                                ('Stumpy SW', 'Circle of Bushes NW'),
-                                ('Stumpy SC', 'Circle of Bushes NC'),
-                                ('Circle of Bushes EC', 'Dark C Whirlpool WC'),
-                                ('Dark C Whirlpool NW', 'Dark Bonk Rock SW'),
-                                ('Dark C Whirlpool SC', 'Swamp Palace NC'),
-                                ('Dark C Whirlpool EN', 'Hype Cave WN'),
-                                ('Dark C Whirlpool EC', 'Hype Cave WC'),
-                                ('Dark C Whirlpool ES', 'Hype Cave WS'),
-                                ('Dark Bonk Rock EN', 'Big Bomb Shop WN'),
-                                ('Dark Bonk Rock EC', 'Big Bomb Shop WC'),
-                                ('Dark Bonk Rock ES', 'Big Bomb Shop WS'),
-                                ('Big Bomb Shop SC', 'Hype Cave NC'),
-                                ('Big Bomb Shop ES', 'Hammer Bridge WS'),
-                                ('Hammer Bridge SC', 'Dark Lake Hylia NW'),
-                                ('Hammer Bridge EN', 'Dark Tree Line WN'),
-                                ('Hammer Bridge EC', 'Dark Tree Line WC'),
-                                ('Dark Tree Line SC', 'Dark Lake Hylia NC'),
-                                ('Dark Tree Line SE', 'Dark Lake Hylia NE'),
-                                ('Dark Purple Chest EC', 'Swamp Palace WC'),
-                                ('Dark Purple Chest ES', 'Swamp Palace WS'),
-                                ('Swamp Palace EC', 'Dark South Pass WC'),
-                                ('Hype Cave SC', 'Dark South Pass NC'),
-                                ('Dark South Pass ES', 'Dark Lake Hylia WS'),
-                                ('Dark Lake Hylia EC', 'Southeast DW WC'),
-                                ('Dark Lake Hylia ES', 'Southeast DW WS'),
-                                ('Southeast DW NW', 'Dark Shopping Mall SW'),
-                                ('Southeast DW NE', 'Dark Shopping Mall SE'),
-                                ('West Dark Death Mountain EN', 'East Dark Death Mountain WN'),
-                                ('West Dark Death Mountain ES', 'East Dark Death Mountain WS'),
-                                ('East Dark Death Mountain EN', 'Turtle Rock WN')
-                                ]
+                        ('Skull Woods SW', 'Skull Woods Pass NW'),
+                        ('Skull Woods SC', 'Skull Woods Pass NE'),
+                        ('Skull Woods SE', 'Dark Fortune NE'),
+                        ('Skull Woods EN', 'Dark Lumberjack WN'),
+                        ('Dark Lumberjack SW', 'Bumper Cave NW'),
+                        ('Bumper Cave SE', 'Outcast Pond NE'),
+                        ('Skull Woods Pass SW', 'Village of Outcasts NW'),
+                        ('Skull Woods Pass SE', 'Village of Outcasts NC'),
+                        ('Dark Fortune SC', 'Village of Outcasts NE'),
+                        ('Dark Fortune EN', 'Outcast Pond WN'),
+                        ('Dark Fortune ES', 'Outcast Pond WS'),
+                        ('Outcast Pond SW', 'Shield Shop NW'),
+                        ('Outcast Pond SE', 'Shield Shop NE'),
+                        ('Outcast Pond EN', 'Dark Chapel WN'),
+                        ('Outcast Pond ES', 'Dark Chapel WS'),
+                        ('Dark Chapel EC', 'Dark Graveyard WC'),
+                        ('Dark Graveyard ES', 'Qirn Jump WC'),
+                        ('Qirn Jump SW', 'Broken Bridge NW'),
+                        ('Qirn Jump SC', 'Broken Bridge NC'),
+                        ('Qirn Jump SE', 'Broken Bridge NE'),
+                        ('Qirn Jump EN', 'Dark Witch WN'),
+                        ('Qirn Jump EC', 'Dark Witch WC'),
+                        ('Qirn Jump ES', 'Dark Witch WS'),
+                        ('Dark Witch EN', 'Catfish Approach WN'),
+                        ('Dark Witch EC', 'Catfish Approach WC'),
+                        ('Catfish Approach NE', 'Catfish SE'),
+                        ('Village of Outcasts SE', 'Frog NE'),
+                        ('Village of Outcasts ES', 'Hammer Pegs WS'),
+                        ('Pyramid SW', 'Dark Bonk Rock NW'),
+                        ('Pyramid SE', 'Big Bomb Shop NE'),
+                        ('Pyramid ES', 'Dark Dune WN'),
+                        ('Broken Bridge SW', 'Dark Dune NW'),
+                        ('Dark Dune SC', 'Hammer Bridge NC'),
+                        ('Palace of Darkness SW', 'Dark Tree Line NW'),
+                        ('Palace of Darkness SE', 'Palace of Darkness Nook NE'),
+                        ('Dig Game EC', 'Frog WC'),
+                        ('Dig Game ES', 'Frog WS'),
+                        ('Frog ES', 'Stumpy WS'),
+                        ('Stumpy SW', 'Circle of Bushes NW'),
+                        ('Stumpy SC', 'Circle of Bushes NC'),
+                        ('Circle of Bushes EC', 'Dark C Whirlpool WC'),
+                        ('Dark C Whirlpool NW', 'Dark Bonk Rock SW'),
+                        ('Dark C Whirlpool SC', 'Swamp Palace NC'),
+                        ('Dark C Whirlpool EN', 'Hype Cave WN'),
+                        ('Dark C Whirlpool EC', 'Hype Cave WC'),
+                        ('Dark C Whirlpool ES', 'Hype Cave WS'),
+                        ('Dark Bonk Rock EN', 'Big Bomb Shop WN'),
+                        ('Dark Bonk Rock EC', 'Big Bomb Shop WC'),
+                        ('Dark Bonk Rock ES', 'Big Bomb Shop WS'),
+                        ('Big Bomb Shop SC', 'Hype Cave NC'),
+                        ('Big Bomb Shop ES', 'Hammer Bridge WS'),
+                        ('Hammer Bridge SC', 'Dark Lake Hylia NW'),
+                        ('Hammer Bridge EN', 'Dark Tree Line WN'),
+                        ('Hammer Bridge EC', 'Dark Tree Line WC'),
+                        ('Dark Tree Line SC', 'Dark Lake Hylia NC'),
+                        ('Dark Tree Line SE', 'Dark Lake Hylia NE'),
+                        ('Dark Purple Chest EC', 'Swamp Palace WC'),
+                        ('Dark Purple Chest ES', 'Swamp Palace WS'),
+                        ('Swamp Palace EC', 'Dark South Pass WC'),
+                        ('Hype Cave SC', 'Dark South Pass NC'),
+                        ('Dark South Pass ES', 'Dark Lake Hylia WS'),
+                        ('Dark Lake Hylia EC', 'Southeast DW WC'),
+                        ('Dark Lake Hylia ES', 'Southeast DW WS'),
+                        ('Southeast DW NW', 'Dark Shopping Mall SW'),
+                        ('Southeast DW NE', 'Dark Shopping Mall SE'),
+                        ('West Dark Death Mountain EN', 'East Dark Death Mountain WN'),
+                        ('West Dark Death Mountain ES', 'East Dark Death Mountain WS'),
+                        ('East Dark Death Mountain EN', 'Turtle Rock WN')
+                        ]
 

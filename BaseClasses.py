@@ -1442,12 +1442,26 @@ class Door(object):
         return '%s' % self.name
 
 
+@unique
+class WorldType(Enum):
+    Light = 0
+    Dark = 1
+    Special = 2
+
+
+@unique
+class Terrain(Enum):
+    Land = 0
+    Water = 1
+
+
 class OWEdge(object):
-    def __init__(self, player, name, owIndex, direction, edge_id, owSlotIndex=0xff):
+    def __init__(self, player, name, owIndex, direction, terrain, edge_id, owSlotIndex=0xff):
         self.player = player
         self.name = name
         self.type = DoorType.Open
         self.direction = direction
+        self.terrain = terrain
         self.deadEnd = False
 
         # rom properties
@@ -1471,6 +1485,13 @@ class OWEdge(object):
         self.vramLoc = 0x0
         self.unknownX = 0x0
         self.unknownY = 0x0
+
+        if self.owIndex < 0x40:
+            self.worldType = WorldType.Light
+        elif self.owIndex < 0x80:
+            self.worldType = WorldType.Dark
+        else:
+            self.worldType = WorldType.Special
 
         # logical properties
         # self.connected = False  # combine with Dest?

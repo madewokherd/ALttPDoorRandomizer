@@ -242,7 +242,10 @@ def main(args, seed=None, fish=None):
             customize_shops(world, player)
     balance_money_progression(world)
 
-    outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
+    if world.owShuffle[1] != 'vanilla':
+        outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
+    else:
+        outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
 
     rom_names = []
     jsonout = {}
