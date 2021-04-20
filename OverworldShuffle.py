@@ -432,6 +432,13 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs')
                          ]
 
+standard_connections = [('Hyrule Castle SW', 'Central Bonk Rock NW'),
+                        ('Hyrule Castle SE', 'Links House NE'),
+                        ('Central Bonk Rock EN', 'Links House WN'),
+                        ('Central Bonk Rock EC', 'Links House WC'),
+                        ('Central Bonk Rock ES', 'Links House WS')
+                        ]
+
 # non shuffled overworld
 default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Lost Woods SC', 'Lost Woods Pass NE'),
