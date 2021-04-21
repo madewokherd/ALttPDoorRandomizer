@@ -194,7 +194,7 @@ OWNewDestination:
         ora #$ff00 ;extend 8-bit negative to 16-bit negative
     + pha
     cpy #$0002 : lda $700 : !bge +
-        and #$00f0 : pha : lda $04 : asl : and #$00f0 : !sub 1,s : tax : pla : txa
+        and #$00f0 : pha : lda $04 : asl : and #$0070 : !sub 1,s : tax : pla : txa
         !add 1,s : tax : pla : txa : asl : asl : asl : asl : asl : pha : bra ++
     + and #$000f : pha : lda $04 : asl : and #$000f : !sub 1,s : !add 3,s
     sep #$10 : tax : phx : ldx #$0 : phx : rep #$10 : pla : plx : plx : pha

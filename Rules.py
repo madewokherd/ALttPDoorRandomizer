@@ -128,6 +128,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Flute Spot 7', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Flute Spot 8', player), lambda state: state.can_flute(player))
     
+    #TODO: Remove the water drop ones, they should be redundant
     set_rule(world.get_entrance('C Whirlpool', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Useless Fairy Whirlpool', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia Whirlpool', player), lambda state: state.has('Flippers', player))
@@ -518,6 +519,9 @@ def default_rules(world, player):
     
     set_rule(world.get_entrance('Flute Away', player), lambda state: state.can_flute(player))
     
+    set_rule(world.get_entrance('Zora Warning Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Potion Shop Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Potion Shop Northeast Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Useless Fairy Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Useless Fairy East Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Wooden Bridge Water Drop', player), lambda state: state.has('Flippers', player))
@@ -528,6 +532,9 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Lake Hylia Island Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Octoballoon Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Catfish Approach Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+    set_rule(world.get_entrance('Dark Witch Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+    set_rule(world.get_entrance('Dark Witch Northeast Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Qirn Jump Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Qirn Jump East Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Broken Bridge Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
@@ -542,6 +549,10 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Southeast DW Waterfall Water Drop', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     set_rule(world.get_entrance('Ice Rod Cave SW', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark Shopping Mall SW', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+    set_rule(world.get_entrance('C Whirlpool EC', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Statues WC', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Dark C Whirlpool EC', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
+    set_rule(world.get_entrance('Hype Cave WC', player), lambda state: state.has_Pearl(player) and state.has('Flippers', player))
     
     set_rule(world.get_entrance('Kakariko Teleporter (Hammer)', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player)) # bunny cannot lift bushes
     set_rule(world.get_entrance('Kakariko Teleporter (Rock)', player), lambda state: state.can_lift_heavy_rocks(player) and state.has_Pearl(player)) # bunny cannot lift bushes
