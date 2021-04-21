@@ -169,7 +169,9 @@ OWNewDestination:
     inx #2 ;LinkOpp
     inx #2 ;ScrollOpp
     inx #2 ;CamOpp
-    inx #2 ;: lda.w $0000,x : sta $84;VRAM
+    inx #2 : lda.w $0000,x : sta $84;VRAM
+        SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
+        LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
     inx #2 ;: lda.w $0000,x : and #$00ff : sta $624 ;UnknownY
     inx ;: lda.w $0000,x : and #$00ff : sta $628 ;UnknownX
         
