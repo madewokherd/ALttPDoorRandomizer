@@ -593,6 +593,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # patch overworld edges
     if world.owShuffle[player] != 'vanilla':
+        rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
+
         if world.owShuffle[player] == 'full':
             rom.write_byte(0x150002, 2)
         
