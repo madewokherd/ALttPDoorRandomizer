@@ -209,7 +209,7 @@ OWNewDestination:
     lda $418 : asl : tax : lda $610,x : !add 1,s : sta $610,x : pla
 
     sep #$30
-    lda OWOppSlotOffset,y : !add $04 : asl : sta $700
+    lda OWOppSlotOffset,y : !add $04 : asl : and #$7f : sta $700
     sep #$20
 
     lda $05 : sta $8a : and #$40 : sta.l $7ef3ca
