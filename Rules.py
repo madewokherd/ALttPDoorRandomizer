@@ -1048,22 +1048,27 @@ def standard_rules(world, player):
         add_rule(world.get_location(location, player), lambda state: state.has('Zelda Delivered', player))
 
     # Bonk Fairy (Light) is a notable omission in ER shuffles/Retro
-    for entrance in ['Blinds Hideout', 'Zoras Domain', 'Kings Grave Outer Rocks', 'Dam', 'Tavern North', 'Chicken House',
-                     'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave', 'Blacksmiths Hut',
-                     'Bat Cave Drop Ledge', 'Bat Cave Cave', 'Sick Kids House', 'Hobo Bridge',
-                     'Lost Woods Hideout Drop', 'Lost Woods Hideout Stump', 'Lumberjack Tree Tree',
-                     'Lumberjack Tree Cave', 'Mini Moldorm Cave', 'Ice Rod Cave', 'Lake Hylia Central Island Pier',
-                     'Bonk Rock Cave', 'Library', 'Potion Shop', 'Two Brothers House (East)', 'Desert Palace Statue Move',
-                     'Eastern Palace', 'Master Sword Meadow', 'Sanctuary', 'Sanctuary Grave',
-                     'Death Mountain Entrance Rock', 'Flute Spot 1', 'Desert Teleporter', 'East Hyrule Teleporter',
-                     'South Hyrule Teleporter', 'Kakariko Teleporter', 'Elder House (East)', 'Elder House (West)',
-                     'North Fairy Cave', 'North Fairy Cave Drop', 'Lost Woods Gamble', 'Snitch Lady (East)',
-                     'Snitch Lady (West)', 'Tavern (Front)', 'Bush Covered House', 'Light World Bomb Hut',
-                     'Kakariko Shop', 'Long Fairy Cave', 'Good Bee Cave', '20 Rupee Cave', 'Cave Shop (Lake Hylia)',
-                     'Waterfall of Wishing', 'Hyrule Castle Main Gate (North)', 'Hyrule Castle Main Gate (South)', '50 Rupee Cave',
-                     'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy',
-                     'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid', 'Top of Pyramid (Inner)']:
-        add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
+    # for entrance in ['Blinds Hideout', 'King Zora', 'Zora\'s Ledge', 'Kings Grave Outer Rocks', 'Dam', 'Tavern North',
+    #                  'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',
+    #                  'Blacksmiths Hut', 'Bat Cave Drop Ledge', 'Bat Cave Cave', 'Sick Kids House', 'Hobo Bridge',
+    #                  'Lost Woods Hideout Drop', 'Lost Woods Hideout Stump', 'Lumberjack Tree Tree',
+    #                  'Lumberjack Tree Cave', 'Mini Moldorm Cave', 'Ice Rod Cave', 'Lake Hylia Central Island Pier',
+    #                  'Bonk Rock Cave', 'Library', 'Potion Shop', 'Two Brothers House (East)', 'Desert Palace Statue Move',
+    #                  'Eastern Palace', 'Master Sword Meadow', 'Sanctuary', 'Sanctuary Grave',
+    #                  'Death Mountain Entrance Rock', 'Desert Teleporter', 'East Hyrule Teleporter',
+    #                  'Flute Spot 1', 'Flute Spot 2', 'Flute Spot 3', 'Flute Spot 4',
+    #                  'Flute Spot 5', 'Flute Spot 6', 'Flute Spot 7', 'Flute Spot 8', 
+    #                  'South Hyrule Teleporter', 'Kakariko Teleporter', 'Elder House (East)', 'Elder House (West)',
+    #                  'North Fairy Cave', 'North Fairy Cave Drop', 'Lost Woods Gamble', 'Snitch Lady (East)',
+    #                  'Snitch Lady (West)', 'Tavern (Front)', 'Bush Covered House', 'Light World Bomb Hut',
+    #                  'Kakariko Shop', 'Long Fairy Cave', 'Good Bee Cave', '20 Rupee Cave', 'Cave Shop (Lake Hylia)',
+    #                  'Waterfall of Wishing', 'Hyrule Castle Main Gate (North)', 'Hyrule Castle Main Gate (South)', '50 Rupee Cave',
+    #                  'Fortune Teller (Light)', 'Lake Hylia Fairy', 'Light Hype Fairy', 'Desert Fairy',
+    #                  'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid', 'Top of Pyramid (Inner)']:
+    #     add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
+    
+    add_rule(world.get_entrance('Sanctuary WS', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Sanctuary EC', player), lambda state: state.has('Zelda Delivered', player))
 
 
 def find_rules_for_zelda_delivery(world, player):
