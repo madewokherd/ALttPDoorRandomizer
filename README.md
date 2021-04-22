@@ -4,6 +4,10 @@ This is a overworld randomizer for _The Legend of Zelda: A Link to the Past_ for
 based on the Door Randomizer found at [Aerinon's Github Project.](https://github.com/Aerinon/ALttPDoorRandomizer)
 See https://alttpr.com/ for more details on the normal randomizer.
 
+### Trackers & Guides
+
+This is a very new mode of LTTPR so the tools and info is very limited. There is a [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.  There is a rumor that some OW tracking capability will be coming to CodeTracker, an EmoTracker package for LTTPR.
+
 # Known Issues
 (Updated 2021-04-21)
 
@@ -45,7 +49,7 @@ OW Transitions are shuffled within each world separately.
 
 ### Vanilla
 
-Doors are not shuffled.
+OW is not shuffled.
 
 
 # Command Line Options
