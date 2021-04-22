@@ -2,7 +2,7 @@
   "widgets": {
     "overworldshuffle": {
       "type": "selectbox",
-      "default": "vanilla",
+      "default": "full",
       "options": [
         "vanilla",
         "full"

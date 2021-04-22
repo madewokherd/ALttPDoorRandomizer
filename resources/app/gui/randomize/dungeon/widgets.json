@@ -2,7 +2,7 @@
   "widgets": {
     "dungeondoorshuffle": {
       "type": "selectbox",
-      "default": "basic",
+      "default": "vanilla",
       "options": [
         "vanilla",
         "basic",
