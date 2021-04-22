@@ -212,7 +212,7 @@ OWNewDestination:
     lda OWOppSlotOffset,y : !add $04 : asl : and #$7f : sta $700
     sep #$20
 
-    lda $05 : sta $8a : and #$40 : sta.l $7ef3ca
+    lda $05 : sta $8a ;: and #$40 : sta.l $7ef3ca ;removed setting DW flag
     rep #$30
 
     rts
