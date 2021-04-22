@@ -1,6 +1,8 @@
 import random
 from BaseClasses import OWEdge, WorldType, Direction, Terrain
 
+__version__ = '0.1.0.1u'
+
 def link_overworld(world, player):
     # setup mandatory connections
     for exitname, regionname in mandatory_connections:
@@ -180,7 +182,6 @@ def connect_remaining(world, edges, player):
     #dw water edges
     connect_edges(world, north_edges, south_edges, player)
     connect_edges(world, west_edges, east_edges, player)
-
 
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
@@ -580,4 +581,3 @@ default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('West Dark Death Mountain ES', 'East Dark Death Mountain WS'),
                         ('East Dark Death Mountain EN', 'Turtle Rock WN')
                         ]
-

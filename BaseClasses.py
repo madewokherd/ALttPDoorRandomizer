@@ -2100,7 +2100,9 @@ class Spoiler(object):
                     self.set_lobby(portal.name, portal.door.name, player)
 
         from Main import __version__ as ERVersion
+        from OverworldShuffle import __version__ as ORVersion
         self.metadata = {'version': ERVersion,
+                         'versions': {'Door':ERVersion, 'Overworld':ORVersion},
                          'logic': self.world.logic,
                          'mode': self.world.mode,
                          'retro': self.world.retro,
@@ -2160,7 +2162,9 @@ class Spoiler(object):
     def to_file(self, filename):
         self.parse_data()
         with open(filename, 'w') as outfile:
-            outfile.write('ALttP Entrance Randomizer Version %s  -  Seed: %s\n\n' % (self.metadata['version'], self.world.seed))
+            outfile.write('ALttP Entrance Randomizer  -  Seed: %s\n\n' % (self.world.seed))
+            for k,v in self.metadata["versions"].items():
+                outfile.write((k + ' Version:').ljust(line_width) + '%s\n' % v)
             outfile.write('Filling Algorithm:               %s\n' % self.world.algorithm)
             outfile.write('Players:                         %d\n' % self.world.players)
             outfile.write('Teams:                           %d\n' % self.world.teams)

@@ -20,6 +20,7 @@ from source.gui.randomize.generation import generation_page
 from source.gui.bottom import bottom_frame, create_guiargs
 from GuiUtils import set_icon
 from Main import __version__ as ESVersion
+from OverworldShuffle import __version__ as ORVersion
 
 from source.classes.BabelFish import BabelFish
 from source.classes.Empty import Empty
@@ -47,13 +48,13 @@ def guiMain(args=None):
             gui_args['sprite'] = gui_args['sprite'].name
         save_settings(gui_args)
         if confirm:
-            messagebox.showinfo("Door Shuffle " + ESVersion, "Settings saved from GUI.")
+            messagebox.showinfo("Overworld Shuffle " + ORVersion, "Settings saved from GUI.")
 
     # routine for exiting the app
     def guiExit():
         skip_exit = False
         if self.settings['saveonexit'] == 'ask':
-            dosave = messagebox.askyesnocancel("Door Shuffle " + ESVersion, "Save settings before exit?")
+            dosave = messagebox.askyesnocancel("Overworld Shuffle " + ORVersion, "Save settings before exit?")
             if dosave:
                 save_settings_from_gui(True)
             if dosave is None:
@@ -68,7 +69,7 @@ def guiMain(args=None):
     mainWindow = Tk()
     self = mainWindow
 
-    mainWindow.wm_title("Door Shuffle %s" % ESVersion)
+    mainWindow.wm_title("Overworld Shuffle %s (DR %s)" % (ORVersion, ESVersion))
     mainWindow.protocol("WM_DELETE_WINDOW", guiExit)  # intercept when user clicks the X
 
     # set program icon

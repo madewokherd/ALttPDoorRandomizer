@@ -28,7 +28,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.1.0.0-ow_0.3.1.7-u'
+__version__ = '0.3.1.7-u'
 
 
 class EnemizerError(RuntimeError):
@@ -93,11 +93,15 @@ def main(args, seed=None, fish=None):
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
+    from OverworldShuffle import __version__ as ORVersion
     logger.info(
       world.fish.translate("cli","cli","app.title") + "\n",
-      __version__,
+      ORVersion,
       world.seed
     )
+
+    for k,v in {"DR":__version__,"OR":ORVersion}.items():
+      logger.info((k + ' Version:').ljust(16) + '%s' % v)
 
     parsed_names = parse_player_names(args.names, world.players, args.teams)
     world.teams = len(parsed_names)
