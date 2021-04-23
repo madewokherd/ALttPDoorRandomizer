@@ -229,7 +229,7 @@ def create_regions(world, player):
         create_dw_region(player, 'Hammer Peg Area', ['Dark Blacksmith Ruins'], ['Dark World Hammer Peg Cave', 'Blacksmith Mirror Spot', 'Bat Cave Ledge Mirror Spot', 'Peg Area Rocks (East)']),
         create_dw_region(player, 'Pyramid Area', ['Pyramid'], ['Pyramid Fairy', 'Pyramid Hole', 'HC Ledge Mirror Spot', 'HC Courtyard Mirror Spot', 'HC Area Mirror Spot', 'HC East Entry Mirror Spot', 'Pyramid ES']),
         create_dw_region(player, 'Pyramid Exit Ledge', None, ['Pyramid Entrance', 'Pyramid Exit Drop']),
-        create_dw_region(player, 'Pyramid Pass', ['Pyramid'], ['HC Area South Mirror Spot', 'Pyramid SW', 'Pyramid SE']),
+        create_dw_region(player, 'Pyramid Pass', None, ['HC Area South Mirror Spot', 'Pyramid SW', 'Pyramid SE']),
         create_dw_region(player, 'Broken Bridge Area', None, ['Broken Bridge Hammer Rock (South)', 'Broken Bridge Water Drop', 'Wooden Bridge Mirror Spot', 'Broken Bridge SW']),
         create_dw_region(player, 'Broken Bridge Northeast', None, ['Broken Bridge Hammer Rock (North)', 'Broken Bridge Hookshot Gap', 'Broken Bridge Northeast Water Drop', 'Wooden Bridge Northeast Mirror Spot', 'Broken Bridge NE']),
         create_dw_region(player, 'Broken Bridge West', None, ['Broken Bridge West Water Drop', 'Wooden Bridge West Mirror Spot', 'Broken Bridge NW']),
