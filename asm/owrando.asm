@@ -151,7 +151,7 @@ OWSearchTransition:
             sep #$20 : lda #OWWestEdges>>16 : phb : pha : plb : ldx #OWWestEdges : jsr OWNewDestination : plb ;x = address of table
 
     .matchfound
-    plx : pla : lda #$0001 : pha : phx
+    plx : pla : pea $0001 : phx
     txa : !add #$0010 : tax : sec : rts
 
     .exitloop
