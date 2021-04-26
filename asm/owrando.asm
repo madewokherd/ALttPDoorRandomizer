@@ -87,11 +87,12 @@ OWShuffle:
     
     inx : lda.l OWEdgeOffsets,x ;record id of first transition in table
     ;multiply ^ by 26, 26bytes per record
-    stz $211c ;ensure the next write to $211b counts as the first write
-    sta $211b : stz $211b : lda #26 : sta $211c : pla ;a = number of trans
-    ldx $2134 ;x = offset to first record
+    sta $4202 : lda #26 : sta $4203
+    ;do something else for 8 cycles before getting the result
+    pla ;a = number of trans
     rep #$20
     and #$00ff
+    ldx $4216 ;x = offset to first record
 
     .nextTransition
     pha
@@ -159,8 +160,11 @@ OWSearchTransition:
 }
 OWNewDestination:
 {
-    tya : sta $211b : stz $211b : lda #26 : sta $211c : rep #$20 : lda $2134
-    phx : !add 1,s : plx : !add #$0006 : tax ;a = offset to dest record
+    tya : sta $4202 : lda #26 : sta $4203
+    ;do something else for 8 cycles before getting the result
+    rep #$20
+    txa : !add #$0006
+    adc $4216 : tax ;a = offset to dest record
     lda.w $0000,x : sta $06 ; set coord
     inx #2 : lda.w $0000,x : sta $04 ;save dest OW slot/ID
     ;I thought I'd need some of these values below, but I likely dont need any of them
