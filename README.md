@@ -9,7 +9,7 @@ See https://alttpr.com/ for more details on the normal randomizer.
 This is a very new mode of LTTPR so the tools and info is very limited. There is a [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.  There is a rumor that some OW tracking capability will be coming to CodeTracker, an EmoTracker package for LTTPR.
 
 # Known Issues
-(Updated 2021-04-24)
+(Updated 2021-04-26)
 
 ### If you want to playtest this, know these things:
 - Camera unlocking issues, which opens up the possibility of a hardlock. The workaround is to move Link around until the camera locks in place. DO NOT try to transition where there is a visible line.
@@ -20,9 +20,9 @@ This is a very new mode of LTTPR so the tools and info is very limited. There is
 
 ### Known bugs:
 - Camera unlocks, this is a known issue and will eventually be fixed at a later time
-- ~~When generating, there is a message about one location that remains unfilled. You will find a Nothing item at that location.~~ _(Fixed with 0.1.0.3)_
+- ~~When generating, there is a message about one location that remains unfilled. You will find a Nothing item at that location.~~ _(Fixed with 0.1.1.0)_
 - There may be an issue with progression being front-loaded in the seed in some scenarios, due to an unsophisticated shuffle algorithm that could make varying-sized parts of each world unreachable
-- ~~Some rare instances of vanilla transitions occur when they should not, you can tell when this bug occurs because it doesn't re-center you within the gap. These cases are seemingly unreproducable, so you can re-navigate to see where it was supposed to lead. Video proof of these occurances are helpful.~~ _(Fixed with 0.1.0.4)_
+- ~~Some rare instances of vanilla transitions occur when they should not, you can tell when this bug occurs because it doesn't re-center you within the gap. These cases are seemingly unreproducable, so you can re-navigate to see where it was supposed to lead. Video proof of these occurances are helpful.~~ _(Fixed with 0.1.1.0)_
 
 # Feedback and Bug Reports
 
