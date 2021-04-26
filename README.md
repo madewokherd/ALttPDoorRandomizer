@@ -42,7 +42,7 @@ Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
 Only extra settings are found here. All door and entrance randomizer settings are supported. See their [readme](https://github.com/Aerinon/ALttPDoorRandomizer/blob/master/README.md)
 
-## Overworld Shuffle (--owShuffle)
+## Overworld Shuffle (--ow_shuffle)
 
 ### Full
 
@@ -66,3 +66,9 @@ Show the help message and exit.
 ```
 
 For specifying the overworld shuffle you want as above. (default: vanilla)
+
+```
+--ow_keepsimilar     
+```
+
+This keeps similar edge transitions paired together with other pairs of transitions

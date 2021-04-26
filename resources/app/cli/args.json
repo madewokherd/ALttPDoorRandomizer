@@ -116,6 +116,10 @@
       "crossed"
     ]
   },
+  "ow_keepsimilar": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "shuffle": {
     "choices": [
       "vanilla",
