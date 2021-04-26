@@ -1,5 +1,6 @@
 import random
 from BaseClasses import OWEdge, WorldType, Direction, Terrain
+from OWEdges import OWEdgeGroups
 
 __version__ = '0.1.0.4-u'
 
@@ -16,14 +17,12 @@ def link_overworld(world, player):
     if world.owShuffle[player] == 'vanilla':
         for exitname, destname in default_connections:
             connect_two_way(world, exitname, destname, player)
-    elif world.owShuffle[player] == 'full':
-        remaining_edges = list()
+    else:
+        remaining_edges = []
         for exitname, destname in default_connections:
             remaining_edges.append(exitname)
             remaining_edges.append(destname)
-
-        #for exitname, destname in default_connections:
-            #connect_two_way(world, exitname, destname, player)
+        
         if world.mode[player] == 'standard':
             for exitname, destname in standard_connections:
                 connect_two_way(world, exitname, destname, player)
@@ -36,9 +35,30 @@ def link_overworld(world, player):
             remaining_edges.remove(exitname)
             remaining_edges.remove(destname)
         
-        connect_remaining(world, remaining_edges, player)
-    else:
-        raise NotImplementedError('Shuffling not supported yet')
+        if world.owShuffle[player] == 'full':
+            if world.owKeepSimilar[player]:
+                #TODO: remove edges from list that are already placed, Std and Plando
+                # shuffle edges in groups that connect the same pair of tiles
+                for grouping in (OWEdgeGroups, None):
+                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                        groups = list(grouping.values())
+                        random.shuffle(groups)
+                        for (forward_edge_sets, back_edge_sets) in groups:
+                            assert len(forward_edge_sets) == len(back_edge_sets)
+                            random.shuffle(back_edge_sets)
+                        
+                            for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
+                                assert len(forward_set) == len(back_set)
+                                for (forward_edge, back_edge) in zip(forward_set, back_set):
+                                    connect_two_way(world, forward_edge, back_edge, player)
+                                    remaining_edges.remove(forward_edge)
+                                    remaining_edges.remove(back_edge)
+                
+                assert len(remaining_edges) == 0, remaining_edges
+            else:
+                connect_remaining(world, remaining_edges, player)
+        else:
+            raise NotImplementedError('Shuffling not supported yet')
 
 
 def connect_custom(world, player):
