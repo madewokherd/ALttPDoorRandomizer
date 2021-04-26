@@ -24,7 +24,7 @@ class World(object):
         self.players = players
         self.teams = 1
         self.owShuffle = owShuffle.copy()
-        self.owKeepSimilar = True
+        self.owKeepSimilar = {}
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
         self.intensity = {}
