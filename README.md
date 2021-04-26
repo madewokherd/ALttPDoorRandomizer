@@ -52,6 +52,10 @@ OW Transitions are shuffled within each world separately.
 
 OW is not shuffled.
 
+## Keep Similar Edges Together (--ow_keepsimilar)
+
+This keeps similar edge transitions together. ie. The 2 west edges will be paired to another set of two similar edges
+
 
 # Command Line Options
 

@@ -143,7 +143,7 @@ def parse_settings():
         "openpyramid": False,
         "shuffleganon": True,
         "ow_shuffle": "vanilla",
-        "ow_keepsimilar": True,
+        "ow_keepsimilar": False,
         "shuffle": "vanilla",
 
         "shufflepots": False,
