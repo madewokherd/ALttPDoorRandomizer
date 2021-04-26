@@ -73,6 +73,7 @@ def main(args, seed=None, fish=None):
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
     world.crystals_ganon_orig = args.crystals_ganon.copy()
     world.crystals_gt_orig = args.crystals_gt.copy()
+    world.owKeepSimilar = args.ow_keepsimilar.copy()
     world.open_pyramid = args.openpyramid.copy()
     world.boss_shuffle = args.shufflebosses.copy()
     world.enemy_shuffle = args.shuffleenemies.copy()

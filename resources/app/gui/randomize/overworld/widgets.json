@@ -7,6 +7,10 @@
         "vanilla",
         "full"
       ]
+    },
+    "keepsimilar": {
+      "type": "checkbox",
+      "default": true
     }
   }
 }

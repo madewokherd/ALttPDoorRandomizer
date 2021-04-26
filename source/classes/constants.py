@@ -71,7 +71,8 @@ SETTINGSTOPROCESS = {
       "sortingalgo": "algorithm"
     },
     "overworld": {
-      "overworldshuffle": "ow_shuffle"
+      "overworldshuffle": "ow_shuffle",
+      "keepsimilar": "ow_keepsimilar"
     },
     "entrance": {
       "openpyramid": "openpyramid",

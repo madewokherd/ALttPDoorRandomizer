@@ -59,22 +59,22 @@
       "expert"
     ]
   },
-  "shopsanity" : {
+  "shopsanity": {
     "action": "store_true",
     "type": "bool"
   },
-  "keydropshuffle" : {
+  "keydropshuffle": {
     "action": "store_true",
     "type": "bool"
   },
-  "mixed_travel" : {
+  "mixed_travel": {
     "choices": [
       "prevent",
       "allow",
       "force"
     ]
   },
-  "standardize_palettes" : {
+  "standardize_palettes": {
     "choices": [
       "standardize",
       "original"
@@ -116,6 +116,10 @@
       "crossed"
     ]
   },
+  "ow_keepsimilar": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "shuffle": {
     "choices": [
       "vanilla",
@@ -140,8 +144,11 @@
     ]
   },
   "intensity": {
-    "choices":[
-      "3", "2", "1", "random"
+    "choices": [
+      "3",
+      "2",
+      "1",
+      "random"
     ]
   },
   "experimental": {
@@ -158,12 +165,28 @@
   },
   "crystals_ganon": {
     "choices": [
-      "7", "6", "5", "4", "3", "2", "1", "0", "random"
+      "7",
+      "6",
+      "5",
+      "4",
+      "3",
+      "2",
+      "1",
+      "0",
+      "random"
     ]
   },
   "crystals_gt": {
     "choices": [
-      "7", "6", "5", "4", "3", "2", "1", "0", "random"
+      "7",
+      "6",
+      "5",
+      "4",
+      "3",
+      "2",
+      "1",
+      "0",
+      "random"
     ]
   },
   "openpyramid": {
