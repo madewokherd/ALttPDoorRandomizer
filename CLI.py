@@ -142,7 +142,7 @@ def parse_settings():
         # Shuffle Ganon defaults to TRUE
         "openpyramid": False,
         "shuffleganon": True,
-        "ow_shuffle": "vanilla",
+        "ow_shuffle": "full",
         "shuffle": "vanilla",
 
         "shufflepots": False,
@@ -159,8 +159,8 @@ def parse_settings():
         "keyshuffle": False,
         "bigkeyshuffle": False,
         "keysanity": False,
-        "door_shuffle": "basic",
-        "intensity": 2,
+        "door_shuffle": "none",
+        "intensity": 3,
         "experimental": False,
         "dungeon_counters": "default",
         "mixed_travel": "prevent",
