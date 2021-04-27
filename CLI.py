@@ -160,7 +160,7 @@ def parse_settings():
         "keyshuffle": False,
         "bigkeyshuffle": False,
         "keysanity": False,
-        "door_shuffle": "none",
+        "door_shuffle": "vanilla",
         "intensity": 3,
         "experimental": False,
         "dungeon_counters": "default",
