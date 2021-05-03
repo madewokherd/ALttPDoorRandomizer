@@ -2,7 +2,7 @@ import random
 from BaseClasses import OWEdge, WorldType, Direction, Terrain
 from OWEdges import OWEdgeGroups
 
-__version__ = '0.1.1.1-u'
+__version__ = '0.1.1.2-u'
 
 def link_overworld(world, player):
     # setup mandatory connections

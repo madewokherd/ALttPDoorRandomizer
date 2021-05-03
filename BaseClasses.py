@@ -1503,11 +1503,11 @@ class OWEdge(object):
     def getAddress(self):
         base_address = {
             Direction.North: 0x153800,
-            Direction.South: 0x153800 + (0x42 * 26),
-            Direction.West: 0x153800 + (0x84 * 26),
-            Direction.East: 0x153800 + (0xcf * 26),
+            Direction.South: 0x153800 + (0x42 * 16),
+            Direction.West: 0x153800 + (0x84 * 16),
+            Direction.East: 0x153800 + (0xcf * 16),
         }
-        return base_address[self.direction] + (self.edge_id * 26)
+        return base_address[self.direction] + (self.edge_id * 16)
 
     def getTarget(self):
         return self.dest.edge_id
@@ -1515,24 +1515,8 @@ class OWEdge(object):
     def dead_end(self):
         self.deadEnd = True
 
-    def coordInfo(self, vram_loc, scrollY, scrollX, linkY, linkX, camY, camX, unkY, unkX):
-        if self.direction in [Direction.North, Direction.South]:
-            self.midpoint = linkX
-            self.linkOpp = linkY
-            self.scrollPos = scrollX
-            self.scrollOpp = scrollY
-            self.camPos = camX
-            self.camOpp = camY
-        elif self.direction in [Direction.West, Direction.East]:
-            self.midpoint = linkY
-            self.linkOpp = linkX
-            self.scrollPos = scrollY
-            self.scrollOpp = scrollX
-            self.camPos = camY
-            self.camOpp = camX
+    def coordInfo(self, vram_loc):
         self.vramLoc = vram_loc
-        self.unknownX = unkX
-        self.unknownY = unkY
         return self
 
     def __eq__(self, other):

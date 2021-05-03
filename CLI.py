@@ -187,7 +187,7 @@ def parse_settings():
         "quickswap": False,
         "heartcolor": "red",
         "heartbeep": "normal",
-        "sprite": os.path.join(".", "data", "sprites", "official", "001.link.1.zspr"),
+        "sprite": None,
         "fastmenu": "normal",
         "ow_palettes": "default",
         "uw_palettes": "default",

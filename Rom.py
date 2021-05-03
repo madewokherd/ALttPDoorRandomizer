@@ -16,7 +16,7 @@ from BaseClasses import CollectionState, ShopType, Region, Location, OWEdge, Doo
 from DoorShuffle import compass_data, DROptions, boss_indicator
 from Dungeons import dungeon_music_addresses
 from KeyDoorShuffle import count_locations_exclude_logic
-from Regions import location_table, shop_to_location_table
+from Regions import location_table, shop_to_location_table, retro_shops
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
 from Text import Uncle_texts, Ganon1_texts, TavernMan_texts, Sahasrahla2_texts, Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '66ad331187e1874d56331f6cbe5b0d90'
+RANDOMIZERBASEHASH = '5ea3196d8db3ca0c757035f7fd51cf9b'
 
 
 class JsonRom(object):
@@ -600,13 +600,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
-                write_int16(rom, edge.getAddress() + 0x0a, edge.scrollPos)
-                write_int16(rom, edge.getAddress() + 0x0c, edge.camPos)
-                write_int16(rom, edge.getAddress() + 0x0e, edge.linkOpp)
-                write_int16(rom, edge.getAddress() + 0x10, edge.scrollOpp)
-                write_int16(rom, edge.getAddress() + 0x12, edge.camOpp)
-                write_int16(rom, edge.getAddress() + 0x14, edge.vramLoc)
-                rom.write_bytes(edge.getAddress() + 0x16, [edge.unknownY, edge.unknownX, edge.getTarget()])
+                write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
+                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
     
     # patch entrance/exits/holes
     for region in world.regions:
@@ -1588,8 +1583,11 @@ def write_custom_shops(rom, world, player):
                 break
             if world.shopsanity[player] or shop.type == ShopType.TakeAny:
                 rom.write_byte(0x186560 + shop.sram_address + index, 1)
-            loc_item = world.get_location(shop_to_location_table[shop.region.name][index], player).item
-            if not loc_item:
+            if world.shopsanity[player] and shop.region.name in shop_to_location_table:
+                loc_item = world.get_location(shop_to_location_table[shop.region.name][index], player).item
+            elif world.shopsanity[player] and shop.region.name in retro_shops:
+                loc_item = world.get_location(retro_shops[shop.region.name][index], player).item
+            else:
                 loc_item = ItemFactory(item['item'], player)
             item_id = loc_item.code
             price = int16_as_bytes(item['price'])

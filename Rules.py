@@ -496,6 +496,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Skull Woods Bush Rock (East)', player), lambda state: state.has_Pearl(player) and state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Forgotten Bush (West)', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Skull Woods Forgotten Bush (East)', player), lambda state: state.has_Pearl(player))
+    set_rule(world.get_entrance('Skull Woods Second Section Hole', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Bumper Cave Entrance Rock', player), lambda state: state.has_Pearl(player) and state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Pass Bush Row (West)', player), lambda state: state.has_Pearl(player))
     set_rule(world.get_entrance('Skull Woods Pass Bush Row (East)', player), lambda state: state.has_Pearl(player))
