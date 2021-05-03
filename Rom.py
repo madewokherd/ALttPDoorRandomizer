@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'e0ea6c453588a8a35a59412ddf5ecdf2'
+RANDOMIZERBASEHASH = '5ea3196d8db3ca0c757035f7fd51cf9b'
 
 
 class JsonRom(object):
@@ -600,13 +600,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
-                write_int16(rom, edge.getAddress() + 0x0a, edge.scrollPos)
-                write_int16(rom, edge.getAddress() + 0x0c, edge.camPos)
-                write_int16(rom, edge.getAddress() + 0x0e, edge.linkOpp)
-                write_int16(rom, edge.getAddress() + 0x10, edge.scrollOpp)
-                write_int16(rom, edge.getAddress() + 0x12, edge.camOpp)
-                write_int16(rom, edge.getAddress() + 0x14, edge.vramLoc)
-                rom.write_bytes(edge.getAddress() + 0x16, [edge.unknownY, edge.unknownX, edge.getTarget()])
+                write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
+                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
     
     # patch entrance/exits/holes
     for region in world.regions:
