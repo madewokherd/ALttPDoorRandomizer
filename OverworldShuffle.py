@@ -42,166 +42,81 @@ def link_overworld(world, player):
                 for grouping in (OWEdgeGroups, None):
                     if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
                         groups = list(grouping.values())
-                        random.shuffle(groups)
-                        for (forward_edge_sets, back_edge_sets) in groups:
-                            assert len(forward_edge_sets) == len(back_edge_sets)
-                            random.shuffle(back_edge_sets)
-                        
-                            for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
-                                assert len(forward_set) == len(back_set)
-                                for (forward_edge, back_edge) in zip(forward_set, back_set):
-                                    connect_two_way(world, forward_edge, back_edge, player)
-                                    remaining_edges.remove(forward_edge)
-                                    remaining_edges.remove(back_edge)
-                
-                assert len(remaining_edges) == 0, remaining_edges
             else:
-                connect_remaining(world, remaining_edges, player)
+                for grouping in (OWEdgeGroups, None):
+                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                        new_grouping = {}
+
+                        for group in grouping.keys():
+                            (area, dir, terrain, count) = group
+                            new_grouping[(area, dir, terrain)] = ([], [])
+                        
+                        for group in grouping.keys():
+                            (forward_edges, back_edges) = grouping[group]
+                            forward_edges = [[i] for l in forward_edges for i in l]
+                            back_edges = [[i] for l in back_edges for i in l]
+                            for (e1, e2) in test_connections:
+                                forward_edges = list(filter(([e1]).__ne__, forward_edges))
+                                forward_edges = list(filter(([e2]).__ne__, forward_edges))
+                                back_edges = list(filter(([e1]).__ne__, forward_edges))
+                                back_edges = list(filter(([e2]).__ne__, forward_edges))
+                            (area, dir, terrain, _) = group
+                            (exist_forward_edges, exist_back_edges) = new_grouping[(area, dir, terrain)]
+                            exist_forward_edges.extend(forward_edges)
+                            exist_back_edges.extend(back_edges)
+                            new_grouping[(area, dir, terrain)] = (exist_forward_edges, exist_back_edges)
+
+                        groups = list(new_grouping.values())
+            
+            #all shuffling occurs here
+            random.shuffle(groups)
+            for (forward_edge_sets, back_edge_sets) in groups:
+                assert len(forward_edge_sets) == len(back_edge_sets)
+                random.shuffle(back_edge_sets)
+                for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
+                    assert len(forward_set) == len(back_set)
+                    for (forward_edge, back_edge) in zip(forward_set, back_set):
+                        connect_two_way(world, forward_edge, back_edge, player)
+                        remaining_edges.remove(forward_edge)
+                        remaining_edges.remove(back_edge)
+                
+            assert len(remaining_edges) == 0, remaining_edges
         else:
             raise NotImplementedError('Shuffling not supported yet')
 
-
 def connect_custom(world, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
-        for exit_name, region_name in world.custom_overworld[player]:
-            # doesn't actually change addresses
-            connect_simple(world, exit_name, region_name, player)
-    # this needs to remove custom connections from the pool
-
+        for edgename1, edgename2 in world.custom_overworld[player]:
+            connect_two_way(world, edgename1, edgename2, player)
+            remaining_edges.remove(edgename1)
+            remaining_edges.remove(edgename2)
 
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
 
-def connect_two_way(world, entrancename, exitname, player):
-    entrance = world.get_entrance(entrancename, player)
-    exit = world.get_entrance(exitname, player)
+def connect_two_way(world, edgename1, edgename2, player):
+    edge1 = world.get_entrance(edgename1, player)
+    edge2 = world.get_entrance(edgename2, player)
 
     # if these were already connected somewhere, remove the backreference
-    if entrance.connected_region is not None:
-        entrance.connected_region.entrances.remove(entrance)
-    if exit.connected_region is not None:
-        exit.connected_region.entrances.remove(exit)
+    if edge1.connected_region is not None:
+        edge1.connected_region.entrances.remove(edge1)
+    if edge2.connected_region is not None:
+        edge2.connected_region.entrances.remove(edge2)
 
-    entrance.connect(exit.parent_region)
-    exit.connect(entrance.parent_region)
-    x = world.check_for_owedge(entrancename, player)
-    y = world.check_for_owedge(exitname, player)
-    if x is not None and y is not None:
+    edge1.connect(edge2.parent_region)
+    edge2.connect(edge1.parent_region)
+    x = world.check_for_owedge(edgename1, player)
+    y = world.check_for_owedge(edgename2, player)
+    if x is None:
+        logging.getLogger('').error('%s is not a valid edge.', edgename1)
+    elif y is None:
+        logging.getLogger('').error('%s is not a valid edge.', edgename2)
+    else:
         x.dest = y
         y.dest = x
-    elif x is None:
-        logging.getLogger('').error('%s is not a valid edge.', entrancename)
-    elif y is None:
-        logging.getLogger('').error('%s is not a valid edge.', exitname)
-
-    world.spoiler.set_overworld(exitname, entrancename, 'both', player)
-
-def connect_edges(world, edges, targets, player):
-    """This works inplace"""
-    random.shuffle(edges)
-    random.shuffle(targets)
-    while edges:
-        edge = edges.pop()
-        target = targets.pop()
-        connect_two_way(world, edge, target, player)
-
-def connect_remaining(world, edges, player):
-    lw_edges = list()
-    dw_edges = list()
-    for edgename in edges:
-        edge = world.check_for_owedge(edgename, player)
-        if edge.worldType == WorldType.Dark:
-            dw_edges.append(edge)
-        else:
-            lw_edges.append(edge)
     
-    land_edges = list()
-    water_edges = list()
-    for edge in lw_edges:
-        if edge.terrain == Terrain.Land:
-            land_edges.append(edge)
-        else:
-            water_edges.append(edge)
-
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in land_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
-
-    #lw land edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
-
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in water_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
-
-    #lw water edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
-
-    land_edges = list()
-    water_edges = list()
-    for edge in dw_edges:
-        if edge.terrain == Terrain.Land:
-            land_edges.append(edge)
-        else:
-            water_edges.append(edge)
-    
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in land_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
-    
-    #dw land edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
-
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in water_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
-    
-    #dw water edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
+    world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
 
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
