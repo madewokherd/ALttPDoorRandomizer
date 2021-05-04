@@ -58,8 +58,8 @@ def link_overworld(world, player):
                             for (e1, e2) in test_connections:
                                 forward_edges = list(filter(([e1]).__ne__, forward_edges))
                                 forward_edges = list(filter(([e2]).__ne__, forward_edges))
-                                back_edges = list(filter(([e1]).__ne__, forward_edges))
-                                back_edges = list(filter(([e2]).__ne__, forward_edges))
+                                back_edges = list(filter(([e1]).__ne__, back_edges))
+                                back_edges = list(filter(([e2]).__ne__, back_edges))
                             (area, dir, terrain, _) = group
                             (exist_forward_edges, exist_back_edges) = new_grouping[(area, dir, terrain)]
                             exist_forward_edges.extend(forward_edges)
