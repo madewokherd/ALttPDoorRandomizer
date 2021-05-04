@@ -144,6 +144,7 @@ def parse_settings():
         "shuffleganon": True,
         "ow_shuffle": "vanilla",
         "ow_keepsimilar": False,
+        "ow_parallel": False,
         "shuffle": "vanilla",
 
         "shufflepots": False,

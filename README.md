@@ -10,6 +10,7 @@ This is a very new mode of LTTPR so the tools and info is very limited. There is
 
 # Known Issues
 (Updated 2021-04-26)
+(Updated 2021-05-04)
 
 ### If you want to playtest this, know these things:
 - Camera unlocking issues, which opens up the possibility of a hardlock. The workaround is to move Link around until the camera locks in place. DO NOT try to transition where there is a visible line.
@@ -56,6 +57,10 @@ OW is not shuffled.
 
 This keeps similar edge transitions together. ie. The 2 west edges will be paired to another set of two similar edges
 
+## Parallel Worlds (--ow_parallel)
+
+This ensures matching layouts of Light and Dark worlds. Any remaining edge transitions that don't have a matching counterpart will be shuffled amongst themselves. ie. If going right from Link's House leads to Blacksmith, then going right from Big Bomb Shop will lead to Hammer Pegs
+
 
 # Command Line Options
 
@@ -76,3 +81,9 @@ For specifying the overworld shuffle you want as above. (default: vanilla)
 ```
 
 This keeps similar edge transitions paired together with other pairs of transitions
+
+```
+--ow_parallel     
+```
+
+This ensures the layout of both worlds have the same shape

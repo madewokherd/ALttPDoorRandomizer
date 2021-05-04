@@ -154,6 +154,7 @@ def roll_settings(weights):
     overworld_shuffle = get_choice('overworld_shuffle')
     ret.ow_shuffle = overworld_shuffle if overworld_shuffle != 'none' else 'vanilla'
     ret.ow_keepsimilar = get_choice('ow_keepsimilar')
+    ret.ow_parallel = get_choice('ow_parallel')
     entrance_shuffle = get_choice('entrance_shuffle')
     ret.shuffle = entrance_shuffle if entrance_shuffle != 'none' else 'vanilla'
     door_shuffle = get_choice('door_shuffle')

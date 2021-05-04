@@ -25,6 +25,7 @@ class World(object):
         self.teams = 1
         self.owShuffle = owShuffle.copy()
         self.owKeepSimilar = {}
+        self.owParallelWorlds = {}
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
         self.intensity = {}
@@ -2095,6 +2096,7 @@ class Spoiler(object):
                          'goal': self.world.goal,
                          'ow_shuffle': self.world.owShuffle,
                          'ow_keepsimilar': self.world.owKeepSimilar,
+                         'ow_parallel': self.world.owParallelWorlds,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
                          'intensity': self.world.intensity,
@@ -2174,6 +2176,7 @@ class Spoiler(object):
                 outfile.write('Item Functionality:'.ljust(line_width) + '%s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Overworld Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
                 outfile.write('Keep OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
+                outfile.write('Parallel Worlds:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_parallel'][player] else 'No'))
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
