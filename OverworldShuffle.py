@@ -1,6 +1,7 @@
 import random
 from BaseClasses import OWEdge, WorldType, Direction, Terrain
-from OWEdges import OWEdgeGroups
+from Utils import bidict
+from OWEdges import OWEdgeGroups, IsParallel
 
 __version__ = '0.1.1.2-u'
 
@@ -18,55 +19,180 @@ def link_overworld(world, player):
         for exitname, destname in default_connections:
             connect_two_way(world, exitname, destname, player)
     else:
-        remaining_edges = []
-        for exitname, destname in default_connections:
-            remaining_edges.append(exitname)
-            remaining_edges.append(destname)
+        connected_edges = []
         
-        if world.mode[player] == 'standard':
-            for exitname, destname in standard_connections:
+        if world.owKeepSimilar[player] and world.owParallelWorlds[player]:
+            for exitname, destname in parallelsimilar_connections:
                 connect_two_way(world, exitname, destname, player)
-                remaining_edges.remove(exitname)
-                remaining_edges.remove(destname)
+                connected_edges.append(exitname)
+                connected_edges.append(destname)
 
         #TODO: Remove, just for testing
         for exitname, destname in test_connections:
             connect_two_way(world, exitname, destname, player)
-            remaining_edges.remove(exitname)
-            remaining_edges.remove(destname)
+            connected_edges.append(exitname)
+            connected_edges.append(destname)
+        
+        trimmed_groups = remove_reserved(world, OWEdgeGroups, connected_edges, player)
         
         if world.owShuffle[player] == 'full':
+            #predefined shuffle groups get reorganized here
             if world.owKeepSimilar[player]:
-                #TODO: remove edges from list that are already placed, Std and Plando
-                # shuffle edges in groups that connect the same pair of tiles
-                for grouping in (OWEdgeGroups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        groups = list(grouping.values())
+                if world.owParallelWorlds[player]:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,E,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                groups = list(grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,E,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, count) = group
+                                    new_grouping[(region, axis, terrain, parallel, count)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, count) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel, count)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain, parallel, count)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                else:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,_,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, count) = group
+                                    new_grouping[(std, region, axis, terrain, count)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, count) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, count)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(std, region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,_,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, count) = group
+                                    new_grouping[(region, axis, terrain, count)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, count) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, count)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
             else:
-                for grouping in (OWEdgeGroups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                if world.owParallelWorlds[player]:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,E,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
 
-                        for group in grouping.keys():
-                            (area, dir, terrain, count) = group
-                            new_grouping[(area, dir, terrain)] = ([], [])
-                        
-                        for group in grouping.keys():
-                            (forward_edges, back_edges) = grouping[group]
-                            forward_edges = [[i] for l in forward_edges for i in l]
-                            back_edges = [[i] for l in back_edges for i in l]
-                            for (e1, e2) in test_connections:
-                                forward_edges = list(filter(([e1]).__ne__, forward_edges))
-                                forward_edges = list(filter(([e2]).__ne__, forward_edges))
-                                back_edges = list(filter(([e1]).__ne__, back_edges))
-                                back_edges = list(filter(([e2]).__ne__, back_edges))
-                            (area, dir, terrain, _) = group
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(area, dir, terrain)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(area, dir, terrain)] = (exist_forward_edges, exist_back_edges)
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, parallel, _) = group
+                                    new_grouping[(std, region, axis, terrain, parallel)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, parallel, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, parallel)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(std, region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
 
-                        groups = list(new_grouping.values())
+                                groups = list(new_grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,E,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, _) = group
+                                    new_grouping[(region, axis, terrain, parallel)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                else:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,_,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, _) = group
+                                    new_grouping[(std, region, axis, terrain)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(std, region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,_,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, _) = group
+                                    new_grouping[(region, axis, terrain)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
             
             #all shuffling occurs here
             random.shuffle(groups)
@@ -77,10 +203,14 @@ def link_overworld(world, player):
                     assert len(forward_set) == len(back_set)
                     for (forward_edge, back_edge) in zip(forward_set, back_set):
                         connect_two_way(world, forward_edge, back_edge, player)
-                        remaining_edges.remove(forward_edge)
-                        remaining_edges.remove(back_edge)
-                
-            assert len(remaining_edges) == 0, remaining_edges
+                        connected_edges.append(forward_edge)
+                        connected_edges.append(back_edge)
+                        if world.owParallelWorlds[player] and forward_edge in parallel_links.keys():
+                            connect_two_way(world, parallel_links[forward_edge], parallel_links[back_edge], player)
+                            connected_edges.append(parallel_links[forward_edge])
+                            connected_edges.append(parallel_links[back_edge])
+
+            assert len(connected_edges) == len(default_connections) * 2, connected_edges
         else:
             raise NotImplementedError('Shuffling not supported yet')
 
@@ -88,8 +218,8 @@ def connect_custom(world, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
         for edgename1, edgename2 in world.custom_overworld[player]:
             connect_two_way(world, edgename1, edgename2, player)
-            remaining_edges.remove(edgename1)
-            remaining_edges.remove(edgename2)
+            connected_edges.append(edgename1)
+            connected_edges.append(edgename2)
 
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
@@ -117,6 +247,38 @@ def connect_two_way(world, edgename1, edgename2, player):
         y.dest = x
     
     world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
+
+def remove_reserved(world, groupedlist, connected_edges, player):
+    #TODO: Remove edges set in connect_custom
+    new_grouping = {}
+    for group in groupedlist.keys():
+        new_grouping[group] = ([], [])
+
+    for group in groupedlist.keys():
+        (std, region, axis, terrain, parallel, count) = group
+        (forward_edges, back_edges) = groupedlist[group]
+
+        for edge in connected_edges:
+            forward_edges = list(list(filter((edge).__ne__, i)) for i in forward_edges)
+            back_edges = list(list(filter((edge).__ne__, i)) for i in back_edges)
+        
+        if world.owParallelWorlds[player] and parallel == IsParallel.Yes and region == WorldType.Dark:
+            for edge in parallel_links:
+                forward_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in forward_edges)
+                back_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in back_edges)
+
+        forward_edges = list(filter(([]).__ne__, forward_edges))
+        back_edges = list(filter(([]).__ne__, back_edges))
+
+        #TODO: The lists above can be left with invalid counts of edges, they need to get put into their appropriate group
+
+        (exist_forward_edges, exist_back_edges) = new_grouping[group]
+        exist_forward_edges.extend(forward_edges)
+        exist_back_edges.extend(back_edges)
+        if len(exist_forward_edges) > 0:
+            new_grouping[group] = (exist_forward_edges, exist_back_edges)
+
+    return new_grouping
 
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
@@ -374,6 +536,147 @@ standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
                         ('Central Bonk Rocks EC', 'Links House WC'),
                         ('Central Bonk Rocks ES', 'Links House WS')
                         ]
+
+parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
+                                ('Dig Game EC', 'Frog WC'),
+                                ('Dig Game ES', 'Frog WS')
+                                ]
+
+parallel_links = bidict({'Lost Woods SW': 'Skull Woods SW',
+                        'Lost Woods SC': 'Skull Woods SC',
+                        'Lost Woods SE': 'Skull Woods SE',
+                        'Lost Woods EN': 'Skull Woods EN',
+                        'Lumberjack SW': 'Dark Lumberjack SW',
+                        'Lumberjack WN': 'Dark Lumberjack WN',
+                        'West Death Mountain EN': 'West Dark Death Mountain EN',
+                        'West Death Mountain ES': 'West Dark Death Mountain ES',
+                        'East Death Mountain WN': 'East Dark Death Mountain WN',
+                        'East Death Mountain WS': 'East Dark Death Mountain WS',
+                        'East Death Mountain EN': 'East Dark Death Mountain EN',
+                        'Death Mountain TR Pegs WN': 'Turtle Rock WN',
+                        'Mountain Entry NW': 'Bumper Cave NW',
+                        'Mountain Entry SE': 'Bumper Cave SE',
+                        'Zora Approach SE': 'Catfish SE',
+                        'Lost Woods Pass NW': 'Skull Woods Pass NW',
+                        'Lost Woods Pass NE': 'Skull Woods Pass NE',
+                        'Lost Woods Pass SW': 'Skull Woods Pass SW',
+                        'Lost Woods Pass SE': 'Skull Woods Pass SE',
+                        'Kakariko Fortune NE': 'Dark Fortune NE',
+                        'Kakariko Fortune SC': 'Dark Fortune SC',
+                        'Kakariko Fortune EN': 'Dark Fortune EN',
+                        'Kakariko Fortune ES': 'Dark Fortune ES',
+                        'Kakariko Pond NE': 'Outcast Pond NE',
+                        'Kakariko Pond SW': 'Outcast Pond SW',
+                        'Kakariko Pond SE': 'Outcast Pond SE',
+                        'Kakariko Pond WN': 'Outcast Pond WN',
+                        'Kakariko Pond WS': 'Outcast Pond WS',
+                        'Kakariko Pond EN': 'Outcast Pond EN',
+                        'Kakariko Pond ES': 'Outcast Pond ES',
+                        'Sanctuary WN': 'Dark Chapel WN',
+                        'Sanctuary WS': 'Dark Chapel WS',
+                        'Sanctuary EC': 'Dark Chapel EC',
+                        'Graveyard WC': 'Dark Graveyard WC',
+                        'Graveyard EC': 'Dark Graveyard ES',
+                        'River Bend SW': 'Qirn Jump SW',
+                        'River Bend SC': 'Qirn Jump SC',
+                        'River Bend SE': 'Qirn Jump SE',
+                        'River Bend WC': 'Qirn Jump WC',
+                        'River Bend EN': 'Qirn Jump EN',
+                        'River Bend EC': 'Qirn Jump EC',
+                        'River Bend ES': 'Qirn Jump ES',
+                        'Potion Shop WN': 'Dark Witch WN',
+                        'Potion Shop WC': 'Dark Witch WC',
+                        'Potion Shop WS': 'Dark Witch WS',
+                        'Potion Shop EN': 'Dark Witch EN',
+                        'Potion Shop EC': 'Dark Witch EC',
+                        'Zora Warning NE': 'Catfish Approach NE',
+                        'Zora Warning WN': 'Catfish Approach WN',
+                        'Zora Warning WC': 'Catfish Approach WC',
+                        'Kakariko NW': 'Village of Outcasts NW',
+                        'Kakariko NC': 'Village of Outcasts NC',
+                        'Kakariko NE': 'Village of Outcasts NE',
+                        'Kakariko SE': 'Village of Outcasts SE',
+                        'Kakariko ES': 'Village of Outcasts ES',
+                        'Forgotten Forest NW': 'Shield Shop NW',
+                        'Forgotten Forest NE': 'Shield Shop NE',
+                        'Hyrule Castle SW': 'Pyramid SW',
+                        'Hyrule Castle SE': 'Pyramid SE',
+                        'Hyrule Castle ES': 'Pyramid ES',
+                        'Wooden Bridge NW': 'Broken Bridge NW',
+                        'Wooden Bridge NC': 'Broken Bridge NC',
+                        'Wooden Bridge NE': 'Broken Bridge NE',
+                        'Wooden Bridge SW': 'Broken Bridge SW',
+                        'Eastern Palace SW': 'Palace of Darkness SW',
+                        'Eastern Palace SE': 'Palace of Darkness SE',
+                        'Blacksmith WS': 'Hammer Pegs WS',
+                        'Sand Dunes NW': 'Dark Dunes NW',
+                        'Sand Dunes SC': 'Dark Dunes SC',
+                        'Sand Dunes WN': 'Dark Dunes WN',
+                        'Maze Race ES': 'Dig Game ES',
+                        'Kakariko Suburb NE': 'Frog NE',
+                        'Kakariko Suburb WS': 'Frog WS',
+                        'Kakariko Suburb ES': 'Frog ES',
+                        'Flute Boy SW': 'Stumpy SW',
+                        'Flute Boy SC': 'Stumpy SC',
+                        'Flute Boy WS': 'Stumpy WS',
+                        'Central Bonk Rocks NW': 'Dark Bonk Rocks NW',
+                        'Central Bonk Rocks SW': 'Dark Bonk Rocks SW',
+                        'Central Bonk Rocks EN': 'Dark Bonk Rocks EN',
+                        'Central Bonk Rocks EC': 'Dark Bonk Rocks EC',
+                        'Central Bonk Rocks ES': 'Dark Bonk Rocks ES',
+                        'Links House NE': 'Big Bomb Shop NE',
+                        'Links House SC': 'Big Bomb Shop SC',
+                        'Links House WN': 'Big Bomb Shop WN',
+                        'Links House WC': 'Big Bomb Shop WC',
+                        'Links House WS': 'Big Bomb Shop WS',
+                        'Links House ES': 'Big Bomb Shop ES',
+                        'Stone Bridge NC': 'Hammer Bridge NC',
+                        'Stone Bridge SC': 'Hammer Bridge SC',
+                        'Stone Bridge WS': 'Hammer Bridge WS',
+                        'Stone Bridge EN': 'Hammer Bridge EN',
+                        'Stone Bridge EC': 'Hammer Bridge EC',
+                        'Tree Line NW': 'Dark Tree Line NW',
+                        'Tree Line SC': 'Dark Tree Line SC',
+                        'Tree Line SE': 'Dark Tree Line SE',
+                        'Tree Line WN': 'Dark Tree Line WN',
+                        'Tree Line WC': 'Dark Tree Line WC',
+                        'Eastern Nook NE': 'Palace of Darkness Nook NE',
+                        'Cave 45 NW': 'Circle of Bushes NW',
+                        'Cave 45 NC': 'Circle of Bushes NC',
+                        'Cave 45 EC': 'Circle of Bushes EC',
+                        'C Whirlpool NW': 'Dark C Whirlpool NW',
+                        'C Whirlpool SC': 'Dark C Whirlpool SC',
+                        'C Whirlpool WC': 'Dark C Whirlpool WC',
+                        'C Whirlpool EN': 'Dark C Whirlpool EN',
+                        'C Whirlpool EC': 'Dark C Whirlpool EC',
+                        'C Whirlpool ES': 'Dark C Whirlpool ES',
+                        'Statues NC': 'Hype Cave NC',
+                        'Statues SC': 'Hype Cave SC',
+                        'Statues WN': 'Hype Cave WN',
+                        'Statues WC': 'Hype Cave WC',
+                        'Statues WS': 'Hype Cave WS',
+                        'Lake Hylia NW': 'Ice Lake NW',
+                        'Lake Hylia NC': 'Ice Lake NC',
+                        'Lake Hylia NE': 'Ice Lake NE',
+                        'Lake Hylia WS': 'Ice Lake WS',
+                        'Lake Hylia EC': 'Ice Lake EC',
+                        'Lake Hylia ES': 'Ice Lake ES',
+                        'Ice Cave SW': 'Shopping Mall SW',
+                        'Ice Cave SE': 'Shopping Mall SE',
+                        'Desert Pass EC': 'Swamp Nook EC',
+                        'Desert Pass ES': 'Swamp Nook ES',
+                        'Dam NC': 'Swamp NC',
+                        'Dam WC': 'Swamp WC',
+                        'Dam WS': 'Swamp WS',
+                        'Dam EC': 'Swamp EC',
+                        'South Pass WC': 'Dark South Pass WC',
+                        'South Pass NC': 'Dark South Pass NC',
+                        'South Pass ES': 'Dark South Pass ES',
+                        'Octoballoon NW': 'Bomber Corner NW',
+                        'Octoballoon NE': 'Bomber Corner NE',
+                        'Octoballoon WC': 'Bomber Corner WC',
+                        'Octoballoon WS': 'Bomber Corner WS'
+                        })
 
 # non shuffled overworld
 default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),

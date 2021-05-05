@@ -1,5 +1,16 @@
 
 from BaseClasses import OWEdge, Direction, Terrain, WorldType, PolSlot
+from enum import Enum, unique
+
+@unique
+class OpenStd(Enum):
+    Open = 0
+    Standard = 1
+
+@unique
+class IsParallel(Enum):
+    No = 0
+    Yes = 1
 
 # constants
 We = Direction.West
@@ -15,6 +26,12 @@ DW = WorldType.Dark
 
 Vt = PolSlot.NorthSouth
 Hz = PolSlot.EastWest
+
+Op = OpenStd.Open
+St = OpenStd.Standard
+
+PL = IsParallel.Yes
+NP = IsParallel.No
 
 
 def create_owedges(world, player):
@@ -312,13 +329,27 @@ def create_owedge(player, name, owIndex, direction, terrain, edge_id, owSlotInde
 
 
 OWEdgeGroups = {
-    (LW, Hz, Ld, 1): (
+    #(IsStandard, World, EdgeAxis, Terrain, HasParallel, NumberInGroup)
+    (St, LW, Vt, Ld, PL, 1): (
+        [
+            ['Hyrule Castle SW'],
+            ['Hyrule Castle SE']
+        ],
+        [
+            ['Central Bonk Rocks NW'],
+            ['Links House NE']
+        ]
+    ),
+    (St, LW, Hz, Ld, PL, 3): (
+        [['Central Bonk Rocks EN', 'Central Bonk Rocks EC', 'Central Bonk Rocks ES']],
+        [['Links House WN', 'Links House WC', 'Links House WS']]
+    ),
+    (Op, LW, Hz, Ld, PL, 1): (
         [
             ['Lost Woods EN'],
             ['East Death Mountain EN'],
             ['Sanctuary EC'],
             ['Graveyard EC'],
-            ['Forgotten Forest ES'],
             ['Kakariko ES'],
             ['Hyrule Castle ES'],
             ['Maze Race ES'],
@@ -338,7 +369,6 @@ OWEdgeGroups = {
             ['Death Mountain TR Pegs WN'],
             ['Graveyard WC'],
             ['River Bend WC'],
-            ['Hyrule Castle WN'],
             ['Blacksmith WS'],
             ['Sand Dunes WN'],
             ['Kakariko Suburb WS'],
@@ -354,7 +384,15 @@ OWEdgeGroups = {
             ['East Death Mountain WS']
         ]
     ),
-    (LW, Vt, Ld, 1): (
+    (Op, LW, Hz, Ld, NP, 1): (
+        [
+            ['Forgotten Forest ES']
+        ],
+        [
+            ['Hyrule Castle WN']
+        ]
+    ),
+    (Op, LW, Vt, Ld, PL, 1): (
         [
             ['Lumberjack SW'],
             ['Mountain Entry SE'],
@@ -363,8 +401,6 @@ OWEdgeGroups = {
             ['Kakariko Fortune SC'],
             ['Wooden Bridge SW'],
             ['Kakariko SE'],
-            ['Hyrule Castle SW'],
-            ['Hyrule Castle SE'],
             ['Sand Dunes SC'],
             ['Eastern Palace SW'],
             ['Eastern Palace SE'],
@@ -384,8 +420,6 @@ OWEdgeGroups = {
             ['Kakariko NE'],
             ['Sand Dunes NW'],
             ['Kakariko Suburb NE'],
-            ['Central Bonk Rocks NW'],
-            ['Links House NE'],
             ['Stone Bridge NC'],
             ['Tree Line NW'],
             ['Eastern Nook NE'],
@@ -398,11 +432,10 @@ OWEdgeGroups = {
             ['Octoballoon NE']
         ]
     ),
-    (LW, Hz, Ld, 2): (
+    (Op, LW, Hz, Ld, PL, 2): (
         [
             ['Kakariko Fortune EN', 'Kakariko Fortune ES'],
             ['Kakariko Pond EN', 'Kakariko Pond ES'],
-            ['Desert EC', 'Desert ES'],
             ['Desert Pass EC', 'Desert Pass ES'],
             ['River Bend EC', 'River Bend ES'],
             ['C Whirlpool EN', 'C Whirlpool ES']
@@ -410,13 +443,20 @@ OWEdgeGroups = {
         [
             ['Kakariko Pond WN', 'Kakariko Pond WS'],
             ['Sanctuary WN', 'Sanctuary WS'],
-            ['Desert Pass WC', 'Desert Pass WS'],
             ['Dam WC', 'Dam WS'],
             ['Potion Shop WC', 'Potion Shop WS'],
             ['Statues WN', 'Statues WS']
         ]
     ),
-    (LW, Vt, Ld, 2): (
+    (Op, LW, Hz, Ld, NP, 2): (
+        [
+            ['Desert EC', 'Desert ES']
+        ],
+        [
+            ['Desert Pass WC', 'Desert Pass WS']
+        ]
+    ),
+    (Op, LW, Vt, Ld, PL, 2): (
         [
             ['Lost Woods SW', 'Lost Woods SC'],
             ['Lost Woods Pass SW', 'Lost Woods Pass SE'],
@@ -432,11 +472,7 @@ OWEdgeGroups = {
             ['Wooden Bridge NW', 'Wooden Bridge NE']
         ]
     ),
-    (LW, Hz, Ld, 3): (
-        [['Central Bonk Rocks EN', 'Central Bonk Rocks EC', 'Central Bonk Rocks ES']],
-        [['Links House WN', 'Links House WC', 'Links House WS']]
-    ),
-    (LW, Hz, Wr, 1): (
+    (Op, LW, Hz, Wr, PL, 1): (
         [
             ['Potion Shop EN'],
             ['Lake Hylia EC'],
@@ -452,7 +488,7 @@ OWEdgeGroups = {
             ['Statues WC']
         ]
     ),
-    (LW, Vt, Wr, 1): (
+    (Op, LW, Vt, Wr, PL, 1): (
         [
             ['Tree Line SC'],
             ['Ice Cave SW'],
@@ -464,7 +500,7 @@ OWEdgeGroups = {
             ['Wooden Bridge NC']
         ]
     ),
-    (DW, Hz, Ld, 1): (
+    (Op, DW, Hz, Ld, PL, 1): (
         [
             ['Skull Woods EN'],
             ['East Dark Death Mountain EN'],
@@ -502,7 +538,7 @@ OWEdgeGroups = {
             ['East Dark Death Mountain WS']
         ]
     ),
-    (DW, Vt, Ld, 1): (
+    (Op, DW, Vt, Ld, PL, 1): (
         [
             ['Dark Lumberjack SW'],
             ['Bumper Cave SE'],
@@ -546,12 +582,11 @@ OWEdgeGroups = {
             ['Bomber Corner NE']
         ]
     ),
-    (DW, Hz, Ld, 2): (
+    (Op, DW, Hz, Ld, PL, 2): (
         [
             ['Dark Fortune EN', 'Dark Fortune ES'],
             ['Outcast Pond EN', 'Outcast Pond ES'],
             ['Swamp Nook EC', 'Swamp Nook ES'],
-            ['Dig Game EC', 'Dig Game ES'],
             ['Qirn Jump EC', 'Qirn Jump ES'],
             ['Dark C Whirlpool EN', 'Dark C Whirlpool ES']
         ],
@@ -559,12 +594,19 @@ OWEdgeGroups = {
             ['Outcast Pond WN', 'Outcast Pond WS'],
             ['Dark Chapel WN', 'Dark Chapel WS'],
             ['Swamp WC', 'Swamp WS'],
-            ['Frog WC', 'Frog WS'],
             ['Dark Witch WC', 'Dark Witch WS'],
             ['Hype Cave WN', 'Hype Cave WS']
         ]
     ),
-    (DW, Vt, Ld, 2): (
+    (Op, DW, Hz, Ld, NP, 2): (
+        [
+            ['Dig Game EC', 'Dig Game ES']
+        ],
+        [
+            ['Frog WC', 'Frog WS']
+        ]
+    ),
+    (Op, DW, Vt, Ld, PL, 2): (
         [
             ['Skull Woods SW', 'Skull Woods SC'],
             ['Skull Woods Pass SW', 'Skull Woods Pass SE'],
@@ -580,11 +622,11 @@ OWEdgeGroups = {
             ['Broken Bridge NW', 'Broken Bridge NE']
         ]
     ),
-    (DW, Hz, Ld, 3): (
+    (Op, DW, Hz, Ld, PL, 3): (
         [['Dark Bonk Rocks EN', 'Dark Bonk Rocks EC', 'Dark Bonk Rocks ES']],
         [['Big Bomb Shop WN', 'Big Bomb Shop WC', 'Big Bomb Shop WS']]
     ),
-    (DW, Hz, Wr, 1): (
+    (Op, DW, Hz, Wr, PL, 1): (
         [
             ['Dark Witch EN'],
             ['Ice Lake EC'],
@@ -600,7 +642,7 @@ OWEdgeGroups = {
             ['Hype Cave WC']
         ]
     ),
-    (DW, Vt, Wr, 1): (
+    (Op, DW, Vt, Wr, PL, 1): (
         [
             ['Dark Tree Line SC'],
             ['Shopping Mall SW'],
