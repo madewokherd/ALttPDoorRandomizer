@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.2.0
+- Added 'Parallel Worlds' toggle option
+- Updated shuffle algorithm
+- Renamed some OW areas
+
 ### 0.1.1.2
 - If Link's current position fits within the incoming gap, Link will not get re-centered to the incoming gap
 - Added Rule for Pearl required to drop down back of SW
