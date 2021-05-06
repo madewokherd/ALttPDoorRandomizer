@@ -203,7 +203,10 @@
       "                overworld screens from the same world.",
       "Crossed:        Overworld screen transitions can lead to any other overworld screen."
     ],
-    "ow_keepsimilar": [ "This keeps similar edge transitions together. ie. the two west edges on Potion Shop will be paired with another similar pair." ],
+    "ow_keepsimilar": [
+      "This keeps similar edge transitions together. ie. the two west edges on",
+      "Potion Shop will be paired with another similar pair." ],
+    "ow_parallel": [ "This ensures the layouts of both worlds are the same shape." ],
     "door_shuffle": [
       "Select Door Shuffling Algorithm. (default: %(default)s)",
       "Basic:          Doors are mixed within a single dungeon.",

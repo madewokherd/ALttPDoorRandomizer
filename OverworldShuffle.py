@@ -1,8 +1,9 @@
 import random
 from BaseClasses import OWEdge, WorldType, Direction, Terrain
-from OWEdges import OWEdgeGroups
+from Utils import bidict
+from OWEdges import OWEdgeGroups, IsParallel
 
-__version__ = '0.1.1.2-u'
+__version__ = '0.1.2.0-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -11,197 +12,273 @@ def link_overworld(world, player):
     for exitname, destname in temporary_mandatory_connections:
         connect_two_way(world, exitname, destname, player)
 
-    connect_custom(world, player)
+    connected_edges = []
+
+    connect_custom(world, connected_edges, player)
 
     # if we do not shuffle, set default connections
     if world.owShuffle[player] == 'vanilla':
         for exitname, destname in default_connections:
             connect_two_way(world, exitname, destname, player)
     else:
-        remaining_edges = []
-        for exitname, destname in default_connections:
-            remaining_edges.append(exitname)
-            remaining_edges.append(destname)
-        
-        if world.mode[player] == 'standard':
-            for exitname, destname in standard_connections:
+        if world.owKeepSimilar[player] and world.owParallelWorlds[player]:
+            for exitname, destname in parallelsimilar_connections:
                 connect_two_way(world, exitname, destname, player)
-                remaining_edges.remove(exitname)
-                remaining_edges.remove(destname)
+                connected_edges.append(exitname)
+                connected_edges.append(destname)
 
         #TODO: Remove, just for testing
         for exitname, destname in test_connections:
             connect_two_way(world, exitname, destname, player)
-            remaining_edges.remove(exitname)
-            remaining_edges.remove(destname)
+            connected_edges.append(exitname)
+            connected_edges.append(destname)
+        
+        trimmed_groups = remove_reserved(world, OWEdgeGroups, connected_edges, player)
         
         if world.owShuffle[player] == 'full':
+            #predefined shuffle groups get reorganized here
             if world.owKeepSimilar[player]:
-                #TODO: remove edges from list that are already placed, Std and Plando
-                # shuffle edges in groups that connect the same pair of tiles
-                for grouping in (OWEdgeGroups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        groups = list(grouping.values())
-                        random.shuffle(groups)
-                        for (forward_edge_sets, back_edge_sets) in groups:
-                            assert len(forward_edge_sets) == len(back_edge_sets)
-                            random.shuffle(back_edge_sets)
-                        
-                            for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
-                                assert len(forward_set) == len(back_set)
-                                for (forward_edge, back_edge) in zip(forward_set, back_set):
-                                    connect_two_way(world, forward_edge, back_edge, player)
-                                    remaining_edges.remove(forward_edge)
-                                    remaining_edges.remove(back_edge)
-                
-                assert len(remaining_edges) == 0, remaining_edges
+                if world.owParallelWorlds[player]:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,E,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                groups = list(grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,E,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, count) = group
+                                    new_grouping[(region, axis, terrain, parallel, count)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, count) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel, count)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain, parallel, count)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                else:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,_,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, count) = group
+                                    new_grouping[(std, region, axis, terrain, count)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, count) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, count)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(std, region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,_,F)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, count) = group
+                                    new_grouping[(region, axis, terrain, count)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, count) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, count)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
             else:
-                connect_remaining(world, remaining_edges, player)
+                if world.owParallelWorlds[player]:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,E,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, parallel, _) = group
+                                    new_grouping[(std, region, axis, terrain, parallel)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, parallel, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, parallel)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(std, region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,E,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, _) = group
+                                    new_grouping[(region, axis, terrain, parallel)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, parallel, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                else:
+                    if world.mode[player] == 'standard':
+                        #tuple stays (A,B,C,D,_,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, _) = group
+                                    new_grouping[(std, region, axis, terrain)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (std, region, axis, terrain, _, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(std, region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+                    else:
+                        #tuple goes to (_,B,C,D,_,_)
+                        for grouping in (trimmed_groups, None):
+                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                                new_grouping = {}
+
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, _) = group
+                                    new_grouping[(region, axis, terrain)] = ([], [])
+                                
+                                for group in grouping.keys():
+                                    (_, region, axis, terrain, _, _) = group
+                                    (forward_edges, back_edges) = grouping[group]
+                                    forward_edges = [[i] for l in forward_edges for i in l]
+                                    back_edges = [[i] for l in back_edges for i in l]
+                                    
+                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain)]
+                                    exist_forward_edges.extend(forward_edges)
+                                    exist_back_edges.extend(back_edges)
+                                    new_grouping[(region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+
+                                groups = list(new_grouping.values())
+            
+            #all shuffling occurs here
+            random.shuffle(groups)
+            for (forward_edge_sets, back_edge_sets) in groups:
+                assert len(forward_edge_sets) == len(back_edge_sets)
+                random.shuffle(back_edge_sets)
+                for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
+                    assert len(forward_set) == len(back_set)
+                    for (forward_edge, back_edge) in zip(forward_set, back_set):
+                        connect_two_way(world, forward_edge, back_edge, player)
+                        connected_edges.append(forward_edge)
+                        connected_edges.append(back_edge)
+                        if world.owParallelWorlds[player] and forward_edge in parallel_links.keys():
+                            connect_two_way(world, parallel_links[forward_edge], parallel_links[back_edge], player)
+                            connected_edges.append(parallel_links[forward_edge])
+                            connected_edges.append(parallel_links[back_edge])
+
+            assert len(connected_edges) == len(default_connections) * 2, connected_edges
         else:
             raise NotImplementedError('Shuffling not supported yet')
 
-
-def connect_custom(world, player):
+def connect_custom(world, connected_edges, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
-        for exit_name, region_name in world.custom_overworld[player]:
-            # doesn't actually change addresses
-            connect_simple(world, exit_name, region_name, player)
-    # this needs to remove custom connections from the pool
-
+        for edgename1, edgename2 in world.custom_overworld[player]:
+            connect_two_way(world, edgename1, edgename2, player)
+            connected_edges.append(edgename1)
+            connected_edges.append(edgename2)
 
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
 
-def connect_two_way(world, entrancename, exitname, player):
-    entrance = world.get_entrance(entrancename, player)
-    exit = world.get_entrance(exitname, player)
+def connect_two_way(world, edgename1, edgename2, player):
+    edge1 = world.get_entrance(edgename1, player)
+    edge2 = world.get_entrance(edgename2, player)
 
     # if these were already connected somewhere, remove the backreference
-    if entrance.connected_region is not None:
-        entrance.connected_region.entrances.remove(entrance)
-    if exit.connected_region is not None:
-        exit.connected_region.entrances.remove(exit)
+    if edge1.connected_region is not None:
+        edge1.connected_region.entrances.remove(edge1)
+    if edge2.connected_region is not None:
+        edge2.connected_region.entrances.remove(edge2)
 
-    entrance.connect(exit.parent_region)
-    exit.connect(entrance.parent_region)
-    x = world.check_for_owedge(entrancename, player)
-    y = world.check_for_owedge(exitname, player)
-    if x is not None and y is not None:
+    edge1.connect(edge2.parent_region)
+    edge2.connect(edge1.parent_region)
+    x = world.check_for_owedge(edgename1, player)
+    y = world.check_for_owedge(edgename2, player)
+    if x is None:
+        logging.getLogger('').error('%s is not a valid edge.', edgename1)
+    elif y is None:
+        logging.getLogger('').error('%s is not a valid edge.', edgename2)
+    else:
         x.dest = y
         y.dest = x
-    elif x is None:
-        logging.getLogger('').error('%s is not a valid edge.', entrancename)
-    elif y is None:
-        logging.getLogger('').error('%s is not a valid edge.', exitname)
-
-    world.spoiler.set_overworld(exitname, entrancename, 'both', player)
-
-def connect_edges(world, edges, targets, player):
-    """This works inplace"""
-    random.shuffle(edges)
-    random.shuffle(targets)
-    while edges:
-        edge = edges.pop()
-        target = targets.pop()
-        connect_two_way(world, edge, target, player)
-
-def connect_remaining(world, edges, player):
-    lw_edges = list()
-    dw_edges = list()
-    for edgename in edges:
-        edge = world.check_for_owedge(edgename, player)
-        if edge.worldType == WorldType.Dark:
-            dw_edges.append(edge)
-        else:
-            lw_edges.append(edge)
     
-    land_edges = list()
-    water_edges = list()
-    for edge in lw_edges:
-        if edge.terrain == Terrain.Land:
-            land_edges.append(edge)
-        else:
-            water_edges.append(edge)
+    world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
 
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in land_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
+def remove_reserved(world, groupedlist, connected_edges, player):
+    #TODO: Remove edges set in connect_custom
+    new_grouping = {}
+    for group in groupedlist.keys():
+        new_grouping[group] = ([], [])
 
-    #lw land edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
+    for group in groupedlist.keys():
+        (std, region, axis, terrain, parallel, count) = group
+        (forward_edges, back_edges) = groupedlist[group]
 
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in water_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
+        for edge in connected_edges:
+            forward_edges = list(list(filter((edge).__ne__, i)) for i in forward_edges)
+            back_edges = list(list(filter((edge).__ne__, i)) for i in back_edges)
+        
+        if world.owParallelWorlds[player] and region == WorldType.Dark:
+            for edge in parallel_links:
+                forward_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in forward_edges)
+                back_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in back_edges)
 
-    #lw water edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
+        forward_edges = list(filter(([]).__ne__, forward_edges))
+        back_edges = list(filter(([]).__ne__, back_edges))
 
-    land_edges = list()
-    water_edges = list()
-    for edge in dw_edges:
-        if edge.terrain == Terrain.Land:
-            land_edges.append(edge)
-        else:
-            water_edges.append(edge)
-    
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in land_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
-    
-    #dw land edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
+        #TODO: The lists above can be left with invalid counts of edges, they need to get put into their appropriate group
 
-    north_edges = list()
-    south_edges = list()
-    west_edges = list()
-    east_edges = list()
-    for edge in water_edges:
-        if edge.direction == Direction.North:
-            north_edges.append(edge.name)
-        elif edge.direction == Direction.South:
-            south_edges.append(edge.name)
-        elif edge.direction == Direction.West:
-            west_edges.append(edge.name)
-        else:
-            east_edges.append(edge.name)
-    
-    #dw water edges
-    connect_edges(world, north_edges, south_edges, player)
-    connect_edges(world, west_edges, east_edges, player)
+        (exist_forward_edges, exist_back_edges) = new_grouping[group]
+        exist_forward_edges.extend(forward_edges)
+        exist_back_edges.extend(back_edges)
+        if len(exist_forward_edges) > 0:
+            new_grouping[group] = (exist_forward_edges, exist_back_edges)
+
+    return new_grouping
 
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
@@ -226,27 +303,27 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Flute Spot 8', 'Octoballoon Area'),
 
                          # Whirlpool Connections
-                         ('C Whirlpool', 'Useless Fairy Water'),
-                         ('Useless Fairy Whirlpool', 'C Whirlpool Area'),
+                         ('C Whirlpool', 'River Bend Water'),
+                         ('River Bend Whirlpool', 'C Whirlpool Area'),
                          ('Lake Hylia Whirlpool', 'Zora Approach Area'),
                          ('Zora Whirlpool', 'Lake Hylia Water'),
                          ('Kakariko Pond Whirlpool', 'Octoballoon Water'),
                          ('Octoballoon Whirlpool', 'Kakariko Pond Area'),
-                         ('Qirn Jump Whirlpool', 'Southeast DW Water'),
-                         ('Southeast DW Whirlpool', 'Qirn Jump Water'),
+                         ('Qirn Jump Whirlpool', 'Bomber Corner Water'),
+                         ('Bomber Corner Whirlpool', 'Qirn Jump Water'),
 
                          # Intra-tile OW Connections
                          ('Death Mountain Entrance Rock', 'Death Mountain Entrance'),
-                         ('Death Mountain Entrance Drop', 'DM Ascent Area'),
-                         ('Death Mountain Return Drop', 'DM Ascent Area'),
+                         ('Death Mountain Entrance Drop', 'Mountain Entry Area'),
+                         ('Death Mountain Return Drop', 'Mountain Entry Area'),
                          ('Bonk Rock Ledge Drop', 'Sanctuary Area'),
                          ('Kings Grave Outer Rocks', 'Kings Grave Area'),
                          ('Kings Grave Inner Rocks', 'Graveyard Area'),
                          ('Graveyard Ledge Drop', 'Graveyard Area'),
-                         ('Useless Fairy Water Drop', 'Useless Fairy Water'),
-                         ('Useless Fairy East Water Drop', 'Useless Fairy Water'),
-                         ('Useless Fairy West Pier', 'Useless Fairy Area'),
-                         ('Useless Fairy East Pier', 'Useless Fairy East Bank'),
+                         ('River Bend Water Drop', 'River Bend Water'),
+                         ('River Bend East Water Drop', 'River Bend Water'),
+                         ('River Bend West Pier', 'River Bend Area'),
+                         ('River Bend East Pier', 'River Bend East Bank'),
                          ('Potion Shop Water Drop', 'Potion Shop Water'),
                          ('Potion Shop Northeast Water Drop', 'Potion Shop Water'),
                          ('Potion Shop Rock (South)', 'Potion Shop Northeast'),
@@ -272,9 +349,9 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Desert Mouth Drop', 'Desert Area'),
                          ('Desert Teleporter Drop', 'Desert Area'),
                          ('Bombos Tablet Drop', 'Desert Area'),
-                         ('Purple Chest Ledge Drop', 'Purple Chest Area'),
-                         ('Purple Chest Rocks (North)', 'Purple Chest Southeast'),
-                         ('Purple Chest Rocks (South)', 'Purple Chest Area'),
+                         ('Desert Pass Ledge Drop', 'Desert Pass Area'),
+                         ('Desert Pass Rocks (North)', 'Desert Pass Southeast'),
+                         ('Desert Pass Rocks (South)', 'Desert Pass Area'),
                          ('Lake Hylia Water Drop', 'Lake Hylia Water'),
                          ('Lake Hylia South Water Drop', 'Lake Hylia Water'),
                          ('Lake Hylia Northeast Water Drop', 'Lake Hylia Water'),
@@ -340,14 +417,14 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Hammer Bridge Pegs (South)', 'Hammer Bridge North Area'),
                          ('Hammer Bridge Water Drop', 'Hammer Bridge Water'),
                          ('Hammer Bridge Pier', 'Hammer Bridge North Area'),
-                         ('Dark Lake Hylia Water Drop', 'Dark Lake Hylia Water'),
-                         ('Dark Lake Hylia Northeast Water Drop', 'Dark Lake Hylia Water'),
-                         ('Dark Lake Hylia Southwest Water Drop', 'Dark Lake Hylia Water'),
-                         ('Dark Lake Hylia Southeast Water Drop', 'Dark Lake Hylia Water'),
-                         ('Dark Lake Hylia Northeast Pier', 'Dark Lake Hylia Northeast Bank'),
-                         ('Southeast DW Water Drop', 'Southeast DW Water'),
-                         ('Southeast DW Waterfall Water Drop', 'Southeast DW Water'),
-                         ('Southeast DW Pier', 'Southeast DW Area'),
+                         ('Ice Lake Water Drop', 'Ice Lake Water'),
+                         ('Ice Lake Northeast Water Drop', 'Ice Lake Water'),
+                         ('Ice Lake Southwest Water Drop', 'Ice Lake Water'),
+                         ('Ice Lake Southeast Water Drop', 'Ice Lake Water'),
+                         ('Ice Lake Northeast Pier', 'Ice Lake Northeast Bank'),
+                         ('Bomber Corner Water Drop', 'Bomber Corner Water'),
+                         ('Bomber Corner Waterfall Water Drop', 'Bomber Corner Water'),
+                         ('Bomber Corner Pier', 'Bomber Corner Area'),
 
                          ('Dark Death Mountain Drop (West)', 'Dark Death Mountain (West Bottom)'),
                          ('Dark Death Mountain Drop (East)', 'Dark Death Mountain (East Bottom)'),
@@ -374,9 +451,9 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Lost Woods Southwest Mirror Spot', 'Lost Woods Area'),
                          ('Lost Woods Northeast Mirror Spot', 'Lost Woods Area'),
                          ('Lumberjack Mirror Spot', 'Lumberjack Area'),
-                         ('DM Ascent Mirror Spot', 'DM Ascent Area'),
-                         ('DM Ascent Entrance Mirror Spot', 'Death Mountain Entrance'),
-                         ('DM Ascent Ledge Mirror Spot', 'Death Mountain Return Ledge'),
+                         ('Mountain Entry Mirror Spot', 'Mountain Entry Area'),
+                         ('Mountain Entry Entrance Mirror Spot', 'Death Mountain Entrance'),
+                         ('Mountain Entry Ledge Mirror Spot', 'Death Mountain Return Ledge'),
                          ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
                          ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
                          ('Lost Woods East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
@@ -386,8 +463,8 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Bonk Rock Ledge Mirror Spot', 'Bonk Rock Ledge'),
                          ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
                          ('Kings Grave Mirror Spot', 'Kings Grave Area'),
-                         ('Useless Fairy Mirror Spot', 'Useless Fairy Area'),
-                         ('Useless Fairy East Mirror Spot', 'Useless Fairy East Bank'),
+                         ('River Bend Mirror Spot', 'River Bend Area'),
+                         ('River Bend East Mirror Spot', 'River Bend East Bank'),
                          ('Potion Shop Mirror Spot', 'Potion Shop Area'),
                          ('Potion Shop Northeast Mirror Spot', 'Potion Shop Northeast'),
                          ('Zora Warning Mirror Spot', 'Zora Warning Area'),
@@ -405,7 +482,7 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Wooden Bridge Mirror Spot', 'Wooden Bridge Area'),
                          ('Wooden Bridge Northeast Mirror Spot', 'Wooden Bridge Area'),
                          ('Wooden Bridge West Mirror Spot', 'Wooden Bridge Area'),
-                         ('Sand Dune Mirror Spot', 'Sand Dune Area'),
+                         ('Sand Dunes Mirror Spot', 'Sand Dunes Area'),
                          ('Eastern Palace Mirror Spot', 'Eastern Palace Area'),
                          ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
                          ('Maze Race Mirror Spot', 'Maze Race Ledge'),
@@ -417,7 +494,7 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
                          ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
                          ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
-                         ('Central Bonk Rock Mirror Spot', 'Central Bonk Rock Area'),
+                         ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area'),
                          ('Links House Mirror Spot', 'Links House Area'),
                          ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
                          ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
@@ -427,8 +504,8 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Checkerboard Mirror Spot', 'Desert Checkerboard Ledge'),
                          ('DP Stairs Mirror Spot', 'Desert Palace Stairs'),
                          ('DP Entrance (North) Mirror Spot', 'Desert Palace Entrance (North) Spot'),
-                         ('Bombos Tablet Mirror Spot', 'Purple Chest Ledge'),
-                         ('Purple Chest Mirror Spot', 'Purple Chest Area'),
+                         ('Bombos Tablet Mirror Spot', 'Desert Pass Ledge'),
+                         ('Desert Pass Mirror Spot', 'Desert Pass Area'),
                          ('Dam Mirror Spot', 'Dam Area'),
                          ('Statues Mirror Spot', 'Statues Area'),
                          ('South Pass Mirror Spot', 'South Pass Area'),
@@ -439,7 +516,7 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Lake Hylia Island Mirror Spot', 'Lake Hylia Island'),
                          ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
                          ('Octoballoon Mirror Spot', 'Octoballoon Area'),
-                         ('Ice Rod Cave Mirror Spot', 'Ice Rod Cave Area'),
+                         ('Ice Cave Mirror Spot', 'Ice Cave Area'),
                          ('Spectacle Rock Mirror Spot', 'Spectacle Rock Ledge'),
                          ('West Death Mountain (Top) Mirror Spot', 'West Death Mountain (Top)'),
                          ('East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top West)'),
@@ -453,20 +530,161 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs')
                          ]
 
-standard_connections = [('Hyrule Castle SW', 'Central Bonk Rock NW'),
+standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
                         ('Hyrule Castle SE', 'Links House NE'),
-                        ('Central Bonk Rock EN', 'Links House WN'),
-                        ('Central Bonk Rock EC', 'Links House WC'),
-                        ('Central Bonk Rock ES', 'Links House WS')
+                        ('Central Bonk Rocks EN', 'Links House WN'),
+                        ('Central Bonk Rocks EC', 'Links House WC'),
+                        ('Central Bonk Rocks ES', 'Links House WS')
                         ]
+
+parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
+                                ('Dig Game EC', 'Frog WC'),
+                                ('Dig Game ES', 'Frog WS')
+                                ]
+
+parallel_links = bidict({'Lost Woods SW': 'Skull Woods SW',
+                        'Lost Woods SC': 'Skull Woods SC',
+                        'Lost Woods SE': 'Skull Woods SE',
+                        'Lost Woods EN': 'Skull Woods EN',
+                        'Lumberjack SW': 'Dark Lumberjack SW',
+                        'Lumberjack WN': 'Dark Lumberjack WN',
+                        'West Death Mountain EN': 'West Dark Death Mountain EN',
+                        'West Death Mountain ES': 'West Dark Death Mountain ES',
+                        'East Death Mountain WN': 'East Dark Death Mountain WN',
+                        'East Death Mountain WS': 'East Dark Death Mountain WS',
+                        'East Death Mountain EN': 'East Dark Death Mountain EN',
+                        'Death Mountain TR Pegs WN': 'Turtle Rock WN',
+                        'Mountain Entry NW': 'Bumper Cave NW',
+                        'Mountain Entry SE': 'Bumper Cave SE',
+                        'Zora Approach SE': 'Catfish SE',
+                        'Lost Woods Pass NW': 'Skull Woods Pass NW',
+                        'Lost Woods Pass NE': 'Skull Woods Pass NE',
+                        'Lost Woods Pass SW': 'Skull Woods Pass SW',
+                        'Lost Woods Pass SE': 'Skull Woods Pass SE',
+                        'Kakariko Fortune NE': 'Dark Fortune NE',
+                        'Kakariko Fortune SC': 'Dark Fortune SC',
+                        'Kakariko Fortune EN': 'Dark Fortune EN',
+                        'Kakariko Fortune ES': 'Dark Fortune ES',
+                        'Kakariko Pond NE': 'Outcast Pond NE',
+                        'Kakariko Pond SW': 'Outcast Pond SW',
+                        'Kakariko Pond SE': 'Outcast Pond SE',
+                        'Kakariko Pond WN': 'Outcast Pond WN',
+                        'Kakariko Pond WS': 'Outcast Pond WS',
+                        'Kakariko Pond EN': 'Outcast Pond EN',
+                        'Kakariko Pond ES': 'Outcast Pond ES',
+                        'Sanctuary WN': 'Dark Chapel WN',
+                        'Sanctuary WS': 'Dark Chapel WS',
+                        'Sanctuary EC': 'Dark Chapel EC',
+                        'Graveyard WC': 'Dark Graveyard WC',
+                        'Graveyard EC': 'Dark Graveyard ES',
+                        'River Bend SW': 'Qirn Jump SW',
+                        'River Bend SC': 'Qirn Jump SC',
+                        'River Bend SE': 'Qirn Jump SE',
+                        'River Bend WC': 'Qirn Jump WC',
+                        'River Bend EN': 'Qirn Jump EN',
+                        'River Bend EC': 'Qirn Jump EC',
+                        'River Bend ES': 'Qirn Jump ES',
+                        'Potion Shop WN': 'Dark Witch WN',
+                        'Potion Shop WC': 'Dark Witch WC',
+                        'Potion Shop WS': 'Dark Witch WS',
+                        'Potion Shop EN': 'Dark Witch EN',
+                        'Potion Shop EC': 'Dark Witch EC',
+                        'Zora Warning NE': 'Catfish Approach NE',
+                        'Zora Warning WN': 'Catfish Approach WN',
+                        'Zora Warning WC': 'Catfish Approach WC',
+                        'Kakariko NW': 'Village of Outcasts NW',
+                        'Kakariko NC': 'Village of Outcasts NC',
+                        'Kakariko NE': 'Village of Outcasts NE',
+                        'Kakariko SE': 'Village of Outcasts SE',
+                        'Kakariko ES': 'Village of Outcasts ES',
+                        'Forgotten Forest NW': 'Shield Shop NW',
+                        'Forgotten Forest NE': 'Shield Shop NE',
+                        'Hyrule Castle SW': 'Pyramid SW',
+                        'Hyrule Castle SE': 'Pyramid SE',
+                        'Hyrule Castle ES': 'Pyramid ES',
+                        'Wooden Bridge NW': 'Broken Bridge NW',
+                        'Wooden Bridge NC': 'Broken Bridge NC',
+                        'Wooden Bridge NE': 'Broken Bridge NE',
+                        'Wooden Bridge SW': 'Broken Bridge SW',
+                        'Eastern Palace SW': 'Palace of Darkness SW',
+                        'Eastern Palace SE': 'Palace of Darkness SE',
+                        'Blacksmith WS': 'Hammer Pegs WS',
+                        'Sand Dunes NW': 'Dark Dunes NW',
+                        'Sand Dunes SC': 'Dark Dunes SC',
+                        'Sand Dunes WN': 'Dark Dunes WN',
+                        'Maze Race ES': 'Dig Game ES',
+                        'Kakariko Suburb NE': 'Frog NE',
+                        'Kakariko Suburb WS': 'Frog WS',
+                        'Kakariko Suburb ES': 'Frog ES',
+                        'Flute Boy SW': 'Stumpy SW',
+                        'Flute Boy SC': 'Stumpy SC',
+                        'Flute Boy WS': 'Stumpy WS',
+                        'Central Bonk Rocks NW': 'Dark Bonk Rocks NW',
+                        'Central Bonk Rocks SW': 'Dark Bonk Rocks SW',
+                        'Central Bonk Rocks EN': 'Dark Bonk Rocks EN',
+                        'Central Bonk Rocks EC': 'Dark Bonk Rocks EC',
+                        'Central Bonk Rocks ES': 'Dark Bonk Rocks ES',
+                        'Links House NE': 'Big Bomb Shop NE',
+                        'Links House SC': 'Big Bomb Shop SC',
+                        'Links House WN': 'Big Bomb Shop WN',
+                        'Links House WC': 'Big Bomb Shop WC',
+                        'Links House WS': 'Big Bomb Shop WS',
+                        'Links House ES': 'Big Bomb Shop ES',
+                        'Stone Bridge NC': 'Hammer Bridge NC',
+                        'Stone Bridge SC': 'Hammer Bridge SC',
+                        'Stone Bridge WS': 'Hammer Bridge WS',
+                        'Stone Bridge EN': 'Hammer Bridge EN',
+                        'Stone Bridge EC': 'Hammer Bridge EC',
+                        'Tree Line NW': 'Dark Tree Line NW',
+                        'Tree Line SC': 'Dark Tree Line SC',
+                        'Tree Line SE': 'Dark Tree Line SE',
+                        'Tree Line WN': 'Dark Tree Line WN',
+                        'Tree Line WC': 'Dark Tree Line WC',
+                        'Eastern Nook NE': 'Palace of Darkness Nook NE',
+                        'Cave 45 NW': 'Circle of Bushes NW',
+                        'Cave 45 NC': 'Circle of Bushes NC',
+                        'Cave 45 EC': 'Circle of Bushes EC',
+                        'C Whirlpool NW': 'Dark C Whirlpool NW',
+                        'C Whirlpool SC': 'Dark C Whirlpool SC',
+                        'C Whirlpool WC': 'Dark C Whirlpool WC',
+                        'C Whirlpool EN': 'Dark C Whirlpool EN',
+                        'C Whirlpool EC': 'Dark C Whirlpool EC',
+                        'C Whirlpool ES': 'Dark C Whirlpool ES',
+                        'Statues NC': 'Hype Cave NC',
+                        'Statues SC': 'Hype Cave SC',
+                        'Statues WN': 'Hype Cave WN',
+                        'Statues WC': 'Hype Cave WC',
+                        'Statues WS': 'Hype Cave WS',
+                        'Lake Hylia NW': 'Ice Lake NW',
+                        'Lake Hylia NC': 'Ice Lake NC',
+                        'Lake Hylia NE': 'Ice Lake NE',
+                        'Lake Hylia WS': 'Ice Lake WS',
+                        'Lake Hylia EC': 'Ice Lake EC',
+                        'Lake Hylia ES': 'Ice Lake ES',
+                        'Ice Cave SW': 'Shopping Mall SW',
+                        'Ice Cave SE': 'Shopping Mall SE',
+                        'Desert Pass EC': 'Swamp Nook EC',
+                        'Desert Pass ES': 'Swamp Nook ES',
+                        'Dam NC': 'Swamp NC',
+                        'Dam WC': 'Swamp WC',
+                        'Dam WS': 'Swamp WS',
+                        'Dam EC': 'Swamp EC',
+                        'South Pass WC': 'Dark South Pass WC',
+                        'South Pass NC': 'Dark South Pass NC',
+                        'South Pass ES': 'Dark South Pass ES',
+                        'Octoballoon NW': 'Bomber Corner NW',
+                        'Octoballoon NE': 'Bomber Corner NE',
+                        'Octoballoon WC': 'Bomber Corner WC',
+                        'Octoballoon WS': 'Bomber Corner WS'
+                        })
 
 # non shuffled overworld
 default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Lost Woods SC', 'Lost Woods Pass NE'),
                         ('Lost Woods SE', 'Kakariko Fortune NE'),
                         ('Lost Woods EN', 'Lumberjack WN'),
-                        ('Lumberjack SW', 'DM Ascent NW'),
-                        ('DM Ascent SE', 'Kakariko Pond NE'),
+                        ('Lumberjack SW', 'Mountain Entry NW'),
+                        ('Mountain Entry SE', 'Kakariko Pond NE'),
                         ('Lost Woods Pass SW', 'Kakariko NW'),
                         ('Lost Woods Pass SE', 'Kakariko NC'),
                         ('Kakariko Fortune SC', 'Kakariko NE'),
@@ -478,23 +696,23 @@ default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Kakariko Pond ES', 'Sanctuary WS'),
                         ('Forgotten Forest ES', 'Hyrule Castle WN'),
                         ('Sanctuary EC', 'Graveyard WC'),
-                        ('Graveyard EC', 'Useless Fairy WC'),
-                        ('Useless Fairy SW', 'Wooden Bridge NW'),
-                        ('Useless Fairy SC', 'Wooden Bridge NC'),
-                        ('Useless Fairy SE', 'Wooden Bridge NE'),
-                        ('Useless Fairy EN', 'Potion Shop WN'),
-                        ('Useless Fairy EC', 'Potion Shop WC'),
-                        ('Useless Fairy ES', 'Potion Shop WS'),
+                        ('Graveyard EC', 'River Bend WC'),
+                        ('River Bend SW', 'Wooden Bridge NW'),
+                        ('River Bend SC', 'Wooden Bridge NC'),
+                        ('River Bend SE', 'Wooden Bridge NE'),
+                        ('River Bend EN', 'Potion Shop WN'),
+                        ('River Bend EC', 'Potion Shop WC'),
+                        ('River Bend ES', 'Potion Shop WS'),
                         ('Potion Shop EN', 'Zora Warning WN'),
                         ('Potion Shop EC', 'Zora Warning WC'),
                         ('Zora Warning NE', 'Zora Approach SE'),
                         ('Kakariko SE', 'Kakariko Suburb NE'),
                         ('Kakariko ES', 'Blacksmith WS'),
-                        ('Hyrule Castle SW', 'Central Bonk Rock NW'),
+                        ('Hyrule Castle SW', 'Central Bonk Rocks NW'),
                         ('Hyrule Castle SE', 'Links House NE'),
-                        ('Hyrule Castle ES', 'Sand Dune WN'),
-                        ('Wooden Bridge SW', 'Sand Dune NW'),
-                        ('Sand Dune SC', 'Stone Bridge NC'),
+                        ('Hyrule Castle ES', 'Sand Dunes WN'),
+                        ('Wooden Bridge SW', 'Sand Dunes NW'),
+                        ('Sand Dunes SC', 'Stone Bridge NC'),
                         ('Eastern Palace SW', 'Tree Line NW'),
                         ('Eastern Palace SE', 'Eastern Nook NE'),
                         ('Maze Race ES', 'Kakariko Suburb WS'),
@@ -502,14 +720,14 @@ default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Flute Boy SW', 'Cave 45 NW'),
                         ('Flute Boy SC', 'Cave 45 NC'),
                         ('Cave 45 EC', 'C Whirlpool WC'),
-                        ('C Whirlpool NW', 'Central Bonk Rock SW'),
+                        ('C Whirlpool NW', 'Central Bonk Rocks SW'),
                         ('C Whirlpool SC', 'Dam NC'),
                         ('C Whirlpool EN', 'Statues WN'),
                         ('C Whirlpool EC', 'Statues WC'),
                         ('C Whirlpool ES', 'Statues WS'),
-                        ('Central Bonk Rock EN', 'Links House WN'),
-                        ('Central Bonk Rock EC', 'Links House WC'),
-                        ('Central Bonk Rock ES', 'Links House WS'),
+                        ('Central Bonk Rocks EN', 'Links House WN'),
+                        ('Central Bonk Rocks EC', 'Links House WC'),
+                        ('Central Bonk Rocks ES', 'Links House WS'),
                         ('Links House SC', 'Statues NC'),
                         ('Links House ES', 'Stone Bridge WS'),
                         ('Stone Bridge SC', 'Lake Hylia NW'),
@@ -517,17 +735,17 @@ default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Stone Bridge EC', 'Tree Line WC'),
                         ('Tree Line SC', 'Lake Hylia NC'),
                         ('Tree Line SE', 'Lake Hylia NE'),
-                        ('Desert EC', 'Purple Chest WC'),
-                        ('Desert ES', 'Purple Chest WS'),
-                        ('Purple Chest EC', 'Dam WC'),
-                        ('Purple Chest ES', 'Dam WS'),
+                        ('Desert EC', 'Desert Pass WC'),
+                        ('Desert ES', 'Desert Pass WS'),
+                        ('Desert Pass EC', 'Dam WC'),
+                        ('Desert Pass ES', 'Dam WS'),
                         ('Dam EC', 'South Pass WC'),
                         ('Statues SC', 'South Pass NC'),
                         ('South Pass ES', 'Lake Hylia WS'),
                         ('Lake Hylia EC', 'Octoballoon WC'),
                         ('Lake Hylia ES', 'Octoballoon WS'),
-                        ('Octoballoon NW', 'Ice Rod Cave SW'),
-                        ('Octoballoon NE', 'Ice Rod Cave SE'),
+                        ('Octoballoon NW', 'Ice Cave SW'),
+                        ('Octoballoon NE', 'Ice Cave SE'),
                         ('West Death Mountain EN', 'East Death Mountain WN'),
                         ('West Death Mountain ES', 'East Death Mountain WS'),
                         ('East Death Mountain EN', 'Death Mountain TR Pegs WN'),
@@ -560,11 +778,11 @@ default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Catfish Approach NE', 'Catfish SE'),
                         ('Village of Outcasts SE', 'Frog NE'),
                         ('Village of Outcasts ES', 'Hammer Pegs WS'),
-                        ('Pyramid SW', 'Dark Bonk Rock NW'),
+                        ('Pyramid SW', 'Dark Bonk Rocks NW'),
                         ('Pyramid SE', 'Big Bomb Shop NE'),
-                        ('Pyramid ES', 'Dark Dune WN'),
-                        ('Broken Bridge SW', 'Dark Dune NW'),
-                        ('Dark Dune SC', 'Hammer Bridge NC'),
+                        ('Pyramid ES', 'Dark Dunes WN'),
+                        ('Broken Bridge SW', 'Dark Dunes NW'),
+                        ('Dark Dunes SC', 'Hammer Bridge NC'),
                         ('Palace of Darkness SW', 'Dark Tree Line NW'),
                         ('Palace of Darkness SE', 'Palace of Darkness Nook NE'),
                         ('Dig Game EC', 'Frog WC'),
@@ -573,30 +791,30 @@ default_connections = [('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Stumpy SW', 'Circle of Bushes NW'),
                         ('Stumpy SC', 'Circle of Bushes NC'),
                         ('Circle of Bushes EC', 'Dark C Whirlpool WC'),
-                        ('Dark C Whirlpool NW', 'Dark Bonk Rock SW'),
-                        ('Dark C Whirlpool SC', 'Swamp Palace NC'),
+                        ('Dark C Whirlpool NW', 'Dark Bonk Rocks SW'),
+                        ('Dark C Whirlpool SC', 'Swamp NC'),
                         ('Dark C Whirlpool EN', 'Hype Cave WN'),
                         ('Dark C Whirlpool EC', 'Hype Cave WC'),
                         ('Dark C Whirlpool ES', 'Hype Cave WS'),
-                        ('Dark Bonk Rock EN', 'Big Bomb Shop WN'),
-                        ('Dark Bonk Rock EC', 'Big Bomb Shop WC'),
-                        ('Dark Bonk Rock ES', 'Big Bomb Shop WS'),
+                        ('Dark Bonk Rocks EN', 'Big Bomb Shop WN'),
+                        ('Dark Bonk Rocks EC', 'Big Bomb Shop WC'),
+                        ('Dark Bonk Rocks ES', 'Big Bomb Shop WS'),
                         ('Big Bomb Shop SC', 'Hype Cave NC'),
                         ('Big Bomb Shop ES', 'Hammer Bridge WS'),
-                        ('Hammer Bridge SC', 'Dark Lake Hylia NW'),
+                        ('Hammer Bridge SC', 'Ice Lake NW'),
                         ('Hammer Bridge EN', 'Dark Tree Line WN'),
                         ('Hammer Bridge EC', 'Dark Tree Line WC'),
-                        ('Dark Tree Line SC', 'Dark Lake Hylia NC'),
-                        ('Dark Tree Line SE', 'Dark Lake Hylia NE'),
-                        ('Dark Purple Chest EC', 'Swamp Palace WC'),
-                        ('Dark Purple Chest ES', 'Swamp Palace WS'),
-                        ('Swamp Palace EC', 'Dark South Pass WC'),
+                        ('Dark Tree Line SC', 'Ice Lake NC'),
+                        ('Dark Tree Line SE', 'Ice Lake NE'),
+                        ('Swamp Nook EC', 'Swamp WC'),
+                        ('Swamp Nook ES', 'Swamp WS'),
+                        ('Swamp EC', 'Dark South Pass WC'),
                         ('Hype Cave SC', 'Dark South Pass NC'),
-                        ('Dark South Pass ES', 'Dark Lake Hylia WS'),
-                        ('Dark Lake Hylia EC', 'Southeast DW WC'),
-                        ('Dark Lake Hylia ES', 'Southeast DW WS'),
-                        ('Southeast DW NW', 'Dark Shopping Mall SW'),
-                        ('Southeast DW NE', 'Dark Shopping Mall SE'),
+                        ('Dark South Pass ES', 'Ice Lake WS'),
+                        ('Ice Lake EC', 'Bomber Corner WC'),
+                        ('Ice Lake ES', 'Bomber Corner WS'),
+                        ('Bomber Corner NW', 'Shopping Mall SW'),
+                        ('Bomber Corner NE', 'Shopping Mall SE'),
                         ('West Dark Death Mountain EN', 'East Dark Death Mountain WN'),
                         ('West Dark Death Mountain ES', 'East Dark Death Mountain WS'),
                         ('East Dark Death Mountain EN', 'Turtle Rock WN')

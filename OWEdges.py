@@ -1,5 +1,16 @@
 
 from BaseClasses import OWEdge, Direction, Terrain, WorldType, PolSlot
+from enum import Enum, unique
+
+@unique
+class OpenStd(Enum):
+    Open = 0
+    Standard = 1
+
+@unique
+class IsParallel(Enum):
+    No = 0
+    Yes = 1
 
 # constants
 We = Direction.West
@@ -15,6 +26,12 @@ DW = WorldType.Dark
 
 Vt = PolSlot.NorthSouth
 Hz = PolSlot.EastWest
+
+Op = OpenStd.Open
+St = OpenStd.Standard
+
+PL = IsParallel.Yes
+NP = IsParallel.No
 
 
 def create_owedges(world, player):
@@ -33,8 +50,8 @@ def create_owedges(world, player):
         create_owedge(player, 'East Death Mountain WS',      0x05, We, Ld, 0x03, 0x0d).coordInfo(0x1660),
         create_owedge(player, 'East Death Mountain EN',      0x05, Ea, Ld, 0x02, 0x06).coordInfo(0x0180),
         create_owedge(player, 'Death Mountain TR Pegs WN',   0x07, We, Ld, 0x02)      .coordInfo(0x00e0),
-        create_owedge(player, 'DM Ascent NW',                0x0a, No, Ld, 0x01)      .coordInfo(0x180a),
-        create_owedge(player, 'DM Ascent SE',                0x0a, So, Ld, 0x04)      .coordInfo(0x1012),
+        create_owedge(player, 'Mountain Entry NW',           0x0a, No, Ld, 0x01)      .coordInfo(0x180a),
+        create_owedge(player, 'Mountain Entry SE',           0x0a, So, Ld, 0x04)      .coordInfo(0x1012),
         create_owedge(player, 'Zora Approach NE',            0x0f, No, Ld, 0x02)      .coordInfo(0x009a),
         create_owedge(player, 'Zora Approach SE',            0x0f, So, Ld, 0x05)      .coordInfo(0x1020),
         create_owedge(player, 'Lost Woods Pass NW',          0x10, No, Ld, 0x03)      .coordInfo(0x1800),
@@ -57,13 +74,13 @@ def create_owedges(world, player):
         create_owedge(player, 'Sanctuary EC',                0x13, Ea, Ld, 0x08)      .coordInfo(0x04c0),
         create_owedge(player, 'Graveyard WC',                0x14, We, Ld, 0x08)      .coordInfo(0x04e0),
         create_owedge(player, 'Graveyard EC',                0x14, Ea, Ld, 0x09)      .coordInfo(0x04c0),
-        create_owedge(player, 'Useless Fairy SW',            0x15, So, Ld, 0x0b)      .coordInfo(0x1004),
-        create_owedge(player, 'Useless Fairy SC',            0x15, So, Wr, 0x0c)      .coordInfo(0x1018),
-        create_owedge(player, 'Useless Fairy SE',            0x15, So, Ld, 0x0d)      .coordInfo(0x1020),
-        create_owedge(player, 'Useless Fairy WC',            0x15, We, Ld, 0x09)      .coordInfo(0x04e0),
-        create_owedge(player, 'Useless Fairy EN',            0x15, Ea, Wr, 0x0a)      .coordInfo(0x01c0),
-        create_owedge(player, 'Useless Fairy EC',            0x15, Ea, Ld, 0x0b)      .coordInfo(0x04c0),
-        create_owedge(player, 'Useless Fairy ES',            0x15, Ea, Ld, 0x0c)      .coordInfo(0x08c0),
+        create_owedge(player, 'River Bend SW',               0x15, So, Ld, 0x0b)      .coordInfo(0x1004),
+        create_owedge(player, 'River Bend SC',               0x15, So, Wr, 0x0c)      .coordInfo(0x1018),
+        create_owedge(player, 'River Bend SE',               0x15, So, Ld, 0x0d)      .coordInfo(0x1020),
+        create_owedge(player, 'River Bend WC',               0x15, We, Ld, 0x09)      .coordInfo(0x04e0),
+        create_owedge(player, 'River Bend EN',               0x15, Ea, Wr, 0x0a)      .coordInfo(0x01c0),
+        create_owedge(player, 'River Bend EC',               0x15, Ea, Ld, 0x0b)      .coordInfo(0x04c0),
+        create_owedge(player, 'River Bend ES',               0x15, Ea, Ld, 0x0c)      .coordInfo(0x08c0),
         create_owedge(player, 'Potion Shop WN',              0x16, We, Wr, 0x0a)      .coordInfo(0x01e0),
         create_owedge(player, 'Potion Shop WC',              0x16, We, Ld, 0x0b)      .coordInfo(0x04e0),
         create_owedge(player, 'Potion Shop WS',              0x16, We, Ld, 0x0c)      .coordInfo(0x08e0),
@@ -91,9 +108,9 @@ def create_owedges(world, player):
         create_owedge(player, 'Eastern Palace SW',           0x1e, So, Ld, 0x13, 0x26).coordInfo(0x2002),
         create_owedge(player, 'Eastern Palace SE',           0x1e, So, Ld, 0x14, 0x27).coordInfo(0x2060),
         create_owedge(player, 'Blacksmith WS',               0x22, We, Ld, 0x10)      .coordInfo(0x05e0),
-        create_owedge(player, 'Sand Dune NW',                0x25, No, Ld, 0x10)      .coordInfo(0x1806),
-        create_owedge(player, 'Sand Dune SC',                0x25, So, Ld, 0x12)      .coordInfo(0x100e),
-        create_owedge(player, 'Sand Dune WN',                0x25, We, Ld, 0x11)      .coordInfo(0x01e0),
+        create_owedge(player, 'Sand Dunes NW',               0x25, No, Ld, 0x10)      .coordInfo(0x1806),
+        create_owedge(player, 'Sand Dunes SC',               0x25, So, Ld, 0x12)      .coordInfo(0x100e),
+        create_owedge(player, 'Sand Dunes WN',               0x25, We, Ld, 0x11)      .coordInfo(0x01e0),
         create_owedge(player, 'Maze Race ES',                0x28, Ea, Ld, 0x12)      .coordInfo(0x0940),
         create_owedge(player, 'Kakariko Suburb NE',          0x29, No, Ld, 0x11)      .coordInfo(0x1820),
         create_owedge(player, 'Kakariko Suburb WS',          0x29, We, Ld, 0x12)      .coordInfo(0x0960),
@@ -101,11 +118,11 @@ def create_owedges(world, player):
         create_owedge(player, 'Flute Boy SW',                0x2a, So, Ld, 0x15)      .coordInfo(0x1000),
         create_owedge(player, 'Flute Boy SC',                0x2a, So, Ld, 0x16)      .coordInfo(0x100c),
         create_owedge(player, 'Flute Boy WS',                0x2a, We, Ld, 0x13)      .coordInfo(0x0960),
-        create_owedge(player, 'Central Bonk Rock NW',        0x2b, No, Ld, 0x12)      .coordInfo(0x1802),
-        create_owedge(player, 'Central Bonk Rock SW',        0x2b, So, Ld, 0x17)      .coordInfo(0x1004),
-        create_owedge(player, 'Central Bonk Rock EN',        0x2b, Ea, Ld, 0x14)      .coordInfo(0x0340),
-        create_owedge(player, 'Central Bonk Rock EC',        0x2b, Ea, Ld, 0x15)      .coordInfo(0x05c0),
-        create_owedge(player, 'Central Bonk Rock ES',        0x2b, Ea, Ld, 0x16)      .coordInfo(0x08c0),
+        create_owedge(player, 'Central Bonk Rocks NW',       0x2b, No, Ld, 0x12)      .coordInfo(0x1802),
+        create_owedge(player, 'Central Bonk Rocks SW',       0x2b, So, Ld, 0x17)      .coordInfo(0x1004),
+        create_owedge(player, 'Central Bonk Rocks EN',       0x2b, Ea, Ld, 0x14)      .coordInfo(0x0340),
+        create_owedge(player, 'Central Bonk Rocks EC',       0x2b, Ea, Ld, 0x15)      .coordInfo(0x05c0),
+        create_owedge(player, 'Central Bonk Rocks ES',       0x2b, Ea, Ld, 0x16)      .coordInfo(0x08c0),
         create_owedge(player, 'Links House NE',              0x2c, No, Ld, 0x13)      .coordInfo(0x1814),
         create_owedge(player, 'Links House SC',              0x2c, So, Ld, 0x18)      .coordInfo(0x100e),
         create_owedge(player, 'Links House WN',              0x2c, We, Ld, 0x14)      .coordInfo(0x0360),
@@ -146,12 +163,12 @@ def create_owedges(world, player):
         create_owedge(player, 'Lake Hylia WS',               0x35, We, Ld, 0x24, 0x3d).coordInfo(0x1860),
         create_owedge(player, 'Lake Hylia EC',               0x35, Ea, Wr, 0x24, 0x3e).coordInfo(0x1680),
         create_owedge(player, 'Lake Hylia ES',               0x35, Ea, Ld, 0x25, 0x3e).coordInfo(0x1880),
-        create_owedge(player, 'Ice Rod Cave SW',             0x37, So, Wr, 0x1e)      .coordInfo(0x1002),
-        create_owedge(player, 'Ice Rod Cave SE',             0x37, So, Ld, 0x1f)      .coordInfo(0x101c),
-        create_owedge(player, 'Purple Chest WC',             0x3a, We, Ld, 0x1f)      .coordInfo(0x03e0),
-        create_owedge(player, 'Purple Chest WS',             0x3a, We, Ld, 0x20)      .coordInfo(0x0860),
-        create_owedge(player, 'Purple Chest EC',             0x3a, Ea, Ld, 0x20)      .coordInfo(0x0640),
-        create_owedge(player, 'Purple Chest ES',             0x3a, Ea, Ld, 0x21)      .coordInfo(0x08c0),
+        create_owedge(player, 'Ice Cave SW',                 0x37, So, Wr, 0x1e)      .coordInfo(0x1002),
+        create_owedge(player, 'Ice Cave SE',                 0x37, So, Ld, 0x1f)      .coordInfo(0x101c),
+        create_owedge(player, 'Desert Pass WC',              0x3a, We, Ld, 0x1f)      .coordInfo(0x03e0),
+        create_owedge(player, 'Desert Pass WS',              0x3a, We, Ld, 0x20)      .coordInfo(0x0860),
+        create_owedge(player, 'Desert Pass EC',              0x3a, Ea, Ld, 0x20)      .coordInfo(0x0640),
+        create_owedge(player, 'Desert Pass ES',              0x3a, Ea, Ld, 0x21)      .coordInfo(0x08c0),
         create_owedge(player, 'Dam NC',                      0x3b, No, Ld, 0x1e)      .coordInfo(0x1816),
         create_owedge(player, 'Dam WC',                      0x3b, We, Ld, 0x21)      .coordInfo(0x0660),
         create_owedge(player, 'Dam WS',                      0x3b, We, Ld, 0x22)      .coordInfo(0x08e0),
@@ -230,9 +247,9 @@ def create_owedges(world, player):
         create_owedge(player, 'Palace of Darkness SW',       0x5e, So, Ld, 0x33, 0x66).coordInfo(0x2002),
         create_owedge(player, 'Palace of Darkness SE',       0x5e, So, Ld, 0x34, 0x67).coordInfo(0x2060),
         create_owedge(player, 'Hammer Pegs WS',              0x62, We, Ld, 0x36)      .coordInfo(0x05e0),
-        create_owedge(player, 'Dark Dune NW',                0x65, No, Ld, 0x30)      .coordInfo(0x1806),
-        create_owedge(player, 'Dark Dune SC',                0x65, So, Ld, 0x32)      .coordInfo(0x100e),
-        create_owedge(player, 'Dark Dune WN',                0x65, We, Ld, 0x37)      .coordInfo(0x01e0),
+        create_owedge(player, 'Dark Dunes NW',               0x65, No, Ld, 0x30)      .coordInfo(0x1806),
+        create_owedge(player, 'Dark Dunes SC',               0x65, So, Ld, 0x32)      .coordInfo(0x100e),
+        create_owedge(player, 'Dark Dunes WN',               0x65, We, Ld, 0x37)      .coordInfo(0x01e0),
         create_owedge(player, 'Dig Game EC',                 0x68, Ea, Ld, 0x37)      .coordInfo(0x08c0),
         create_owedge(player, 'Dig Game ES',                 0x68, Ea, Ld, 0x38)      .coordInfo(0x0940),
         create_owedge(player, 'Frog NE',                     0x69, No, Ld, 0x31)      .coordInfo(0x1820),
@@ -242,11 +259,11 @@ def create_owedges(world, player):
         create_owedge(player, 'Stumpy SW',                   0x6a, So, Ld, 0x35)      .coordInfo(0x1000),
         create_owedge(player, 'Stumpy SC',                   0x6a, So, Ld, 0x36)      .coordInfo(0x100c),
         create_owedge(player, 'Stumpy WS',                   0x6a, We, Ld, 0x3a)      .coordInfo(0x0960),
-        create_owedge(player, 'Dark Bonk Rock NW',           0x6b, No, Ld, 0x32)      .coordInfo(0x1802),
-        create_owedge(player, 'Dark Bonk Rock SW',           0x6b, So, Ld, 0x37)      .coordInfo(0x1004),
-        create_owedge(player, 'Dark Bonk Rock EN',           0x6b, Ea, Ld, 0x3a)      .coordInfo(0x0340),
-        create_owedge(player, 'Dark Bonk Rock EC',           0x6b, Ea, Ld, 0x3b)      .coordInfo(0x05c0),
-        create_owedge(player, 'Dark Bonk Rock ES',           0x6b, Ea, Ld, 0x3c)      .coordInfo(0x08c0),
+        create_owedge(player, 'Dark Bonk Rocks NW',          0x6b, No, Ld, 0x32)      .coordInfo(0x1802),
+        create_owedge(player, 'Dark Bonk Rocks SW',          0x6b, So, Ld, 0x37)      .coordInfo(0x1004),
+        create_owedge(player, 'Dark Bonk Rocks EN',          0x6b, Ea, Ld, 0x3a)      .coordInfo(0x0340),
+        create_owedge(player, 'Dark Bonk Rocks EC',          0x6b, Ea, Ld, 0x3b)      .coordInfo(0x05c0),
+        create_owedge(player, 'Dark Bonk Rocks ES',          0x6b, Ea, Ld, 0x3c)      .coordInfo(0x08c0),
         create_owedge(player, 'Big Bomb Shop NE',            0x6c, No, Ld, 0x33)      .coordInfo(0x1814),
         create_owedge(player, 'Big Bomb Shop SC',            0x6c, So, Ld, 0x38)      .coordInfo(0x100e),
         create_owedge(player, 'Big Bomb Shop WN',            0x6c, We, Ld, 0x3b)      .coordInfo(0x0360),
@@ -278,27 +295,27 @@ def create_owedges(world, player):
         create_owedge(player, 'Hype Cave WN',                0x74, We, Ld, 0x42)      .coordInfo(0x02e0),
         create_owedge(player, 'Hype Cave WC',                0x74, We, Wr, 0x43)      .coordInfo(0x05e0),
         create_owedge(player, 'Hype Cave WS',                0x74, We, Ld, 0x44)      .coordInfo(0x08e0),
-        create_owedge(player, 'Dark Lake Hylia NW',          0x75, No, Ld, 0x3b)      .coordInfo(0x180c),
-        create_owedge(player, 'Dark Lake Hylia NC',          0x75, No, Wr, 0x3c, 0x76).coordInfo(0x185a),
-        create_owedge(player, 'Dark Lake Hylia NE',          0x75, No, Ld, 0x3d, 0x76).coordInfo(0x1860),
-        create_owedge(player, 'Dark Lake Hylia WS',          0x75, We, Ld, 0x48, 0x7d).coordInfo(0x1860),
-        create_owedge(player, 'Dark Lake Hylia EC',          0x75, Ea, Wr, 0x48, 0x7e).coordInfo(0x1680),
-        create_owedge(player, 'Dark Lake Hylia ES',          0x75, Ea, Ld, 0x49, 0x7e).coordInfo(0x1880),
-        create_owedge(player, 'Dark Shopping Mall SW',       0x77, So, Wr, 0x3e)      .coordInfo(0x1002),
-        create_owedge(player, 'Dark Shopping Mall SE',       0x77, So, Ld, 0x3f)      .coordInfo(0x101c),
-        create_owedge(player, 'Dark Purple Chest EC',        0x7a, Ea, Ld, 0x44)      .coordInfo(0x0640),
-        create_owedge(player, 'Dark Purple Chest ES',        0x7a, Ea, Ld, 0x45)      .coordInfo(0x08c0),
-        create_owedge(player, 'Swamp Palace NC',             0x7b, No, Ld, 0x3e)      .coordInfo(0x1816),
-        create_owedge(player, 'Swamp Palace WC',             0x7b, We, Ld, 0x45)      .coordInfo(0x0660),
-        create_owedge(player, 'Swamp Palace WS',             0x7b, We, Ld, 0x46)      .coordInfo(0x08e0),
-        create_owedge(player, 'Swamp Palace EC',             0x7b, Ea, Ld, 0x46)      .coordInfo(0x04c0),
+        create_owedge(player, 'Ice Lake NW',                 0x75, No, Ld, 0x3b)      .coordInfo(0x180c),
+        create_owedge(player, 'Ice Lake NC',                 0x75, No, Wr, 0x3c, 0x76).coordInfo(0x185a),
+        create_owedge(player, 'Ice Lake NE',                 0x75, No, Ld, 0x3d, 0x76).coordInfo(0x1860),
+        create_owedge(player, 'Ice Lake WS',                 0x75, We, Ld, 0x48, 0x7d).coordInfo(0x1860),
+        create_owedge(player, 'Ice Lake EC',                 0x75, Ea, Wr, 0x48, 0x7e).coordInfo(0x1680),
+        create_owedge(player, 'Ice Lake ES',                 0x75, Ea, Ld, 0x49, 0x7e).coordInfo(0x1880),
+        create_owedge(player, 'Shopping Mall SW',            0x77, So, Wr, 0x3e)      .coordInfo(0x1002),
+        create_owedge(player, 'Shopping Mall SE',            0x77, So, Ld, 0x3f)      .coordInfo(0x101c),
+        create_owedge(player, 'Swamp Nook EC',               0x7a, Ea, Ld, 0x44)      .coordInfo(0x0640),
+        create_owedge(player, 'Swamp Nook ES',               0x7a, Ea, Ld, 0x45)      .coordInfo(0x08c0),
+        create_owedge(player, 'Swamp NC',                    0x7b, No, Ld, 0x3e)      .coordInfo(0x1816),
+        create_owedge(player, 'Swamp WC',                    0x7b, We, Ld, 0x45)      .coordInfo(0x0660),
+        create_owedge(player, 'Swamp WS',                    0x7b, We, Ld, 0x46)      .coordInfo(0x08e0),
+        create_owedge(player, 'Swamp EC',                    0x7b, Ea, Ld, 0x46)      .coordInfo(0x04c0),
         create_owedge(player, 'Dark South Pass NC',          0x7c, No, Ld, 0x3f)      .coordInfo(0x1810),
         create_owedge(player, 'Dark South Pass WC',          0x7c, We, Ld, 0x47)      .coordInfo(0x04e0),
         create_owedge(player, 'Dark South Pass ES',          0x7c, Ea, Ld, 0x47)      .coordInfo(0x08c0),
-        create_owedge(player, 'Southeast DW NW',             0x7f, No, Wr, 0x40)      .coordInfo(0x1802),
-        create_owedge(player, 'Southeast DW NE',             0x7f, No, Ld, 0x41)      .coordInfo(0x181c),
-        create_owedge(player, 'Southeast DW WC',             0x7f, We, Wr, 0x49)      .coordInfo(0x05e0),
-        create_owedge(player, 'Southeast DW WS',             0x7f, We, Ld, 0x4a)      .coordInfo(0x0860),
+        create_owedge(player, 'Bomber Corner NW',            0x7f, No, Wr, 0x40)      .coordInfo(0x1802),
+        create_owedge(player, 'Bomber Corner NE',            0x7f, No, Ld, 0x41)      .coordInfo(0x181c),
+        create_owedge(player, 'Bomber Corner WC',            0x7f, We, Wr, 0x49)      .coordInfo(0x05e0),
+        create_owedge(player, 'Bomber Corner WS',            0x7f, We, Ld, 0x4a)      .coordInfo(0x0860),
         create_owedge(player, 'Master Sword Meadow SC',      0x80, So, Ld, 0x40)      .coordInfo(0x0000),
         create_owedge(player, 'Hobo EC',                     0x80, Ea, Wr, 0x4a)      .coordInfo(0x0020),
         create_owedge(player, 'Zoras Domain SW',             0x81, So, Ld, 0x41, 0x89).coordInfo(0x1782)
@@ -312,13 +329,27 @@ def create_owedge(player, name, owIndex, direction, terrain, edge_id, owSlotInde
 
 
 OWEdgeGroups = {
-    (LW, Hz, Ld, 1): (
+    #(IsStandard, World, EdgeAxis, Terrain, HasParallel, NumberInGroup)
+    (St, LW, Vt, Ld, PL, 1): (
+        [
+            ['Hyrule Castle SW'],
+            ['Hyrule Castle SE']
+        ],
+        [
+            ['Central Bonk Rocks NW'],
+            ['Links House NE']
+        ]
+    ),
+    (St, LW, Hz, Ld, PL, 3): (
+        [['Central Bonk Rocks EN', 'Central Bonk Rocks EC', 'Central Bonk Rocks ES']],
+        [['Links House WN', 'Links House WC', 'Links House WS']]
+    ),
+    (Op, LW, Hz, Ld, PL, 1): (
         [
             ['Lost Woods EN'],
             ['East Death Mountain EN'],
             ['Sanctuary EC'],
             ['Graveyard EC'],
-            ['Forgotten Forest ES'],
             ['Kakariko ES'],
             ['Hyrule Castle ES'],
             ['Maze Race ES'],
@@ -337,10 +368,9 @@ OWEdgeGroups = {
             ['Lumberjack WN'],
             ['Death Mountain TR Pegs WN'],
             ['Graveyard WC'],
-            ['Useless Fairy WC'],
-            ['Hyrule Castle WN'],
+            ['River Bend WC'],
             ['Blacksmith WS'],
-            ['Sand Dune WN'],
+            ['Sand Dunes WN'],
             ['Kakariko Suburb WS'],
             ['Flute Boy WS'],
             ['Stone Bridge WS'],
@@ -354,38 +384,42 @@ OWEdgeGroups = {
             ['East Death Mountain WS']
         ]
     ),
-    (LW, Vt, Ld, 1): (
+    (Op, LW, Hz, Ld, NP, 1): (
+        [
+            ['Forgotten Forest ES']
+        ],
+        [
+            ['Hyrule Castle WN']
+        ]
+    ),
+    (Op, LW, Vt, Ld, PL, 1): (
         [
             ['Lumberjack SW'],
-            ['DM Ascent SE'],
+            ['Mountain Entry SE'],
             ['Lost Woods SE'],
             ['Zora Approach SE'],
             ['Kakariko Fortune SC'],
             ['Wooden Bridge SW'],
             ['Kakariko SE'],
-            ['Hyrule Castle SW'],
-            ['Hyrule Castle SE'],
-            ['Sand Dune SC'],
+            ['Sand Dunes SC'],
             ['Eastern Palace SW'],
             ['Eastern Palace SE'],
-            ['Central Bonk Rock SW'],
+            ['Central Bonk Rocks SW'],
             ['Links House SC'],
             ['Stone Bridge SC'],
             ['C Whirlpool SC'],
             ['Statues SC'],
             ['Tree Line SE'],
-            ['Ice Rod Cave SE']
+            ['Ice Cave SE']
         ],
         [
-            ['DM Ascent NW'],
+            ['Mountain Entry NW'],
             ['Kakariko Pond NE'],
             ['Kakariko Fortune NE'],
             ['Zora Warning NE'],
             ['Kakariko NE'],
-            ['Sand Dune NW'],
+            ['Sand Dunes NW'],
             ['Kakariko Suburb NE'],
-            ['Central Bonk Rock NW'],
-            ['Links House NE'],
             ['Stone Bridge NC'],
             ['Tree Line NW'],
             ['Eastern Nook NE'],
@@ -396,33 +430,39 @@ OWEdgeGroups = {
             ['South Pass NC'],
             ['Lake Hylia NE'],
             ['Octoballoon NE']
-        ],
+        ]
     ),
-    (LW, Hz, Ld, 2): (
+    (Op, LW, Hz, Ld, PL, 2): (
         [
             ['Kakariko Fortune EN', 'Kakariko Fortune ES'],
             ['Kakariko Pond EN', 'Kakariko Pond ES'],
-            ['Desert EC', 'Desert ES'],
-            ['Purple Chest EC', 'Purple Chest ES'],
-            ['Useless Fairy EC', 'Useless Fairy ES'],
+            ['Desert Pass EC', 'Desert Pass ES'],
+            ['River Bend EC', 'River Bend ES'],
             ['C Whirlpool EN', 'C Whirlpool ES']
         ],
         [
             ['Kakariko Pond WN', 'Kakariko Pond WS'],
             ['Sanctuary WN', 'Sanctuary WS'],
-            ['Purple Chest WC', 'Purple Chest WS'],
             ['Dam WC', 'Dam WS'],
             ['Potion Shop WC', 'Potion Shop WS'],
             ['Statues WN', 'Statues WS']
-        ],
+        ]
     ),
-    (LW, Vt, Ld, 2): (
+    (Op, LW, Hz, Ld, NP, 2): (
+        [
+            ['Desert EC', 'Desert ES']
+        ],
+        [
+            ['Desert Pass WC', 'Desert Pass WS']
+        ]
+    ),
+    (Op, LW, Vt, Ld, PL, 2): (
         [
             ['Lost Woods SW', 'Lost Woods SC'],
             ['Lost Woods Pass SW', 'Lost Woods Pass SE'],
             ['Kakariko Pond SW', 'Kakariko Pond SE'],
             ['Flute Boy SW', 'Flute Boy SC'],
-            ['Useless Fairy SW', 'Useless Fairy SE']
+            ['River Bend SW', 'River Bend SE']
         ],
         [
             ['Lost Woods Pass NW', 'Lost Woods Pass NE'],
@@ -430,18 +470,14 @@ OWEdgeGroups = {
             ['Forgotten Forest NW', 'Forgotten Forest NE'],
             ['Cave 45 NW', 'Cave 45 NC'],
             ['Wooden Bridge NW', 'Wooden Bridge NE']
-        ],
+        ]
     ),
-    (LW, Hz, Ld, 3): (
-        [['Central Bonk Rock EN', 'Central Bonk Rock EC', 'Central Bonk Rock ES']],
-        [['Links House WN', 'Links House WC', 'Links House WS']]
-    ),
-    (LW, Hz, Wr, 1): (
+    (Op, LW, Hz, Wr, PL, 1): (
         [
             ['Potion Shop EN'],
             ['Lake Hylia EC'],
             ['Stone Bridge EC'],
-            ['Useless Fairy EN'],
+            ['River Bend EN'],
             ['C Whirlpool EC']
         ],
         [
@@ -452,11 +488,11 @@ OWEdgeGroups = {
             ['Statues WC']
         ]
     ),
-    (LW, Vt, Wr, 1): (
+    (Op, LW, Vt, Wr, PL, 1): (
         [
             ['Tree Line SC'],
-            ['Ice Rod Cave SW'],
-            ['Useless Fairy SC']
+            ['Ice Cave SW'],
+            ['River Bend SC']
         ],
         [
             ['Lake Hylia NC'],
@@ -464,7 +500,7 @@ OWEdgeGroups = {
             ['Wooden Bridge NC']
         ]
     ),
-    (DW, Hz, Ld, 1): (
+    (Op, DW, Hz, Ld, PL, 1): (
         [
             ['Skull Woods EN'],
             ['East Dark Death Mountain EN'],
@@ -475,10 +511,10 @@ OWEdgeGroups = {
             ['Frog ES'],
             ['Big Bomb Shop ES'],
             ['Circle of Bushes EC'],
-            ['Swamp Palace EC'],
+            ['Swamp EC'],
             ['Dark South Pass ES'],
             ['Dark Witch EC'],
-            ['Dark Lake Hylia ES'],
+            ['Ice Lake ES'],
             ['Hammer Bridge EN'],
             ['West Dark Death Mountain EN'],
             ['West Dark Death Mountain ES']
@@ -489,20 +525,20 @@ OWEdgeGroups = {
             ['Dark Graveyard WC'],
             ['Qirn Jump WC'],
             ['Hammer Pegs WS'],
-            ['Dark Dune WN'],
+            ['Dark Dunes WN'],
             ['Stumpy WS'],
             ['Hammer Bridge WS'],
             ['Dark C Whirlpool WC'],
             ['Dark South Pass WC'],
-            ['Dark Lake Hylia WS'],
+            ['Ice Lake WS'],
             ['Catfish Approach WC'],
-            ['Southeast DW WS'],
+            ['Bomber Corner WS'],
             ['Dark Tree Line WN'],
             ['East Dark Death Mountain WN'],
             ['East Dark Death Mountain WS']
         ]
     ),
-    (DW, Vt, Ld, 1): (
+    (Op, DW, Vt, Ld, PL, 1): (
         [
             ['Dark Lumberjack SW'],
             ['Bumper Cave SE'],
@@ -513,16 +549,16 @@ OWEdgeGroups = {
             ['Village of Outcasts SE'],
             ['Pyramid SW'],
             ['Pyramid SE'],
-            ['Dark Dune SC'],
+            ['Dark Dunes SC'],
             ['Palace of Darkness SW'],
             ['Palace of Darkness SE'],
-            ['Dark Bonk Rock SW'],
+            ['Dark Bonk Rocks SW'],
             ['Big Bomb Shop SC'],
             ['Hammer Bridge SC'],
             ['Dark C Whirlpool SC'],
             ['Hype Cave SC'],
             ['Dark Tree Line SE'],
-            ['Dark Shopping Mall SE']
+            ['Shopping Mall SE']
         ],
         [
             ['Bumper Cave NW'],
@@ -530,41 +566,47 @@ OWEdgeGroups = {
             ['Dark Fortune NE'],
             ['Catfish Approach NE'],
             ['Village of Outcasts NE'],
-            ['Dark Dune NW'],
+            ['Dark Dunes NW'],
             ['Frog NE'],
-            ['Dark Bonk Rock NW'],
+            ['Dark Bonk Rocks NW'],
             ['Big Bomb Shop NE'],
             ['Hammer Bridge NC'],
             ['Dark Tree Line NW'],
             ['Palace of Darkness Nook NE'],
             ['Dark C Whirlpool NW'],
             ['Hype Cave NC'],
-            ['Dark Lake Hylia NW'],
-            ['Swamp Palace NC'],
+            ['Ice Lake NW'],
+            ['Swamp NC'],
             ['Dark South Pass NC'],
-            ['Dark Lake Hylia NE'],
-            ['Southeast DW NE']
-        ],
+            ['Ice Lake NE'],
+            ['Bomber Corner NE']
+        ]
     ),
-    (DW, Hz, Ld, 2): (
+    (Op, DW, Hz, Ld, PL, 2): (
         [
             ['Dark Fortune EN', 'Dark Fortune ES'],
             ['Outcast Pond EN', 'Outcast Pond ES'],
-            ['Dark Purple Chest EC', 'Dark Purple Chest ES'],
-            ['Dig Game EC', 'Dig Game ES'],
+            ['Swamp Nook EC', 'Swamp Nook ES'],
             ['Qirn Jump EC', 'Qirn Jump ES'],
             ['Dark C Whirlpool EN', 'Dark C Whirlpool ES']
         ],
         [
             ['Outcast Pond WN', 'Outcast Pond WS'],
             ['Dark Chapel WN', 'Dark Chapel WS'],
-            ['Swamp Palace WC', 'Swamp Palace WS'],
-            ['Frog WC', 'Frog WS'],
+            ['Swamp WC', 'Swamp WS'],
             ['Dark Witch WC', 'Dark Witch WS'],
             ['Hype Cave WN', 'Hype Cave WS']
-        ],
+        ]
     ),
-    (DW, Vt, Ld, 2): (
+    (Op, DW, Hz, Ld, NP, 2): (
+        [
+            ['Dig Game EC', 'Dig Game ES']
+        ],
+        [
+            ['Frog WC', 'Frog WS']
+        ]
+    ),
+    (Op, DW, Vt, Ld, PL, 2): (
         [
             ['Skull Woods SW', 'Skull Woods SC'],
             ['Skull Woods Pass SW', 'Skull Woods Pass SE'],
@@ -578,37 +620,37 @@ OWEdgeGroups = {
             ['Shield Shop NW', 'Shield Shop NE'],
             ['Circle of Bushes NW', 'Circle of Bushes NC'],
             ['Broken Bridge NW', 'Broken Bridge NE']
-        ],
+        ]
     ),
-    (DW, Hz, Ld, 3): (
-        [['Dark Bonk Rock EN', 'Dark Bonk Rock EC', 'Dark Bonk Rock ES']],
+    (Op, DW, Hz, Ld, PL, 3): (
+        [['Dark Bonk Rocks EN', 'Dark Bonk Rocks EC', 'Dark Bonk Rocks ES']],
         [['Big Bomb Shop WN', 'Big Bomb Shop WC', 'Big Bomb Shop WS']]
     ),
-    (DW, Hz, Wr, 1): (
+    (Op, DW, Hz, Wr, PL, 1): (
         [
             ['Dark Witch EN'],
-            ['Dark Lake Hylia EC'],
+            ['Ice Lake EC'],
             ['Hammer Bridge EC'],
             ['Qirn Jump EN'],
             ['Dark C Whirlpool EC']
         ],
         [
             ['Catfish Approach WN'],
-            ['Southeast DW WC'],
+            ['Bomber Corner WC'],
             ['Dark Tree Line WC'],
             ['Dark Witch WN'],
             ['Hype Cave WC']
         ]
     ),
-    (DW, Vt, Wr, 1): (
+    (Op, DW, Vt, Wr, PL, 1): (
         [
             ['Dark Tree Line SC'],
-            ['Dark Shopping Mall SW'],
+            ['Shopping Mall SW'],
             ['Qirn Jump SC']
         ],
         [
-            ['Dark Lake Hylia NC'],
-            ['Southeast DW NW'],
+            ['Ice Lake NC'],
+            ['Bomber Corner NW'],
             ['Broken Bridge NC']
         ]
     )

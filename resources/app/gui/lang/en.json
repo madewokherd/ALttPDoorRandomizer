@@ -116,6 +116,7 @@
     "randomizer.overworld.overworldshuffle.crossed": "Crossed",
 
     "randomizer.overworld.keepsimilar": "Keep Similar Edges Together",
+    "randomizer.overworld.parallelworlds": "Parallel Worlds",
     
     "randomizer.entrance.openpyramid": "Pre-open Pyramid Hole",
     "randomizer.entrance.shuffleganon": "Include Ganon's Tower and Pyramid Hole in shuffle pool",

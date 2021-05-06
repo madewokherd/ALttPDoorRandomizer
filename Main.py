@@ -74,6 +74,7 @@ def main(args, seed=None, fish=None):
     world.crystals_ganon_orig = args.crystals_ganon.copy()
     world.crystals_gt_orig = args.crystals_gt.copy()
     world.owKeepSimilar = args.ow_keepsimilar.copy()
+    world.owParallelWorlds = args.ow_parallel.copy()
     world.open_pyramid = args.openpyramid.copy()
     world.boss_shuffle = args.shufflebosses.copy()
     world.enemy_shuffle = args.shuffleenemies.copy()

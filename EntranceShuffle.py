@@ -3141,7 +3141,7 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Elder House Exit (West)', 'Kakariko Area'),
                        ('North Fairy Cave Drop', 'North Fairy Cave'),
                        ('North Fairy Cave', 'North Fairy Cave'),
-                       ('North Fairy Cave Exit', 'Useless Fairy Area'),
+                       ('North Fairy Cave Exit', 'River Bend Area'),
                        ('Lost Woods Gamble', 'Lost Woods Gamble'),
                        ('Fortune Teller (Light)', 'Fortune Teller (Light)'),
                        ('Snitch Lady (East)', 'Snitch Lady (East)'),
@@ -3453,7 +3453,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South 
                                ('Palace of Darkness', 'Palace of Darkness Portal'),
                                ('Palace of Darkness Exit', 'Palace of Darkness Area'),
                                ('Swamp Palace', 'Swamp Portal'),  # requires additional patch for flooding moat if moved
-                               ('Swamp Palace Exit', 'Swamp Palace Area'),
+                               ('Swamp Palace Exit', 'Swamp Area'),
 
                                ('Turtle Rock', 'Turtle Rock Main Portal'),
                                ('Turtle Rock Exit (Front)', 'Turtle Rock Area'),

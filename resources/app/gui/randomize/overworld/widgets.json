@@ -11,6 +11,10 @@
     "keepsimilar": {
       "type": "checkbox",
       "default": true
+    },
+    "parallelworlds": {
+      "type": "checkbox",
+      "default": true
     }
   }
 }
