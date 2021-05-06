@@ -9,6 +9,7 @@
 *.srm
 *.bst
 *.wixobj
+*.bat
 build
 bundle/components.wxs
 dist
