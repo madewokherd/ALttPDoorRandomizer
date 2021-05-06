@@ -12,15 +12,15 @@ def link_overworld(world, player):
     for exitname, destname in temporary_mandatory_connections:
         connect_two_way(world, exitname, destname, player)
 
-    connect_custom(world, player)
+    connected_edges = []
+
+    connect_custom(world, connected_edges, player)
 
     # if we do not shuffle, set default connections
     if world.owShuffle[player] == 'vanilla':
         for exitname, destname in default_connections:
             connect_two_way(world, exitname, destname, player)
     else:
-        connected_edges = []
-        
         if world.owKeepSimilar[player] and world.owParallelWorlds[player]:
             for exitname, destname in parallelsimilar_connections:
                 connect_two_way(world, exitname, destname, player)
@@ -214,7 +214,7 @@ def link_overworld(world, player):
         else:
             raise NotImplementedError('Shuffling not supported yet')
 
-def connect_custom(world, player):
+def connect_custom(world, connected_edges, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
         for edgename1, edgename2 in world.custom_overworld[player]:
             connect_two_way(world, edgename1, edgename2, player)
@@ -262,7 +262,7 @@ def remove_reserved(world, groupedlist, connected_edges, player):
             forward_edges = list(list(filter((edge).__ne__, i)) for i in forward_edges)
             back_edges = list(list(filter((edge).__ne__, i)) for i in back_edges)
         
-        if world.owParallelWorlds[player] and parallel == IsParallel.Yes and region == WorldType.Dark:
+        if world.owParallelWorlds[player] and region == WorldType.Dark:
             for edge in parallel_links:
                 forward_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in forward_edges)
                 back_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in back_edges)
