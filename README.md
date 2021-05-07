@@ -14,7 +14,7 @@ This is a very new mode of LTTPR so the tools and info is very limited. There is
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
 - Do NOT grab the Frogsmith until you have seen the Blacksmith location. Doing so may prevent you from continuing in your save file.
-- Inverted/Standard regions/rules/logic is NOT implemented yet. Generation should fail 100%.
+- Inverted regions/rules/logic is NOT implemented yet. Generation should fail 100%.
 - If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to NOT make any other movements and S+Q immediately or there will be a hardlock. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
 
 ### Known bugs:

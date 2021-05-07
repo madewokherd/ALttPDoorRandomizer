@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.2.1
+- Made possible fix for Standard
+- Merged DR v0.3.1.10 - Fixed Standard generation
+
 ### 0.1.2.0
 - Added 'Parallel Worlds' toggle option
 - Updated shuffle algorithm
