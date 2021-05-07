@@ -1045,11 +1045,13 @@ def standard_rules(world, player):
     rule_list, debug_path = find_rules_for_zelda_delivery(world, player)
     set_rule(world.get_location('Zelda Drop Off', player), lambda state: state.has('Zelda Herself', player) and check_rule_list(state, rule_list))
 
-    for location in ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'Purple Chest', 'Maze Race']:
-        add_rule(world.get_location(location, player), lambda state: state.has('Zelda Delivered', player))
+    # for location in ['Mushroom', 'Bottle Merchant', 'Flute Spot', 'Sunken Treasure', 'King Zora', 'Zora\'s Ledge', 
+    #                 'Purple Chest', 'Maze Race', 'Hobo', 'Desert Ledge', 'Bombos Tablet', 'Lake Hylia Island',
+    #                 'Old Man', 'Ether Tablet', 'Spectacle Rock', 'Floating Island']:
+    #     add_rule(world.get_location(location, player), lambda state: state.has('Zelda Delivered', player))
 
     # Bonk Fairy (Light) is a notable omission in ER shuffles/Retro
-    # for entrance in ['Blinds Hideout', 'King Zora', 'Zora\'s Ledge', 'Kings Grave Outer Rocks', 'Dam', 'Tavern North',
+    # for entrance in ['Blinds Hideout', 'Kings Grave Outer Rocks', 'Dam', 'Tavern North',
     #                  'Chicken House', 'Aginahs Cave', 'Sahasrahlas Hut', 'Kakariko Well Drop', 'Kakariko Well Cave',
     #                  'Blacksmiths Hut', 'Bat Cave Drop Ledge', 'Bat Cave Cave', 'Sick Kids House', 'Hobo Bridge',
     #                  'Lost Woods Hideout Drop', 'Lost Woods Hideout Stump', 'Lumberjack Tree Tree',
@@ -1068,8 +1070,11 @@ def standard_rules(world, player):
     #                  'Lumberjack House', 'Lake Hylia Fortune Teller', 'Kakariko Gamble Game', 'Top of Pyramid', 'Top of Pyramid (Inner)']:
     #     add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
     
-    add_rule(world.get_entrance('Sanctuary WS', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Sanctuary EC', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Links House SC', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Links House ES', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Central Bonk Rocks SW', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Hyrule Castle WN', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Hyrule Castle ES', player), lambda state: state.has('Zelda Delivered', player))
 
 
 def find_rules_for_zelda_delivery(world, player):
