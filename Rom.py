@@ -595,8 +595,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if world.owShuffle[player] != 'vanilla':
         rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
 
-        if world.owShuffle[player] == 'full':
-            rom.write_byte(0x150002, 2)
+        if world.owShuffle[player] == 'parallel':
+            owMode = 1
+        elif world.owShuffle[player] == 'full':
+            owMode = 2
+        
+        rom.write_byte(0x150002, owMode)
+
+        owFlags = 0
+        if world.owKeepSimilar[player]:
+            owFlags += 0x1
+
+        write_int16(rom, 0x150003, owFlags)
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
@@ -1993,8 +2003,17 @@ def write_strings(rom, world, player, team):
                 this_hint = location + ' contains ' + hint_text(world.get_location(location, player).item) + '.'
                 tt[hint_locations.pop(0)] = this_hint
 
+        # Adding a guaranteed hint for the Flute in overworld shuffle.
+        if world.owShuffle[player] in ['parallel','full']:
+            this_location = world.find_items_not_key_only('Ocarina', player)
+            if this_location:
+                this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
+                tt[hint_locations.pop(0)] = this_hint
+
         # Lastly we write hints to show where certain interesting items are. It is done the way it is to re-use the silver code and also to give one hint per each type of item regardless of how many exist. This supports many settings well.
         items_to_hint = RelevantItems.copy()
+        if world.owShuffle[player] in ['parallel','full']:
+            items_to_hint.remove('Ocarina')
         if world.keyshuffle[player]:
             items_to_hint.extend(SmallKeys)
         if world.bigkeyshuffle[player]:
@@ -2002,6 +2021,7 @@ def write_strings(rom, world, player, team):
         random.shuffle(items_to_hint)
         hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 8
         hint_count += 2 if world.doorShuffle[player] == 'crossed' else 0
+        hint_count += 1 if world.owShuffle[player] in ['parallel', 'full'] else 0
         while hint_count > 0:
             this_item = items_to_hint.pop(0)
             this_location = world.find_items_not_key_only(this_item, player)

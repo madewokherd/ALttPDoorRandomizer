@@ -111,16 +111,11 @@
   "ow_shuffle": {
     "choices": [
       "vanilla",
-      "simple",
-      "full",
-      "crossed"
+      "parallel",
+      "full"
     ]
   },
   "ow_keepsimilar": {
-    "action": "store_true",
-    "type": "bool"
-  },
-  "ow_parallel": {
     "action": "store_true",
     "type": "bool"
   },

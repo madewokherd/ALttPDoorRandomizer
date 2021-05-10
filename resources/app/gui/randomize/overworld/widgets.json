@@ -2,17 +2,14 @@
   "widgets": {
     "overworldshuffle": {
       "type": "selectbox",
-      "default": "full",
+      "default": "parallel",
       "options": [
         "vanilla",
+        "parallel",
         "full"
       ]
     },
     "keepsimilar": {
-      "type": "checkbox",
-      "default": true
-    },
-    "parallelworlds": {
       "type": "checkbox",
       "default": true
     }

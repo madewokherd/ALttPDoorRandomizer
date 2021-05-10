@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.2.2
+- Re-purposed OW Shuffle setting to Layout Shuffle
+- Merged Parallel Worlds setting into Layout Shuffle
+- Added guaranteed Flute hint for OW Shuffle modes
+
 ### 0.1.2.1
 - Made possible fix for Standard
 - Merged DR v0.3.1.10 - Fixed Standard generation

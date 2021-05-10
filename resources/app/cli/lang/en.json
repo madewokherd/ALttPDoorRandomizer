@@ -194,19 +194,17 @@
       "the overworld vanilla."
     ],
     "ow_shuffle": [
-      "Select Overworld Shuffling Algorithm. (default: %(default)s)",
+      "This shuffles the layout of the overworld.",
       "Vanilla:        All overworld transitions are connected the same",
       "                way they were in the base game.",
-      "Simple:         Overworld retains the same vanilla shape, but some overworld",
-      "                screens will be swapped with their opposite world version.",
-      "Full:           Overworld screen transitions will lead to other",
-      "                overworld screens from the same world.",
-      "Crossed:        Overworld screen transitions can lead to any other overworld screen."
+      "Parallel:       Overworld transitions are shuffled, but both worlds",
+      "                will have the same pattern/shape.",
+      "Full:           Overworld transitions are shuffled, but both worlds",
+      "                will have an independent map shape."
     ],
     "ow_keepsimilar": [
       "This keeps similar edge transitions together. ie. the two west edges on",
       "Potion Shop will be paired with another similar pair." ],
-    "ow_parallel": [ "This ensures the layouts of both worlds are the same shape." ],
     "door_shuffle": [
       "Select Door Shuffling Algorithm. (default: %(default)s)",
       "Basic:          Doors are mixed within a single dungeon.",
