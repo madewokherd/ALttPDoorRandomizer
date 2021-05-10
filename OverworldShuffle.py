@@ -21,7 +21,7 @@ def link_overworld(world, player):
         for exitname, destname in default_connections:
             connect_two_way(world, exitname, destname, player)
     else:
-        if world.owKeepSimilar[player] and world.owParallelWorlds[player]:
+        if world.owKeepSimilar[player] and world.owShuffle[player] == 'parallel':
             for exitname, destname in parallelsimilar_connections:
                 connect_two_way(world, exitname, destname, player)
                 connected_edges.append(exitname)
@@ -38,181 +38,181 @@ def link_overworld(world, player):
         if world.owShuffle[player] == 'full':
             #predefined shuffle groups get reorganized here
             if world.owKeepSimilar[player]:
-                if world.owParallelWorlds[player]:
-                    if world.mode[player] == 'standard':
-                        #tuple stays (A,B,C,D,E,F)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                groups = list(grouping.values())
-                    else:
-                        #tuple goes to (_,B,C,D,E,F)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
+                if world.mode[player] == 'standard':
+                    #tuple stays (A,B,C,D,_,F)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
 
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, parallel, count) = group
-                                    new_grouping[(region, axis, terrain, parallel, count)] = ([], [])
-                                
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, parallel, count) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel, count)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(region, axis, terrain, parallel, count)] = (exist_forward_edges, exist_back_edges)
+                            for group in grouping.keys():
+                                (std, region, axis, terrain, _, count) = group
+                                new_grouping[(std, region, axis, terrain, count)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (std, region, axis, terrain, _, count) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, count)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(std, region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
 
-                                groups = list(new_grouping.values())
+                            groups = list(new_grouping.values())
                 else:
-                    if world.mode[player] == 'standard':
-                        #tuple stays (A,B,C,D,_,F)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
+                    #tuple goes to (_,B,C,D,_,F)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
 
-                                for group in grouping.keys():
-                                    (std, region, axis, terrain, _, count) = group
-                                    new_grouping[(std, region, axis, terrain, count)] = ([], [])
-                                
-                                for group in grouping.keys():
-                                    (std, region, axis, terrain, _, count) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, count)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(std, region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, _, count) = group
+                                new_grouping[(region, axis, terrain, count)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, _, count) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, count)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
 
-                                groups = list(new_grouping.values())
-                    else:
-                        #tuple goes to (_,B,C,D,_,F)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
-
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, _, count) = group
-                                    new_grouping[(region, axis, terrain, count)] = ([], [])
-                                
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, _, count) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, count)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
-
-                                groups = list(new_grouping.values())
+                            groups = list(new_grouping.values())
             else:
-                if world.owParallelWorlds[player]:
-                    if world.mode[player] == 'standard':
-                        #tuple stays (A,B,C,D,E,_)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
+                if world.mode[player] == 'standard':
+                    #tuple stays (A,B,C,D,_,_)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
 
-                                for group in grouping.keys():
-                                    (std, region, axis, terrain, parallel, _) = group
-                                    new_grouping[(std, region, axis, terrain, parallel)] = ([], [])
+                            for group in grouping.keys():
+                                (std, region, axis, terrain, _, _) = group
+                                new_grouping[(std, region, axis, terrain)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (std, region, axis, terrain, _, _) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                forward_edges = [[i] for l in forward_edges for i in l]
+                                back_edges = [[i] for l in back_edges for i in l]
                                 
-                                for group in grouping.keys():
-                                    (std, region, axis, terrain, parallel, _) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    forward_edges = [[i] for l in forward_edges for i in l]
-                                    back_edges = [[i] for l in back_edges for i in l]
-                                    
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, parallel)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(std, region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(std, region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
 
-                                groups = list(new_grouping.values())
-                    else:
-                        #tuple goes to (_,B,C,D,E,_)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
-
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, parallel, _) = group
-                                    new_grouping[(region, axis, terrain, parallel)] = ([], [])
-                                
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, parallel, _) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    forward_edges = [[i] for l in forward_edges for i in l]
-                                    back_edges = [[i] for l in back_edges for i in l]
-                                    
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
-
-                                groups = list(new_grouping.values())
+                            groups = list(new_grouping.values())
                 else:
-                    if world.mode[player] == 'standard':
-                        #tuple stays (A,B,C,D,_,_)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
+                    #tuple goes to (_,B,C,D,_,_)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
 
-                                for group in grouping.keys():
-                                    (std, region, axis, terrain, _, _) = group
-                                    new_grouping[(std, region, axis, terrain)] = ([], [])
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, _, _) = group
+                                new_grouping[(region, axis, terrain)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, _, _) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                forward_edges = [[i] for l in forward_edges for i in l]
+                                back_edges = [[i] for l in back_edges for i in l]
                                 
-                                for group in grouping.keys():
-                                    (std, region, axis, terrain, _, _) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    forward_edges = [[i] for l in forward_edges for i in l]
-                                    back_edges = [[i] for l in back_edges for i in l]
-                                    
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(std, region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
 
-                                groups = list(new_grouping.values())
-                    else:
-                        #tuple goes to (_,B,C,D,_,_)
-                        for grouping in (trimmed_groups, None):
-                            if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                                new_grouping = {}
+                            groups = list(new_grouping.values())
+        elif world.owShuffle[player] == 'parallel':
+            #predefined shuffle groups get reorganized here
+            if world.owKeepSimilar[player]:
+                if world.mode[player] == 'standard':
+                    #tuple stays (A,B,C,D,E,F)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            groups = list(grouping.values())
+                else:
+                    #tuple goes to (_,B,C,D,E,F)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
 
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, _, _) = group
-                                    new_grouping[(region, axis, terrain)] = ([], [])
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, parallel, count) = group
+                                new_grouping[(region, axis, terrain, parallel, count)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, parallel, count) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel, count)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(region, axis, terrain, parallel, count)] = (exist_forward_edges, exist_back_edges)
+
+                            groups = list(new_grouping.values())
+            else:
+                if world.mode[player] == 'standard':
+                    #tuple stays (A,B,C,D,E,_)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
+
+                            for group in grouping.keys():
+                                (std, region, axis, terrain, parallel, _) = group
+                                new_grouping[(std, region, axis, terrain, parallel)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (std, region, axis, terrain, parallel, _) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                forward_edges = [[i] for l in forward_edges for i in l]
+                                back_edges = [[i] for l in back_edges for i in l]
                                 
-                                for group in grouping.keys():
-                                    (_, region, axis, terrain, _, _) = group
-                                    (forward_edges, back_edges) = grouping[group]
-                                    forward_edges = [[i] for l in forward_edges for i in l]
-                                    back_edges = [[i] for l in back_edges for i in l]
-                                    
-                                    (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain)]
-                                    exist_forward_edges.extend(forward_edges)
-                                    exist_back_edges.extend(back_edges)
-                                    new_grouping[(region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, parallel)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(std, region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
 
-                                groups = list(new_grouping.values())
-            
-            #all shuffling occurs here
-            random.shuffle(groups)
-            for (forward_edge_sets, back_edge_sets) in groups:
-                assert len(forward_edge_sets) == len(back_edge_sets)
-                random.shuffle(back_edge_sets)
-                for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
-                    assert len(forward_set) == len(back_set)
-                    for (forward_edge, back_edge) in zip(forward_set, back_set):
-                        connect_two_way(world, forward_edge, back_edge, player)
-                        connected_edges.append(forward_edge)
-                        connected_edges.append(back_edge)
-                        if world.owParallelWorlds[player] and forward_edge in parallel_links.keys():
-                            connect_two_way(world, parallel_links[forward_edge], parallel_links[back_edge], player)
-                            connected_edges.append(parallel_links[forward_edge])
-                            connected_edges.append(parallel_links[back_edge])
+                            groups = list(new_grouping.values())
+                else:
+                    #tuple goes to (_,B,C,D,E,_)
+                    for grouping in (trimmed_groups, None):
+                        if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
+                            new_grouping = {}
 
-            assert len(connected_edges) == len(default_connections) * 2, connected_edges
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, parallel, _) = group
+                                new_grouping[(region, axis, terrain, parallel)] = ([], [])
+                            
+                            for group in grouping.keys():
+                                (_, region, axis, terrain, parallel, _) = group
+                                (forward_edges, back_edges) = grouping[group]
+                                forward_edges = [[i] for l in forward_edges for i in l]
+                                back_edges = [[i] for l in back_edges for i in l]
+                                
+                                (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel)]
+                                exist_forward_edges.extend(forward_edges)
+                                exist_back_edges.extend(back_edges)
+                                new_grouping[(region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+
+                            groups = list(new_grouping.values())
         else:
             raise NotImplementedError('Shuffling not supported yet')
+        
+        #all shuffling occurs here
+        random.shuffle(groups)
+        for (forward_edge_sets, back_edge_sets) in groups:
+            assert len(forward_edge_sets) == len(back_edge_sets)
+            random.shuffle(back_edge_sets)
+            for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
+                assert len(forward_set) == len(back_set)
+                for (forward_edge, back_edge) in zip(forward_set, back_set):
+                    connect_two_way(world, forward_edge, back_edge, player)
+                    connected_edges.append(forward_edge)
+                    connected_edges.append(back_edge)
+                    if world.owShuffle[player] == 'parallel' and forward_edge in parallel_links.keys():
+                        connect_two_way(world, parallel_links[forward_edge], parallel_links[back_edge], player)
+                        connected_edges.append(parallel_links[forward_edge])
+                        connected_edges.append(parallel_links[back_edge])
+                        
+        assert len(connected_edges) == len(default_connections) * 2, connected_edges
 
 def connect_custom(world, connected_edges, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
@@ -262,7 +262,7 @@ def remove_reserved(world, groupedlist, connected_edges, player):
             forward_edges = list(list(filter((edge).__ne__, i)) for i in forward_edges)
             back_edges = list(list(filter((edge).__ne__, i)) for i in back_edges)
         
-        if world.owParallelWorlds[player] and region == WorldType.Dark:
+        if world.owShuffle[player] == 'parallel' and region == WorldType.Dark:
             for edge in parallel_links:
                 forward_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in forward_edges)
                 back_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in back_edges)

@@ -9,7 +9,7 @@ See https://alttpr.com/ for more details on the normal randomizer.
 This is a very new mode of LTTPR so the tools and info is very limited. There is a [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.  There is a rumor that some OW tracking capability will be coming to CodeTracker, an EmoTracker package for LTTPR.
 
 # Known Issues
-(Updated 2021-05-04)
+(Updated 2021-05-09)
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
@@ -40,23 +40,23 @@ Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
 
 Only extra settings are found here. All door and entrance randomizer settings are supported. See their [readme](https://github.com/Aerinon/ALttPDoorRandomizer/blob/master/README.md)
 
-## Overworld Shuffle (--ow_shuffle)
-
-### Full
-
-OW Transitions are shuffled within each world separately.
+## Overworld Layout Shuffle (--ow_shuffle)
 
 ### Vanilla
 
 OW is not shuffled.
 
+### Parallel
+
+OW Transitions are shuffled, but both worlds will have a matching layout.
+
+### Full
+
+OW Transitions are shuffled within each world separately.
+
 ## Keep Similar Edges Together (--ow_keepsimilar)
 
 This keeps similar edge transitions together. ie. The 2 west edges of Potion Shop will be paired to another set of two similar edges
-
-## Parallel Worlds (--ow_parallel)
-
-This ensures matching layouts of Light and Dark worlds. Any remaining edge transitions that don't have a matching counterpart will be shuffled amongst themselves. ie. If going right from Link's House leads to Blacksmith, then going right from Big Bomb Shop will lead to Hammer Pegs
 
 
 # Command Line Options
@@ -71,16 +71,10 @@ Show the help message and exit.
 --ow_shuffle <mode>     
 ```
 
-For specifying the overworld shuffle you want as above. (default: vanilla)
+For specifying the overworld layout shuffle you want as above. (default: vanilla)
 
 ```
 --ow_keepsimilar     
 ```
 
 This keeps similar edge transitions paired together with other pairs of transitions
-
-```
---ow_parallel     
-```
-
-This ensures the layout of both worlds have the same shape

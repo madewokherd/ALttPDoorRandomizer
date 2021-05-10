@@ -72,8 +72,7 @@ SETTINGSTOPROCESS = {
     },
     "overworld": {
       "overworldshuffle": "ow_shuffle",
-      "keepsimilar": "ow_keepsimilar",
-      "parallelworlds": "ow_parallel"
+      "keepsimilar": "ow_keepsimilar"
     },
     "entrance": {
       "openpyramid": "openpyramid",
