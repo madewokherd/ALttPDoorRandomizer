@@ -601,6 +601,12 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             owMode = 2
         
         rom.write_byte(0x150002, owMode)
+
+        owFlags = 0
+        if world.owKeepSimilar[player]:
+            owFlags += 0x1
+
+        write_int16(rom, 0x150003, owFlags)
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
