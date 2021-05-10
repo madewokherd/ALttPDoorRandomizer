@@ -595,8 +595,12 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if world.owShuffle[player] != 'vanilla':
         rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
 
-        if world.owShuffle[player] == 'full':
-            rom.write_byte(0x150002, 2)
+        if world.owShuffle[player] == 'parallel':
+            owMode = 1
+        elif world.owShuffle[player] == 'full':
+            owMode = 2
+        
+        rom.write_byte(0x150002, owMode)
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
