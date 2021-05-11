@@ -517,6 +517,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), lambda state: state.has_Pearl(player) and state.can_lift_rocks(player))
     set_rule(world.get_entrance('Hammer Bridge Pegs (North)', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))
     set_rule(world.get_entrance('Hammer Bridge Pegs (South)', player), lambda state: state.has_Pearl(player) and state.has('Hammer', player))
+    set_rule(world.get_entrance('Circle of Bushes Bush (North)', player), lambda state: state.has_Pearl(player))
+    set_rule(world.get_entrance('Circle of Bushes Bush (South)', player), lambda state: state.has_Pearl(player))
     
     set_rule(world.get_entrance('Flute Away', player), lambda state: state.can_flute(player))
     
@@ -614,6 +616,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Flute Boy Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Flute Boy Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Cave 45 Mirror Spot', player), lambda state: state.has_Mirror(player))
+    set_rule(world.get_entrance('Flute Boy Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('C Whirlpool Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('C Whirlpool Outer Mirror Spot', player), lambda state: state.has_Mirror(player))
     set_rule(world.get_entrance('Central Bonk Rocks Mirror Spot', player), lambda state: state.has_Mirror(player))
