@@ -2333,7 +2333,7 @@ class Pot(object):
 
 # byte 0: DDOO EEEE (DR, OR, ER)
 dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0}
-or_mode = {"basic": 1, "full": 2, "crossed": 3, "vanilla": 0}
+or_mode = {"parallel": 1, "full": 2, "vanilla": 0}
 er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, "restricted_legacy": 8,
            "full_legacy": 9, "madness_legacy": 10, "insanity_legacy": 11, "dungeonsfull": 7, "dungeonssimple": 6}
 
