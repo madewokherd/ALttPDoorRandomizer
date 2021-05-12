@@ -26,15 +26,19 @@ This is a very new mode of LTTPR so the tools and info is very limited. There is
 
 All feedback and dev conversation happens in the #ow-rando channel on the [ALTTP Randomizer discord](https://discordapp.com/invite/alttprandomizer).
 
-# Installation
+# Installation from source
 
-Install Python 3
+See these instructions.
 
-Run ```pip install python-bps-continued```.  On Linux, you should use pip3.  On Windows, you may need to run ```python -m pip install python-bps-continued``` or ```py -m pip install python-bps-continued```.
+https://github.com/codemann8/ALttPDoorRandomizer/blob/OverworldShuffle/docs/BUILDING.md
 
-Clone this repository then run ```DungeonRandomizer.py```.
+When installing platform specific dependencies, don't forget to run the appropriate command from the bottom of the page! Those will install missing pip dependencies.
 
-Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
+Running the MultiServer and MultiClient for multiworld should run resources/ci/common/local_install.py for those dependencies as well.
+
+To use the CLI, run ```DungeonRandomizer.py```.
+
+Alternatively, run ```Gui.py``` for a simple graphical user interface.
 
 # Settings
 
