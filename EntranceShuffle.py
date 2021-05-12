@@ -3107,14 +3107,15 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Bomb Hut Inner Bushes', 'Light World'),
                                   ('Bomb Hut Outer Bushes', 'Bomb Hut Area'),
                                   ('Bomb Hut Mirror Spot', 'West Dark World')]
+
 # non-shuffled entrance links
 default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ("Blinds Hideout", "Blinds Hideout"),
                        ('Dam', 'Dam'),
                        ('Lumberjack House', 'Lumberjack House'),
-                       ("Hyrule Castle Secret Entrance Drop", "Hyrule Castle Secret Entrance"),
-                       ("Hyrule Castle Secret Entrance Stairs", "Hyrule Castle Secret Entrance"),
-                       ("Hyrule Castle Secret Entrance Exit", "Hyrule Castle Courtyard"),
+                       ('Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance'),
+                       ('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance'),
+                       ('Hyrule Castle Secret Entrance Exit', 'Hyrule Castle Courtyard Northeast'),
                        ('Bonk Fairy (Light)', 'Bonk Fairy (Light)'),
                        ('Lake Hylia Fairy', 'Lake Hylia Healer Fairy'),
                        ('Lake Hylia Fortune Teller', 'Lake Hylia Fortune Teller'),
@@ -3152,7 +3153,7 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Kakariko Shop', 'Kakariko Shop'),
                        ('Lost Woods Hideout Drop', 'Lost Woods Hideout (top)'),
                        ('Lost Woods Hideout Stump', 'Lost Woods Hideout (bottom)'),
-                       ('Lost Woods Hideout Exit', 'Lost Woods Area'),
+                       ('Lost Woods Hideout Exit', 'Lost Woods East Area'),
                        ('Lumberjack Tree Tree', 'Lumberjack Tree (top)'),
                        ('Lumberjack Tree Cave', 'Lumberjack Tree (bottom)'),
                        ('Lumberjack Tree Exit', 'Lumberjack Area'),
@@ -3201,7 +3202,7 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Paradox Cave (Top)', 'Paradox Cave'),
                        ('Paradox Cave Exit (Bottom)', 'East Death Mountain (Bottom)'),
                        ('Paradox Cave Exit (Middle)', 'East Death Mountain (Bottom)'),
-                       ('Paradox Cave Exit (Top)', 'East Death Mountain (Top East)'),
+                       ('Paradox Cave Exit (Top)', 'East Death Mountain (East Top)'),
                        ('Hookshot Fairy', 'Hookshot Fairy'),
                        ('Fairy Ascension Cave (Bottom)', 'Fairy Ascension Cave (Bottom)'),
                        ('Fairy Ascension Cave (Top)', 'Fairy Ascension Cave (Top)'),
@@ -3247,16 +3248,18 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
                        ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
                        ('Superbunny Cave (Bottom)', 'Superbunny Cave'),
-                       ('Superbunny Cave Exit (Top)', 'Dark Death Mountain (Top East)'),
+                       ('Superbunny Cave Exit (Top)', 'Dark Death Mountain (East Top)'),
                        ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
-                       ('Hookshot Cave Exit (South)', 'Dark Death Mountain (Top East)'),
+                       ('Hookshot Cave Exit (South)', 'Dark Death Mountain (East Top)'),
                        ('Hookshot Cave Exit (North)', 'Dark Death Mountain Floating Island'),
                        ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
                        ('Mimic Cave', 'Mimic Cave'),
 
                        ('Pyramid Hole', 'Pyramid'),
                        ('Pyramid Exit', 'Pyramid Exit Ledge'),
-                       ('Pyramid Entrance', 'Bottom of Pyramid')
+                       ('Pyramid Entrance', 'Bottom of Pyramid'),
+                       ('Inverted Pyramid Hole', 'Pyramid'),
+                       ('Inverted Pyramid Entrance', 'Bottom of Pyramid')
                       ]
 
 inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'),
@@ -3465,7 +3468,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South 
                                ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Eye Bridge Portal'),
 
                                ('Ganons Tower', 'Ganons Tower Portal'),
-                               ('Ganons Tower Exit', 'Dark Death Mountain (Top West)')
+                               ('Ganons Tower Exit', 'Dark Death Mountain (West Top)')
                                ]
 
 inverted_default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
