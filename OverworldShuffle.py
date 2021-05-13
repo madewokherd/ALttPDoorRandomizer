@@ -246,7 +246,8 @@ def connect_two_way(world, edgename1, edgename2, player):
         x.dest = y
         y.dest = x
     
-    world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
+    if world.owShuffle[player] != 'vanilla':
+        world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
 
 def remove_reserved(world, groupedlist, connected_edges, player):
     #TODO: Remove edges set in connect_custom

@@ -2229,7 +2229,8 @@ class Spoiler(object):
                 outfile.write('Difficulty:'.ljust(line_width) + '%s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:'.ljust(line_width) + '%s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
-                outfile.write('Keep OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
+                if self.metadata['ow_shuffle'][player] != 'vanilla':
+                    outfile.write('Keep OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
