@@ -6,10 +6,12 @@ See https://alttpr.com/ for more details on the normal randomizer.
 
 ### Trackers & Guides
 
-This is a very new mode of LTTPR so the tools and info is very limited. There is a [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.  There is a rumor that some OW tracking capability will be coming to CodeTracker, an EmoTracker package for LTTPR.
+This is a very new mode of LTTPR so the tools and info is very limited. - There is an [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.
+- There is OW tracking capability within CodeTracker, an [EmoTracker](https://emotracker.net) package for LTTPR.
+- There is an [OW OWG Reference Sheet](https://zelda.codemann8.com/images/shared/ow-owg-reference-sheet.png) that shows all the in-logic places where boots/mirror clips and fake flippers are expected from the player.
 
 # Known Issues
-(Updated 2021-05-09)
+(Updated 2021-05-16)
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
@@ -26,15 +28,19 @@ This is a very new mode of LTTPR so the tools and info is very limited. There is
 
 All feedback and dev conversation happens in the #ow-rando channel on the [ALTTP Randomizer discord](https://discordapp.com/invite/alttprandomizer).
 
-# Installation
+# Installation from source
 
-Install Python 3
+See these instructions.
 
-Run ```pip install python-bps-continued```.  On Linux, you should use pip3.  On Windows, you may need to run ```python -m pip install python-bps-continued``` or ```py -m pip install python-bps-continued```.
+https://github.com/codemann8/ALttPDoorRandomizer/blob/OverworldShuffle/docs/BUILDING.md
 
-Clone this repository then run ```DungeonRandomizer.py```.
+When installing platform specific dependencies, don't forget to run the appropriate command from the bottom of the page! Those will install missing pip dependencies.
 
-Alternatively, run ```Gui.py``` for a simple graphical user interface. (WIP)
+Running the MultiServer and MultiClient for multiworld should run resources/ci/common/local_install.py for those dependencies as well.
+
+To use the CLI, run ```DungeonRandomizer.py```.
+
+Alternatively, run ```Gui.py``` for a simple graphical user interface.
 
 # Settings
 

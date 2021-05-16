@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.3.0
+- Added OWG Logic for OW Shuffle
+- Merged DR v0.4.0.2 - OWG Framework / YAML
+
 ### 0.1.2.2
 - Re-purposed OW Shuffle setting to Layout Shuffle
 - Merged Parallel Worlds setting into Layout Shuffle

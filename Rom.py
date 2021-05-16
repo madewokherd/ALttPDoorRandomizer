@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '5ea3196d8db3ca0c757035f7fd51cf9b'
+RANDOMIZERBASEHASH = '053bac2160444043322960417237eb04'
 
 
 class JsonRom(object):
@@ -723,13 +723,13 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_bytes(paired_door.address_a(world, player), paired_door.rom_data_a(world, player))
         rom.write_bytes(paired_door.address_b(world, player), paired_door.rom_data_b(world, player))
     if world.doorShuffle[player] != 'vanilla':
-
-        for builder in world.dungeon_layouts[player].values():
-            for stonewall in builder.pre_open_stonewalls:
-                if stonewall.name == 'Desert Wall Slide NW':
-                    dr_flags |= DROptions.Open_Desert_Wall
-                elif stonewall.name == 'PoD Bow Statue Down Ladder':
-                    dr_flags |= DROptions.Open_PoD_Wall
+        if not world.experimental[player]:
+            for builder in world.dungeon_layouts[player].values():
+                for stonewall in builder.pre_open_stonewalls:
+                    if stonewall.name == 'Desert Wall Slide NW':
+                        dr_flags |= DROptions.Open_Desert_Wall
+                    elif stonewall.name == 'PoD Bow Statue Down Ladder':
+                        dr_flags |= DROptions.Open_PoD_Wall
         for name, pair in boss_indicator.items():
             dungeon_id, boss_door = pair
             opposite_door = world.get_door(boss_door, player).dest
@@ -806,15 +806,17 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
-        # collection rate address: 238C37
+        # collection rate address:
+        cr_address = 0x2391BE
+        cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
         # top half
-        rom.write_byte(0x118C53, mid_top)
-        rom.write_byte(0x118C54, last_top)
+        rom.write_byte(cr_pc+0x1c, mid_top)
+        rom.write_byte(cr_pc+0x1d, last_top)
         # bottom half
-        rom.write_byte(0x118C71, mid_bot)
-        rom.write_byte(0x118C72, last_bot)
+        rom.write_byte(cr_pc+0x3a, mid_bot)
+        rom.write_byte(cr_pc+0x3b, last_bot)
 
     if world.keydropshuffle[player] or world.doorShuffle[player] != 'vanilla':
         gt = world.dungeon_layouts[player]['Ganons Tower']
@@ -822,16 +824,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         total = 0
         for region in gt.master_sector.regions:
             total += count_locations_exclude_logic(region.locations, gt_logic)
-        rom.write_byte(0x187012, total)  # dynamic credits
-        # gt big key address: 238B59
+        # rom.write_byte(0x187012, total)  # dynamic credits
+        # gt big key address:
+        gtbk_address = 0x2390E0
+        gtbk_pc = gtbk_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit(total // 10)
         last_top, last_bot = credits_digit(total % 10)
         # top half
-        rom.write_byte(0x118B75, mid_top)
-        rom.write_byte(0x118B76, last_top)
+        rom.write_byte(gtbk_pc+0x1c, mid_top)
+        rom.write_byte(gtbk_pc+0x1d, last_top)
         # bottom half
-        rom.write_byte(0x118B93, mid_bot)
-        rom.write_byte(0x118B94, last_bot)
+        rom.write_byte(gtbk_pc+0x3a, mid_bot)
+        rom.write_byte(gtbk_pc+0x3b, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
@@ -1153,15 +1157,15 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180211, gametype)  # Game type
 
     # assorted fixes
-    rom.write_byte(0x1800A2, 0x01)  # remain in real dark world when dying in dark world dungeon before killing aga1
+    rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
     rom.write_byte(0x180169, 0x01 if world.lock_aga_door_in_escape else 0x00)  # Lock or unlock aga tower door during escape sequence.
     if world.mode[player] == 'inverted':
         rom.write_byte(0x180169, 0x02)  # lock aga/ganon tower door with crystals in inverted
     rom.write_byte(0x180171, 0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01) # Bob is enabled
     rom.write_byte(0x180168, 0x08)  # Spike Cave Damage
-    rom.write_bytes(0x18016B, [0x04, 0x02, 0x01]) #Set spike cave and MM spike room Cape usage
-    rom.write_bytes(0x18016E, [0x04, 0x08, 0x10]) #Set spike cave and MM spike room Cape usage
+    rom.write_bytes(0x18016B, [0x04, 0x02, 0x01]) # Set spike cave and MM spike room Byrna usage
+    rom.write_bytes(0x18016E, [0x04, 0x08, 0x10]) # Set spike cave and MM spike room Cape usage
     rom.write_bytes(0x50563, [0x3F, 0x14]) # disable below ganon chest
     rom.write_byte(0x50599, 0x00) # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest
@@ -1313,6 +1317,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             if item.name != 'Piece of Heart' or equip[0x36B] == 0:
                 equip[0x36C] = min(equip[0x36C] + 0x08, 0xA0)
                 equip[0x36D] = min(equip[0x36D] + 0x08, 0xA0)
+        elif item.name == 'Pegasus Boots':
+            rom.write_byte(0x183015, 0x01)
+            ability_flags |= 0b00000100
         else:
             raise RuntimeError(f'Unsupported item in starting equipment: {item.name}')
 
