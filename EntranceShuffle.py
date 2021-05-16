@@ -3267,9 +3267,9 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Cave Shop (Dark Death Mountain)', 'Cave Shop (Dark Death Mountain)'),
                        ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
                        ('Superbunny Cave (Bottom)', 'Superbunny Cave (Bottom)'),
-                       ('Superbunny Cave Exit (Top)', 'Dark Death Mountain (Top East)'),
-                       ('Superbunny Cave Exit (Bottom)', 'Dark Death Mountain (East Bottom)'),
-                       ('Hookshot Cave Exit (South)', 'Dark Death Mountain (Top East)'),
+                       ('Superbunny Cave Exit (Top)', 'East Dark Death Mountain (Top)'),
+                       ('Superbunny Cave Exit (Bottom)', 'East Dark Death Mountain (Bottom)'),
+                       ('Hookshot Cave Exit (South)', 'East Dark Death Mountain (Top)'),
                        ('Hookshot Cave Exit (North)', 'Dark Death Mountain Floating Island'),
                        ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
                        ('Mimic Cave', 'Mimic Cave'),
@@ -3485,7 +3485,7 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South 
                                ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Eye Bridge Portal'),
 
                                ('Ganons Tower', 'Ganons Tower Portal'),
-                               ('Ganons Tower Exit', 'Dark Death Mountain (Top West)')
+                               ('Ganons Tower Exit', 'West Dark Death Mountain (Top)')
                                ]
 
 inverted_default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
