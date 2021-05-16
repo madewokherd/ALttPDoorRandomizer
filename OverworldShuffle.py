@@ -3,7 +3,7 @@ from BaseClasses import OWEdge, WorldType, Direction, Terrain
 from Utils import bidict
 from OWEdges import OWEdgeGroups, IsParallel
 
-__version__ = '0.1.2.2u'
+__version__ = '0.1.3.0u'
 
 def link_overworld(world, player):
     # setup mandatory connections
