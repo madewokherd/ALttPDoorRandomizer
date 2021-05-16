@@ -175,7 +175,8 @@ def create_regions(world, player):
         create_dw_region(player, 'Hammer Bridge North Area', None, ['Hammer Bridge Pegs (North)', 'Hammer Bridge Water Drop', 'Stone Bridge Mirror Spot', 'Hammer Bridge NC', 'Hammer Bridge EN']),
         create_dw_region(player, 'Hammer Bridge South Area', None, ['Hammer Bridge Pegs (South)', 'Stone Bridge South Mirror Spot', 'Hammer Bridge WS', 'Hammer Bridge SC']),
         create_dw_region(player, 'Hammer Bridge Water', None, ['Hammer Bridge Pier', 'Hobo Mirror Spot', 'Hammer Bridge EC']),
-        create_dw_region(player, 'Dark Central Cliffs', None, ['Dark Bonk Rocks Cliff Ledge Drop', 'Bomb Shop Cliff Ledge Drop', 'Hammer Bridge South Cliff Ledge Drop', 'Ice Lake Area Cliff Ledge Drop', 'Ice Palace Island FAWT Ledge Drop', 'Hammer Bridge EC Cliff Water Drop', 'Dark Tree Line WC Cliff Water Drop', 'Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Cliff Ledge Drop', 'Dark South Teleporter Cliff Ledge Drop', 'Hype Cliff Ledge Drop']),
+        create_dw_region(player, 'Dark Central Cliffs', None, ['Dark Bonk Rocks Cliff Ledge Drop', 'Bomb Shop Cliff Ledge Drop', 'Hammer Bridge South Cliff Ledge Drop', 'Ice Lake Area Cliff Ledge Drop', 'Ice Palace Island FAWT Ledge Drop',
+                                'Hammer Bridge EC Cliff Water Drop', 'Dark Tree Line WC Cliff Water Drop', 'Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Cliff Ledge Drop', 'Hype Cliff Ledge Drop']), #, 'Dark South Teleporter Cliff Ledge Drop']), #will add in Inverted
         create_dw_region(player, 'Dark Tree Line Area', None, ['Dark Lake Hylia Fairy', 'Tree Line Mirror Spot', 'Dark Tree Line WN', 'Dark Tree Line NW', 'Dark Tree Line SE']),
         create_dw_region(player, 'Dark Tree Line Water', None, ['Dark Tree Line WC', 'Dark Tree Line SC']),
         create_dw_region(player, 'Palace of Darkness Nook Area', None, ['East Dark World Hint', 'Eastern Nook Mirror Spot', 'Palace of Darkness Nook NE']),
