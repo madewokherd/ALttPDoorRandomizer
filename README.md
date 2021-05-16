@@ -6,10 +6,12 @@ See https://alttpr.com/ for more details on the normal randomizer.
 
 ### Trackers & Guides
 
-This is a very new mode of LTTPR so the tools and info is very limited. There is a [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.  There is a rumor that some OW tracking capability will be coming to CodeTracker, an EmoTracker package for LTTPR.
+This is a very new mode of LTTPR so the tools and info is very limited. - There is an [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.
+- There is OW tracking capability within CodeTracker, an [EmoTracker](https://emotracker.net) package for LTTPR.
+- There is an [OW OWG Reference Sheet](https://zelda.codemann8.com/images/shared/ow-owg-reference-sheet.png) that shows all the in-logic places where boots/mirror clips and fake flippers are expected from the player.
 
 # Known Issues
-(Updated 2021-05-09)
+(Updated 2021-05-16)
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
