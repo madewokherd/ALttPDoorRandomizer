@@ -1370,6 +1370,8 @@ def standard_rules(world, player):
     add_rule(world.get_entrance('Central Bonk Rocks SW', player), lambda state: state.has('Zelda Delivered', player))
     add_rule(world.get_entrance('Hyrule Castle WN', player), lambda state: state.has('Zelda Delivered', player))
     add_rule(world.get_entrance('Hyrule Castle ES', player), lambda state: state.has('Zelda Delivered', player))
+    set_rule(world.get_entrance('Hyrule Castle Main Gate (South)', player), lambda state: state.has('Zelda Delivered', player))
+    set_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has('Zelda Delivered', player))
 
 
 def find_rules_for_zelda_delivery(world, player):
