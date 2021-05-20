@@ -10,6 +10,13 @@ def link_overworld(world, player):
         connect_simple(world, exitname, regionname, player)
     for exitname, destname in temporary_mandatory_connections:
         connect_two_way(world, exitname, destname, player)
+    
+    if world.mode[player] != 'inverted':
+        for exitname, regionname in open_connections:
+            connect_simple(world, exitname, regionname, player)
+    else:
+        for exitname, regionname in inverted_connections:
+            connect_simple(world, exitname, regionname, player)
 
     connected_edges = []
 
@@ -249,7 +256,7 @@ def connect_two_way(world, edgename1, edgename2, player):
         world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
 
 def remove_reserved(world, groupedlist, connected_edges, player):
-    #TODO: Remove edges set in connect_custom
+    #TODO: 
     new_grouping = {}
     for group in groupedlist.keys():
         new_grouping[group] = ([], [])
@@ -270,7 +277,7 @@ def remove_reserved(world, groupedlist, connected_edges, player):
         forward_edges = list(filter(([]).__ne__, forward_edges))
         back_edges = list(filter(([]).__ne__, back_edges))
 
-        #TODO: The lists above can be left with invalid counts of edges, they need to get put into their appropriate group
+        #TODO: Remove edges set in connect_custom. The lists above can be left with invalid counts if connect_custom removes entries, they need to get put into their appropriate group
 
         (exist_forward_edges, exist_back_edges) = new_grouping[group]
         exist_forward_edges.extend(forward_edges)
@@ -293,16 +300,7 @@ temporary_mandatory_connections = [
                         ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
-                         ('Flute Spot 2', 'Potion Shop Area'),
-                         ('Flute Spot 3', 'Kakariko Area'),
-                         ('Flute Spot 4', 'Links House Area'),
-                         ('Flute Spot 5', 'Eastern Nook Area'),
-                         ('Flute Spot 6', 'Desert Palace Teleporter Ledge'),
-                         ('Flute Spot 7', 'Dam Area'),
-                         ('Flute Spot 8', 'Octoballoon Area'),
-
-                         # Whirlpool Connections
+mandatory_connections = [ # Whirlpool Connections
                          ('C Whirlpool', 'River Bend Water'),
                          ('River Bend Whirlpool', 'C Whirlpool Water'),
                          ('Lake Hylia Whirlpool', 'Zora Waterfall Water'),
@@ -313,6 +311,8 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Bomber Corner Whirlpool', 'Qirn Jump Water'),
 
                          # Intra-tile OW Connections
+                         ('Lost Woods Bush (West)', 'Lost Woods East Area'),
+                         ('Lost Woods Bush (East)', 'Lost Woods West Area'),
                          ('Death Mountain Entrance Rock', 'Death Mountain Entrance'),
                          ('Death Mountain Entrance Drop', 'Mountain Entry Area'),
                          ('Death Mountain Return Drop', 'Mountain Entry Area'),
@@ -324,6 +324,8 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Kings Grave Outer Rocks', 'Kings Grave Area'),
                          ('Kings Grave Inner Rocks', 'Graveyard Area'),
                          ('Graveyard Ledge Drop', 'Graveyard Area'),
+                         ('Graveyard Ladder (Top)', 'Graveyard Area'),
+                         ('Graveyard Ladder (Bottom)', 'Graveyard Ledge'),
                          ('River Bend Water Drop', 'River Bend Water'),
                          ('River Bend East Water Drop', 'River Bend Water'),
                          ('River Bend West Pier', 'River Bend Area'),
@@ -333,17 +335,30 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Potion Shop Rock (South)', 'Potion Shop Northeast'),
                          ('Potion Shop Rock (North)', 'Potion Shop Area'),
                          ('Zora Approach Water Drop', 'Zora Approach Water'),
+                         ('Kakariko Yard Bush (South)', 'Kakariko Grass Yard'),
+                         ('Kakariko Yard Bush (North)', 'Kakariko Area'),
+                         ('Kakariko Southwest Bush (North)', 'Kakariko Southwest'),
+                         ('Kakariko Southwest Bush (South)', 'Kakariko Area'),
                          ('Bat Cave Ledge Peg', 'Bat Cave Ledge'),
+                         ('Hyrule Castle Courtyard Bush (North)', 'Hyrule Castle Courtyard'),
+                         ('Hyrule Castle Courtyard Bush (South)', 'Hyrule Castle Courtyard Northeast'),
                          ('Hyrule Castle Main Gate (South)', 'Hyrule Castle Courtyard'),
                          ('Hyrule Castle Main Gate (North)', 'Hyrule Castle Area'),
                          ('Hyrule Castle Ledge Drop', 'Hyrule Castle Area'),
                          ('Hyrule Castle Ledge Courtyard Drop', 'Hyrule Castle Courtyard'),
                          ('Hyrule Castle Inner East Rock', 'Hyrule Castle East Entry'),
                          ('Hyrule Castle Outer East Rock', 'Hyrule Castle Area'),
+                         ('Wooden Bridge Bush (South)', 'Wooden Bridge Northeast'),
+                         ('Wooden Bridge Bush (North)', 'Wooden Bridge Area'),
                          ('Wooden Bridge Water Drop', 'Wooden Bridge Water'),
+                         ('Wooden Bridge Northeast Water Drop', 'Wooden Bridge Water'),
                          ('Maze Race Game', 'Maze Race Prize'),
                          ('Maze Race Ledge Drop', 'Maze Race Area'),
+                         ('Flute Boy Bush (North)', 'Flute Boy Approach Area'),
+                         ('Flute Boy Bush (South)', 'Flute Boy Bush Entry'),
                          ('Cave 45 Ledge Drop', 'Flute Boy Approach Area'),
+                         ('Cave 45 Inverted Leave', 'Flute Boy Approach Area'),
+                         ('Cave 45 Inverted Approach', 'Cave 45 Ledge'),
                          ('C Whirlpool Water Entry', 'C Whirlpool Water'),
                          ('C Whirlpool Landing', 'C Whirlpool Area'),
                          ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'),
@@ -355,10 +370,14 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Desert Ledge Outer Rocks', 'Desert Palace Entrance (North) Spot'),
                          ('Desert Ledge Inner Rocks', 'Desert Ledge'),
                          ('Checkerboard Ledge Drop', 'Desert Area'),
+                         ('Checkerboard Ledge Approach', 'Desert Checkerboard Ledge'),
+                         ('Checkerboard Ledge Leave', 'Desert Area'),
                          ('Desert Mouth Drop', 'Desert Area'),
                          ('Desert Teleporter Drop', 'Desert Area'),
                          ('Bombos Tablet Drop', 'Desert Area'),
                          ('Desert Pass Ledge Drop', 'Desert Pass Area'),
+                         ('Desert Pass Ladder (North)', 'Desert Pass Area'),
+                         ('Desert Pass Ladder (South)', 'Desert Pass Ledge'),
                          ('Desert Pass Rocks (North)', 'Desert Pass Southeast'),
                          ('Desert Pass Rocks (South)', 'Desert Pass Area'),
                          ('Lake Hylia Water Drop', 'Lake Hylia Water'),
@@ -367,6 +386,7 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Lake Hylia Central Water Drop', 'Lake Hylia Water'),
                          ('Lake Hylia Island Water Drop', 'Lake Hylia Water'),
                          ('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'),
+                         ('Lake Hylia Island Pier', 'Lake Hylia Island'),
                          ('Lake Hylia West Pier', 'Lake Hylia Area'),
                          ('Lake Hylia East Pier', 'Lake Hylia Northeast Bank'),
                          ('Octoballoon Water Drop', 'Octoballoon Water'),
@@ -375,16 +395,23 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
 
                          ('West Death Mountain Drop', 'West Death Mountain (Bottom)'),
                          ('Spectacle Rock Drop', 'West Death Mountain (Top)'),
+                         ('Spectacle Rock Leave', 'West Death Mountain (Top)'),
+                         ('Spectacle Rock Approach', 'Spectacle Rock Ledge'),
                          ('DM Hammer Bridge (West)', 'East Death Mountain (Top West)'),
                          ('DM Hammer Bridge (East)', 'East Death Mountain (Top East)'),
-                         ('East Death Mountain Spiral Drop', 'Spiral Cave Ledge'),
-                         ('East Death Mountain Fairy Drop', 'Fairy Ascension Ledge'),
+                         ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'),
+                         ('Floating Island Bridge (East)', 'Death Mountain Floating Island'),
+                         ('East Death Mountain Spiral Ledge Drop', 'Spiral Cave Ledge'),
+                         ('East Death Mountain Fairy Ledge Drop', 'Fairy Ascension Ledge'),
+                         ('East Death Mountain Mimic Ledge Drop', 'Mimic Cave Ledge'),
                          ('Spiral Ledge Drop', 'East Death Mountain (Bottom)'),
                          ('Fairy Ascension Ledge Drop', 'Fairy Ascension Plateau'),
-                         ('Fairy Ascension Plateau Drop', 'East Death Mountain (Bottom)'),
-                         ('Fairy Ascension Rocks', 'Fairy Ascension Plateau'),
+                         ('Fairy Ascension Plateau Ledge Drop', 'East Death Mountain (Bottom)'),
+                         ('Fairy Ascension Rocks (North)', 'East Death Mountain (Bottom)'),
+                         ('Fairy Ascension Rocks (South)', 'Fairy Ascension Plateau'),
+                         ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'),
                          ('DM Broken Bridge (West)', 'East Death Mountain (Bottom)'),
-                         ('DM Broken Bridge (East)', 'East Death Mountain (West Lip)'),
+                         ('DM Broken Bridge (East)', 'East Death Mountain (Bottom Left)'),
                          ('TR Pegs Ledge Entry', 'Death Mountain TR Pegs Ledge'),
                          ('TR Pegs Ledge Drop', 'Death Mountain TR Pegs'),
                          
@@ -409,9 +436,11 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Catfish Approach Water Drop', 'Catfish Approach Water'),
                          ('Village of Outcasts Pegs', 'Dark Grassy Lawn'),
                          ('Grassy Lawn Pegs', 'Village of Outcasts Area'),
+                         ('Shield Shop Fence (Outer) Ledge Drop', 'Shield Shop Fence'),
+                         ('Shield Shop Fence (Inner) Ledge Drop', 'Shield Shop Area'),
                          ('Peg Area Rocks (West)', 'Hammer Peg Area'),
                          ('Peg Area Rocks (East)', 'Hammer Peg Entry'),
-                         ('Pyramid Exit Drop', 'Pyramid Area'),
+                         ('Pyramid Exit Ledge Drop', 'Pyramid Area'),
                          ('Broken Bridge Hammer Rock (South)', 'Broken Bridge Northeast'),
                          ('Broken Bridge Hammer Rock (North)', 'Broken Bridge Area'),
                          ('Broken Bridge Hookshot Gap', 'Broken Bridge West'),
@@ -441,15 +470,21 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Ice Lake Southeast Water Drop', 'Ice Lake Water'),
                          ('Ice Lake Moat Water Drop', 'Ice Lake Water'),
                          ('Ice Lake Northeast Pier', 'Ice Lake Northeast Bank'),
+                         ('Ice Palace Approach', 'Ice Palace Area'),
+                         ('Ice Palace Leave', 'Ice Lake Moat'),
                          ('Bomber Corner Water Drop', 'Bomber Corner Water'),
                          ('Bomber Corner Waterfall Water Drop', 'Bomber Corner Water'),
                          ('Bomber Corner Pier', 'Bomber Corner Area'),
 
                          ('Dark Death Mountain Drop (West)', 'West Dark Death Mountain (Bottom)'),
-                         ('GT Approach Entry', 'GT Approach'),
+                         ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'),
+                         ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'),
+                         ('GT Entry Approach', 'GT Approach'),
+                         ('GT Entry Leave', 'West Dark Death Mountain (Top)'),
                          ('Dark Death Mountain Drop (East)', 'East Dark Death Mountain (Bottom)'),
                          ('Floating Island Drop', 'East Dark Death Mountain (Top)'),
                          ('Turtle Rock Ledge Drop', 'Turtle Rock Area'),
+                         ('Turtle Rock Tail Ledge Drop', 'Turtle Rock Ledge'),
                          
                          # OWG Connections
                          ('Sand Dunes Ledge Drop', 'Sand Dunes Area'),
@@ -497,7 +532,7 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Ice Lake Northeast Pier Bomb Jump', 'Ice Lake Northeast Bank'),
                          ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'),
                          ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'),
-                         #('Dark South Teleporter Cliff Ledge Drop', 'C Whirlpool Area'), #inverted only, add glove requirement
+                         ('Dark South Teleporter Cliff Ledge Drop', 'Dark Central Cliffs'), #TODO:inverted only, add glove requirement
                          ('Hype Cliff Ledge Drop', 'Hype Cave Area'),
                          ('Ice Palace Island FAWT Ledge Drop', 'Ice Lake Moat'),
                          ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), #fake flipper
@@ -515,13 +550,25 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('West Death Mountain Teleporter', 'West Dark Death Mountain (Bottom)'),
                          ('East Death Mountain Teleporter', 'East Dark Death Mountain (Bottom)'),
                          ('TR Pegs Teleporter', 'Turtle Rock Ledge'),
+                         
+                         ('Post Aga Inverted Teleporter', 'Hyrule Castle Area'),
+                         ('Ice Palace Teleporter', 'Lake Hylia Central Island'),
+                         ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge'),
+                         ('East Dark World Teleporter', 'Eastern Nook Area'),
+                         ('South Dark World Teleporter', 'C Whirlpool Area'),
+                         ('West Dark World Teleporter (Hammer)', 'Lost Woods Pass East Top Area'),
+                         ('West Dark World Teleporter (Rock)', 'Lost Woods Pass East Bottom Area'),
+                         ('Dark Death Mountain Teleporter (West)', 'West Death Mountain (Bottom)'),
+                         ('Dark Death Mountain Teleporter (East)', 'East Death Mountain (Bottom)'),
+                         ('Turtle Rock Teleporter', 'Death Mountain TR Pegs Ledge'),
 
                          # Mirror Connections
-                         ('Lost Woods Mirror Spot', 'Lost Woods Area'),
-                         ('Lost Woods Entry Mirror Spot', 'Lost Woods Area'),
-                         ('Lost Woods Pedestal Mirror Spot', 'Lost Woods Area'),
-                         ('Lost Woods Southwest Mirror Spot', 'Lost Woods Area'),
-                         ('Lost Woods Northeast Mirror Spot', 'Lost Woods Area'),
+                         ('Lost Woods East Mirror Spot', 'Lost Woods East Area'),
+                         ('Lost Woods Entry Mirror Spot', 'Lost Woods West Area'),
+                         ('Lost Woods Pedestal Mirror Spot', 'Lost Woods West Area'),
+                         ('Lost Woods Southwest Mirror Spot', 'Lost Woods West Area'),
+                         ('Lost Woods East (Forgotten) Mirror Spot', 'Lost Woods East Area'),
+                         ('Lost Woods West (Forgotten) Mirror Spot', 'Lost Woods West Area'),
                          ('Lumberjack Mirror Spot', 'Lumberjack Area'),
                          ('Mountain Entry Mirror Spot', 'Mountain Entry Area'),
                          ('Mountain Entry Entrance Mirror Spot', 'Death Mountain Entrance'),
@@ -599,9 +646,11 @@ mandatory_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                          ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
                          ('Isolated Ledge Mirror Spot', 'Fairy Ascension Ledge'),
                          ('Fairy Ascension Mirror Spot', 'Fairy Ascension Plateau'),
-                         ('Death Mountain Bridge Mirror Spot', 'East Death Mountain (West Lip)'),
+                         ('Death Mountain Bridge Mirror Spot', 'East Death Mountain (Bottom Left)'),
                          ('Floating Island Mirror Spot', 'Death Mountain Floating Island'),
                          ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs')
+
+                         #TODO: Inverted Mirror Spots
                          ]
 
 standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
@@ -610,6 +659,26 @@ standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
                         ('Central Bonk Rocks EC', 'Links House WC'),
                         ('Central Bonk Rocks ES', 'Links House WS')
                         ]
+
+open_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
+                         ('Flute Spot 2', 'Potion Shop Area'),
+                         ('Flute Spot 3', 'Kakariko Area'),
+                         ('Flute Spot 4', 'Links House Area'),
+                         ('Flute Spot 5', 'Eastern Nook Area'),
+                         ('Flute Spot 6', 'Desert Palace Teleporter Ledge'),
+                         ('Flute Spot 7', 'Dam Area'),
+                         ('Flute Spot 8', 'Octoballoon Area')
+                         ]
+
+inverted_connections = [('Flute Spot 1', 'West Dark Death Mountain (Bottom)'),
+                         ('Flute Spot 2', 'Dark Witch Area'),
+                         ('Flute Spot 3', 'Village of Outcasts Area'),
+                         ('Flute Spot 4', 'Big Bomb Shop Area'),
+                         ('Flute Spot 5', 'Palace of Darkness Nook Area'),
+                         ('Flute Spot 6', 'Misery Mire Teleporter Ledge'),
+                         ('Flute Spot 7', 'Swamp Area'),
+                         ('Flute Spot 8', 'Bomber Corner Area')
+                         ]
 
 parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
                                 ('Dig Game EC', 'Frog WC'),

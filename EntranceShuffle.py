@@ -1082,7 +1082,7 @@ def link_entrances(world, player):
         world.ganonstower_vanilla[player] = False
 
 def link_inverted_entrances(world, player):
-    # Link's house shuffled freely, Houlihan set in mandatory_connections 
+    connect_exit(world, 'Chris Houlihan Room Exit', 'Pyramid Exit Ledge', player)
 
     Dungeon_Exits = Inverted_Dungeon_Exits_Base.copy()
     Cave_Exits = Cave_Exits_Base.copy()
@@ -2939,6 +2939,7 @@ Inverted_Must_Exit_Invalid_Connections = defaultdict(set, {
 mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Sanctuary S&Q', 'Sanctuary'),
                          ('Old Man S&Q', 'Old Man House'),
+                         ('Other World S&Q', 'Pyramid Area'),
 
                          ('Flute Away', 'Flute Sky'),
                          
@@ -2967,9 +2968,9 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ]
 
 inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
-                                  ('Dark Sanctuary S&Q', 'Inverted Dark Sanctuary'),
+                                  ('Sanctuary S&Q', 'Inverted Dark Sanctuary'),
                                   ('Old Man S&Q', 'Old Man House'),
-                                  ('Castle Ledge S&Q', 'Hyrule Castle Ledge'),
+                                  ('Other World S&Q', 'Hyrule Castle Ledge'),
                                   ('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'),
                                   ('Lake Hylia Island Pier', 'Lake Hylia Island'),
                                   ('Lake Hylia Warp', 'Northeast Light World'),
@@ -3127,14 +3128,15 @@ inverted_mandatory_connections = [('Links House S&Q', 'Inverted Links House'),
                                   ('Bomb Hut Inner Bushes', 'Light World'),
                                   ('Bomb Hut Outer Bushes', 'Bomb Hut Area'),
                                   ('Bomb Hut Mirror Spot', 'West Dark World')]
+
 # non-shuffled entrance links
 default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ("Blinds Hideout", "Blinds Hideout"),
                        ('Dam', 'Dam'),
                        ('Lumberjack House', 'Lumberjack House'),
-                       ("Hyrule Castle Secret Entrance Drop", "Hyrule Castle Secret Entrance"),
-                       ("Hyrule Castle Secret Entrance Stairs", "Hyrule Castle Secret Entrance"),
-                       ("Hyrule Castle Secret Entrance Exit", "Hyrule Castle Courtyard"),
+                       ('Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance'),
+                       ('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance'),
+                       ('Hyrule Castle Secret Entrance Exit', 'Hyrule Castle Courtyard Northeast'),
                        ('Bonk Fairy (Light)', 'Bonk Fairy (Light)'),
                        ('Lake Hylia Fairy', 'Lake Hylia Healer Fairy'),
                        ('Lake Hylia Fortune Teller', 'Lake Hylia Fortune Teller'),
@@ -3172,7 +3174,7 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Kakariko Shop', 'Kakariko Shop'),
                        ('Lost Woods Hideout Drop', 'Lost Woods Hideout (top)'),
                        ('Lost Woods Hideout Stump', 'Lost Woods Hideout (bottom)'),
-                       ('Lost Woods Hideout Exit', 'Lost Woods Area'),
+                       ('Lost Woods Hideout Exit', 'Lost Woods East Area'),
                        ('Lumberjack Tree Tree', 'Lumberjack Tree (top)'),
                        ('Lumberjack Tree Cave', 'Lumberjack Tree (bottom)'),
                        ('Lumberjack Tree Exit', 'Lumberjack Area'),
@@ -3276,7 +3278,9 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
 
                        ('Pyramid Hole', 'Pyramid'),
                        ('Pyramid Exit', 'Pyramid Exit Ledge'),
-                       ('Pyramid Entrance', 'Bottom of Pyramid')
+                       ('Pyramid Entrance', 'Bottom of Pyramid'),
+                       ('Inverted Pyramid Hole', 'Pyramid'),
+                       ('Inverted Pyramid Entrance', 'Bottom of Pyramid')
                       ]
 
 inverted_default_connections =  [('Waterfall of Wishing', 'Waterfall of Wishing'),

@@ -3,10 +3,9 @@ from DoorShuffle import link_doors
 from Doors import create_doors
 from Dungeons import create_dungeons, get_dungeon_item_pool
 from EntranceShuffle import link_entrances
-from InvertedRegions import mark_dark_world_regions
 from ItemList import difficulties, generate_itempool
 from Items import ItemFactory
-from Regions import create_regions, create_dungeon_regions, create_shops
+from Regions import create_regions, create_dungeon_regions, create_shops, mark_dark_world_regions
 from RoomData import create_rooms
 from Rules import set_rules
 from test.TestBase import TestBase

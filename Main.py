@@ -13,8 +13,7 @@ from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from OverworldGlitchRules import create_owg_connections
 from PotShuffle import shuffle_pots
-from Regions import create_regions, create_shops, mark_light_world_regions, create_dungeon_regions, adjust_locations
-from InvertedRegions import create_inverted_regions, mark_dark_world_regions
+from Regions import create_regions, create_shops, mark_light_world_regions, mark_dark_world_regions, create_dungeon_regions, adjust_locations
 from OWEdges import create_owedges
 from OverworldShuffle import link_overworld
 from EntranceShuffle import link_entrances, link_inverted_entrances
@@ -127,10 +126,7 @@ def main(args, seed=None, fish=None):
             if item:
                 world.push_precollected(item)
 
-        if world.mode[player] != 'inverted':
-            create_regions(world, player)
-        else:
-            create_inverted_regions(world, player)
+        create_regions(world, player)
         create_owedges(world, player)
         if world.logic[player] in ('owglitches', 'nologic'):
             create_owg_connections(world, player)
@@ -403,10 +399,7 @@ def copy_world(world):
     ret.standardize_palettes = world.standardize_palettes.copy()
 
     for player in range(1, world.players + 1):
-        if world.mode[player] != 'inverted':
-            create_regions(ret, player)
-        else:
-            create_inverted_regions(ret, player)
+        create_regions(ret, player)
         create_dungeon_regions(ret, player)
         create_shops(ret, player)
         create_rooms(ret, player)
