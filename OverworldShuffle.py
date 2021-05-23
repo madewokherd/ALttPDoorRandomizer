@@ -316,8 +316,8 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Spectacle Rock Drop', 'West Death Mountain (Top)'),
                          ('Spectacle Rock Leave', 'West Death Mountain (Top)'), #inverted only
                          ('Spectacle Rock Approach', 'Spectacle Rock Ledge'), #inverted only
-                         ('DM Hammer Bridge (West)', 'East Death Mountain (Top West)'), #hammer
-                         ('DM Hammer Bridge (East)', 'East Death Mountain (Top East)'), #hammer
+                         ('DM Hammer Bridge (West)', 'East Death Mountain (Top East)'), #hammer
+                         ('DM Hammer Bridge (East)', 'East Death Mountain (Top West)'), #hammer
                          ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'), #inverted only
                          ('Floating Island Bridge (East)', 'Death Mountain Floating Island'), #inverted only
                          ('East Death Mountain Spiral Ledge Drop', 'Spiral Cave Ledge'),
@@ -507,7 +507,7 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Lake Hylia Area Cliff Ledge Drop', 'Lake Hylia Area'),
                          ('C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'),
                          ('C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'),
-                         ('South Teleporter Cliff Ledge Drop', 'Dark C Whirlpool Area'),
+                         ('South Teleporter Cliff Ledge Drop', 'Dark Central Cliffs'),
                          ('Statues Cliff Ledge Drop', 'Statues Area'),
                          ('Lake Hylia Island FAWT Ledge Drop', 'Lake Hylia Island'),
                          ('Stone Bridge EC Cliff Water Drop', 'Stone Bridge Water'), #fake flipper
@@ -541,7 +541,7 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Ice Lake Northeast Pier Bomb Jump', 'Ice Lake Northeast Bank'),
                          ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'),
                          ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'),
-                         ('Dark South Teleporter Cliff Ledge Drop', 'Dark Central Cliffs'), #TODO:inverted only, add glove requirement
+                         ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs'), #TODO:inverted only, add glove requirement
                          ('Hype Cliff Ledge Drop', 'Hype Cave Area'),
                          ('Ice Palace Island FAWT Ledge Drop', 'Ice Lake Moat'),
                          ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), #fake flipper
