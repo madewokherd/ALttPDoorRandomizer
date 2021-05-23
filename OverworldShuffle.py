@@ -1,4 +1,4 @@
-import random
+import random, logging
 from BaseClasses import OWEdge, WorldType, Direction, Terrain
 from OWEdges import OWEdgeGroups, parallel_links, IsParallel
 
