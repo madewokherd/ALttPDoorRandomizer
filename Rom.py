@@ -1892,7 +1892,7 @@ def write_strings(rom, world, player, team):
         entrances_to_hint.update(InconvenientDungeonEntrances)
         if world.shuffle_ganon:
             if world.mode[player] == 'inverted':
-                entrances_to_hint.update({'Inverted Ganons Tower': 'The sealed castle door'})
+                entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
             else:
                 entrances_to_hint.update({'Ganons Tower': 'Ganon\'s Tower'})
         if world.shuffle[player] in ['simple', 'restricted', 'restricted_legacy']:
@@ -1925,19 +1925,14 @@ def write_strings(rom, world, player, team):
             entrances_to_hint.update(ConnectorEntrances)
             entrances_to_hint.update(DungeonEntrances)
             if world.mode[player] == 'inverted':
-                entrances_to_hint.update({'Inverted Agahnims Tower': 'The dark mountain tower'})
+                entrances_to_hint.update({'Ganons Tower': 'The dark mountain tower'})
             else:
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
         elif world.shuffle[player] == 'restricted':
             entrances_to_hint.update(ConnectorEntrances)
         entrances_to_hint.update(OtherEntrances)
-        if world.mode[player] == 'inverted':
-            entrances_to_hint.update({'Inverted Dark Sanctuary': 'The dark sanctuary cave'})
-            entrances_to_hint.update({'Inverted Big Bomb Shop': 'The old hero\'s dark home'})
-            entrances_to_hint.update({'Inverted Links House': 'The old hero\'s light home'})
-        else:
-            entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
-            entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
+        entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
+        entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
             if world.shuffle_ganon:
@@ -2383,7 +2378,7 @@ def set_inverted_mode(world, player, rom):
     rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])
 
 def patch_shuffled_dark_sanc(world, rom, player):
-    dark_sanc = world.get_region('Inverted Dark Sanctuary', player)
+    dark_sanc = world.get_region('Dark Sanctuary Hint', player)
     dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[dark_sanc_entrance][1]
     door_index = door_addresses[str(dark_sanc_entrance)][0]
