@@ -79,17 +79,22 @@ def mirrorless_path_to_location(world, startName, targetName, player):
     # Only considering the secret passage for now (in non-insanity shuffle).  Basically, if it's Ganon you need the master sword.
     start = world.get_region(startName, player)
     target = world.get_region(targetName, player)
+    is_same_world = start.type == target.type or target.type.is_indoors
     seen = {start}
     queue = collections.deque([(start, [])])
     while queue:
         (current, path) = queue.popleft()
         for entrance in current.exits:
-            if entrance.connected_region not in seen:
+            if (entrance.connected_region is not None and entrance.connected_region not in seen
+                and (entrance.connected_region.type == start.type or entrance.connected_region.type.is_indoors
+                    or (not is_same_world and ((world.mode[player] != 'inverted' and start.type == RegionType.LightWorld)
+                        or (world.mode[player] == 'inverted' and start.type == RegionType.DarkWorld))))):
                 new_path = path + [entrance.access_rule]
                 if entrance.connected_region == target:
                     return new_path
                 else:
                     queue.append((entrance.connected_region, new_path))
+                    seen.add(entrance.connected_region)
 
 def mirrorless_path_to_castle_courtyard(world, player):
     # If Agahnim is defeated then the courtyard needs to be accessible without using the mirror for the mirror offset glitch.
@@ -109,6 +114,7 @@ def mirrorless_path_to_castle_courtyard(world, player):
                     return new_path
                 else:
                     queue.append((entrance.connected_region, new_path))
+                    seen.add(entrance.connected_region)
 
 def set_rule(spot, rule):
     spot.access_rule = rule
