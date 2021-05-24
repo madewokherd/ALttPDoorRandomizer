@@ -2,6 +2,7 @@
   "widgets": {
     "openpyramid":      { "type": "checkbox" },
     "shuffleganon":     { "type": "checkbox" },
+    "shufflelinks":     { "type": "checkbox" },
     "entranceshuffle":  {
       "type": "selectbox",
       "options": [
@@ -18,7 +19,6 @@
         "dungeonsfull",
         "dungeonssimple"
       ]
-    },
-    "shufflelinks":     { "type": "checkbox" }
+    }
   }
 }
