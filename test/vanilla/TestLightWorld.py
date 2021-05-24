@@ -34,29 +34,19 @@ class TestLightWorld(TestVanilla):
             ["Aginah's Cave", True, []],
 
             ["Sahasrahla's Hut - Left", True, []],
-
             ["Sahasrahla's Hut - Middle", True, []],
-
             ["Sahasrahla's Hut - Right", True, []],
 
             ["Kakariko Well - Top", True, []],
-
             ["Kakariko Well - Left", True, []],
-
             ["Kakariko Well - Middle", True, []],
-
             ["Kakariko Well - Right", True, []],
-
             ["Kakariko Well - Bottom", True, []],
 
             ["Blind's Hideout - Top", True, []],
-
             ["Blind's Hideout - Left", True, []],
-
             ["Blind's Hideout - Right", True, []],
-
             ["Blind's Hideout - Far Left", True, []],
-
             ["Blind's Hideout - Far Right", True, []],
 
             ["Bonk Rock Cave", False, []],
@@ -64,11 +54,8 @@ class TestLightWorld(TestVanilla):
             ["Bonk Rock Cave", True, ['Pegasus Boots']],
 
             ["Mini Moldorm Cave - Far Left", True, []],
-
             ["Mini Moldorm Cave - Left", True, []],
-
             ["Mini Moldorm Cave - Right", True, []],
-
             ["Mini Moldorm Cave - Far Right", True, []],
 
             ["Ice Rod Cave", True, []],

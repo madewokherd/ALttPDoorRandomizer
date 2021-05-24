@@ -52,6 +52,7 @@ def main(args=None):
     test("Crossed   ", "--shuffle crossed")
     test("Insanity  ", "--shuffle insanity")
     test("OWG       ", "--logic owglitches")
+    test("OW Full   ", "--ow_shuffle full")
 
     from tqdm import tqdm
     with tqdm(concurrent.futures.as_completed(task_mapping),

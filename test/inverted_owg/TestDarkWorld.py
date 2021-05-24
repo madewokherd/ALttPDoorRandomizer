@@ -6,13 +6,9 @@ class TestDarkWorld(TestInvertedOWG):
     def testSouthDarkWorld(self):
         self.run_location_tests([
             ["Hype Cave - Top", True, []],
-
             ["Hype Cave - Middle Right", True, []],
-
             ["Hype Cave - Middle Left", True, []],
-
             ["Hype Cave - Bottom", True, []],
-
             ["Hype Cave - Generous Guy", True, []],
 
             ["Stumpy", True, []],

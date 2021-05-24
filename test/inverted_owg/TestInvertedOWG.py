@@ -2,6 +2,7 @@ from BaseClasses import World
 from DoorShuffle import link_doors
 from Doors import create_doors
 from Dungeons import create_dungeons, get_dungeon_item_pool
+from OverworldShuffle import link_overworld
 from EntranceShuffle import link_inverted_entrances
 from ItemList import generate_itempool, difficulties
 from Items import ItemFactory
@@ -14,7 +15,7 @@ from test.TestBase import TestBase
 
 class TestInvertedOWG(TestBase):
     def setUp(self):
-        self.world = World(1, {1: 'vanilla'}, {1: 'vanilla'}, {1: 'owglitches'}, {1: 'inverted'}, {1: 'random'}, {1: 'normal'}, {1: 'normal'}, 'none', 'on', {1: 'ganon'}, 'balanced', {1: 'items'},
+        self.world = World(1, {1: 'vanilla'}, {1: 'vanilla'}, {1: 'vanilla'}, {1: 'owglitches'}, {1: 'inverted'}, {1: 'random'}, {1: 'normal'}, {1: 'normal'}, 'none', 'on', {1: 'ganon'}, 'balanced', {1: 'items'},
                            {1: True}, {1: False}, False, None, {1: False})
         self.world.difficulty_requirements[1] = difficulties['normal']
         self.world.intensity = {1: 1}
@@ -24,6 +25,7 @@ class TestInvertedOWG(TestBase):
         create_doors(self.world, 1)
         create_rooms(self.world, 1)
         create_dungeons(self.world, 1)
+        link_overworld(self.world, 1)
         create_owg_connections(self.world, 1)
         link_inverted_entrances(self.world, 1)
         link_doors(self.world, 1)

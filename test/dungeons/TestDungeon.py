@@ -11,7 +11,7 @@ from Rules import set_rules
 
 class TestDungeon(unittest.TestCase):
     def setUp(self):
-        self.world = World(1, 'vanilla', 'noglitches', 'open', 'random', 'normal', 'normal', 'none', 'on', 'ganon', 'balanced',
+        self.world = World(1, 'vanilla', 'vanilla', 'vanilla', 'noglitches', 'open', 'random', 'normal', 'normal', 'none', 'on', 'ganon', 'balanced',
                            True, False, False, False, False, False, False, False, False, None,
                            'none', False)
         self.starting_regions = []

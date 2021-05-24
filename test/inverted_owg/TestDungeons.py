@@ -19,8 +19,7 @@ class TestDungeons(TestInvertedOWG):
             ["Sewers - Secret Room - Left", False, []],
             ["Sewers - Secret Room - Left", True, ['Moon Pearl', 'Progressive Glove', 'Pegasus Boots']],
             ["Sewers - Secret Room - Left", True, ['Moon Pearl', 'Pegasus Boots', 'Lamp', 'Small Key (Escape)']],
-            ["Sewers - Secret Room - Left", True,
-             ['Magic Mirror', 'Pegasus Boots', 'Lamp', 'Small Key (Escape)']],
+            ["Sewers - Secret Room - Left", True, ['Magic Mirror', 'Pegasus Boots', 'Lamp', 'Small Key (Escape)']],
             ["Sewers - Secret Room - Left", True, ['Beat Agahnim 1', 'Lamp', 'Small Key (Escape)']],
 
             ["Eastern Palace - Compass Chest", False, []],

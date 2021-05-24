@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     compiledOptions = {}
     notebooks = {
-      "randomize": [ "dungeon", "enemizer", "entrando", "gameoptions", "generation", "item", "multiworld" ]
+      "randomize": [ "dungeon", "enemizer", "overworld", "entrando", "gameoptions", "generation", "item", "multiworld" ]
     }
     for notebook in notebooks:
         for page in notebooks[notebook]:
