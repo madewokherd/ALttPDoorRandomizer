@@ -563,6 +563,9 @@ def assign_portal(candidates, possible_portals, world, player):
     candidate = random.choice(candidates)
     portal_choice = random.choice(possible_portals)
     portal = world.get_portal(portal_choice, player)
+    while candidate.lw_restricted and not portal.light_world:
+        candidates.remove(candidate)
+        candidate = random.choice(candidates)
     if candidate != portal.door:
         if candidate.entranceFlag:
             for other_portal in world.dungeon_portals[player]:
@@ -2025,6 +2028,7 @@ class DROptions(Flag):
     Open_PoD_Wall = 0x40  # If on, pre opens the PoD wall, no bow required
     Open_Desert_Wall = 0x80  # If on, pre opens the desert wall, no fire required
     Hide_Total = 0x100
+    DarkWorld_Spawns = 0x200
 
 
 # DATA GOES DOWN HERE
@@ -2180,7 +2184,6 @@ logical_connections = [
 
     ('Ice Cross Bottom Push Block Left', 'Ice Floor Switch'),
     ('Ice Cross Right Push Block Top', 'Ice Bomb Drop'),
-    ('Ice Cross Top Push Block Bottom', 'Ice Compass Room'),
     ('Ice Conveyor to Crystal', 'Ice Conveyor - Crystal'),
     ('Ice Conveyor Crystal Exit', 'Ice Conveyor'),
     ('Ice Big Key Push Block', 'Ice Dead End'),
