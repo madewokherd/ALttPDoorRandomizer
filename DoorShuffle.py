@@ -1864,6 +1864,8 @@ def find_accessible_entrances(world, player, builder):
             connect = ext.connected_region
             if connect is None or ext.door and ext.door.blocked:
                 continue
+            if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle' and ext.name in ['Hyrule Castle Main Gate (North)', 'Top of Pyramid (Inner)', 'Inverted Pyramid Entrance' ]:
+                continue
             if connect.name in entrances and connect not in visited_entrances:
                 visited_entrances.append(connect.name)
             elif connect and connect not in queue and connect not in visited_regions:
