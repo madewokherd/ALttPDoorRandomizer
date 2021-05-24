@@ -299,7 +299,9 @@ temporary_mandatory_connections = [
                         ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [ # Whirlpool Connections
+mandatory_connections = [('Flute Away', 'Flute Sky'),
+                         
+                         # Whirlpool Connections
                          ('C Whirlpool', 'River Bend Water'),
                          ('River Bend Whirlpool', 'C Whirlpool Water'),
                          ('Lake Hylia Whirlpool', 'Zora Waterfall Water'),

@@ -860,6 +860,8 @@ def enable_new_entrances(region, connections, potentials, enabled, world, player
     while len(queue) > 0:
         ext = queue.popleft()
         visited.add(ext)
+        if ext.connected_region is None:
+            continue
         region_name = ext.connected_region.name
         if region_name in connections.keys() and connections[region_name] in potentials.keys():
             for potential in potentials.pop(connections[region_name]):
