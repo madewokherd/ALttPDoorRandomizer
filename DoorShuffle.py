@@ -1888,8 +1888,8 @@ def create_doors_for_inaccessible_region(inaccessible_region, world, player):
     for ext in region.exits:
         create_door(world, player, ext.name, region.name)
         if ext.connected_region is None:
-            logging.getLogger('').error('Exit not connected to any region: %s', ext.name)
-        if ext.connected_region.name.endswith(' Portal'):
+            logging.getLogger('').warning('Exit not connected to any region: %s', ext.name)
+        elif ext.connected_region.name.endswith(' Portal'):
             for more_exts in ext.connected_region.exits:
                 create_door(world, player, more_exts.name, ext.connected_region.name)
 
@@ -1897,14 +1897,15 @@ def create_doors_for_inaccessible_region(inaccessible_region, world, player):
 def create_door(world, player, entName, region_name):
     entrance = world.get_entrance(entName, player)
     connect = entrance.connected_region
-    for ext in connect.exits:
-        if ext.connected_region is not None and ext.connected_region.name == region_name:
-            d = Door(player, ext.name, DoorType.Logical, ext),
-            world.doors += d
-            connect_door_only(world, ext.name, ext.connected_region, player)
-    d = Door(player, entName, DoorType.Logical, entrance),
-    world.doors += d
-    connect_door_only(world, entName, connect, player)
+    if connect is not None:
+        for ext in connect.exits:
+            if ext.connected_region is not None and ext.connected_region.name == region_name:
+                d = Door(player, ext.name, DoorType.Logical, ext),
+                world.doors += d
+                connect_door_only(world, ext.name, ext.connected_region, player)
+        d = Door(player, entName, DoorType.Logical, entrance),
+        world.doors += d
+        connect_door_only(world, entName, connect, player)
 
 
 def check_required_paths(paths, world, player):

@@ -314,18 +314,12 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Lost Woods Bush (East)', 'Lost Woods West Area'), #pearl
                          ('West Death Mountain Drop', 'West Death Mountain (Bottom)'),
                          ('Spectacle Rock Drop', 'West Death Mountain (Top)'),
-                         ('Spectacle Rock Leave', 'West Death Mountain (Top)'), #inverted only
-                         ('Spectacle Rock Approach', 'Spectacle Rock Ledge'), #inverted only
                          ('DM Hammer Bridge (West)', 'East Death Mountain (Top East)'), #hammer
                          ('DM Hammer Bridge (East)', 'East Death Mountain (Top West)'), #hammer
-                         ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'), #inverted only
-                         ('Floating Island Bridge (East)', 'Death Mountain Floating Island'), #inverted only
                          ('East Death Mountain Spiral Ledge Drop', 'Spiral Cave Ledge'),
                          ('Spiral Ledge Drop', 'East Death Mountain (Bottom)'),
                          ('East Death Mountain Fairy Ledge Drop', 'Fairy Ascension Ledge'),
                          ('Fairy Ascension Ledge Drop', 'Fairy Ascension Plateau'),
-                         ('East Death Mountain Mimic Ledge Drop', 'Mimic Cave Ledge'), #inverted only
-                         ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'), #inverted only
                          ('Fairy Ascension Plateau Ledge Drop', 'East Death Mountain (Bottom)'),
                          ('Fairy Ascension Rocks (North)', 'East Death Mountain (Bottom)'), #mitts
                          ('Fairy Ascension Rocks (South)', 'Fairy Ascension Plateau'), #mitts
@@ -343,8 +337,6 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Waterfall of Wishing Cave Entry', 'Waterfall of Wishing Cave'), #flippers
                          ('Bonk Rock Ledge Drop', 'Sanctuary Area'),
                          ('Graveyard Ledge Drop', 'Graveyard Area'),
-                         ('Graveyard Ladder (Top)', 'Graveyard Area'), #inverted only
-                         ('Graveyard Ladder (Bottom)', 'Graveyard Ledge'), #inverted only
                          ('Kings Grave Outer Rocks', 'Kings Grave Area'), #mitts
                          ('Kings Grave Inner Rocks', 'Graveyard Area'), #mitts
                          ('River Bend Water Drop', 'River Bend Water'), #flippers
@@ -384,16 +376,12 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Desert Ledge Outer Rocks', 'Desert Palace Entrance (North) Spot'), #glove
                          ('Desert Ledge Inner Rocks', 'Desert Ledge'), #glove
                          ('Checkerboard Ledge Drop', 'Desert Area'),
-                         ('Checkerboard Ledge Approach', 'Desert Checkerboard Ledge'), #inverted only
-                         ('Checkerboard Ledge Leave', 'Desert Area'), #inverted only
                          ('Desert Mouth Drop', 'Desert Area'),
                          ('Desert Teleporter Drop', 'Desert Area'),
                          ('Bombos Tablet Drop', 'Desert Area'),
                          ('Flute Boy Bush (North)', 'Flute Boy Approach Area'), #pearl
                          ('Flute Boy Bush (South)', 'Flute Boy Bush Entry'), #pearl
                          ('Cave 45 Ledge Drop', 'Flute Boy Approach Area'),
-                         ('Cave 45 Inverted Leave', 'Flute Boy Approach Area'), #inverted only
-                         ('Cave 45 Inverted Approach', 'Cave 45 Ledge'), #inverted only
                          ('C Whirlpool Water Entry', 'C Whirlpool Water'), #flippers
                          ('C Whirlpool Landing', 'C Whirlpool Area'),
                          ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'), #glove
@@ -406,12 +394,9 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Lake Hylia Central Water Drop', 'Lake Hylia Water'), #flippers
                          ('Lake Hylia Island Water Drop', 'Lake Hylia Water'), #flippers
                          ('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'),
-                         ('Lake Hylia Island Pier', 'Lake Hylia Island'), #inverted only
                          ('Lake Hylia West Pier', 'Lake Hylia Area'),
                          ('Lake Hylia East Pier', 'Lake Hylia Northeast Bank'),
                          ('Desert Pass Ledge Drop', 'Desert Pass Area'),
-                         ('Desert Pass Ladder (North)', 'Desert Pass Area'), #inverted only
-                         ('Desert Pass Ladder (South)', 'Desert Pass Ledge'), #inverted only
                          ('Desert Pass Rocks (North)', 'Desert Pass Southeast'), #glove
                          ('Desert Pass Rocks (South)', 'Desert Pass Area'), #glove
                          ('Octoballoon Water Drop', 'Octoballoon Water'), #flippers
@@ -423,14 +408,11 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Skull Woods Forgotten Bush (West)', 'Skull Woods Forgotten Path (Northeast)'), #pearl
                          ('Skull Woods Forgotten Bush (East)', 'Skull Woods Forgotten Path (Southwest)'), #pearl
                          ('Dark Death Mountain Drop (West)', 'West Dark Death Mountain (Bottom)'),
-                         ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'), #inverted only
-                         ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'), #inverted only
                          ('GT Entry Approach', 'GT Approach'),
                          ('GT Entry Leave', 'West Dark Death Mountain (Top)'),
                          ('Floating Island Drop', 'East Dark Death Mountain (Top)'),
                          ('Dark Death Mountain Drop (East)', 'East Dark Death Mountain (Bottom)'),
                          ('Turtle Rock Ledge Drop', 'Turtle Rock Area'),
-                         ('Turtle Rock Tail Ledge Drop', 'Turtle Rock Ledge'), #inverted only
                          ('Bumper Cave Entrance Rock', 'Bumper Cave Entrance'), #glove
                          ('Bumper Cave Ledge Drop', 'Bumper Cave Area'),
                          ('Bumper Cave Entrance Drop', 'Bumper Cave Area'),
@@ -489,8 +471,6 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Ice Lake Southeast Water Drop', 'Ice Lake Water'), #flippers
                          ('Ice Lake Moat Water Entry', 'Ice Lake Water'), #flippers
                          ('Ice Lake Northeast Pier', 'Ice Lake Northeast Bank'),
-                         ('Ice Palace Approach', 'Ice Palace Area'), #inverted only
-                         ('Ice Palace Leave', 'Ice Lake Moat'), #inverted only
                          ('Bomber Corner Water Drop', 'Bomber Corner Water'), #flippers
                          ('Bomber Corner Waterfall Water Drop', 'Bomber Corner Water'), #flippers
                          ('Bomber Corner Pier', 'Bomber Corner Area'),
@@ -541,129 +521,166 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Ice Lake Northeast Pier Bomb Jump', 'Ice Lake Northeast Bank'),
                          ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'),
                          ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'),
-                         ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs'), #TODO:inverted only, add glove requirement
                          ('Hype Cliff Ledge Drop', 'Hype Cave Area'),
                          ('Ice Palace Island FAWT Ledge Drop', 'Ice Lake Moat'),
                          ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), #fake flipper
-                         ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water'), #fake flipper
-                         
-                         # Portal Connections
-                         ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),
-                         ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area'),
-                         ('Top of Pyramid', 'Pyramid Area'),
-                         ('Top of Pyramid (Inner)', 'Pyramid Area'),
-                         ('East Hyrule Teleporter', 'Palace of Darkness Nook Area'),
-                         ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
-                         ('Desert Teleporter', 'Misery Mire Teleporter Ledge'),
-                         ('Lake Hylia Teleporter', 'Ice Palace Area'),
-                         ('West Death Mountain Teleporter', 'West Dark Death Mountain (Bottom)'),
-                         ('East Death Mountain Teleporter', 'East Dark Death Mountain (Bottom)'),
-                         ('TR Pegs Teleporter', 'Turtle Rock Ledge'),
-                         
-                         ('Post Aga Inverted Teleporter', 'Hyrule Castle Area'),
-                         ('Ice Palace Teleporter', 'Lake Hylia Central Island'),
-                         ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge'),
-                         ('East Dark World Teleporter', 'Eastern Nook Area'),
-                         ('South Dark World Teleporter', 'C Whirlpool Area'),
-                         ('West Dark World Teleporter (Hammer)', 'Lost Woods Pass East Top Area'),
-                         ('West Dark World Teleporter (Rock)', 'Lost Woods Pass East Bottom Area'),
-                         ('Dark Death Mountain Teleporter (West)', 'West Death Mountain (Bottom)'),
-                         ('Dark Death Mountain Teleporter (East)', 'East Death Mountain (Bottom)'),
-                         ('Turtle Rock Teleporter', 'Death Mountain TR Pegs Ledge'),
+                         ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water') #fake flipper
+                         ]
 
+standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
+                        ('Hyrule Castle SE', 'Links House NE'),
+                        ('Central Bonk Rocks EN', 'Links House WN'),
+                        ('Central Bonk Rocks EC', 'Links House WC'),
+                        ('Central Bonk Rocks ES', 'Links House WS')
+                        ]
+
+open_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
+                    ('Flute Spot 2', 'Potion Shop Area'),
+                    ('Flute Spot 3', 'Kakariko Area'),
+                    ('Flute Spot 4', 'Links House Area'),
+                    ('Flute Spot 5', 'Eastern Nook Area'),
+                    ('Flute Spot 6', 'Desert Palace Teleporter Ledge'),
+                    ('Flute Spot 7', 'Dam Area'),
+                    ('Flute Spot 8', 'Octoballoon Area'),
+
+                    # Mirror Connections
+                    ('Lost Woods East Mirror Spot', 'Lost Woods East Area'),
+                    ('Lost Woods Entry Mirror Spot', 'Lost Woods West Area'),
+                    ('Lost Woods Pedestal Mirror Spot', 'Lost Woods West Area'),
+                    ('Lost Woods Southwest Mirror Spot', 'Lost Woods West Area'),
+                    ('Lost Woods East (Forgotten) Mirror Spot', 'Lost Woods East Area'),
+                    ('Lost Woods West (Forgotten) Mirror Spot', 'Lost Woods West Area'),
+                    ('Lumberjack Mirror Spot', 'Lumberjack Area'),
+                    ('Spectacle Rock Mirror Spot', 'Spectacle Rock Ledge'),
+                    ('West Death Mountain (Top) Mirror Spot', 'West Death Mountain (Top)'),
+                    ('East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top West)'),
+                    ('East Death Mountain (Top East) Mirror Spot', 'East Death Mountain (Top East)'),
+                    ('Spiral Cave Mirror Spot', 'Spiral Cave Ledge'),
+                    ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
+                    ('Isolated Ledge Mirror Spot', 'Fairy Ascension Ledge'),
+                    ('Fairy Ascension Mirror Spot', 'Fairy Ascension Plateau'),
+                    ('Death Mountain Bridge Mirror Spot', 'East Death Mountain (Bottom Left)'),
+                    ('Floating Island Mirror Spot', 'Death Mountain Floating Island'),
+                    ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs'),
+                    ('Mountain Entry Mirror Spot', 'Mountain Entry Area'),
+                    ('Mountain Entry Entrance Mirror Spot', 'Death Mountain Entrance'),
+                    ('Mountain Entry Ledge Mirror Spot', 'Death Mountain Return Ledge'),
+                    ('Zora Waterfall Mirror Spot', 'Zora Waterfall Area'),
+                    ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
+                    ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
+                    ('Lost Woods Pass East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
+                    ('Kakariko Fortune Mirror Spot', 'Kakariko Fortune Area'),
+                    ('Kakariko Pond Mirror Spot', 'Kakariko Pond Area'),
+                    ('Forgotton Forest Mirror Spot', 'Forgotten Forest Area'),
+                    ('Forgotton Forest Fence Mirror Spot', 'Forgotten Forest Area'),
+                    ('Bonk Rock Ledge Mirror Spot', 'Bonk Rock Ledge'),
+                    ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
+                    ('Kings Grave Mirror Spot', 'Kings Grave Area'),
+                    ('River Bend Mirror Spot', 'River Bend Area'),
+                    ('River Bend East Mirror Spot', 'River Bend East Bank'),
+                    ('Potion Shop Mirror Spot', 'Potion Shop Area'),
+                    ('Potion Shop Northeast Mirror Spot', 'Potion Shop Northeast'),
+                    ('Zora Approach Mirror Spot', 'Zora Approach Area'),
+                    ('Zora Approach Ledge Mirror Spot', 'Zora Approach Ledge'),
+                    ('Kakariko Mirror Spot', 'Kakariko Area'),
+                    ('Kakariko Grass Mirror Spot', 'Kakariko Area'),
+                    ('HC Ledge Mirror Spot', 'Hyrule Castle Ledge'),
+                    ('HC Courtyard Mirror Spot', 'Hyrule Castle Courtyard'),
+                    ('HC Area Mirror Spot', 'Hyrule Castle Area'),
+                    ('HC Area South Mirror Spot', 'Hyrule Castle Area'),
+                    ('HC East Entry Mirror Spot', 'Hyrule Castle East Entry'),
+                    ('Wooden Bridge Mirror Spot', 'Wooden Bridge Area'),
+                    ('Wooden Bridge Northeast Mirror Spot', 'Wooden Bridge Area'),
+                    ('Wooden Bridge West Mirror Spot', 'Wooden Bridge Area'),
+                    ('Eastern Palace Mirror Spot', 'Eastern Palace Area'),
+                    ('Blacksmith Mirror Spot', 'Blacksmith Area'),
+                    ('Blacksmith Entry Mirror Spot', 'Blacksmith Area'),
+                    ('Bat Cave Ledge Mirror Spot', 'Bat Cave Ledge'),
+                    ('Sand Dunes Mirror Spot', 'Sand Dunes Area'),
+                    ('Maze Race Mirror Spot', 'Maze Race Ledge'),
+                    ('Maze Race Ledge Mirror Spot', 'Maze Race Ledge'),
+                    ('Kakariko Suburb Mirror Spot', 'Kakariko Suburb Area'),
+                    ('Kakariko Suburb South Mirror Spot', 'Kakariko Suburb Area'),
+                    ('Flute Boy Mirror Spot', 'Flute Boy Area'),
+                    ('Flute Boy Pass Mirror Spot', 'Flute Boy Pass'),
+                    ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area'),
+                    ('Links House Mirror Spot', 'Links House Area'),
+                    ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
+                    ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
+                    ('Hobo Mirror Spot', 'Stone Bridge Water'),
+                    ('Tree Line Mirror Spot', 'Tree Line Area'),
+                    ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
+                    ('Desert Mirror Spot', 'Desert Area'),
+                    ('Desert Ledge Mirror Spot', 'Desert Ledge'),
+                    ('Checkerboard Mirror Spot', 'Desert Checkerboard Ledge'),
+                    ('DP Stairs Mirror Spot', 'Desert Palace Stairs'),
+                    ('DP Entrance (North) Mirror Spot', 'Desert Palace Entrance (North) Spot'),
+                    ('Bombos Tablet Ledge Mirror Spot', 'Bombos Tablet Ledge'),
+                    ('Flute Boy Entry Mirror Spot', 'Flute Boy Bush Entry'),
+                    ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
+                    ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
+                    ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
+                    ('Desert Pass Ledge Mirror Spot', 'Desert Pass Ledge'),
+                    ('Desert Pass Mirror Spot', 'Desert Pass Area'),
+                    ('Dam Mirror Spot', 'Dam Area'),
+                    ('Statues Mirror Spot', 'Statues Area'),
+                    ('South Pass Mirror Spot', 'South Pass Area'),
+                    ('Lake Hylia Mirror Spot', 'Lake Hylia Area'),
+                    ('Lake Hylia Northeast Mirror Spot', 'Lake Hylia Northeast Bank'),
+                    ('South Shore Mirror Spot', 'Lake Hylia South Shore'),
+                    ('South Shore East Mirror Spot', 'Lake Hylia South Shore'),
+                    ('Lake Hylia Island Mirror Spot', 'Lake Hylia Island'),
+                    ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
+                    ('Lake Hylia Water Mirror Spot', 'Lake Hylia Water'),
+                    ('Octoballoon Mirror Spot', 'Octoballoon Area'),
+                    ('Ice Cave Mirror Spot', 'Ice Cave Area'),
+                         
+                    # Portal Connections
+                    ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),
+                    ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area'),
+                    ('Top of Pyramid', 'Pyramid Area'),
+                    ('Top of Pyramid (Inner)', 'Pyramid Area'),
+                    ('East Hyrule Teleporter', 'Palace of Darkness Nook Area'),
+                    ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
+                    ('Desert Teleporter', 'Misery Mire Teleporter Ledge'),
+                    ('Lake Hylia Teleporter', 'Ice Palace Area'),
+                    ('West Death Mountain Teleporter', 'West Dark Death Mountain (Bottom)'),
+                    ('East Death Mountain Teleporter', 'East Dark Death Mountain (Bottom)'),
+                    ('TR Pegs Teleporter', 'Turtle Rock Ledge')
+                    ]
+
+inverted_connections = [('Flute Spot 1', 'West Dark Death Mountain (Bottom)'),
+                         ('Flute Spot 2', 'Dark Witch Area'),
+                         ('Flute Spot 3', 'Village of Outcasts Area'),
+                         ('Flute Spot 4', 'Big Bomb Shop Area'),
+                         ('Flute Spot 5', 'Palace of Darkness Nook Area'),
+                         ('Flute Spot 6', 'Misery Mire Teleporter Ledge'),
+                         ('Flute Spot 7', 'Swamp Area'),
+                         ('Flute Spot 8', 'Bomber Corner Area'),
+                         
+                         ('Spectacle Rock Leave', 'West Death Mountain (Top)'),
+                         ('Spectacle Rock Approach', 'Spectacle Rock Ledge'),
+                         ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'),
+                         ('Floating Island Bridge (East)', 'Death Mountain Floating Island'),
+                         ('East Death Mountain Mimic Ledge Drop', 'Mimic Cave Ledge'),
+                         ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'),
+                         ('Graveyard Ladder (Top)', 'Graveyard Area'),
+                         ('Graveyard Ladder (Bottom)', 'Graveyard Ledge'),
+                         ('Checkerboard Ledge Approach', 'Desert Checkerboard Ledge'),
+                         ('Checkerboard Ledge Leave', 'Desert Area'),
+                         ('Cave 45 Inverted Leave', 'Flute Boy Approach Area'),
+                         ('Cave 45 Inverted Approach', 'Cave 45 Ledge'),
+                         ('Lake Hylia Island Pier', 'Lake Hylia Island'),
+                         ('Desert Pass Ladder (North)', 'Desert Pass Area'),
+                         ('Desert Pass Ladder (South)', 'Desert Pass Ledge'),
+                         ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'),
+                         ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'),
+                         ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs'), #OWG only, needs glove
+                         ('Turtle Rock Tail Ledge Drop', 'Turtle Rock Ledge'),
+                         ('Ice Palace Approach', 'Ice Palace Area'),
+                         ('Ice Palace Leave', 'Ice Lake Moat'),
+                         
                          # Mirror Connections
-                         ('Lost Woods East Mirror Spot', 'Lost Woods East Area'),
-                         ('Lost Woods Entry Mirror Spot', 'Lost Woods West Area'),
-                         ('Lost Woods Pedestal Mirror Spot', 'Lost Woods West Area'),
-                         ('Lost Woods Southwest Mirror Spot', 'Lost Woods West Area'),
-                         ('Lost Woods East (Forgotten) Mirror Spot', 'Lost Woods East Area'),
-                         ('Lost Woods West (Forgotten) Mirror Spot', 'Lost Woods West Area'),
-                         ('Lumberjack Mirror Spot', 'Lumberjack Area'),
-                         ('Spectacle Rock Mirror Spot', 'Spectacle Rock Ledge'),
-                         ('West Death Mountain (Top) Mirror Spot', 'West Death Mountain (Top)'),
-                         ('East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top West)'),
-                         ('East Death Mountain (Top East) Mirror Spot', 'East Death Mountain (Top East)'),
-                         ('Spiral Cave Mirror Spot', 'Spiral Cave Ledge'),
-                         ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
-                         ('Isolated Ledge Mirror Spot', 'Fairy Ascension Ledge'),
-                         ('Fairy Ascension Mirror Spot', 'Fairy Ascension Plateau'),
-                         ('Death Mountain Bridge Mirror Spot', 'East Death Mountain (Bottom Left)'),
-                         ('Floating Island Mirror Spot', 'Death Mountain Floating Island'),
-                         ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs'),
-                         ('Mountain Entry Mirror Spot', 'Mountain Entry Area'),
-                         ('Mountain Entry Entrance Mirror Spot', 'Death Mountain Entrance'),
-                         ('Mountain Entry Ledge Mirror Spot', 'Death Mountain Return Ledge'),
-                         ('Zora Waterfall Mirror Spot', 'Zora Waterfall Area'),
-                         ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
-                         ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
-                         ('Lost Woods Pass East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
-                         ('Kakariko Fortune Mirror Spot', 'Kakariko Fortune Area'),
-                         ('Kakariko Pond Mirror Spot', 'Kakariko Pond Area'),
-                         ('Forgotton Forest Mirror Spot', 'Forgotten Forest Area'),
-                         ('Forgotton Forest Fence Mirror Spot', 'Forgotten Forest Area'),
-                         ('Bonk Rock Ledge Mirror Spot', 'Bonk Rock Ledge'),
-                         ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
-                         ('Kings Grave Mirror Spot', 'Kings Grave Area'),
-                         ('River Bend Mirror Spot', 'River Bend Area'),
-                         ('River Bend East Mirror Spot', 'River Bend East Bank'),
-                         ('Potion Shop Mirror Spot', 'Potion Shop Area'),
-                         ('Potion Shop Northeast Mirror Spot', 'Potion Shop Northeast'),
-                         ('Zora Approach Mirror Spot', 'Zora Approach Area'),
-                         ('Zora Approach Ledge Mirror Spot', 'Zora Approach Ledge'),
-                         ('Kakariko Mirror Spot', 'Kakariko Area'),
-                         ('Kakariko Grass Mirror Spot', 'Kakariko Area'),
-                         ('HC Ledge Mirror Spot', 'Hyrule Castle Ledge'),
-                         ('HC Courtyard Mirror Spot', 'Hyrule Castle Courtyard'),
-                         ('HC Area Mirror Spot', 'Hyrule Castle Area'),
-                         ('HC Area South Mirror Spot', 'Hyrule Castle Area'),
-                         ('HC East Entry Mirror Spot', 'Hyrule Castle East Entry'),
-                         ('Wooden Bridge Mirror Spot', 'Wooden Bridge Area'),
-                         ('Wooden Bridge Northeast Mirror Spot', 'Wooden Bridge Area'),
-                         ('Wooden Bridge West Mirror Spot', 'Wooden Bridge Area'),
-                         ('Eastern Palace Mirror Spot', 'Eastern Palace Area'),
-                         ('Blacksmith Mirror Spot', 'Blacksmith Area'),
-                         ('Blacksmith Entry Mirror Spot', 'Blacksmith Area'),
-                         ('Bat Cave Ledge Mirror Spot', 'Bat Cave Ledge'),
-                         ('Sand Dunes Mirror Spot', 'Sand Dunes Area'),
-                         ('Maze Race Mirror Spot', 'Maze Race Ledge'),
-                         ('Maze Race Ledge Mirror Spot', 'Maze Race Ledge'),
-                         ('Kakariko Suburb Mirror Spot', 'Kakariko Suburb Area'),
-                         ('Kakariko Suburb South Mirror Spot', 'Kakariko Suburb Area'),
-                         ('Flute Boy Mirror Spot', 'Flute Boy Area'),
-                         ('Flute Boy Pass Mirror Spot', 'Flute Boy Pass'),
-                         ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area'),
-                         ('Links House Mirror Spot', 'Links House Area'),
-                         ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
-                         ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
-                         ('Hobo Mirror Spot', 'Stone Bridge Water'),
-                         ('Tree Line Mirror Spot', 'Tree Line Area'),
-                         ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
-                         ('Desert Mirror Spot', 'Desert Area'),
-                         ('Desert Ledge Mirror Spot', 'Desert Ledge'),
-                         ('Checkerboard Mirror Spot', 'Desert Checkerboard Ledge'),
-                         ('DP Stairs Mirror Spot', 'Desert Palace Stairs'),
-                         ('DP Entrance (North) Mirror Spot', 'Desert Palace Entrance (North) Spot'),
-                         ('Bombos Tablet Ledge Mirror Spot', 'Bombos Tablet Ledge'),
-                         ('Flute Boy Entry Mirror Spot', 'Flute Boy Bush Entry'),
-                         ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
-                         ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
-                         ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
-                         ('Desert Pass Ledge Mirror Spot', 'Desert Pass Ledge'),
-                         ('Desert Pass Mirror Spot', 'Desert Pass Area'),
-                         ('Dam Mirror Spot', 'Dam Area'),
-                         ('Statues Mirror Spot', 'Statues Area'),
-                         ('South Pass Mirror Spot', 'South Pass Area'),
-                         ('Lake Hylia Mirror Spot', 'Lake Hylia Area'),
-                         ('Lake Hylia Northeast Mirror Spot', 'Lake Hylia Northeast Bank'),
-                         ('South Shore Mirror Spot', 'Lake Hylia South Shore'),
-                         ('South Shore East Mirror Spot', 'Lake Hylia South Shore'),
-                         ('Lake Hylia Island Mirror Spot', 'Lake Hylia Island'),
-                         ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
-                         ('Lake Hylia Water Mirror Spot', 'Lake Hylia Water'),
-                         ('Octoballoon Mirror Spot', 'Octoballoon Area'),
-                         ('Ice Cave Mirror Spot', 'Ice Cave Area'),
-
-                         #Inverted Mirror Connections
                          ('Skull Woods Back Mirror Spot', 'Skull Woods Forest (West)'),
                          ('Skull Woods Forgotten (West) Mirror Spot', 'Skull Woods Forgotten Path (Southwest)'),
                          ('Skull Woods Forgotten (East) Mirror Spot', 'Skull Woods Forgotten Path (Northeast)'),
@@ -756,34 +773,19 @@ mandatory_connections = [ # Whirlpool Connections
                          ('Swamp Nook Pegs Mirror Spot', 'Swamp Nook Area'),
                          ('Swamp Mirror Spot', 'Swamp Area'),
                          ('Dark South Pass Mirror Spot', 'Dark South Pass Area'),
-                         ('Bomber Corner Mirror Spot', 'Bomber Corner Area')
-                         ]
-
-standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
-                        ('Hyrule Castle SE', 'Links House NE'),
-                        ('Central Bonk Rocks EN', 'Links House WN'),
-                        ('Central Bonk Rocks EC', 'Links House WC'),
-                        ('Central Bonk Rocks ES', 'Links House WS')
-                        ]
-
-open_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
-                    ('Flute Spot 2', 'Potion Shop Area'),
-                    ('Flute Spot 3', 'Kakariko Area'),
-                    ('Flute Spot 4', 'Links House Area'),
-                    ('Flute Spot 5', 'Eastern Nook Area'),
-                    ('Flute Spot 6', 'Desert Palace Teleporter Ledge'),
-                    ('Flute Spot 7', 'Dam Area'),
-                    ('Flute Spot 8', 'Octoballoon Area')
-                    ]
-
-inverted_connections = [('Flute Spot 1', 'West Dark Death Mountain (Bottom)'),
-                         ('Flute Spot 2', 'Dark Witch Area'),
-                         ('Flute Spot 3', 'Village of Outcasts Area'),
-                         ('Flute Spot 4', 'Big Bomb Shop Area'),
-                         ('Flute Spot 5', 'Palace of Darkness Nook Area'),
-                         ('Flute Spot 6', 'Misery Mire Teleporter Ledge'),
-                         ('Flute Spot 7', 'Swamp Area'),
-                         ('Flute Spot 8', 'Bomber Corner Area')
+                         ('Bomber Corner Mirror Spot', 'Bomber Corner Area'),
+                         
+                         # Portal Connections
+                         ('Post Aga Inverted Teleporter', 'Hyrule Castle Area'),
+                         ('Ice Palace Teleporter', 'Lake Hylia Central Island'),
+                         ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge'),
+                         ('East Dark World Teleporter', 'Eastern Nook Area'),
+                         ('South Dark World Teleporter', 'C Whirlpool Area'),
+                         ('West Dark World Teleporter (Hammer)', 'Lost Woods Pass East Top Area'),
+                         ('West Dark World Teleporter (Rock)', 'Lost Woods Pass East Bottom Area'),
+                         ('Dark Death Mountain Teleporter (West)', 'West Death Mountain (Bottom)'),
+                         ('Dark Death Mountain Teleporter (East)', 'East Death Mountain (Bottom)'),
+                         ('Turtle Rock Teleporter', 'Death Mountain TR Pegs Ledge')
                          ]
 
 parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
