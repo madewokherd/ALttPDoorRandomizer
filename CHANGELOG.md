@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.1.3.1
+- Various logic fixes and region prep for Inverted
+- Fixed muted MSU-1 music in door rando when descending GT Climb stairs
+- Fixed Standard + Vanilla (thanks compiling)
+- Merged DR v0.4.0.4 - Shuffle Link's House / Experimental Bunny Start / 10 Bomb Fix
+
 ### 0.1.3.0
 - Added OWG Logic for OW Shuffle
 - Merged DR v0.4.0.2 - OWG Framework / YAML
