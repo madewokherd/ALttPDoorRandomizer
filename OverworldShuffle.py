@@ -330,9 +330,10 @@ mandatory_connections = [('Flute Away', 'Flute Sky'),
                          ('TR Pegs Ledge Entry', 'Death Mountain TR Pegs Ledge'), #mitts
                          ('TR Pegs Ledge Leave', 'Death Mountain TR Pegs'), #mitts
                          ('TR Pegs Ledge Drop', 'Death Mountain TR Pegs'),
-                         ('Death Mountain Entrance Rock', 'Death Mountain Entrance'), #glove
-                         ('Death Mountain Entrance Drop', 'Mountain Entry Area'),
-                         ('Death Mountain Return Drop', 'Mountain Entry Area'),
+                         ('Mountain Entry Entrance Rock (West)', 'Mountain Entry Entrance'), #glove
+                         ('Mountain Entry Entrance Rock (East)', 'Mountain Entry Area'), #glove
+                         ('Mountain Entry Entrance Ledge Drop', 'Mountain Entry Area'),
+                         ('Mountain Entry Ledge Drop', 'Mountain Entry Area'),
                          ('Zora Waterfall Landing', 'Zora Waterfall Area'),
                          ('Zora Waterfall Water Drop', 'Zora Waterfall Water'), #flippers
                          ('Zora Waterfall Water Entry', 'Zora Waterfall Water'), #flippers
