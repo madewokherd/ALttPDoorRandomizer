@@ -514,8 +514,6 @@ def analyze_portals(world, player):
 
 def connect_portal(portal, world, player):
     ent, ext, entrance_name = portal_map[portal.name]
-    if world.mode[player] == 'inverted' and portal.name in ['Ganons Tower', 'Agahnims Tower']:
-        ext = 'Inverted ' + ext
     portal_entrance = world.get_entrance(portal.door.entrance.name, player)  # ensures I get the right one for copying
     target_exit = world.get_entrance(ext, player)
     portal_entrance.connected_region = target_exit.parent_region

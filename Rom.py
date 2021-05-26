@@ -700,7 +700,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if should_be_bunny(sanc_region, world.mode[player]):
         rom.write_bytes(0x13fff2, [0x12, 0x00])
 
-    lh_name = 'Links House' if world.mode[player] != 'inverted' else 'Inverted Links House'
+    lh_name = 'Links House'
     links_house = world.get_region(lh_name, player)
     if should_be_bunny(links_house, world.mode[player]):
         rom.write_bytes(0x13fff0, [0x04, 0x01])

@@ -16,7 +16,7 @@ from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, mark_dark_world_regions, create_dungeon_regions, adjust_locations
 from OWEdges import create_owedges
 from OverworldShuffle import link_overworld
-from EntranceShuffle import link_entrances, link_inverted_entrances
+from EntranceShuffle import link_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
 from DoorShuffle import link_doors, connect_portal
@@ -152,10 +152,7 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
     for player in range(1, world.players + 1):
-        if world.mode[player] != 'inverted':
-            link_entrances(world, player)
-        else:
-            link_inverted_entrances(world, player)
+        link_entrances(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.dungeons"))
 
