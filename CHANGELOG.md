@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.4.0
+- Initial Inverted Implementation
+- Fix for Kakariko Pond no longer requiring fake flipper
+
 ### 0.1.3.1
 - Various logic fixes and region prep for Inverted
 - Fixed muted MSU-1 music in door rando when descending GT Climb stairs

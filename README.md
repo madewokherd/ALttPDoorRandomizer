@@ -7,17 +7,19 @@ See https://alttpr.com/ for more details on the normal randomizer.
 ### Trackers & Guides
 
 This is a very new mode of LTTPR so the tools and info is very limited. - There is an [OW Rando Cheat Sheet](https://zelda.codemann8.com/images/shared/ow-rando-reference-sheet.png) that shows all the transitions that exist and are candidates for shuffle.
-- There is OW tracking capability within CodeTracker, an [EmoTracker](https://emotracker.net) package for LTTPR.
+- There is OW tracking capability within the following trackers:
+  - CodeTracker, an [EmoTracker](https://emotracker.net) package for LTTPR
+  - [Community Tracker](https://alttptracker.dunka.net/)
 - There is an [OW OWG Reference Sheet](https://zelda.codemann8.com/images/shared/ow-owg-reference-sheet.png) that shows all the in-logic places where boots/mirror clips and fake flippers are expected from the player.
 
 # Known Issues
-(Updated 2021-05-16)
+(Updated 2021-05-26)
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
 - Do NOT grab the Frogsmith until you have seen the Blacksmith location. Doing so may prevent you from continuing in your save file.
-- Inverted regions/rules/logic is NOT implemented yet. Generation should fail 100%.
-- If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to NOT make any other movements and S+Q immediately or there will be a hardlock. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
+- ~~Inverted regions/rules/logic is NOT implemented yet. Generation should fail 100%.~~ _(Fixed with 0.1.4.0)_
+- If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to NOT make any other movements and S+Q immediately when the game allows you to (might take several seconds, the game has to scroll back to the original point of water entry) or there will be a hardlock. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
 
 ### Known bugs:
 - ~~Camera unlocks, this is a known issue and will eventually be fixed at a later time~~ _(Fixed with 0.1.1.2)_
