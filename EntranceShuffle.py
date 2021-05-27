@@ -2818,7 +2818,6 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
                        ('Mimic Cave', 'Mimic Cave'),
 
-                       ('Pyramid Exit', 'Pyramid Exit Ledge'),
                        ('Pyramid Hole', 'Pyramid'),
                        ('Pyramid Entrance', 'Bottom of Pyramid'),
                        ('Inverted Pyramid Hole', 'Pyramid'),
@@ -2842,9 +2841,7 @@ open_default_connections =  [('Old Man Cave (West)', 'Old Man Cave Ledge'),
                             ('Links House', 'Links House'),
                             ('Links House Exit', 'Links House Area'),
                             ('Big Bomb Shop', 'Big Bomb Shop'),
-                            ('Pyramid Exit', 'Pyramid Exit Ledge'),
-                            ('Pyramid Hole', 'Pyramid'),
-                            ('Pyramid Entrance', 'Bottom of Pyramid')]
+                            ('Pyramid Exit', 'Pyramid Exit Ledge')]
 
 inverted_default_connections =  [('Old Man Cave (West)', 'Bumper Cave'),
                                  ('Old Man Cave (East)', 'Death Mountain Return Cave'),
@@ -2863,9 +2860,7 @@ inverted_default_connections =  [('Old Man Cave (West)', 'Bumper Cave'),
                                  ('Links House', 'Big Bomb Shop'),
                                  ('Links House Exit', 'Big Bomb Shop Area'),
                                  ('Big Bomb Shop', 'Links House'),
-                                 ('Pyramid Exit', 'Hyrule Castle Courtyard'),
-                                 ('Inverted Pyramid Hole', 'Pyramid'),
-                                 ('Inverted Pyramid Entrance', 'Bottom of Pyramid')]
+                                 ('Pyramid Exit', 'Hyrule Castle Ledge')]
 
 # non shuffled dungeons
 default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
