@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '06e14a9760b94dc64806b401cacd4680'
+RANDOMIZERBASEHASH = '081bd865c18f390a369248797fedd2d4'
 
 
 class JsonRom(object):
@@ -2371,24 +2371,24 @@ def set_inverted_mode(world, player, rom):
     rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])
     rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])
     write_int16(rom, 0xDB96F + 2 * 0x35, 0x001B)  # move pyramid exit door
-    write_int16(rom, 0xDBA71 + 2 * 0x35, 0x06A4)
+    write_int16(rom, 0xDBA71 + 2 * 0x35, 0x011C)
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         rom.write_byte(0xDBB73 + 0x35, 0x36)
     rom.write_byte(snes_to_pc(0x09D436), 0xF3)  # remove castle gate warp
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         write_int16(rom, 0x15AEE + 2 * 0x37, 0x0010)  # pyramid exit to new hc area
         rom.write_byte(0x15B8C + 0x37, 0x1B)
-        write_int16(rom, 0x15BDB + 2 * 0x37, 0x0418)
-        write_int16(rom, 0x15C79 + 2 * 0x37, 0x0679)
-        write_int16(rom, 0x15D17 + 2 * 0x37, 0x06B4)
-        write_int16(rom, 0x15DB5 + 2 * 0x37, 0x06C6)
-        write_int16(rom, 0x15E53 + 2 * 0x37, 0x0738)
-        write_int16(rom, 0x15EF1 + 2 * 0x37, 0x06E6)
-        write_int16(rom, 0x15F8F + 2 * 0x37, 0x0733)
-        rom.write_byte(0x1602D + 0x37, 0x07)
-        rom.write_byte(0x1607C + 0x37, 0xF9)
+        write_int16(rom, 0x15BDB + 2 * 0x37, 0x000E)
+        write_int16(rom, 0x15C79 + 2 * 0x37, 0x0600)
+        write_int16(rom, 0x15D17 + 2 * 0x37, 0x0676)
+        write_int16(rom, 0x15DB5 + 2 * 0x37, 0x0604)
+        write_int16(rom, 0x15E53 + 2 * 0x37, 0x06E8)
+        write_int16(rom, 0x15EF1 + 2 * 0x37, 0x066D)
+        write_int16(rom, 0x15F8F + 2 * 0x37, 0x06F3)
+        rom.write_byte(0x1602D + 0x37, 0x00)
+        rom.write_byte(0x1607C + 0x37, 0x0A)
         write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
-        write_int16(rom, 0x16169 + 2 * 0x37, 0x0000)
+        write_int16(rom, 0x16169 + 2 * 0x37, 0x811c)
     rom.write_bytes(snes_to_pc(0x1BC387), [0xDD, 0xD1])
     rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF])
     rom.write_byte(0x180089, 0x01)  # open TR after exit
