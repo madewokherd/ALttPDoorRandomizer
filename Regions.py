@@ -303,7 +303,7 @@ def create_regions(world, player):
         create_cave_region(player, 'Cave Shop (Dark Death Mountain)', 'a common shop', ['Dark Death Mountain Shop - Left', 'Dark Death Mountain Shop - Middle', 'Dark Death Mountain Shop - Right']),
         create_cave_region(player, 'Bumper Cave', 'a connector', None, ['Bumper Cave Exit (Bottom)', 'Bumper Cave Exit (Top)']),
         create_cave_region(player, 'Fortune Teller (Dark)', 'a fortune teller'),
-        create_cave_region(player, 'Dark Sanctuary Hint', 'a storyteller'),
+        create_cave_region(player, 'Dark Sanctuary Hint', 'a storyteller', None, ['Dark Sanctuary Hint Exit']),
         create_cave_region(player, 'Dark World Potion Shop', 'a common shop', ['Dark Potion Shop - Left', 'Dark Potion Shop - Middle', 'Dark Potion Shop - Right']),
         create_cave_region(player, 'Village of Outcasts Shop', 'a common shop', ['Village of Outcasts Shop - Left', 'Village of Outcasts Shop - Middle', 'Village of Outcasts Shop - Right']),
         create_cave_region(player, 'Chest Game', 'a game of 16 chests', ['Chest Game']),

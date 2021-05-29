@@ -260,7 +260,7 @@ def link_entrances(world, player):
             bomb_shop_doors = [door for door in bomb_shop_doors[:]]
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop' if not invFlag else 'Links House', player)
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         single_doors.extend(bomb_shop_doors)
 
         # tavern back door cannot be shuffled yet
@@ -350,7 +350,7 @@ def link_entrances(world, player):
         bomb_shop_doors = [door for door in bomb_shop_doors if door in all_entrances]
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop' if not invFlag else 'Links House', player)
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         if bomb_shop in lw_entrances:
             lw_entrances.remove(bomb_shop)
         if bomb_shop in dw_entrances:
@@ -613,7 +613,7 @@ def link_entrances(world, player):
         bomb_shop_doors = [door for door in bomb_shop_doors if door in all_entrances]
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop' if not invFlag else 'Links House', player)
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         if bomb_shop in lw_entrances:
             lw_entrances.remove(bomb_shop)
         if bomb_shop in dw_entrances:
@@ -763,7 +763,7 @@ def link_entrances(world, player):
         bomb_shop_doors = [door for door in bomb_shop_doors if door in entrances]
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop' if not invFlag else 'Links House', player)
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         entrances.remove(bomb_shop)
 
         # place the old man cave's entrance somewhere
@@ -1293,7 +1293,7 @@ def link_entrances(world, player):
         bomb_shop_doors = [door for door in bomb_shop_doors if door in doors]
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop' if not invFlag else 'Links House', player)
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         exit_pool.remove(bomb_shop)
         doors.remove(bomb_shop)
 
@@ -2668,7 +2668,8 @@ open_mandatory_connections = [('Sanctuary S&Q', 'Sanctuary'),
                                 ('Other World S&Q', 'Pyramid Area')]
 
 inverted_mandatory_connections = [('Sanctuary S&Q', 'Dark Sanctuary Hint'),
-                                  ('Other World S&Q', 'Hyrule Castle Ledge')]
+                                  ('Other World S&Q', 'Hyrule Castle Ledge'),
+                                  ('Dark Sanctuary Hint Exit', 'Dark Chapel Area')]
 
 # non-shuffled entrance links
 default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
