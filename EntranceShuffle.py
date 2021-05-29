@@ -282,14 +282,14 @@ def link_entrances(world, player):
             blacksmith_doors = list(Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Single_Cave_Targets)
         else:
-            lw_entrances = list(Inverted_LW_Entrances + Inverted_LW_Single_Cave_Doors)
+            lw_entrances = list(Inverted_LW_Entrances + LW_Single_Cave_Doors)
             dw_entrances = list(Inverted_DW_Entrances + Inverted_DW_Single_Cave_Doors + Inverted_Old_Man_Entrances)
             lw_must_exits = list(Inverted_LW_Entrances_Must_Exit)
             old_man_entrances = list(Inverted_Old_Man_Entrances)
             caves = list(Cave_Exits + Cave_Three_Exits + Old_Man_House)
             single_doors = list(Single_Cave_Doors)
             bomb_shop_doors = list(Inverted_Bomb_Shop_Single_Cave_Doors + Inverted_Bomb_Shop_Multi_Cave_Doors)
-            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Inverted_Blacksmith_Multi_Cave_Doors)
+            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Inverted_Single_Cave_Targets)
 
         # place links house
@@ -451,13 +451,13 @@ def link_entrances(world, player):
             blacksmith_doors = list(Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Single_Cave_Targets)
         else:
-            lw_entrances = list(Inverted_LW_Entrances + Inverted_LW_Dungeon_Entrances + Inverted_LW_Single_Cave_Doors)
+            lw_entrances = list(Inverted_LW_Entrances + Inverted_LW_Dungeon_Entrances + LW_Single_Cave_Doors)
             dw_entrances = list(Inverted_DW_Entrances + Inverted_DW_Dungeon_Entrances + Inverted_DW_Single_Cave_Doors + Inverted_Old_Man_Entrances)
             lw_must_exits = list(Inverted_LW_Dungeon_Entrances_Must_Exit + Inverted_LW_Entrances_Must_Exit)
             old_man_entrances = list(Inverted_Old_Man_Entrances + Old_Man_Entrances + ['Ganons Tower', 'Tower of Hera'])
             caves = list(Cave_Exits + Dungeon_Exits + Cave_Three_Exits)  # don't need to consider three exit caves, have one exit caves to avoid parity issues
             bomb_shop_doors = list(Inverted_Bomb_Shop_Single_Cave_Doors + Inverted_Bomb_Shop_Multi_Cave_Doors)
-            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Inverted_Blacksmith_Multi_Cave_Doors)
+            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Inverted_Single_Cave_Targets)
 
             # randomize which desert ledge door is a must-exit
@@ -654,12 +654,12 @@ def link_entrances(world, player):
             blacksmith_doors = list(Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Single_Cave_Targets)
         else:
-            entrances = list(Inverted_LW_Entrances + Inverted_LW_Dungeon_Entrances + Inverted_LW_Single_Cave_Doors + Inverted_Old_Man_Entrances + Inverted_DW_Entrances + Inverted_DW_Dungeon_Entrances + Inverted_DW_Single_Cave_Doors)
+            entrances = list(Inverted_LW_Entrances + Inverted_LW_Dungeon_Entrances + LW_Single_Cave_Doors + Inverted_Old_Man_Entrances + Inverted_DW_Entrances + Inverted_DW_Dungeon_Entrances + Inverted_DW_Single_Cave_Doors)
             must_exits = list(Inverted_LW_Entrances_Must_Exit + Inverted_LW_Dungeon_Entrances_Must_Exit)
             old_man_entrances = list(Inverted_Old_Man_Entrances + Old_Man_Entrances + ['Ganons Tower', 'Tower of Hera'])
             caves = list(Cave_Exits + Dungeon_Exits + Cave_Three_Exits + Old_Man_House)  # don't need to consider three exit caves, have one exit caves to avoid parity issues
             bomb_shop_doors = list(Inverted_Bomb_Shop_Single_Cave_Doors + Inverted_Bomb_Shop_Multi_Cave_Doors)
-            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Inverted_Blacksmith_Multi_Cave_Doors)
+            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Inverted_Single_Cave_Targets)
 
         if invFlag:
@@ -1116,7 +1116,7 @@ def link_entrances(world, player):
 
             doors = Inverted_LW_Entrances + Inverted_LW_Dungeon_Entrances + Inverted_LW_Entrances_Must_Exit + Inverted_LW_Dungeon_Entrances_Must_Exit + ['Kakariko Well Cave', 'Bat Cave Cave', 'North Fairy Cave', 'Sanctuary', 'Lost Woods Hideout Stump', 'Lumberjack Tree Cave', 'Hyrule Castle Secret Entrance Stairs'] + Inverted_Old_Man_Entrances +\
                     Inverted_DW_Entrances + Inverted_DW_Dungeon_Entrances + ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'] +\
-                    Inverted_LW_Single_Cave_Doors + Inverted_DW_Single_Cave_Doors + ['Desert Palace Entrance (West)', 'Desert Palace Entrance (North)']
+                    LW_Single_Cave_Doors + Inverted_DW_Single_Cave_Doors + ['Desert Palace Entrance (West)', 'Desert Palace Entrance (North)']
 
             # randomize which desert ledge door is a must-exit
             if random.randint(0, 1) == 0:
@@ -1136,7 +1136,7 @@ def link_entrances(world, player):
             door_targets = list(Single_Cave_Targets)
         else:
             bomb_shop_doors = list(Inverted_Bomb_Shop_Single_Cave_Doors + Inverted_Bomb_Shop_Multi_Cave_Doors + ['Turtle Rock Isolated Ledge Entrance', 'Hookshot Cave Back Entrance'])
-            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Inverted_Blacksmith_Multi_Cave_Doors)
+            blacksmith_doors = list(Inverted_Blacksmith_Single_Cave_Doors + Blacksmith_Multi_Cave_Doors)
             door_targets = list(Inverted_Single_Cave_Targets)
 
         random.shuffle(doors)
@@ -2424,10 +2424,6 @@ Inverted_Bomb_Shop_Multi_Cave_Doors = ['Hyrule Castle Entrance (South)',
                                        'Agahnims Tower',
                                        'Desert Palace Entrance (West)',
                                        'Desert Palace Entrance (North)']
-
-Inverted_Blacksmith_Multi_Cave_Doors = Blacksmith_Multi_Cave_Doors  # same as non-inverted
-
-Inverted_LW_Single_Cave_Doors = [x for x in LW_Single_Cave_Doors if x != 'Links House'] + ['Inverted Big Bomb Shop']
 
 Inverted_DW_Single_Cave_Doors = ['Bonk Fairy (Dark)',
                                  'Dark Sanctuary Hint',
