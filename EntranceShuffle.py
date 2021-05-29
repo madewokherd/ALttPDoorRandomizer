@@ -1104,7 +1104,6 @@ def link_entrances(world, player):
         # beware ye who enter here
 
         if not invFlag:
-            entrances = LW_Entrances + LW_Dungeon_Entrances + DW_Entrances + DW_Dungeon_Entrances + Old_Man_Entrances + ['Skull Woods Second Section Door (East)', 'Skull Woods First Section Door', 'Kakariko Well Cave', 'Bat Cave Cave', 'North Fairy Cave', 'Sanctuary', 'Lost Woods Hideout Stump', 'Lumberjack Tree Cave']
             entrances_must_exits = DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + LW_Dungeon_Entrances_Must_Exit + ['Skull Woods Second Section Door (West)']
 
             doors = LW_Entrances + LW_Dungeon_Entrances + LW_Dungeon_Entrances_Must_Exit + ['Kakariko Well Cave', 'Bat Cave Cave', 'North Fairy Cave', 'Sanctuary', 'Lost Woods Hideout Stump', 'Lumberjack Tree Cave'] + Old_Man_Entrances +\
@@ -1118,13 +1117,16 @@ def link_entrances(world, player):
                     Inverted_DW_Entrances + Inverted_DW_Dungeon_Entrances + ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'] +\
                     LW_Single_Cave_Doors + Inverted_DW_Single_Cave_Doors + ['Desert Palace Entrance (West)', 'Desert Palace Entrance (North)']
 
+        exit_pool = list(doors)
+
+        if invFlag:
             # randomize which desert ledge door is a must-exit
             if random.randint(0, 1) == 0:
                 entrances_must_exits.append('Desert Palace Entrance (North)')
-                entrances.append('Desert Palace Entrance (West)')
+                exit_pool.append('Desert Palace Entrance (West)')
             else:
                 entrances_must_exits.append('Desert Palace Entrance (West)')
-                entrances.append('Desert Palace Entrance (North)')
+                exit_pool.append('Desert Palace Entrance (North)')
 
         # TODO: there are other possible entrances we could support here by way of exiting from a connector,
         # and rentering to find bomb shop. However appended list here is all those that we currently have
@@ -1168,7 +1170,7 @@ def link_entrances(world, player):
         else:
             hole_entrances.append('Hyrule Castle Secret Entrance Drop')
             hole_targets.append('Hyrule Castle Secret Entrance')
-            entrances.append('Hyrule Castle Secret Entrance Stairs')
+            exit_pool.append('Hyrule Castle Secret Entrance Stairs')
             caves.append('Hyrule Castle Secret Entrance Exit')
             if not invFlag:
                 doors.append('Hyrule Castle Secret Entrance Stairs')
@@ -1181,18 +1183,18 @@ def link_entrances(world, player):
             caves.extend(['Ganons Tower Exit', 'Pyramid Exit'])
             hole_targets.append('Pyramid')
             if not invFlag:
-                entrances.append('Ganons Tower')
+                exit_pool.extend(['Ganons Tower', 'Pyramid Entrance'])
                 hole_entrances.append('Pyramid Hole')
                 entrances_must_exits.append('Pyramid Entrance')
                 doors.extend(['Ganons Tower', 'Pyramid Entrance'])
             else:
-                entrances.append('Agahnims Tower')
+                exit_pool.extend(['Agahnims Tower', 'Inverted Pyramid Entrance'])
                 hole_entrances.append('Inverted Pyramid Hole')
                 doors.extend(['Agahnims Tower', 'Inverted Pyramid Entrance'])
 
         random.shuffle(hole_entrances)
         random.shuffle(hole_targets)
-        random.shuffle(entrances)
+        random.shuffle(exit_pool)
 
         # fill up holes
         for hole in hole_entrances:
@@ -1208,33 +1210,30 @@ def link_entrances(world, player):
             doors.append('Hyrule Castle Entrance (South)')
             caves.append(('Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'))
             if not invFlag:
-                entrances.append('Hyrule Castle Entrance (South)')
+                exit_pool.append('Hyrule Castle Entrance (South)')
 
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
             links_house = 'Links House'
         else:
             if not invFlag:
-                links_house_doors = [i for i in entrances + entrances_must_exits if i not in Isolated_LH_Doors_Open]
+                links_house_doors = [i for i in doors if i not in Isolated_LH_Doors_Open]
             else:
-                links_house_doors = [i for i in entrances + entrances_must_exits if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
+                links_house_doors = [i for i in doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             if not invFlag and world.doorShuffle[player] == 'crossed' and world.intensity[player] >= 3:
                 exclusions = DW_Entrances + DW_Dungeon_Entrances + DW_Single_Cave_Doors \
                              + DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + ['Ganons Tower']
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
-        if links_house in entrances:
-            entrances.remove(links_house)
-        elif links_house in entrances_must_exits:
-            entrances_must_exits.remove(links_house)
+        exit_pool.remove(links_house)
         doors.remove(links_house)
 
         if invFlag:
             # place dark sanc
-            sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in entrances]
+            sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in exit_pool]
             sanc_door = random.choice(sanc_doors)
-            entrances.remove(sanc_door)
+            exit_pool.remove(sanc_door)
             doors.remove(sanc_door)
             connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
             world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
@@ -1256,7 +1255,7 @@ def link_entrances(world, player):
             cavelist.remove(candidate)
             return candidate
 
-        def connect_reachable_exit(entrance, caves, doors):
+        def connect_reachable_exit(entrance, caves, doors, exit_pool):
             cave = extract_reachable_exit(caves)
 
             exit = cave[-1]
@@ -1264,18 +1263,19 @@ def link_entrances(world, player):
             connect_exit(world, exit, entrance, player)
             connect_entrance(world, doors.pop(), exit, player)
             # rest of cave now is forced to be in this world
+            exit_pool.remove(entrance)
             caves.append(cave)
 
         # connect mandatory exits
         for entrance in entrances_must_exits:
-            connect_reachable_exit(entrance, caves, doors)
+            connect_reachable_exit(entrance, caves, doors, exit_pool)
 
         # place old man, has limited options
         # exit has to come from specific set of doors, the entrance is free to move about
-        old_man_entrances = [entrance for entrance in old_man_entrances if entrance in entrances]
+        old_man_entrances = [entrance for entrance in old_man_entrances if entrance in exit_pool]
         random.shuffle(old_man_entrances)
         old_man_exit = old_man_entrances.pop()
-        entrances.remove(old_man_exit)
+        exit_pool.remove(old_man_exit)
 
         connect_exit(world, 'Old Man Cave Exit (East)', old_man_exit, player)
         connect_entrance(world, doors.pop(), 'Old Man Cave Exit (East)', player)
@@ -1286,6 +1286,7 @@ def link_entrances(world, player):
         random.shuffle(blacksmith_doors)
         blacksmith_hut = blacksmith_doors.pop()
         connect_entrance(world, blacksmith_hut, 'Blacksmiths Hut', player)
+        exit_pool.remove(blacksmith_hut)
         doors.remove(blacksmith_hut)
 
         # place dam and pyramid fairy, have limited options
@@ -1293,6 +1294,7 @@ def link_entrances(world, player):
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
         connect_entrance(world, bomb_shop, 'Big Bomb Shop' if not invFlag else 'Links House', player)
+        exit_pool.remove(bomb_shop)
         doors.remove(bomb_shop)
 
         # handle remaining caves
@@ -1301,7 +1303,7 @@ def link_entrances(world, player):
                 cave = (cave,)
 
             for exit in cave:
-                connect_exit(world, exit, entrances.pop(), player)
+                connect_exit(world, exit, exit_pool.pop(), player)
                 connect_entrance(world, doors.pop(), exit, player)
 
         # place remaining doors
