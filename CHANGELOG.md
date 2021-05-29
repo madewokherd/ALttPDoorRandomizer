@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.4.1
+- Moved Inverted Pyramid Entrance to top of HC Ledge
+- Fixed various issues with Inverted and Insanity
+
 ### 0.1.4.0
 - Initial Inverted Implementation
 - Fix for Kakariko Pond no longer requiring fake flipper
