@@ -1559,10 +1559,10 @@ class OWEdge(object):
 
     def getAddress(self):
         base_address = {
-            Direction.North: 0x153800,
-            Direction.South: 0x153800 + (0x42 * 16),
-            Direction.West: 0x153800 + (0x84 * 16),
-            Direction.East: 0x153800 + (0xcf * 16),
+            Direction.North: 0x152800,
+            Direction.South: 0x152800 + (0x42 * 16),
+            Direction.West: 0x152800 + (0x84 * 16),
+            Direction.East: 0x152800 + (0xcf * 16),
         }
         return base_address[self.direction] + (self.edge_id * 16)
 

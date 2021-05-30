@@ -1,7 +1,7 @@
 org $aa8000 ;150000
 db $4f, $52 ;OR
 OWMode:
-db 0
+dw 0
 OWFlags:
 dw 0
 org $aa8010
@@ -13,7 +13,7 @@ org $02a999
 jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 
 ;Code
-org $aaa000
+org $aa8800
 OWCoordIndex: ; Horizontal 1st
 db 2, 2, 0, 0 ; Coordinate Index $20-$23
 OWOppCoordIndex: ; Horizontal 1st
@@ -35,6 +35,7 @@ db 2, 2, 0, 0 ; For OWCameraRange
 OWCameraRange:
 dw $011E, $0100 ; Length of the range the camera can move on small screens
 
+org $aa9000
 OWEdgeTransition:
 {
     php : phy
@@ -219,7 +220,7 @@ OWNewDestination:
 }
 
 ;Data
-org $aab000
+org $aaa000
 OWEdgeOffsets:
 ;2 bytes per each direction per each OW Slot, order is NSWE per value at $0418
 ;AABB, A = offset to the transition table, B = number of transitions
@@ -371,7 +372,7 @@ dw $0000, $4001, $0000, $0000
 dw $0000, $0000, $0000, $4a01
 dw $0000, $4101, $0000, $0000
 
-org $aab800 ;PC 153800
+org $aaa800 ;PC 152800
 OWNorthEdges:
 ;   Min    Max   Width   Mid OW Slot/OWID VRAM *FREE* Dest Index
 dw $00a0, $00a0, $0000, $00a0, $0000, $0000, $0000, $0040 ;Lost Woods
