@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'c92a4c56df18241a90e586324b800064'
+RANDOMIZERBASEHASH = 'e5d8410de046832272951f3e6b4fade2'
 
 
 class JsonRom(object):
@@ -594,9 +594,17 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # patch overworld edges
     if world.owShuffle[player] != 'vanilla':
         rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
-        #patches maps of WDM and WDDM to include a convenient portal
-        rom.buffer[0x153B03] = rom.buffer[0x153B03] | 0x2
-        rom.buffer[0x153B43] = rom.buffer[0x153B43] | 0x2
+        #patches map data specific for OW Shuffle
+        rom.buffer[0x153B03] = rom.buffer[0x153B03] | 0x2 #convenient portal on WDM
+        rom.buffer[0x153B1A] = rom.buffer[0x153B1A] | 0x2 #rocks added to prevent OWG hardlock
+        rom.buffer[0x153B1B] = rom.buffer[0x153B1B] | 0x2 #rocks added to prevent OWG hardlock
+        rom.buffer[0x153B22] = rom.buffer[0x153B22] | 0x2 #rocks added to prevent OWG hardlock
+        rom.buffer[0x153B3F] = rom.buffer[0x153B3F] | 0x2 #added C to terrain
+        rom.buffer[0x153B43] = rom.buffer[0x153B43] | 0x2 #convenient portal on WDDM
+        rom.buffer[0x153B5A] = rom.buffer[0x153B5A] | 0x2 #rocks added to prevent OWG hardlock
+        rom.buffer[0x153B5B] = rom.buffer[0x153B5B] | 0x2 #rocks added to prevent OWG hardlock
+        rom.buffer[0x153B62] = rom.buffer[0x153B62] | 0x2 #rocks added to prevent OWG hardlock
+        rom.buffer[0x153B7F] = rom.buffer[0x153B7F] | 0x2 #added C to terrain
 
         if world.owShuffle[player] == 'parallel':
             owMode = 1
