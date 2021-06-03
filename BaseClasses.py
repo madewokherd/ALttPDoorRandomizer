@@ -2170,6 +2170,7 @@ class Spoiler(object):
                          'enemy_shuffle': self.world.enemy_shuffle,
                          'enemy_health': self.world.enemy_health,
                          'enemy_damage': self.world.enemy_damage,
+                         'potshuffle': self.world.potshuffle,
                          'players': self.world.players,
                          'teams': self.world.teams,
                          'experimental': self.world.experimental,
@@ -2249,6 +2250,7 @@ class Spoiler(object):
                 outfile.write('Enemy shuffle:'.ljust(line_width) + '%s\n' % self.metadata['enemy_shuffle'][player])
                 outfile.write('Enemy health:'.ljust(line_width) + '%s\n' % self.metadata['enemy_health'][player])
                 outfile.write('Enemy damage:'.ljust(line_width) + '%s\n' % self.metadata['enemy_damage'][player])
+                outfile.write('Pot shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['potshuffle'][player] else 'No'))
                 outfile.write('Hints:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['hints'][player] else 'No'))
                 outfile.write('Experimental:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
                 outfile.write('Key Drops shuffled:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['keydropshuffle'][player] else 'No'))
