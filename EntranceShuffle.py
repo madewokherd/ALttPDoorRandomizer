@@ -1419,9 +1419,9 @@ def link_entrances(world, player):
         exit_pool.remove(links_house)
 
         if not invFlag:
-                sanc_doors = [door for door in Sanctuary_Doors if door in exit_pool]
-            else:
-                sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in exit_pool]
+            sanc_doors = [door for door in Sanctuary_Doors if door in exit_pool]
+        else:
+            sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in exit_pool]
         sanc_door = random.choice(sanc_doors)
         exit_pool.remove(sanc_door)
         doors.remove(sanc_door)
