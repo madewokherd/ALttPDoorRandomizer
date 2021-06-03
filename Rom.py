@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '287a85bc8ba1815c2e9b41d0cd79b869'
+RANDOMIZERBASEHASH = '1d9b62cedf002fdb9aebc750d75543ef'
 
 
 class JsonRom(object):
@@ -2196,6 +2196,10 @@ def write_strings(rom, world, player, team):
     rom.write_bytes(0x76CC0, [byte for p in pointers for byte in [p & 0xFF, p >> 8 & 0xFF]])
 
 def set_inverted_mode(world, player, rom):
+    # flip inverted map flags
+    for b in range(0x00, 0x80):
+        rom.buffer[0x153B00 + b] = (rom.buffer[0x153B00 + b] + 1) % 2
+    
     rom.write_byte(snes_to_pc(0x0283E0), 0xF0)  # residual portals
     rom.write_byte(snes_to_pc(0x02B34D), 0xF0)
     rom.write_byte(snes_to_pc(0x06DB78), 0x8B)

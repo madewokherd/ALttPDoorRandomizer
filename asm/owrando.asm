@@ -12,6 +12,48 @@ dw 0
 org $02a999
 jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 
+;(replacing -> LDA $8A : AND.b #$40)
+org $00d8c4  ; < ? - Bank00.asm 4068 ()
+jsl.l OWWorldCheck
+org $0283dc  ; < ? - Bank02.asm 816 ()
+jsl.l OWWorldCheck
+org $02aa36  ; < ? - Bank02.asm 6559 ()
+jsl.l OWWorldCheck
+org $02aeca  ; < ? - Bank02.asm 7257 ()
+jsl.l OWWorldCheck16 : nop
+org $02b349  ; < ? - Bank02.asm 7902 ()
+jsl.l OWWorldCheck
+org $02c40a  ; < ? - Bank02.asm 10547 ()
+jsl.l OWWorldCheck
+org $05afd9  ; < ? - sprite_warp_vortex.asm 60 ()
+jsl.l OWWorldCheck
+org $07a3f0  ; < ? - Bank07.asm 5772 ()
+jsl.l OWWorldCheck
+org $07a967  ; < ? - Bank07.asm 6578 ()
+jsl.l OWWorldCheck
+org $07a9a1  ; < ? - Bank07.asm 6622 ()
+jsl.l OWWorldCheck
+org $07a9ed  ; < ? - Bank07.asm 6677 ()
+jsl.l OWWorldCheck
+org $07aa34  ; < ? - Bank07.asm 6718 ()
+jsl.l OWWorldCheck
+org $08d408  ; < ? - ancilla_morph_poof.asm 48 ()
+jsl.l OWWorldCheck
+org $0aba6c  ; < ? - Bank0a.asm 474 ()
+jsl.l OWWorldCheck16 : nop
+org $0aba99  ; < ? - Bank0a.asm 515 ()
+jsl.l OWWorldCheck
+org $0bfeab  ; < ? - Bank0b.asm 36 ()
+jsl.l OWWorldCheck16 : nop
+org $0cffb6  ; < ? - ?.asm ? ()
+jsl.l OWWorldCheck16 : nop
+org $0cffe8  ; < ? - ?.asm ? ()
+jsl.l OWWorldCheck16 : nop
+org $1beca2  ; < ? - palettes.asm 556 ()
+jsl.l OWWorldCheck16 : nop
+org $1bed95  ; < ? - palettes.asm 748 ()
+jsl.l OWWorldCheck16 : nop
+
 ;Code
 org $aa8800
 OWCoordIndex: ; Horizontal 1st
@@ -34,6 +76,19 @@ OWCameraRangeIndex:
 db 2, 2, 0, 0 ; For OWCameraRange
 OWCameraRange:
 dw $011E, $0100 ; Length of the range the camera can move on small screens
+
+OWWorldCheck:
+{
+    phx
+        ldx $8a : lda.l OWTileWorldAssoc,x
+    plx : and.b #$ff : rtl
+}
+OWWorldCheck16:
+{
+    phx
+        ldx $8a : lda.l OWTileWorldAssoc,x
+    plx : and.w #$00ff : rtl
+}
 
 org $aa9000
 OWEdgeTransition:
@@ -660,3 +715,42 @@ dw $0f78, $0fb8, $0040, $0f98, $7c7c, $0000, $0000, $0048
 dw $0f20, $0f40, $0020, $0f30, $757e, $0000, $0000, $0049
 dw $0f70, $0fb8, $0048, $0f94, $757e, $0000, $0000, $004a
 dw $0058, $00c0, $0068, $008c, $8080, $0000, $0000, $0017 ;Hobo
+
+org $aaba00 ;PC 153a00
+OWTileWorldAssoc:
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+db $40, $40, $40, $40, $40, $40, $40, $40
+
+org $aabb00 ;PC 153b00
+OWTileMapAlt:
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
+db 0, 0, 0, 0, 0, 0, 0, 0
