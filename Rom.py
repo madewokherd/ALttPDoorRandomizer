@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '1d9b62cedf002fdb9aebc750d75543ef'
+RANDOMIZERBASEHASH = '14051d4a1af47ef5df279ec6c4329d6d'
 
 
 class JsonRom(object):
@@ -594,6 +594,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # patch overworld edges
     if world.owShuffle[player] != 'vanilla':
         rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
+        #patches maps of WDM and WDDM to include a convenient portal
+        rom.buffer[0x153B03] = rom.buffer[0x153B03] | 0x2
+        rom.buffer[0x153B43] = rom.buffer[0x153B43] | 0x2
 
         if world.owShuffle[player] == 'parallel':
             owMode = 1
@@ -2198,7 +2201,8 @@ def write_strings(rom, world, player, team):
 def set_inverted_mode(world, player, rom):
     # flip inverted map flags
     for b in range(0x00, 0x80):
-        rom.buffer[0x153B00 + b] = (rom.buffer[0x153B00 + b] + 1) % 2
+        v = rom.buffer[0x153B00 + b]
+        rom.buffer[0x153B00 + b] = (v & 0xFE) | ((v + 1) % 2)
     
     rom.write_byte(snes_to_pc(0x0283E0), 0xF0)  # residual portals
     rom.write_byte(snes_to_pc(0x02B34D), 0xF0)
