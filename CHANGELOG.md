@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.4.2
+- Modified various OW map terrain specific to OW Shuffle
+- Changed World check to table-based vs OW ID-based (should have no effect with current modes)
+- Merged DR v0.4.0.5 - Mystery Boss Shuffle Fix / Swordless+Hard Item Pool Fix / Insanity+Inverted ER Fixes
+
 ### 0.1.4.1
 - Moved Inverted Pyramid Entrance to top of HC Ledge
 - Fixed various issues with Inverted and Insanity
