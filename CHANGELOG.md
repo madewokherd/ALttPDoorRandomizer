@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.1.4.3
+- Merged DR v0.4.0.6 - TT Maiden Attic Hint / DR Entrance Floor Mat Mods / Hard/Expert Item Pool Fix
+
 ### 0.1.4.2
 - Modified various OW map terrain specific to OW Shuffle
 - Changed World check to table-based vs OW ID-based (should have no effect with current modes)
