@@ -128,10 +128,10 @@ def main(args, seed=None, fish=None):
                 world.push_precollected(item)
 
         create_regions(world, player)
+        create_dungeon_regions(world, player)
         create_owedges(world, player)
         if world.logic[player] in ('owglitches', 'nologic'):
             create_owg_connections(world, player)
-        create_dungeon_regions(world, player)
         create_shops(world, player)
         create_doors(world, player)
         create_rooms(world, player)

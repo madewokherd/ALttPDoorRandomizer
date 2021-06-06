@@ -160,6 +160,7 @@ class World(object):
     def initialize_owedges(self, edges):
         for edge in edges:
             self._owedge_cache[(edge.name, edge.player)] = edge
+            self._entrance_cache[edge.name, edge.player].spot_type = 'OWEdge'
 
     def initialize_doors(self, doors):
         for door in doors:
@@ -586,7 +587,7 @@ class CollectionState(object):
             # try to resolve a name
             if resolution_hint == 'Location':
                 spot = self.world.get_location(spot, player)
-            elif resolution_hint == 'Entrance':
+            elif resolution_hint in ['Entrance', 'OWEdge']:
                 spot = self.world.get_entrance(spot, player)
             else:
                 # default to Region
