@@ -530,13 +530,6 @@ mandatory_connections = [('Flute Away', 'Flute Sky'),
                          ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water') #fake flipper
                          ]
 
-standard_connections = [('Hyrule Castle SW', 'Central Bonk Rocks NW'),
-                        ('Hyrule Castle SE', 'Links House NE'),
-                        ('Central Bonk Rocks EN', 'Links House WN'),
-                        ('Central Bonk Rocks EC', 'Links House WC'),
-                        ('Central Bonk Rocks ES', 'Links House WS')
-                        ]
-
 open_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
                     ('Flute Spot 2', 'Potion Shop Area'),
                     ('Flute Spot 3', 'Kakariko Area'),
