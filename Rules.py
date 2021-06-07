@@ -1271,6 +1271,8 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Kakariko Southwest Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('Kakariko Yard Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Kakariko Yard Bush (South)', player), player)
+    add_bunny_rule(world.get_entrance('Hyrule Castle Southwest Bush (North)', player), player)
+    add_bunny_rule(world.get_entrance('Hyrule Castle Southwest Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('Hyrule Castle Courtyard Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Hyrule Castle Courtyard Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('Hyrule Castle Inner East Rock', player), player)

@@ -359,6 +359,8 @@ mandatory_connections = [('Flute Away', 'Flute Sky'),
                          ('Kakariko Southwest Bush (South)', 'Kakariko Area'), #pearl
                          ('Kakariko Yard Bush (South)', 'Kakariko Grass Yard'), #pearl
                          ('Kakariko Yard Bush (North)', 'Kakariko Area'), #pearl
+                         ('Hyrule Castle Southwest Bush (North)', 'Hyrule Castle Southwest'), #pearl
+                         ('Hyrule Castle Southwest Bush (South)', 'Hyrule Castle Area'), #pearl
                          ('Hyrule Castle Courtyard Bush (North)', 'Hyrule Castle Courtyard'), #pearl
                          ('Hyrule Castle Courtyard Bush (South)', 'Hyrule Castle Courtyard Northeast'), #pearl
                          ('Hyrule Castle Main Gate (South)', 'Hyrule Castle Courtyard'), #aga+mirror
