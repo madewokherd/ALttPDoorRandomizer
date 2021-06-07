@@ -50,7 +50,7 @@ def main(args, seed=None, fish=None):
         for player, code in args.code.items():
             if code:
                 Settings.adjust_args_from_code(code, player, args)
-    world = World(args.multi, args.ow_shuffle, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
+    world = World(args.multi, args.ow_shuffle, args.ow_swap, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
                   args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
                   args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
     logger = logging.getLogger('')
@@ -350,7 +350,7 @@ def main(args, seed=None, fish=None):
 
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.owShuffle, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
+    ret = World(world.players, world.owShuffle, world.owSwap, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
                 world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
     ret.teams = world.teams

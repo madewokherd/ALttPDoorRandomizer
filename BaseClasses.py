@@ -19,11 +19,12 @@ from RoomData import Room
 
 class World(object):
 
-    def __init__(self, players, owShuffle, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
+    def __init__(self, players, owShuffle, owSwap, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
                  timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
         self.owShuffle = owShuffle.copy()
+        self.owSwap = owSwap.copy()
         self.owKeepSimilar = {}
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
@@ -2152,6 +2153,7 @@ class Spoiler(object):
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'ow_shuffle': self.world.owShuffle,
+                         'ow_swap': self.world.owSwap,
                          'ow_keepsimilar': self.world.owKeepSimilar,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
@@ -2232,8 +2234,9 @@ class Spoiler(object):
                 outfile.write('Difficulty:'.ljust(line_width) + '%s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:'.ljust(line_width) + '%s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
+                outfile.write('Overworld Tile Swap:'.ljust(line_width) + '%s\n' % self.metadata['ow_swap'][player])
                 if self.metadata['ow_shuffle'][player] != 'vanilla':
-                    outfile.write('Keep OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
+                    outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])

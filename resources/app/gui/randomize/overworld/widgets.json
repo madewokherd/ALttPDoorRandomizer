@@ -1,17 +1,26 @@
 {
   "widgets": {
+    "keepsimilar": {
+      "type": "checkbox",
+      "default": true
+    },
     "overworldshuffle": {
       "type": "selectbox",
-      "default": "parallel",
+      "default": "vanilla",
       "options": [
         "vanilla",
         "parallel",
         "full"
       ]
     },
-    "keepsimilar": {
-      "type": "checkbox",
-      "default": true
+    "overworldswap": {
+      "type": "selectbox",
+      "default": "mixed",
+      "options": [
+        "vanilla",
+        "mixed",
+        "crossed"
+      ]
     }
   }
 }

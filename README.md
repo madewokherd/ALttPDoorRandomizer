@@ -13,17 +13,16 @@ This is a very new mode of LTTPR so the tools and info is very limited. - There 
 - There is an [OW OWG Reference Sheet](https://zelda.codemann8.com/images/shared/ow-owg-reference-sheet.png) that shows all the in-logic places where boots/mirror clips and fake flippers are expected from the player.
 
 # Known Issues
-(Updated 2021-05-26)
+(Updated 2021-06-07)
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
 - Do NOT grab the Frogsmith until you have seen the Blacksmith location. Doing so may prevent you from continuing in your save file.
-- ~~Inverted regions/rules/logic is NOT implemented yet. Generation should fail 100%.~~ _(Fixed with 0.1.4.0)_
 - If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to NOT make any other movements and S+Q immediately when the game allows you to (might take several seconds, the game has to scroll back to the original point of water entry) or there will be a hardlock. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
 
 ### Known bugs:
-- ~~Camera unlocks, this is a known issue and will eventually be fixed at a later time~~ _(Fixed with 0.1.1.2)_
-- ~~When generating, there is a message about one location that remains unfilled. You will find a Nothing item at that location.~~ _(Fixed with 0.1.1.0)_
+- Screens that loop on itself and also have free-standing items, the sprites are duplicated and can cause item duplication
+- When OWG are performed to enter mega-tile screens (large OW screens), there is a small chance that an incorrect VRAM reference value causes the map graphics to offset in increments of 16 pixels
 - There may be an issue with progression being front-loaded in the seed in some scenarios, due to an unsophisticated shuffle algorithm that could make varying-sized parts of each world unreachable
 
 # Feedback and Bug Reports
@@ -62,6 +61,20 @@ OW Transitions are shuffled, but both worlds will have a matching layout.
 
 OW Transitions are shuffled within each world separately.
 
+## Overworld Tile Swap (--ow_swap)
+
+### Vanilla
+
+OW tiles remain in their original worlds.
+
+### Mixed
+
+OW tiles are randomly chosen to become a part of the opposite world
+
+### Crossed
+
+OW tiles remain in their original world, but transitions can now be travel cross-world.
+
 ## Keep Similar Edges Together (--ow_keepsimilar)
 
 This keeps similar edge transitions together. ie. The 2 west edges of Potion Shop will be paired to another set of two similar edges
@@ -80,6 +93,12 @@ Show the help message and exit.
 ```
 
 For specifying the overworld layout shuffle you want as above. (default: vanilla)
+
+```
+--ow_swap <mode>     
+```
+
+For specifying the overworld tile swap you want as above. (default: vanilla)
 
 ```
 --ow_keepsimilar     

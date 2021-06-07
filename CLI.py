@@ -93,7 +93,7 @@ def parse_cli(argv, no_defaults=False):
         for player in range(1, multiargs.multi + 1):
             playerargs = parse_cli(shlex.split(getattr(ret, f"p{player}")), True)
 
-            for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality', 'ow_shuffle', 'ow_keepsimilar',
+            for name in ['logic', 'mode', 'swords', 'goal', 'difficulty', 'item_functionality', 'ow_shuffle', 'ow_swap', 'ow_keepsimilar',
                          'shuffle', 'door_shuffle', 'intensity', 'crystals_ganon', 'crystals_gt', 'openpyramid',
                          'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
                          'triforce_pool_min', 'triforce_pool_max', 'triforce_goal_min', 'triforce_goal_max',
@@ -142,6 +142,7 @@ def parse_settings():
         "openpyramid": False,
         "shuffleganon": True,
         "ow_shuffle": "vanilla",
+        "ow_swap": "vanilla",
         "ow_keepsimilar": False,
         "shuffle": "vanilla",
         "shufflelinks": False,

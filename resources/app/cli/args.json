@@ -116,6 +116,13 @@
       "full"
     ]
   },
+  "ow_swap": {
+    "choices": [
+      "vanilla",
+      "mixed",
+      "crossed"
+    ]
+  },
   "ow_keepsimilar": {
     "action": "store_true",
     "type": "bool"
