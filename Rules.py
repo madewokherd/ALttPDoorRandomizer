@@ -902,7 +902,7 @@ def ow_rules(world, player):
     else:
         set_rule(world.get_entrance('Turtle Rock Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Turtle Rock Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: state.has('Hammer', player) and state.has_Pearl(player))
+        set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
         
     if (world.mode[player] == 'inverted') == (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         set_rule(world.get_entrance('Mountain Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
