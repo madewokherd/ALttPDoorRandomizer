@@ -80,6 +80,10 @@ db 2, 2, 0, 0 ; For OWCameraRange
 OWCameraRange:
 dw $011E, $0100 ; Length of the range the camera can move on small screens
 
+DivideByTwoPreserveSign:
+{
+    asl : php : ror : plp : ror : rtl
+}
 OWWorldCheck:
 {
     phx
@@ -216,8 +220,6 @@ OWNewDestination:
     lda.w $0006,x : sta $06 ;set coord
     lda.w $0008,x : sta $04 ;save dest OW slot/ID
     lda.w $000a,x : sta $84 ;VRAM
-        LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
-        LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
 
     ;;22	e0	e2	61c	61e - X
     ;;20	e6	e8	618	61a - Y
@@ -227,6 +229,16 @@ OWNewDestination:
     + tya : and #$01ff : cmp 3,s : !blt .adjustMainAxis
     dec : cmp 1,s : !bge .adjustMainAxis
         inc : pha : lda $06 : and #$fe00 : !add 1,s : sta $06 : pla
+
+        ; adjust and set other VRAM addresses
+        lda.w $0006,x : pha : lda $06 : !sub 1,s 
+        jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : pha ; number of tiles
+        lda $418 : dec #2 : bmi +
+            pla : pea $0000 : bra ++ ;pla : asl #7 : pha : bra ++ ; y-axis shifts VRAM by increments of 0x80 (disabled for now)
+        + pla : asl : pha ; x-axis shifts VRAM by increments of 0x02
+        ++ lda $84 : !add 1,s : sta $84 : pla : pla
+            LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
+            LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
 
     .adjustMainAxis
     pla : pla : sep #$10 : ldy $418
@@ -238,7 +250,7 @@ OWNewDestination:
     ldx OWBGIndex,y : lda $e2,x : !add 1,s : adc 3,s : sta $e2,x
     ldx OWCameraIndex,y : lda $618,x : !add 1,s : adc 3,s : sta $618,x
     ldx OWCameraIndex,y : lda $61a,x : !add 1,s : adc 3,s : sta $61a,x
-    pla : asl : php : ror : plp : ror : pha
+    pla : jsl DivideByTwoPreserveSign : pha
     ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x : pla
     ldx OWBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x : pla
     pla : pla
@@ -274,6 +286,7 @@ OWNewDestination:
 
     sep #$30 : lda OWOppSlotOffset,y : !add $04 : asl : and #$7f : sta $700
     
+    ; crossed OW shuffle
     lda.l OWMode+1 : and #$ff : cmp #$02 : bne .return
         ldx $05 : lda.l OWTileWorldAssoc,x : sta.l $7ef3ca ; change world
 
