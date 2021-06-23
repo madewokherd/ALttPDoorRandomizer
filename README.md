@@ -13,14 +13,16 @@ This is a very new mode of LTTPR so the tools and info is very limited. - There 
 - There is an [OW OWG Reference Sheet](https://zelda.codemann8.com/images/shared/ow-owg-reference-sheet.png) that shows all the in-logic places where boots/mirror clips and fake flippers are expected from the player.
 
 # Known Issues
-(Updated 2021-06-07)
+(Updated 2021-06-23)
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
 - Do NOT grab the Frogsmith until you have seen the Blacksmith location. Doing so may prevent you from continuing in your save file.
 - If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to NOT make any other movements and S+Q immediately when the game allows you to (might take several seconds, the game has to scroll back to the original point of water entry) or there will be a hardlock. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
+- In Crossed OW Tile Swap, there are some interesting bunny water-walk situations that can occur, these are mean to be out-of-logic but beware of logic bugs around this area.
 
 ### Known bugs:
+- In Mixed OW Tile Swap, Smith and Stumpy have issues when their tiles are swapped. Progression cannot be found on them when these tiles are swapped
 - Screens that loop on itself and also have free-standing items, the sprites are duplicated and can cause item duplication
 - When OWG are performed to enter mega-tile screens (large OW screens), there is a small chance that an incorrect VRAM reference value causes the map graphics to offset in increments of 16 pixels
 - There may be an issue with progression being front-loaded in the seed in some scenarios, due to an unsophisticated shuffle algorithm that could make varying-sized parts of each world unreachable
@@ -74,6 +76,10 @@ OW tiles are randomly chosen to become a part of the opposite world
 ### Crossed
 
 OW tiles remain in their original world, but transitions can now be travel cross-world.
+
+## Visual Representation of Main OW Shuffle Settings
+
+![OW Shuffle Settings Combination](https://zelda.codemann8.com/images/shared/ow-modes.gif)
 
 ## Keep Similar Edges Together (--ow_keepsimilar)
 

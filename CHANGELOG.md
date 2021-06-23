@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.5.0
+- Added OW Tile Swap setting
+- Fixed horizontal VRAM visual loading glitch on megatiles
+- Merged DR v0.4.0.7 - Fast Credits / Reduced Flashing / Sprite Author in Credits
+
 ### 0.1.4.3
 - Merged DR v0.4.0.6 - TT Maiden Attic Hint / DR Entrance Floor Mat Mods / Hard/Expert Item Pool Fix
 
