@@ -676,7 +676,7 @@ flute_connections = {0x03: ('Flute Spot 1', ['West Death Mountain (Bottom)', 'We
                     0x2c: ('Flute Spot 4', ['Links House Area', 'Big Bomb Shop Area']),
                     0x2f: ('Flute Spot 5', ['Eastern Nook Area', 'Palace of Darkness Nook Area']),
                     0x30: ('Flute Spot 6', ['Desert Palace Teleporter Ledge', 'Misery Mire Teleporter Ledge']),
-                    0x33: ('Flute Spot 7', ['Dam Area', 'Swamp Area']),
+                    0x3b: ('Flute Spot 7', ['Dam Area', 'Swamp Area']),
                     0x3f: ('Flute Spot 8', ['Octoballoon Area', 'Bomber Corner Area'])
                     }
                          
