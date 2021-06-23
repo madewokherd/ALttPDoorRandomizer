@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.5.1
+- Fixed issue with Flute Spot 7 logically connecting to the wrong area in Mixed/Crossed OW Shuffle
+- Fixed issue with TR portal not requiring mitts when tile is swapped
+
 ### 0.1.5.0
 - Added OW Tile Swap setting
 - Fixed horizontal VRAM visual loading glitch on megatiles
