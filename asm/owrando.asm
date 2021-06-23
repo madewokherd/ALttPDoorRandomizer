@@ -282,7 +282,7 @@ OWNewDestination:
         lda.l InvertedMode : bne .inverted
             lda $7ef3ca : and.b #$40 : bra +
             .inverted lda $7ef3ca : and.b #$40 : eor #$40
-        ++ cmp #$40 : bne .nobunny
+        + cmp #$40 : bne .nobunny
             ; turn into bunny
             lda $5d : cmp #$17 : beq .return
             lda #$17 : sta $5d
