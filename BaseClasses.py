@@ -3,7 +3,7 @@ import copy
 import json
 import logging
 from collections import OrderedDict, Counter, deque, defaultdict
-from enum import Enum, unique
+from enum import Enum, IntEnum, unique
 
 try:
     from fast_enum import FastEnum
@@ -73,6 +73,7 @@ class World(object):
         self.dynamic_locations = []
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
+        self.owswaps = {}
         self.owedges = []
         self._owedge_cache = {}
         self.doors = []
@@ -142,6 +143,7 @@ class World(object):
             set_player_attr('mixed_travel', 'prevent')
             set_player_attr('standardize_palettes', 'standardize')
             set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False})
+            set_player_attr('owswaps', [[],[],[]])
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
@@ -1503,7 +1505,7 @@ class Door(object):
 
 
 @unique
-class WorldType(Enum):
+class WorldType(IntEnum):
     Light = 0
     Dark = 1
     Special = 2

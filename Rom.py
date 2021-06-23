@@ -27,7 +27,7 @@ from EntranceShuffle import door_addresses, exit_ids
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '2f83a44f0ac2720b489d50bfa8e56837'
+RANDOMIZERBASEHASH = '03a63945398191337e896e5771f77173'
 
 
 class JsonRom(object):
@@ -592,7 +592,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         write_pots_to_rom(rom, world.pot_contents[player])
 
     # patch overworld edges
-    if world.owShuffle[player] != 'vanilla':
+    if world.owShuffle[player] != 'vanilla' or world.owSwap[player] != 'vanilla':
         rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
         #patches map data specific for OW Shuffle
         rom.buffer[0x153B03] = rom.buffer[0x153B03] | 0x2 #convenient portal on WDM
@@ -606,18 +606,39 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.buffer[0x153B62] = rom.buffer[0x153B62] | 0x2 #rocks added to prevent OWG hardlock
         rom.buffer[0x153B7F] = rom.buffer[0x153B7F] | 0x2 #added C to terrain
 
+
+        owMode = 0
         if world.owShuffle[player] == 'parallel':
             owMode = 1
         elif world.owShuffle[player] == 'full':
             owMode = 2
         
-        rom.write_byte(0x150002, owMode)
+        if world.owSwap[player] == 'mixed':
+            owMode |= 0x100
+            world.fix_fake_world[player] = True
+        elif world.owSwap[player] == 'crossed':
+            owMode |= 0x200
+            world.fix_fake_world[player] = True
+        
+        write_int16(rom, 0x150002, owMode)
 
         owFlags = 0
         if world.owKeepSimilar[player]:
-            owFlags += 0x1
+            owFlags |= 0x1
 
-        write_int16(rom, 0x150003, owFlags)
+        write_int16(rom, 0x150004, owFlags)
+
+        if world.owSwap[player] == 'mixed':
+            for b in world.owswaps[player][0]:
+                # load inverted maps
+                v = rom.buffer[0x153B00 + b]
+                v = (v & 0xFE) | ((v + 1) % 2)
+                rom.buffer[0x153B00 + b] = v
+
+                # set world flag
+                v = rom.buffer[0x153A00 + b]
+                v = (v & 0xBF) | ((((v >> 6) + 1) % 2) << 6)
+                rom.buffer[0x153A00 + b] = v
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
@@ -895,10 +916,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # set open mode:
     if world.mode[player] in ['open', 'inverted']:
         rom.write_byte(0x180032, 0x01)  # open mode
-    if world.mode[player] == 'inverted':
-        set_inverted_mode(world, player, rom)
     elif world.mode[player] == 'standard':
         rom.write_byte(0x180032, 0x00)  # standard mode
+
+    set_inverted_mode(world, player, rom)
 
     uncle_location = world.get_location('Link\'s Uncle', player)
     if uncle_location.item is None or uncle_location.item.name not in ['Master Sword', 'Tempered Sword', 'Fighter Sword', 'Golden Sword', 'Progressive Sword']:
@@ -2221,211 +2242,265 @@ def write_strings(rom, world, player, team):
     rom.write_bytes(0x76CC0, [byte for p in pointers for byte in [p & 0xFF, p >> 8 & 0xFF]])
 
 def set_inverted_mode(world, player, rom):
-    # flip inverted map flags
-    for b in range(0x00, 0x80):
-        v = rom.buffer[0x153B00 + b]
-        rom.buffer[0x153B00 + b] = (v & 0xFE) | ((v + 1) % 2)
+    if world.mode[player] == 'inverted':
+        # load inverted maps
+        for b in range(0x00, 0x82):
+            v = rom.buffer[0x153B00 + b]
+            rom.buffer[0x153B00 + b] = (v & 0xFE) | ((v + 1) % 2)
     
-    rom.write_byte(snes_to_pc(0x0283E0), 0xF0)  # residual portals
-    rom.write_byte(snes_to_pc(0x02B34D), 0xF0)
-    rom.write_byte(snes_to_pc(0x06DB78), 0x8B)
-    rom.write_byte(snes_to_pc(0x05AF79), 0xF0)
-    rom.write_byte(snes_to_pc(0x0DB3C5), 0xC6)
-    rom.write_byte(snes_to_pc(0x07A3F4), 0xF0)  # duck
-    write_int16s(rom, snes_to_pc(0x02E849), [0x0043, 0x0056, 0x0058, 0x006C, 0x006F, 0x0070, 0x007B, 0x007F, 0x001B])  # dw flute
-    write_int16(rom, snes_to_pc(0x02E8D5), 0x07C8)
-    write_int16(rom, snes_to_pc(0x02E8F7), 0x01F8)
-    rom.write_byte(snes_to_pc(0x08D40C), 0xD0)  # morph proof
-    # the following bytes should only be written in vanilla
-    # or they'll overwrite the randomizer's shuffles
-    if world.shuffle[player] == 'vanilla':
-        rom.write_byte(0xDBB73 + 0x23, 0x37)  # switch AT and GT
-        rom.write_byte(0xDBB73 + 0x36, 0x24)
-        if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
-            write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
-            write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
-    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        rom.write_byte(0x15B8C, 0x6C)
-        rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
-        rom.write_byte(0xDBB73 + 0x52, 0x01)
-        rom.write_byte(0xDBB73 + 0x15, 0x06)  # bumper and old man cave
-        write_int16(rom, 0x15AEE + 2*0x17, 0x00F0)
-        rom.write_byte(0xDBB73 + 0x05, 0x16)
-        write_int16(rom, 0x15AEE + 2*0x07, 0x00FB)
-        rom.write_byte(0xDBB73 + 0x2D, 0x17)
-        write_int16(rom, 0x15AEE + 2*0x2F, 0x00EB)
-        rom.write_byte(0xDBB73 + 0x06, 0x2E)
-        write_int16(rom, 0x15AEE + 2*0x08, 0x00E6)
-        rom.write_byte(0xDBB73 + 0x16, 0x5E)
-        rom.write_byte(0xDBB73 + 0x6F, 0x07)  # DDM fairy to old man cave
-        write_int16(rom, 0x15AEE + 2*0x18, 0x00F1)
-        rom.write_byte(0x15B8C + 0x18, 0x43)
-        write_int16(rom, 0x15BDB + 2 * 0x18, 0x1400)
-        write_int16(rom, 0x15C79 + 2 * 0x18, 0x0294)
-        write_int16(rom, 0x15D17 + 2 * 0x18, 0x0600)
-        write_int16(rom, 0x15DB5 + 2 * 0x18, 0x02E8)
-        write_int16(rom, 0x15E53 + 2 * 0x18, 0x0678)
-        write_int16(rom, 0x15EF1 + 2 * 0x18, 0x0303)
-        write_int16(rom, 0x15F8F + 2 * 0x18, 0x0685)
-        rom.write_byte(0x1602D + 0x18, 0x0A)
-        rom.write_byte(0x1607C + 0x18, 0xF6)
-        write_int16(rom, 0x160CB + 2 * 0x18, 0x0000)
-        write_int16(rom, 0x16169 + 2 * 0x18, 0x0000)
-    write_int16(rom, 0x15AEE + 2 * 0x3D, 0x0003)  # pyramid exit and houlihan
-    rom.write_byte(0x15B8C + 0x3D, 0x5B)
-    write_int16(rom, 0x15BDB + 2 * 0x3D, 0x0B0E)
-    write_int16(rom, 0x15C79 + 2 * 0x3D, 0x075A)
-    write_int16(rom, 0x15D17 + 2 * 0x3D, 0x0674)
-    write_int16(rom, 0x15DB5 + 2 * 0x3D, 0x07A8)
-    write_int16(rom, 0x15E53 + 2 * 0x3D, 0x06E8)
-    write_int16(rom, 0x15EF1 + 2 * 0x3D, 0x07C7)
-    write_int16(rom, 0x15F8F + 2 * 0x3D, 0x06F3)
-    rom.write_byte(0x1602D + 0x3D, 0x06)
-    rom.write_byte(0x1607C + 0x3D, 0xFA)
-    write_int16(rom, 0x160CB + 2 * 0x3D, 0x0000)
-    write_int16(rom, 0x16169 + 2 * 0x3D, 0x0000)
-    write_int16(rom, snes_to_pc(0x02D8D4), 0x112)  # change sactuary spawn point to dark sanc
-    rom.write_bytes(snes_to_pc(0x02D8E8), [0x22, 0x22, 0x22, 0x23, 0x04, 0x04, 0x04, 0x05])
-    write_int16(rom, snes_to_pc(0x02D91A), 0x0400)
-    write_int16(rom, snes_to_pc(0x02D928), 0x222E)
-    write_int16(rom, snes_to_pc(0x02D936), 0x229A)
-    write_int16(rom, snes_to_pc(0x02D944), 0x0480)
-    write_int16(rom, snes_to_pc(0x02D952), 0x00A5)
-    write_int16(rom, snes_to_pc(0x02D960), 0x007F)
-    rom.write_byte(snes_to_pc(0x02D96D), 0x14)
-    rom.write_byte(snes_to_pc(0x02D974), 0x00)
-    rom.write_byte(snes_to_pc(0x02D97B), 0xFF)
-    rom.write_byte(snes_to_pc(0x02D982), 0x00)
-    rom.write_byte(snes_to_pc(0x02D989), 0x02)
-    rom.write_byte(snes_to_pc(0x02D990), 0x00)
-    write_int16(rom, snes_to_pc(0x02D998), 0x0000)
-    write_int16(rom, snes_to_pc(0x02D9A6), 0x005A)
-    rom.write_byte(snes_to_pc(0x02D9B3), 0x12)
-    # keep the old man spawn point at old man house unless shuffle is vanilla
-    if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
-        rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01])
-        write_int16(rom, snes_to_pc(0x02D8DE), 0x00F1)
-        rom.write_bytes(snes_to_pc(0x02D910), [0x1F, 0x1E, 0x1F, 0x1F, 0x03, 0x02, 0x03, 0x03])
-        write_int16(rom, snes_to_pc(0x02D924), 0x0300)
-        write_int16(rom, snes_to_pc(0x02D932), 0x1F10)
-        write_int16(rom, snes_to_pc(0x02D940), 0x1FC0)
-        write_int16(rom, snes_to_pc(0x02D94E), 0x0378)
-        write_int16(rom, snes_to_pc(0x02D95C), 0x0187)
-        write_int16(rom, snes_to_pc(0x02D96A), 0x017F)
-        rom.write_byte(snes_to_pc(0x02D972), 0x06)
-        rom.write_byte(snes_to_pc(0x02D979), 0x00)
-        rom.write_byte(snes_to_pc(0x02D980), 0xFF)
-        rom.write_byte(snes_to_pc(0x02D987), 0x00)
-        rom.write_byte(snes_to_pc(0x02D98E), 0x22)
-        rom.write_byte(snes_to_pc(0x02D995), 0x12)
-        write_int16(rom, snes_to_pc(0x02D9A2), 0x0000)
-        write_int16(rom, snes_to_pc(0x02D9B0), 0x0007)
-        rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
-        rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])
-    write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
-    rom.write_byte(0x15B8C + 0x06, 0x1B)
-    write_int16(rom, 0x15BDB + 2 * 0x06, 0x00AE)
-    write_int16(rom, 0x15C79 + 2 * 0x06, 0x0610)
-    write_int16(rom, 0x15D17 + 2 * 0x06, 0x077E)
-    write_int16(rom, 0x15DB5 + 2 * 0x06, 0x0672)
-    write_int16(rom, 0x15E53 + 2 * 0x06, 0x07F8)
-    write_int16(rom, 0x15EF1 + 2 * 0x06, 0x067D)
-    write_int16(rom, 0x15F8F + 2 * 0x06, 0x0803)
-    rom.write_byte(0x1602D + 0x06, 0x00)
-    rom.write_byte(0x1607C + 0x06, 0xF2)
-    write_int16(rom, 0x160CB + 2 * 0x06, 0x0000)
-    write_int16(rom, 0x16169 + 2 * 0x06, 0x0000)
-    write_int16(rom, snes_to_pc(0x02E87B), 0x00AE)  # move flute splot 9
-    write_int16(rom, snes_to_pc(0x02E89D), 0x0610)
-    write_int16(rom, snes_to_pc(0x02E8BF), 0x077E)
-    write_int16(rom, snes_to_pc(0x02E8E1), 0x0672)
-    write_int16(rom, snes_to_pc(0x02E903), 0x07F8)
-    write_int16(rom, snes_to_pc(0x02E925), 0x067D)
-    write_int16(rom, snes_to_pc(0x02E947), 0x0803)
-    write_int16(rom, snes_to_pc(0x02E969), 0x0000)
-    write_int16(rom, snes_to_pc(0x02E98B), 0xFFF2)
-    rom.write_byte(snes_to_pc(0x1AF696), 0xF0)  # bat sprite retreat
-    rom.write_byte(snes_to_pc(0x1AF6B2), 0x33)
-    rom.write_bytes(snes_to_pc(0x1AF730), [0x6A, 0x9E, 0x0C, 0x00, 0x7A, 0x9E, 0x0C,
-                                           0x00, 0x8A, 0x9E, 0x0C, 0x00, 0x6A, 0xAE,
-                                           0x0C, 0x00, 0x7A, 0xAE, 0x0C, 0x00, 0x8A,
-                                           0xAE, 0x0C, 0x00, 0x67, 0x97, 0x0C, 0x00,
-                                           0x8D, 0x97, 0x0C, 0x00])
-    write_int16s(rom, snes_to_pc(0x0FF1C8), [0x190F, 0x190F, 0x190F, 0x194C, 0x190F,
-                                                 0x194B, 0x190F, 0x195C, 0x594B, 0x194C,
-                                                 0x19EE, 0x19EE, 0x194B, 0x19EE, 0x19EE,
-                                                 0x19EE, 0x594B, 0x190F, 0x595C, 0x190F,
-                                                 0x190F, 0x195B, 0x190F, 0x190F, 0x19EE,
-                                                 0x19EE, 0x195C, 0x19EE, 0x19EE, 0x19EE,
-                                                 0x19EE, 0x595C, 0x595B, 0x190F, 0x190F,
-                                                 0x190F])
-    write_int16s(rom, snes_to_pc(0x0FA480), [0x190F, 0x196B, 0x9D04, 0x9D04, 0x196B,
-                                                 0x190F, 0x9D04, 0x9D04])
-    write_int16s(rom, snes_to_pc(0x1bb810), [0x00BE, 0x00C0, 0x013E])
-    write_int16s(rom, snes_to_pc(0x1bb836), [0x001B, 0x001B, 0x001B])
-    write_int16(rom, snes_to_pc(0x308300), 0x0140) # new pyramid hole entrance
-    write_int16(rom, snes_to_pc(0x308320), 0x001B)
-    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        rom.write_byte(snes_to_pc(0x308340), 0x7B)
-    write_int16(rom, snes_to_pc(0x1af504), 0x148B)
-    write_int16(rom, snes_to_pc(0x1af50c), 0x149B)
-    write_int16(rom, snes_to_pc(0x1af514), 0x14A4)
-    write_int16(rom, snes_to_pc(0x1af51c), 0x1489)
-    write_int16(rom, snes_to_pc(0x1af524), 0x14AC)
-    write_int16(rom, snes_to_pc(0x1af52c), 0x54AC)
-    write_int16(rom, snes_to_pc(0x1af534), 0x148C)
-    write_int16(rom, snes_to_pc(0x1af53c), 0x548C)
-    write_int16(rom, snes_to_pc(0x1af544), 0x1484)
-    write_int16(rom, snes_to_pc(0x1af54c), 0x5484)
-    write_int16(rom, snes_to_pc(0x1af554), 0x14A2)
-    write_int16(rom, snes_to_pc(0x1af55c), 0x54A2)
-    write_int16(rom, snes_to_pc(0x1af564), 0x14A0)
-    write_int16(rom, snes_to_pc(0x1af56c), 0x54A0)
-    write_int16(rom, snes_to_pc(0x1af574), 0x148E)
-    write_int16(rom, snes_to_pc(0x1af57c), 0x548E)
-    write_int16(rom, snes_to_pc(0x1af584), 0x14AE)
-    write_int16(rom, snes_to_pc(0x1af58c), 0x54AE)
-    rom.write_byte(snes_to_pc(0x00DB9D), 0x1A)  # castle hole graphics
-    rom.write_byte(snes_to_pc(0x00DC09), 0x1A)
-    rom.write_byte(snes_to_pc(0x00D009), 0x31)
-    rom.write_byte(snes_to_pc(0x00D0e8), 0xE0)
-    rom.write_byte(snes_to_pc(0x00D1c7), 0x00)
-    write_int16(rom, snes_to_pc(0x1BE8DA), 0x39AD)
-    rom.write_byte(0xF6E58, 0x80)  # no whirlpool under castle gate
-    rom.write_bytes(0x0086E, [0x5C, 0x00, 0xA0, 0xA1])  # TR tail
-    rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warps under rocks
-    rom.write_bytes(snes_to_pc(0x1BC81E), [0x94, 0x1D, 0x82])
-    rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])
-    rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])
-    rom.write_bytes(snes_to_pc(0x1BC3DF), [0xD8, 0xD1])
-    rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])
-    rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])
-    write_int16(rom, 0xDB96F + 2 * 0x35, 0x001B)  # move pyramid exit door
-    write_int16(rom, 0xDBA71 + 2 * 0x35, 0x011C)
-    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        rom.write_byte(0xDBB73 + 0x35, 0x36)
-    rom.write_byte(snes_to_pc(0x09D436), 0xF3)  # remove castle gate warp
-    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        write_int16(rom, 0x15AEE + 2 * 0x37, 0x0010)  # pyramid exit to new hc area
-        rom.write_byte(0x15B8C + 0x37, 0x1B)
-        write_int16(rom, 0x15BDB + 2 * 0x37, 0x000E)
-        write_int16(rom, 0x15C79 + 2 * 0x37, 0x0600)
-        write_int16(rom, 0x15D17 + 2 * 0x37, 0x0676)
-        write_int16(rom, 0x15DB5 + 2 * 0x37, 0x0604)
-        write_int16(rom, 0x15E53 + 2 * 0x37, 0x06E8)
-        write_int16(rom, 0x15EF1 + 2 * 0x37, 0x066D)
-        write_int16(rom, 0x15F8F + 2 * 0x37, 0x06F3)
-        rom.write_byte(0x1602D + 0x37, 0x00)
-        rom.write_byte(0x1607C + 0x37, 0x0A)
-        write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
-        write_int16(rom, 0x16169 + 2 * 0x37, 0x811c)
-    rom.write_bytes(snes_to_pc(0x1BC387), [0xDD, 0xD1])
-    rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF])
-    rom.write_byte(0x180089, 0x01)  # open TR after exit
-    rom.write_byte(snes_to_pc(0x0ABFBB), 0x90)
-    rom.write_byte(snes_to_pc(0x0280A6), 0xD0)
-    rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])
+        rom.write_byte(snes_to_pc(0x0283E0), 0xF0) # residual portals
+        rom.write_byte(snes_to_pc(0x02B34D), 0xF0)
+        rom.write_byte(snes_to_pc(0x06DB78), 0x8B) # dark-style portal
 
+        rom.write_byte(snes_to_pc(0x0DB3C5), 0xC6) #vortex
+
+        rom.write_byte(snes_to_pc(0x07A3F4), 0xF0) # duck
+        rom.write_byte(snes_to_pc(0x08D40C), 0xD0) # morph poof
+        rom.write_byte(snes_to_pc(0x0ABFBB), 0x90) # move mirror portal indicator to correct map (0xB0 normally)
+        rom.write_byte(snes_to_pc(0x0280A6), 0xD0) # use starting point prompt instead of start at pyramid
+        
+        write_int16(rom, snes_to_pc(0x02D8D4), 0x112) # change sanctuary spawn point to dark sanc
+        rom.write_bytes(snes_to_pc(0x02D8E8), [0x22, 0x22, 0x22, 0x23, 0x04, 0x04, 0x04, 0x05])
+        write_int16(rom, snes_to_pc(0x02D91A), 0x0400)
+        write_int16(rom, snes_to_pc(0x02D928), 0x222E)
+        write_int16(rom, snes_to_pc(0x02D936), 0x229A)
+        write_int16(rom, snes_to_pc(0x02D944), 0x0480)
+        write_int16(rom, snes_to_pc(0x02D952), 0x00A5)
+        write_int16(rom, snes_to_pc(0x02D960), 0x007F)
+        rom.write_byte(snes_to_pc(0x02D96D), 0x14)
+        rom.write_byte(snes_to_pc(0x02D974), 0x00)
+        rom.write_byte(snes_to_pc(0x02D97B), 0xFF)
+        rom.write_byte(snes_to_pc(0x02D982), 0x00)
+        rom.write_byte(snes_to_pc(0x02D989), 0x02)
+        rom.write_byte(snes_to_pc(0x02D990), 0x00)
+        write_int16(rom, snes_to_pc(0x02D998), 0x0000)
+        write_int16(rom, snes_to_pc(0x02D9A6), 0x005A)
+        rom.write_byte(snes_to_pc(0x02D9B3), 0x12)
+
+        if world.shuffle[player] == 'vanilla':
+            rom.write_byte(0xDBB73 + 0x23, 0x37)  # switch AT and GT
+            rom.write_byte(0xDBB73 + 0x36, 0x24)
+            if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
+                write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
+                write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
+        
+    if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E849), 0x0043) #flute spot
+        if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
+            rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01]) # mountain cave starts on OW
+            
+            write_int16(rom, snes_to_pc(0x02D8DE), 0x00F1) # change mountain cave spawn point to just outside old man cave
+            rom.write_bytes(snes_to_pc(0x02D910), [0x1F, 0x1E, 0x1F, 0x1F, 0x03, 0x02, 0x03, 0x03])
+            write_int16(rom, snes_to_pc(0x02D924), 0x0300)
+            write_int16(rom, snes_to_pc(0x02D932), 0x1F10)
+            write_int16(rom, snes_to_pc(0x02D940), 0x1FC0)
+            write_int16(rom, snes_to_pc(0x02D94E), 0x0378)
+            write_int16(rom, snes_to_pc(0x02D95C), 0x0187)
+            write_int16(rom, snes_to_pc(0x02D96A), 0x017F)
+            rom.write_byte(snes_to_pc(0x02D972), 0x06)
+            rom.write_byte(snes_to_pc(0x02D979), 0x00)
+            rom.write_byte(snes_to_pc(0x02D980), 0xFF)
+            rom.write_byte(snes_to_pc(0x02D987), 0x00)
+            rom.write_byte(snes_to_pc(0x02D98E), 0x22)
+            rom.write_byte(snes_to_pc(0x02D995), 0x12)
+            write_int16(rom, snes_to_pc(0x02D9A2), 0x0000)
+            write_int16(rom, snes_to_pc(0x02D9B0), 0x0007)
+            rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
+
+            rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00]) #indicates the overworld door being used for the single entrance spawn point
+        
+            rom.write_byte(0xDBB73 + 0x6F, 0x07)  # DDM fairy entrance to old man fetch east UW
+            write_int16(rom, 0x15AEE + 2*0x18, 0x00F1) # old man fetch UW to DDM fairy entrance
+            rom.write_byte(0x15B8C + 0x18, 0x43)
+            write_int16(rom, 0x15BDB + 2 * 0x18, 0x1400)
+            write_int16(rom, 0x15C79 + 2 * 0x18, 0x0294)
+            write_int16(rom, 0x15D17 + 2 * 0x18, 0x0600)
+            write_int16(rom, 0x15DB5 + 2 * 0x18, 0x02E8)
+            write_int16(rom, 0x15E53 + 2 * 0x18, 0x0678)
+            write_int16(rom, 0x15EF1 + 2 * 0x18, 0x0303)
+            write_int16(rom, 0x15F8F + 2 * 0x18, 0x0685)
+            rom.write_byte(0x1602D + 0x18, 0x0A)
+            rom.write_byte(0x1607C + 0x18, 0xF6)
+            write_int16(rom, 0x160CB + 2 * 0x18, 0x0000)
+            write_int16(rom, 0x16169 + 2 * 0x18, 0x0000)
+            
+            rom.write_byte(0xDBB73 + 0x06, 0x2E) # old man fetch east entrance to DMD west UW
+            write_int16(rom, 0x15AEE + 2*0x08, 0x00E6) # DMD west UW to old man fetch east entrance 
+            if (world.mode[player] == 'inverted') != (0x0A in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                rom.write_byte(0xDBB73 + 0x16, 0x5E) # bumper cave top entrance to DDM Fairy UW
+            else:
+                rom.write_byte(0xDBB73 + 0x2D, 0x5E) # DMD west entrance to DDM Fairy
+    if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
+    if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        rom.write_bytes(snes_to_pc(0x1BC387), [0xDD, 0xD1])  # add warps under rocks
+        rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF]) # add warps under rocks
+        rom.write_byte(0x180089, 0x01)  # open TR after exit
+        rom.write_bytes(0x0086E, [0x5C, 0x00, 0xA0, 0xA1]) # TR tail
+        if world.shuffle[player] in ['vanilla']:
+            world.fix_trock_doors[player] = True
+    if (world.mode[player] == 'inverted') != (0x0A in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            rom.write_byte(0xDBB73 + 0x15, 0x06)  # bumper cave bottom entrance to old man fetch west UW
+            write_int16(rom, 0x15AEE + 2*0x17, 0x00F0)  # old man fetch west UW to bumper cave bottom entrance
+            rom.write_byte(0xDBB73 + 0x05, 0x16) # old man fetch west entrance to bumper cave bottom UW
+            write_int16(rom, 0x15AEE + 2*0x07, 0x00FB) # bumper cave bottom UW to old man fetch west entrance
+            rom.write_byte(0xDBB73 + 0x2D, 0x17) # DMD west entrance to bumper cave top UW
+            write_int16(rom, 0x15AEE + 2*0x2F, 0x00EB) # bumper cave top UW to DMD west entrance
+            if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                rom.write_byte(0xDBB73 + 0x16, 0x2E) # bumper cave top entrance to DMD west UW
+                write_int16(rom, 0x15AEE + 2*0x18, 0x00E6) # DMD west UW to bumper cave top entrance
+    if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
+    if (world.mode[player] == 'inverted') != (0x16 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E84B), 0x0056) #flute spot
+    if (world.mode[player] == 'inverted') != (0x18 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E84D), 0x0058) #flute spot
+        write_int16(rom, snes_to_pc(0x02E8D5), 0x07C8) #flute spot
+        write_int16(rom, snes_to_pc(0x02E8F7), 0x01F8) #flute spot
+    if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
+        rom.write_byte(0x15B8C + 0x06, 0x1B)
+        write_int16(rom, 0x15BDB + 2 * 0x06, 0x00AE)
+        write_int16(rom, 0x15C79 + 2 * 0x06, 0x0610)
+        write_int16(rom, 0x15D17 + 2 * 0x06, 0x077E)
+        write_int16(rom, 0x15DB5 + 2 * 0x06, 0x0672)
+        write_int16(rom, 0x15E53 + 2 * 0x06, 0x07F8)
+        write_int16(rom, 0x15EF1 + 2 * 0x06, 0x067D)
+        write_int16(rom, 0x15F8F + 2 * 0x06, 0x0803)
+        rom.write_byte(0x1602D + 0x06, 0x00)
+        rom.write_byte(0x1607C + 0x06, 0xF2)
+        write_int16(rom, 0x160CB + 2 * 0x06, 0x0000)
+        write_int16(rom, 0x16169 + 2 * 0x06, 0x0000)
+        
+        write_int16(rom, snes_to_pc(0x02E859), 0x001B)  # move flute spot 9
+        write_int16(rom, snes_to_pc(0x02E87B), 0x00AE)
+        write_int16(rom, snes_to_pc(0x02E89D), 0x0610)
+        write_int16(rom, snes_to_pc(0x02E8BF), 0x077E)
+        write_int16(rom, snes_to_pc(0x02E8E1), 0x0672)
+        write_int16(rom, snes_to_pc(0x02E903), 0x07F8)
+        write_int16(rom, snes_to_pc(0x02E925), 0x067D)
+        write_int16(rom, snes_to_pc(0x02E947), 0x0803)
+        write_int16(rom, snes_to_pc(0x02E969), 0x0000)
+        write_int16(rom, snes_to_pc(0x02E98B), 0xFFF2)
+
+        #new pyramid hole mask position
+        rom.write_bytes(snes_to_pc(0x1AF730), [0x6A, 0x9E, 0x0C, 0x00, 0x7A, 0x9E, 0x0C,
+                                            0x00, 0x8A, 0x9E, 0x0C, 0x00, 0x6A, 0xAE,
+                                            0x0C, 0x00, 0x7A, 0xAE, 0x0C, 0x00, 0x8A,
+                                            0xAE, 0x0C, 0x00, 0x67, 0x97, 0x0C, 0x00,
+                                            0x8D, 0x97, 0x0C, 0x00])
+        
+        rom.write_byte(snes_to_pc(0x00D009), 0x31)  # castle hole graphics
+        rom.write_byte(snes_to_pc(0x00D0E8), 0xE0)
+        rom.write_byte(snes_to_pc(0x00D1C7), 0x00)
+        write_int16(rom, snes_to_pc(0x1BE8DA), 0x39AD) # add color for shading for castle hole
+        
+        #castle hole map16 data
+        write_int16s(rom, snes_to_pc(0x0FF1C8), [0x190F, 0x190F, 0x190F, 0x194C, 0x190F,
+                                                    0x194B, 0x190F, 0x195C, 0x594B, 0x194C,
+                                                    0x19EE, 0x19EE, 0x194B, 0x19EE, 0x19EE,
+                                                    0x19EE, 0x594B, 0x190F, 0x595C, 0x190F,
+                                                    0x190F, 0x195B, 0x190F, 0x190F, 0x19EE,
+                                                    0x19EE, 0x195C, 0x19EE, 0x19EE, 0x19EE,
+                                                    0x19EE, 0x595C, 0x595B, 0x190F, 0x190F,
+                                                    0x190F])
+        write_int16s(rom, snes_to_pc(0x0FA480), [0x190F, 0x196B, 0x9D04, 0x9D04, 0x196B,
+                                                    0x190F, 0x9D04, 0x9D04])
+
+        write_int16s(rom, snes_to_pc(0x1BB810), [0x00BE, 0x00C0, 0x013E]) # update pyramid hole entrance
+        write_int16s(rom, snes_to_pc(0x1BB836), [0x001B, 0x001B, 0x001B])
+        
+        write_int16(rom, snes_to_pc(0x308300), 0x0140) #add extra pyramid hole
+        write_int16(rom, snes_to_pc(0x308320), 0x001B)
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            rom.write_byte(snes_to_pc(0x308340), 0x7B)
+        
+        rom.write_byte(snes_to_pc(0x00DB9D), 0x1A) # make retreat bat gfx available in HC area
+        rom.write_byte(snes_to_pc(0x00DC09), 0x1A)
+
+        rom.write_byte(snes_to_pc(0x1AF696), 0xF0)  # bat sprite retreat : bat X position
+        rom.write_byte(snes_to_pc(0x1AF6B2), 0x33)  # bat sprite retreat : bat delay
+        
+        write_int16(rom, snes_to_pc(0x1af504), 0x148B) # prioritize retreat Bat and use 3rd sprite group
+        write_int16(rom, snes_to_pc(0x1af50c), 0x149B)
+        write_int16(rom, snes_to_pc(0x1af514), 0x14A4)
+        write_int16(rom, snes_to_pc(0x1af51c), 0x1489)
+        write_int16(rom, snes_to_pc(0x1af524), 0x14AC)
+        write_int16(rom, snes_to_pc(0x1af52c), 0x54AC)
+        write_int16(rom, snes_to_pc(0x1af534), 0x148C)
+        write_int16(rom, snes_to_pc(0x1af53c), 0x548C)
+        write_int16(rom, snes_to_pc(0x1af544), 0x1484)
+        write_int16(rom, snes_to_pc(0x1af54c), 0x5484)
+        write_int16(rom, snes_to_pc(0x1af554), 0x14A2)
+        write_int16(rom, snes_to_pc(0x1af55c), 0x54A2)
+        write_int16(rom, snes_to_pc(0x1af564), 0x14A0)
+        write_int16(rom, snes_to_pc(0x1af56c), 0x54A0)
+        write_int16(rom, snes_to_pc(0x1af574), 0x148E)
+        write_int16(rom, snes_to_pc(0x1af57c), 0x548E)
+        write_int16(rom, snes_to_pc(0x1af584), 0x14AE)
+        write_int16(rom, snes_to_pc(0x1af58c), 0x54AE)
+        
+        rom.write_byte(0xF6E58, 0x80)  # no whirlpool under castle gate
+        rom.write_byte(snes_to_pc(0x09D436), 0xF3)  # replace whirlpool with harmless sprite
+        
+        write_int16(rom, 0xDB96F + 2 * 0x35, 0x001B)  # move pyramid exit door
+        write_int16(rom, 0xDBA71 + 2 * 0x35, 0x011C)
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            rom.write_byte(0xDBB73 + 0x35, 0x36)
+        
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            write_int16(rom, 0x15AEE + 2 * 0x37, 0x0010)  # pyramid exit to new hc area
+            rom.write_byte(0x15B8C + 0x37, 0x1B)
+            write_int16(rom, 0x15BDB + 2 * 0x37, 0x000E)
+            write_int16(rom, 0x15C79 + 2 * 0x37, 0x0600)
+            write_int16(rom, 0x15D17 + 2 * 0x37, 0x0676)
+            write_int16(rom, 0x15DB5 + 2 * 0x37, 0x0604)
+            write_int16(rom, 0x15E53 + 2 * 0x37, 0x06E8)
+            write_int16(rom, 0x15EF1 + 2 * 0x37, 0x066D)
+            write_int16(rom, 0x15F8F + 2 * 0x37, 0x06F3)
+            rom.write_byte(0x1602D + 0x37, 0x00)
+            rom.write_byte(0x1607C + 0x37, 0x0A)
+            write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
+            write_int16(rom, 0x16169 + 2 * 0x37, 0x811c)
+    if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05]) #frog pickup on contact
+    if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E84F), 0x006C) #flute spot
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            rom.write_byte(0x15B8C, 0x6C) #exit links at bomb shop area
+            rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
+            rom.write_byte(0xDBB73 + 0x52, 0x01)
+    if (world.mode[player] == 'inverted') != (0x2F in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E851), 0x006F) #flute spot
+        rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])  # add warp under rock
+    if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E853), 0x0070) #flute spot
+        rom.write_bytes(snes_to_pc(0x1BC81E), [0x94, 0x1D, 0x82])  # add warp under rock
+    if (world.mode[player] == 'inverted') != (0x33 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        rom.write_bytes(snes_to_pc(0x1BC3DF), [0xD8, 0xD1])  # add warp under rock
+        rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
+    if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
+    if (world.mode[player] == 'inverted') != (0x3B in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E855), 0x007B) #flute spot
+    if (world.mode[player] == 'inverted') != (0x3F in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        write_int16(rom, snes_to_pc(0x02E857), 0x007F) #flute spot
+    
+    if world.mode[player] == 'inverted':
+        rom.write_byte(0x15B8C + 0x3D, rom.buffer[0x15B8C])  # houlihan exit
+        write_int16(rom, 0x15BDB + 2 * 0x3D, rom.buffer[0x15BDB] + (rom.buffer[0x15BDC] << 8))
+        write_int16(rom, 0x15C79 + 2 * 0x3D, rom.buffer[0x15C79] + (rom.buffer[0x15C7A] << 8))
+        write_int16(rom, 0x15D17 + 2 * 0x3D, rom.buffer[0x15D17] + (rom.buffer[0x15D18] << 8))
+        write_int16(rom, 0x15DB5 + 2 * 0x3D, rom.buffer[0x15DB5] + (rom.buffer[0x15DB6] << 8))
+        write_int16(rom, 0x15E53 + 2 * 0x3D, rom.buffer[0x15E53] + (rom.buffer[0x15E54] << 8))
+        write_int16(rom, 0x15EF1 + 2 * 0x3D, rom.buffer[0x15EF1] + (rom.buffer[0x15EF2] << 8))
+        write_int16(rom, 0x15F8F + 2 * 0x3D, rom.buffer[0x15F8F] + (rom.buffer[0x15F90] << 8))
+        rom.write_byte(0x1602D + 0x3D, rom.buffer[0x1602D])
+        rom.write_byte(0x1607C + 0x3D, rom.buffer[0x1607C])
+        write_int16(rom, 0x160CB + 2 * 0x3D, rom.buffer[0x160CB] + (rom.buffer[0x160CC] << 8))
+        write_int16(rom, 0x16169 + 2 * 0x3D, rom.buffer[0x16169] + (rom.buffer[0x1616A] << 8))
+        
 def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc = world.get_region('Dark Sanctuary Hint', player)
     dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)

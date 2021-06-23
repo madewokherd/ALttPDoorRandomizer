@@ -27,7 +27,7 @@ org $02c40a  ; < ? - Bank02.asm 10547 ()
 jsl.l OWWorldCheck
 org $05afd9  ; < ? - sprite_warp_vortex.asm 60 ()
 jsl.l OWWorldCheck
-org $07a3f0  ; < ? - Bank07.asm 5772 ()
+org $07a3f0  ; < ? - Bank07.asm 5772 () ; flute activation/use
 jsl.l OWWorldCheck
 org $07a967  ; < ? - Bank07.asm 6578 ()
 jsl.l OWWorldCheck
@@ -53,6 +53,9 @@ org $1beca2  ; < ? - palettes.asm 556 ()
 jsl.l OWWorldCheck16 : nop
 org $1bed95  ; < ? - palettes.asm 748 ()
 jsl.l OWWorldCheck16 : nop
+
+org $02b16e  ; AND #$3F : ORA 7EF3CA
+and #$7f : eor #$40 : nop #2 ; something to do with mirroring and simply toggling world to opposite one: TODO: better comment
 
 ;Code
 org $aa8800
@@ -94,7 +97,7 @@ org $aa9000
 OWEdgeTransition:
 {
     php : phy
-    lda.l OWMode : beq +
+    lda.l OWMode : ora.l OWMode+1 : beq +
         jsl OWShuffle : bra .return
     + jsl OWVanilla
     .return
@@ -270,7 +273,27 @@ OWNewDestination:
     lda $418 : asl : tax : lda $610,x : !add 1,s : sta $610,x : pla
 
     sep #$30 : lda OWOppSlotOffset,y : !add $04 : asl : and #$7f : sta $700
-    sep #$20 : lda $05 : sta $8a ;: and #$40 : sta.l $7ef3ca ;removed setting DW flag
+    
+    lda.l OWMode+1 : and #$ff : cmp #$02 : bne .return
+        ldx $05 : lda.l OWTileWorldAssoc,x : sta.l $7ef3ca ; change world
+
+        ; toggle bunny mode
+        lda $7ef357 : bne .nobunny
+        lda.l InvertedMode : bne .inverted
+            lda $7ef3ca : and.b #$40 : bra +
+            .inverted lda $7ef3ca : and.b #$40 : eor #$40
+        ++ cmp #$40 : bne .nobunny
+            ; turn into bunny
+            lda $5d : cmp #$17 : beq .return
+            lda #$17 : sta $5d
+            lda #$01 : sta $02e0
+            bra .return
+        .nobunny
+        lda $5d : cmp #$17 : bne .return
+        stz $5d : stz $2e0
+
+    .return
+    lda $05 : sta $8a
     rep #$30 : rts
 }
 

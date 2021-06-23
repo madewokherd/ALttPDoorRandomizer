@@ -1,6 +1,6 @@
-import random, logging
-from BaseClasses import OWEdge, WorldType, Direction, Terrain
-from OWEdges import OWEdgeGroups, parallel_links, IsParallel
+import random, logging, copy
+from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain
+from OWEdges import OWTileGroups, OWEdgeGroups, parallel_links, IsParallel
 
 __version__ = '0.1.4.3-u'
 
@@ -10,22 +10,155 @@ def link_overworld(world, player):
         connect_simple(world, exitname, regionname, player)
     for exitname, destname in temporary_mandatory_connections:
         connect_two_way(world, exitname, destname, player)
+
+    # tile shuffle
+    trimmed_groups = copy.deepcopy(OWEdgeGroups)
+    if world.owSwap[player] != 'vanilla':
+        tile_groups = {}
+        for (name, groupType) in OWTileGroups.keys():
+            if world.mode[player] != 'standard' or name not in ['Castle', 'Links']:
+                if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
+                    tile_groups[(name,)] = ([], [], [])
+                else:
+                    tile_groups[(name, groupType)] = ([], [], [])
+
+        for (name, groupType) in OWTileGroups.keys():
+            if world.mode[player] != 'standard' or name not in ['Castle', 'Links']:
+                (owids, lw_regions, dw_regions) = OWTileGroups[(name, groupType,)]
+                if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
+                    (exist_owids, exist_lw_regions, exist_dw_regions) = tile_groups[(name,)]
+                    exist_owids.extend(owids)
+                    exist_lw_regions.extend(lw_regions)
+                    exist_dw_regions.extend(dw_regions)
+                    tile_groups[(name,)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+                else:
+                    (exist_owids, exist_lw_regions, exist_dw_regions) = tile_groups[(name, groupType)]
+                    exist_owids.extend(owids)
+                    exist_lw_regions.extend(lw_regions)
+                    exist_dw_regions.extend(dw_regions)
+                    tile_groups[(name, groupType)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+        
+        #tile shuffle happens here, the groups that remain in the list are the tiles that get swapped
+        removed = list()
+        for group in tile_groups.keys():
+            if random.randint(0, 1):
+                removed.append(group)
+        for group in removed:
+            tile_groups.pop(group, None)
+        
+        #save shuffled tiles to world object
+        for group in tile_groups.keys():
+            (owids, lw_regions, dw_regions) = tile_groups[group]
+            (exist_owids, exist_lw_regions, exist_dw_regions) = world.owswaps[player]
+            exist_owids.extend(owids)
+            exist_lw_regions.extend(lw_regions)
+            exist_dw_regions.extend(dw_regions)
+            world.owswaps[player] = [exist_owids, exist_lw_regions, exist_dw_regions]
+
+        #dont perform moon pearl check unless both hobo and ped are swapped
+        if 0x80 in world.owswaps[player][0]:
+            world.owswaps[player][0].remove(0x80)
+
+        #replace LW edges with DW
+        ignore_list = list() #TODO: Remove ignore_list when special OW areas are included in pool
+        for edgeset in temporary_mandatory_connections:
+            for edge in edgeset:
+                ignore_list.append(edge)
+        
+        swapped_edges = list()
+        def getSwappedEdges(world, lst, player):
+            for regionname in lst:
+                region = world.get_region(regionname, player)
+                for exit in region.exits:
+                    if exit.spot_type == 'OWEdge' and exit.name not in ignore_list:
+                        swapped_edges.append(exit.name)
+        
+        getSwappedEdges(world, world.owswaps[player][1], player)
+        getSwappedEdges(world, world.owswaps[player][2], player)
+
+        def performSwap(groups, swaps):
+            try:
+                for group in groups.keys():
+                    (mode, wrld, dir, terrain, parallel, count) = group
+                    for p in range(0, len(groups[group])):
+                        edgepool = groups[group][p]
+                        for s in range(0, len(edgepool)):
+                            if s <= len(edgepool):
+                                for e in range(0, len(edgepool[s])):
+                                    if len(edgepool) > 0 and edgepool[s][e] in swaps:
+                                        if parallel == IsParallel.Yes:
+                                            if wrld == WorldType.Light and edgepool[s][e] in parallel_links:
+                                                logging.getLogger('').debug('%s was moved', edgepool[s][e])
+                                                swaps.remove(edgepool[s][e])
+                                                groups[group][p][s][e] = parallel_links[edgepool[s][e]]
+                                            elif wrld == WorldType.Dark and edgepool[s][e] in parallel_links.inverse:
+                                                logging.getLogger('').debug('%s was moved', edgepool[s][e])
+                                                swaps.remove(edgepool[s][e])
+                                                groups[group][p][s][e] = parallel_links.inverse[edgepool[s][e]][0]  
+                                        else:
+                                            for edge in edgepool[s]:
+                                                logging.getLogger('').debug('%s was moved', edge)
+                                                swaps.remove(edge)
+                                            groups[(mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][p].append(edgepool[s])
+                                            groups[group][p].remove(edgepool[s])
+            except IndexError:
+                #TODO: Figure out a way to handle index changes on the fly when removing items
+                logging.getLogger('').warning('OW Tile Swap encountered minor IndexError... retrying')
+        
+        tries = 5
+        while tries > 0:
+            performSwap(trimmed_groups, swapped_edges)
+            if len(swapped_edges) == 0:
+                tries = 0
+                continue
+            tries -= 1
+        assert len(swapped_edges) == 0
+
+        #move swapped regions to other world
+        if world.owSwap[player] == 'mixed':
+            for name in world.owswaps[player][1]:
+                region = world.get_region(name, player)
+                region.type = RegionType.DarkWorld
+            for name in world.owswaps[player][2]:
+                region = world.get_region(name, player)
+                region.type = RegionType.LightWorld
     
-    if world.mode[player] != 'inverted':
-        for exitname, regionname in open_connections:
-            connect_simple(world, exitname, regionname, player)
-    else:
-        for exitname, regionname in inverted_connections:
-            connect_simple(world, exitname, regionname, player)
+    #make new connections
+    for owid in flute_connections.keys():
+        (spot, dest) = flute_connections[owid]
+        if (world.mode[player] == 'inverted') == (owid in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            connect_simple(world, spot, dest[0], player)
+        else:
+            connect_simple(world, spot, dest[1], player)
+    
+    for owid in ow_connections.keys():
+        if (world.mode[player] == 'inverted') == (owid in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            for (exitname, regionname) in ow_connections[owid][0]:
+                connect_simple(world, exitname, regionname, player)
+        else:
+            for (exitname, regionname) in ow_connections[owid][1]:
+                connect_simple(world, exitname, regionname, player)
 
     connected_edges = []
 
     connect_custom(world, connected_edges, player)
 
-    # if we do not shuffle, set default connections
+    # layout shuffle
     if world.owShuffle[player] == 'vanilla':
-        for exitname, destname in default_connections:
-            connect_two_way(world, exitname, destname, player)
+        #for exitname, destname in default_connections:
+         #   connect_two_way(world, exitname, destname, player)
+        for grouping in (trimmed_groups,):
+            groups = list(trimmed_groups.values())
+        for (forward_edge_sets, back_edge_sets) in groups:
+            assert len(forward_edge_sets) == len(back_edge_sets)
+            for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
+                assert len(forward_set) == len(back_set)
+                for (forward_edge, back_edge) in zip(forward_set, back_set):
+                    connect_two_way(world, forward_edge, back_edge, player)
+                    connected_edges.append(forward_edge)
+                    connected_edges.append(back_edge)
+                        
+        assert len(connected_edges) == len(default_connections) * 2, connected_edges
     else:
         if world.owKeepSimilar[player] and world.owShuffle[player] == 'parallel':
             for exitname, destname in parallelsimilar_connections:
@@ -39,7 +172,7 @@ def link_overworld(world, player):
             connected_edges.append(exitname)
             connected_edges.append(destname)
         
-        trimmed_groups = remove_reserved(world, OWEdgeGroups, connected_edges, player)
+        trimmed_groups = remove_reserved(world, trimmed_groups, connected_edges, player)
         
         groups = reorganize_groups(world, trimmed_groups, player)
         
@@ -54,11 +187,14 @@ def link_overworld(world, player):
                     connect_two_way(world, forward_edge, back_edge, player)
                     connected_edges.append(forward_edge)
                     connected_edges.append(back_edge)
-                    if world.owShuffle[player] == 'parallel' and forward_edge in parallel_links.keys():
-                        connect_two_way(world, parallel_links[forward_edge], parallel_links[back_edge], player)
-                        connected_edges.append(parallel_links[forward_edge])
-                        connected_edges.append(parallel_links[back_edge])
-                        
+                    if world.owShuffle[player] == 'parallel':
+                        if forward_edge in parallel_links.keys() or forward_edge in parallel_links.inverse.keys():
+                            parallel_forward_edge = parallel_links[forward_edge] if forward_edge in parallel_links.keys() else parallel_links.inverse[forward_edge][0]
+                            parallel_back_edge = parallel_links[back_edge] if back_edge in parallel_links.keys() else parallel_links.inverse[back_edge][0]
+                            connect_two_way(world, parallel_forward_edge, parallel_back_edge, player)
+                            connected_edges.append(parallel_forward_edge)
+                            connected_edges.append(parallel_back_edge)
+        
         assert len(connected_edges) == len(default_connections) * 2, connected_edges
 
 def connect_custom(world, connected_edges, player):
@@ -93,7 +229,7 @@ def connect_two_way(world, edgename1, edgename2, player):
         x.dest = y
         y.dest = x
 
-    if world.owShuffle[player] != 'vanilla':
+    if world.owShuffle[player] != 'vanilla' or world.owSwap[player] != 'vanilla':
         world.spoiler.set_overworld(edgename2, edgename1, 'both', player)
 
 def remove_reserved(world, groupedlist, connected_edges, player):
@@ -113,6 +249,9 @@ def remove_reserved(world, groupedlist, connected_edges, player):
             for edge in parallel_links:
                 forward_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in forward_edges)
                 back_edges = list(list(filter((parallel_links[edge]).__ne__, i)) for i in back_edges)
+            for edge in parallel_links.inverse:
+                forward_edges = list(list(filter((parallel_links.inverse[edge][0]).__ne__, i)) for i in forward_edges)
+                back_edges = list(list(filter((parallel_links.inverse[edge][0]).__ne__, i)) for i in back_edges)
 
         forward_edges = list(filter(([]).__ne__, forward_edges))
         back_edges = list(filter(([]).__ne__, back_edges))
@@ -133,159 +272,151 @@ def reorganize_groups(world, groups, player):
         if world.owKeepSimilar[player]:
             if world.mode[player] == 'standard':
                 #tuple stays (A,B,C,D,_,F)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (std, region, axis, terrain, _, count) = group
-                            new_grouping[(std, region, axis, terrain, count)] = ([], [])
-                        
-                        for group in grouping.keys():
-                            (std, region, axis, terrain, _, count) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, count)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(std, region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+                    for group in grouping.keys():
+                        (std, region, axis, terrain, _, count) = group
+                        new_grouping[(std, region, axis, terrain, count)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (std, region, axis, terrain, _, count) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, count)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(std, region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
             else:
                 #tuple goes to (_,B,C,D,_,F)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, _, count) = group
-                            new_grouping[(region, axis, terrain, count)] = ([], [])
-                        
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, _, count) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, count)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, _, count) = group
+                        new_grouping[(region, axis, terrain, count)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, _, count) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, count)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(region, axis, terrain, count)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
         else:
             if world.mode[player] == 'standard':
                 #tuple stays (A,B,C,D,_,_)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (std, region, axis, terrain, _, _) = group
-                            new_grouping[(std, region, axis, terrain)] = ([], [])
+                    for group in grouping.keys():
+                        (std, region, axis, terrain, _, _) = group
+                        new_grouping[(std, region, axis, terrain)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (std, region, axis, terrain, _, _) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        forward_edges = [[i] for l in forward_edges for i in l]
+                        back_edges = [[i] for l in back_edges for i in l]
                         
-                        for group in grouping.keys():
-                            (std, region, axis, terrain, _, _) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            forward_edges = [[i] for l in forward_edges for i in l]
-                            back_edges = [[i] for l in back_edges for i in l]
-                            
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(std, region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(std, region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
             else:
                 #tuple goes to (_,B,C,D,_,_)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, _, _) = group
-                            new_grouping[(region, axis, terrain)] = ([], [])
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, _, _) = group
+                        new_grouping[(region, axis, terrain)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, _, _) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        forward_edges = [[i] for l in forward_edges for i in l]
+                        back_edges = [[i] for l in back_edges for i in l]
                         
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, _, _) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            forward_edges = [[i] for l in forward_edges for i in l]
-                            back_edges = [[i] for l in back_edges for i in l]
-                            
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(region, axis, terrain)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
     elif world.owShuffle[player] == 'parallel':
         #predefined shuffle groups get reorganized here
         if world.owKeepSimilar[player]:
             if world.mode[player] == 'standard':
                 #tuple stays (A,B,C,D,E,F)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        return list(grouping.values())
+                for grouping in (groups,):
+                    return list(grouping.values())
             else:
                 #tuple goes to (_,B,C,D,E,F)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, parallel, count) = group
-                            new_grouping[(region, axis, terrain, parallel, count)] = ([], [])
-                        
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, parallel, count) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel, count)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(region, axis, terrain, parallel, count)] = (exist_forward_edges, exist_back_edges)
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, parallel, count) = group
+                        new_grouping[(region, axis, terrain, parallel, count)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, parallel, count) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel, count)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(region, axis, terrain, parallel, count)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
         else:
             if world.mode[player] == 'standard':
                 #tuple stays (A,B,C,D,E,_)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (std, region, axis, terrain, parallel, _) = group
-                            new_grouping[(std, region, axis, terrain, parallel)] = ([], [])
+                    for group in grouping.keys():
+                        (std, region, axis, terrain, parallel, _) = group
+                        new_grouping[(std, region, axis, terrain, parallel)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (std, region, axis, terrain, parallel, _) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        forward_edges = [[i] for l in forward_edges for i in l]
+                        back_edges = [[i] for l in back_edges for i in l]
                         
-                        for group in grouping.keys():
-                            (std, region, axis, terrain, parallel, _) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            forward_edges = [[i] for l in forward_edges for i in l]
-                            back_edges = [[i] for l in back_edges for i in l]
-                            
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, parallel)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(std, region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(std, region, axis, terrain, parallel)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(std, region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
             else:
                 #tuple goes to (_,B,C,D,E,_)
-                for grouping in (groups, None):
-                    if grouping is not None: #TODO: Figure out why ^ has to be a tuple for this to work
-                        new_grouping = {}
+                for grouping in (groups,):
+                    new_grouping = {}
 
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, parallel, _) = group
-                            new_grouping[(region, axis, terrain, parallel)] = ([], [])
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, parallel, _) = group
+                        new_grouping[(region, axis, terrain, parallel)] = ([], [])
+                    
+                    for group in grouping.keys():
+                        (_, region, axis, terrain, parallel, _) = group
+                        (forward_edges, back_edges) = grouping[group]
+                        forward_edges = [[i] for l in forward_edges for i in l]
+                        back_edges = [[i] for l in back_edges for i in l]
                         
-                        for group in grouping.keys():
-                            (_, region, axis, terrain, parallel, _) = group
-                            (forward_edges, back_edges) = grouping[group]
-                            forward_edges = [[i] for l in forward_edges for i in l]
-                            back_edges = [[i] for l in back_edges for i in l]
-                            
-                            (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel)]
-                            exist_forward_edges.extend(forward_edges)
-                            exist_back_edges.extend(back_edges)
-                            new_grouping[(region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
+                        (exist_forward_edges, exist_back_edges) = new_grouping[(region, axis, terrain, parallel)]
+                        exist_forward_edges.extend(forward_edges)
+                        exist_back_edges.extend(back_edges)
+                        new_grouping[(region, axis, terrain, parallel)] = (exist_forward_edges, exist_back_edges)
 
-                        return list(new_grouping.values())
+                    return list(new_grouping.values())
     else:
         raise NotImplementedError('Shuffling not supported yet')
 
@@ -535,259 +666,364 @@ mandatory_connections = [('Flute Away', 'Flute Sky'),
                          ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water') #fake flipper
                          ]
 
-open_connections = [('Flute Spot 1', 'West Death Mountain (Bottom)'),
-                    ('Flute Spot 2', 'Potion Shop Area'),
-                    ('Flute Spot 3', 'Kakariko Area'),
-                    ('Flute Spot 4', 'Links House Area'),
-                    ('Flute Spot 5', 'Eastern Nook Area'),
-                    ('Flute Spot 6', 'Desert Palace Teleporter Ledge'),
-                    ('Flute Spot 7', 'Dam Area'),
-                    ('Flute Spot 8', 'Octoballoon Area'),
-
-                    # Mirror Connections
-                    ('Lost Woods East Mirror Spot', 'Lost Woods East Area'),
-                    ('Lost Woods Entry Mirror Spot', 'Lost Woods West Area'),
-                    ('Lost Woods Pedestal Mirror Spot', 'Lost Woods West Area'),
-                    ('Lost Woods Southwest Mirror Spot', 'Lost Woods West Area'),
-                    ('Lost Woods East (Forgotten) Mirror Spot', 'Lost Woods East Area'),
-                    ('Lost Woods West (Forgotten) Mirror Spot', 'Lost Woods West Area'),
-                    ('Lumberjack Mirror Spot', 'Lumberjack Area'),
-                    ('Spectacle Rock Mirror Spot', 'Spectacle Rock Ledge'),
-                    ('West Death Mountain (Top) Mirror Spot', 'West Death Mountain (Top)'),
-                    ('East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top West)'),
-                    ('East Death Mountain (Top East) Mirror Spot', 'East Death Mountain (Top East)'),
-                    ('Spiral Cave Mirror Spot', 'Spiral Cave Ledge'),
-                    ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
-                    ('Isolated Ledge Mirror Spot', 'Fairy Ascension Ledge'),
-                    ('Fairy Ascension Mirror Spot', 'Fairy Ascension Plateau'),
-                    ('Death Mountain Bridge Mirror Spot', 'East Death Mountain (Bottom Left)'),
-                    ('Floating Island Mirror Spot', 'Death Mountain Floating Island'),
-                    ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs'),
-                    ('Mountain Entry Mirror Spot', 'Mountain Entry Area'),
-                    ('Mountain Entry Entrance Mirror Spot', 'Mountain Entry Entrance'),
-                    ('Mountain Entry Ledge Mirror Spot', 'Mountain Entry Ledge'),
-                    ('Zora Waterfall Mirror Spot', 'Zora Waterfall Area'),
-                    ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
-                    ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
-                    ('Lost Woods Pass East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
-                    ('Kakariko Fortune Mirror Spot', 'Kakariko Fortune Area'),
-                    ('Kakariko Pond Mirror Spot', 'Kakariko Pond Area'),
-                    ('Forgotton Forest Mirror Spot', 'Forgotten Forest Area'),
-                    ('Forgotton Forest Fence Mirror Spot', 'Forgotten Forest Area'),
-                    ('Bonk Rock Ledge Mirror Spot', 'Bonk Rock Ledge'),
-                    ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
-                    ('Kings Grave Mirror Spot', 'Kings Grave Area'),
-                    ('River Bend Mirror Spot', 'River Bend Area'),
-                    ('River Bend East Mirror Spot', 'River Bend East Bank'),
-                    ('Potion Shop Mirror Spot', 'Potion Shop Area'),
-                    ('Potion Shop Northeast Mirror Spot', 'Potion Shop Northeast'),
-                    ('Zora Approach Mirror Spot', 'Zora Approach Area'),
-                    ('Zora Approach Ledge Mirror Spot', 'Zora Approach Ledge'),
-                    ('Kakariko Mirror Spot', 'Kakariko Area'),
-                    ('Kakariko Grass Mirror Spot', 'Kakariko Area'),
-                    ('HC Ledge Mirror Spot', 'Hyrule Castle Ledge'),
-                    ('HC Courtyard Mirror Spot', 'Hyrule Castle Courtyard'),
-                    ('HC Area Mirror Spot', 'Hyrule Castle Area'),
-                    ('HC Area South Mirror Spot', 'Hyrule Castle Area'),
-                    ('HC East Entry Mirror Spot', 'Hyrule Castle East Entry'),
-                    ('Wooden Bridge Mirror Spot', 'Wooden Bridge Area'),
-                    ('Wooden Bridge Northeast Mirror Spot', 'Wooden Bridge Area'),
-                    ('Wooden Bridge West Mirror Spot', 'Wooden Bridge Area'),
-                    ('Eastern Palace Mirror Spot', 'Eastern Palace Area'),
-                    ('Blacksmith Mirror Spot', 'Blacksmith Area'),
-                    ('Blacksmith Entry Mirror Spot', 'Blacksmith Area'),
-                    ('Bat Cave Ledge Mirror Spot', 'Bat Cave Ledge'),
-                    ('Sand Dunes Mirror Spot', 'Sand Dunes Area'),
-                    ('Maze Race Mirror Spot', 'Maze Race Ledge'),
-                    ('Maze Race Ledge Mirror Spot', 'Maze Race Ledge'),
-                    ('Kakariko Suburb Mirror Spot', 'Kakariko Suburb Area'),
-                    ('Kakariko Suburb South Mirror Spot', 'Kakariko Suburb Area'),
-                    ('Flute Boy Mirror Spot', 'Flute Boy Area'),
-                    ('Flute Boy Pass Mirror Spot', 'Flute Boy Pass'),
-                    ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area'),
-                    ('Links House Mirror Spot', 'Links House Area'),
-                    ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
-                    ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
-                    ('Hobo Mirror Spot', 'Stone Bridge Water'),
-                    ('Tree Line Mirror Spot', 'Tree Line Area'),
-                    ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
-                    ('Desert Mirror Spot', 'Desert Area'),
-                    ('Desert Ledge Mirror Spot', 'Desert Ledge'),
-                    ('Checkerboard Mirror Spot', 'Desert Checkerboard Ledge'),
-                    ('DP Stairs Mirror Spot', 'Desert Palace Stairs'),
-                    ('DP Entrance (North) Mirror Spot', 'Desert Palace Entrance (North) Spot'),
-                    ('Bombos Tablet Ledge Mirror Spot', 'Bombos Tablet Ledge'),
-                    ('Flute Boy Entry Mirror Spot', 'Flute Boy Bush Entry'),
-                    ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
-                    ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
-                    ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
-                    ('Desert Pass Ledge Mirror Spot', 'Desert Pass Ledge'),
-                    ('Desert Pass Mirror Spot', 'Desert Pass Area'),
-                    ('Dam Mirror Spot', 'Dam Area'),
-                    ('Statues Mirror Spot', 'Statues Area'),
-                    ('South Pass Mirror Spot', 'South Pass Area'),
-                    ('Lake Hylia Mirror Spot', 'Lake Hylia Area'),
-                    ('Lake Hylia Northeast Mirror Spot', 'Lake Hylia Northeast Bank'),
-                    ('South Shore Mirror Spot', 'Lake Hylia South Shore'),
-                    ('South Shore East Mirror Spot', 'Lake Hylia South Shore'),
-                    ('Lake Hylia Island Mirror Spot', 'Lake Hylia Island'),
-                    ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
-                    ('Lake Hylia Water Mirror Spot', 'Lake Hylia Water'),
-                    ('Octoballoon Mirror Spot', 'Octoballoon Area'),
-                    ('Ice Cave Mirror Spot', 'Ice Cave Area'),
+flute_connections = {0x03: ('Flute Spot 1', ['West Death Mountain (Bottom)', 'West Dark Death Mountain (Bottom)']),
+                    0x16: ('Flute Spot 2', ['Potion Shop Area', 'Dark Witch Area']),
+                    0x18: ('Flute Spot 3', ['Kakariko Area', 'Village of Outcasts Area']),
+                    0x2c: ('Flute Spot 4', ['Links House Area', 'Big Bomb Shop Area']),
+                    0x2f: ('Flute Spot 5', ['Eastern Nook Area', 'Palace of Darkness Nook Area']),
+                    0x30: ('Flute Spot 6', ['Desert Palace Teleporter Ledge', 'Misery Mire Teleporter Ledge']),
+                    0x33: ('Flute Spot 7', ['Dam Area', 'Swamp Area']),
+                    0x3f: ('Flute Spot 8', ['Octoballoon Area', 'Bomber Corner Area'])
+                    }
                          
-                    # Portal Connections
-                    ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),
-                    ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area'),
-                    ('Top of Pyramid', 'Pyramid Area'),
-                    ('Top of Pyramid (Inner)', 'Pyramid Area'),
-                    ('East Hyrule Teleporter', 'Palace of Darkness Nook Area'),
-                    ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
-                    ('Desert Teleporter', 'Misery Mire Teleporter Ledge'),
-                    ('Lake Hylia Teleporter', 'Ice Palace Area'),
-                    ('West Death Mountain Teleporter', 'West Dark Death Mountain (Bottom)'),
-                    ('East Death Mountain Teleporter', 'East Dark Death Mountain (Bottom)'),
-                    ('TR Pegs Teleporter', 'Turtle Rock Ledge')
-                    ]
-
-inverted_connections = [('Flute Spot 1', 'West Dark Death Mountain (Bottom)'),
-                         ('Flute Spot 2', 'Dark Witch Area'),
-                         ('Flute Spot 3', 'Village of Outcasts Area'),
-                         ('Flute Spot 4', 'Big Bomb Shop Area'),
-                         ('Flute Spot 5', 'Palace of Darkness Nook Area'),
-                         ('Flute Spot 6', 'Misery Mire Teleporter Ledge'),
-                         ('Flute Spot 7', 'Swamp Area'),
-                         ('Flute Spot 8', 'Bomber Corner Area'),
-                         
-                         ('Spectacle Rock Leave', 'West Death Mountain (Top)'),
-                         ('Spectacle Rock Approach', 'Spectacle Rock Ledge'),
-                         ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'),
-                         ('Floating Island Bridge (East)', 'Death Mountain Floating Island'),
-                         ('East Death Mountain Mimic Ledge Drop', 'Mimic Cave Ledge'),
-                         ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'),
-                         ('Graveyard Ladder (Top)', 'Graveyard Area'),
-                         ('Graveyard Ladder (Bottom)', 'Graveyard Ledge'),
-                         ('Checkerboard Ledge Approach', 'Desert Checkerboard Ledge'),
-                         ('Checkerboard Ledge Leave', 'Desert Area'),
-                         ('Cave 45 Inverted Leave', 'Flute Boy Approach Area'),
-                         ('Cave 45 Inverted Approach', 'Cave 45 Ledge'),
-                         ('Lake Hylia Island Pier', 'Lake Hylia Island'),
-                         ('Desert Pass Ladder (North)', 'Desert Pass Area'),
-                         ('Desert Pass Ladder (South)', 'Desert Pass Ledge'),
-                         ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'),
-                         ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'),
-                         ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs'), #OWG only, needs glove
-                         ('Turtle Rock Tail Ledge Drop', 'Turtle Rock Ledge'),
-                         ('Ice Palace Approach', 'Ice Palace Area'),
-                         ('Ice Palace Leave', 'Ice Lake Moat'),
-                         
-                         # Mirror Connections
-                         ('Skull Woods Back Mirror Spot', 'Skull Woods Forest (West)'),
-                         ('Skull Woods Forgotten (West) Mirror Spot', 'Skull Woods Forgotten Path (Southwest)'),
-                         ('Skull Woods Forgotten (East) Mirror Spot', 'Skull Woods Forgotten Path (Northeast)'),
-                         ('Skull Woods Portal Entry Mirror Spot', 'Skull Woods Portal Entry'),
-                         ('Skull Woods Forgotten (Middle) Mirror Spot', 'Skull Woods Forgotten Path (Northeast)'),
-                         ('Skull Woods Front Mirror Spot', 'Skull Woods Forest'),
-                         ('Dark Lumberjack Mirror Spot', 'Dark Lumberjack Area'),
-                         ('West Dark Death Mountain (Top) Mirror Spot', 'West Dark Death Mountain (Top)'),
-                         ('Bubble Boy Mirror Spot', 'West Dark Death Mountain (Bottom)'),
-                         ('West Dark Death Mountain (Bottom) Mirror Spot', 'West Dark Death Mountain (Bottom)'),
-                         ('East Dark Death Mountain (Top West) Mirror Spot', 'East Dark Death Mountain (Top)'),
-                         ('East Dark Death Mountain (Top East) Mirror Spot', 'East Dark Death Mountain (Top)'),
-                         ('TR Ledge (West) Mirror Spot', 'Dark Death Mountain Ledge'),
-                         ('TR Ledge (East) Mirror Spot', 'Dark Death Mountain Ledge'),
-                         ('TR Isolated Mirror Spot', 'Dark Death Mountain Isolated Ledge'),
-                         ('East Dark Death Mountain (Bottom Plateau) Mirror Spot', 'East Dark Death Mountain (Bottom)'),
-                         ('East Dark Death Mountain (Bottom Left) Mirror Spot', 'East Dark Death Mountain (Bottom Left)'),
-                         ('East Dark Death Mountain (Bottom) Mirror Spot', 'East Dark Death Mountain (Bottom)'),
-                         ('Dark Floating Island Mirror Spot', 'Dark Death Mountain Floating Island'),
-                         ('Turtle Rock Mirror Spot', 'Turtle Rock Area'),
-                         ('Turtle Rock Ledge Mirror Spot', 'Turtle Rock Ledge'),
-                         ('Bumper Cave Area Mirror Spot', 'Bumper Cave Area'),
-                         ('Bumper Cave Entry Mirror Spot', 'Bumper Cave Entrance'),
-                         ('Bumper Cave Ledge Mirror Spot', 'Bumper Cave Ledge'),
-                         ('Catfish Mirror Spot', 'Catfish Area'),
-                         ('Skull Woods Pass West Mirror Spot', 'Skull Woods Pass West Area'),
-                         ('Skull Woods Pass East Top Mirror Spot', 'Skull Woods Pass East Top Area'),
-                         ('Skull Woods Pass East Bottom Mirror Spot', 'Skull Woods Pass East Bottom Area'),
-                         ('Outcast Fortune Mirror Spot', 'Dark Fortune Area'),
-                         ('Outcast Pond Mirror Spot', 'Outcast Pond Area'),
-                         ('Dark Chapel Mirror Spot', 'Dark Chapel Area'),
-                         ('Dark Chapel Ledge Mirror Spot', 'Dark Chapel Area'),
-                         ('Dark Graveyard Mirror Spot', 'Dark Graveyard Area'),
-                         ('Dark Graveyard Ledge Mirror Spot', 'Dark Graveyard Area'),
-                         ('Dark Graveyard Grave Mirror Spot', 'Dark Graveyard Area'),
-                         ('Qirn Jump Mirror Spot', 'Qirn Jump Area'),
-                         ('Qirn Jump East Mirror Spot', 'Qirn Jump East Bank'),
-                         ('Dark Witch Mirror Spot', 'Dark Witch Area'),
-                         ('Dark Witch Northeast Mirror Spot', 'Dark Witch Northeast'),
-                         ('Catfish Approach Mirror Spot', 'Catfish Approach Area'),
-                         ('Catfish Approach Ledge Mirror Spot', 'Catfish Approach Ledge'),
-                         ('Village of Outcasts Mirror Spot', 'Village of Outcasts Area'),
-                         ('Village of Outcasts Southwest Mirror Spot', 'Village of Outcasts Area'),
-                         ('Hammer House Mirror Spot', 'Dark Grassy Lawn'),
-                         ('Shield Shop Mirror Spot', 'Shield Shop Area'),
-                         ('Pyramid Mirror Spot', 'Pyramid Area'),
-                         ('Pyramid Pass Mirror Spot', 'Pyramid Pass'),
-                         ('Pyramid Courtyard Mirror Spot', 'Pyramid Area'),
-                         ('Pyramid Uncle Mirror Spot', 'Pyramid Area'),
-                         ('Pyramid From Ledge Mirror Spot', 'Pyramid Area'),
-                         ('Pyramid Entry Mirror Spot', 'Pyramid Area'),
-                         ('Broken Bridge West Mirror Spot', 'Broken Bridge West'),
-                         ('Broken Bridge East Mirror Spot', 'Broken Bridge Area'),
-                         ('Broken Bridge Northeast Mirror Spot', 'Broken Bridge Northeast'),
-                         ('Palace of Darkness Mirror Spot', 'Palace of Darkness Area'),
-                         ('Hammer Pegs Mirror Spot', 'Hammer Peg Area'),
-                         ('Hammer Pegs Entry Mirror Spot', 'Hammer Peg Entry'),
-                         ('Dark Dunes Mirror Spot', 'Dark Dunes Area'),
-                         ('Dig Game Mirror Spot', 'Dig Game Area'),
-                         ('Dig Game Ledge Mirror Spot', 'Dig Game Ledge'),
-                         ('Frog Mirror Spot', 'Frog Area'),
-                         ('Frog Prison Mirror Spot', 'Frog Prison'),
-                         ('Archery Game Mirror Spot', 'Archery Game Area'),
-                         ('Stumpy Mirror Spot', 'Stumpy Area'),
-                         ('Stumpy Pass Mirror Spot', 'Stumpy Pass'),
-                         ('Dark Bonk Rocks Mirror Spot', 'Dark Bonk Rocks Area'),
-                         ('Big Bomb Shop Mirror Spot', 'Big Bomb Shop Area'),
-                         ('Hammer Bridge North Mirror Spot', 'Hammer Bridge North Area'),
-                         ('Hammer Bridge South Mirror Spot', 'Hammer Bridge South Area'),
-                         ('Dark Hobo Mirror Spot', 'Hammer Bridge Water'),
-                         ('Dark Tree Line Mirror Spot', 'Dark Tree Line Area'),
-                         ('Darkness Nook Mirror Spot', 'Palace of Darkness Nook Area'),
-                         ('Misery Mire Mirror Spot', 'Misery Mire Area'),
-                         ('Misery Mire Ledge Mirror Spot', 'Misery Mire Area'),
-                         ('Misery Mire Blocked Mirror Spot', 'Misery Mire Area'),
-                         ('Misery Mire Main Mirror Spot', 'Misery Mire Area'),
-                         ('Stumpy Approach Mirror Spot', 'Stumpy Approach Area'),
-                         ('Stumpy Bush Entry Mirror Spot', 'Stumpy Approach Bush Entry'),
-                         ('Dark C Whirlpool Mirror Spot', 'Dark C Whirlpool Area'),
-                         ('Dark C Whirlpool Outer Mirror Spot', 'Dark C Whirlpool Outer Area'),
-                         ('Hype Cave Mirror Spot', 'Hype Cave Area'),
-                         ('Ice Lake Mirror Spot', 'Ice Lake Area'),
-                         ('Ice Lake Southwest Mirror Spot', 'Ice Lake Ledge (West)'),
-                         ('Ice Lake Southeast Mirror Spot', 'Ice Lake Ledge (East)'),
-                         ('Ice Lake Northeast Mirror Spot', 'Ice Lake Northeast Bank'),
-                         ('Ice Palace Mirror Spot', 'Ice Palace Area'),
-                         ('Shopping Mall Mirror Spot', 'Shopping Mall Area'),
-                         ('Swmap Nook Mirror Spot', 'Swamp Nook Area'),
-                         ('Swamp Nook Southeast Mirror Spot', 'Swamp Nook Area'),
-                         ('Swamp Nook Pegs Mirror Spot', 'Swamp Nook Area'),
-                         ('Swamp Mirror Spot', 'Swamp Area'),
-                         ('Dark South Pass Mirror Spot', 'Dark South Pass Area'),
-                         ('Bomber Corner Mirror Spot', 'Bomber Corner Area'),
-                         
-                         # Portal Connections
-                         ('Post Aga Inverted Teleporter', 'Hyrule Castle Area'),
-                         ('Ice Palace Teleporter', 'Lake Hylia Central Island'),
-                         ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge'),
-                         ('East Dark World Teleporter', 'Eastern Nook Area'),
-                         ('South Dark World Teleporter', 'C Whirlpool Area'),
-                         ('West Dark World Teleporter (Hammer)', 'Lost Woods Pass East Top Area'),
-                         ('West Dark World Teleporter (Rock)', 'Lost Woods Pass East Bottom Area'),
-                         ('Dark Death Mountain Teleporter (West)', 'West Death Mountain (Bottom)'),
-                         ('Dark Death Mountain Teleporter (East)', 'East Death Mountain (Bottom)'),
-                         ('Turtle Rock Teleporter', 'Death Mountain TR Pegs Ledge')
-                         ]
+ow_connections = {
+    0x00: ([
+            ('Lost Woods East Mirror Spot', 'Lost Woods East Area'),
+            ('Lost Woods Entry Mirror Spot', 'Lost Woods West Area'),
+            ('Lost Woods Pedestal Mirror Spot', 'Lost Woods West Area'),
+            ('Lost Woods Southwest Mirror Spot', 'Lost Woods West Area'),
+            ('Lost Woods East (Forgotten) Mirror Spot', 'Lost Woods East Area'),
+            ('Lost Woods West (Forgotten) Mirror Spot', 'Lost Woods West Area')
+        ], [
+            ('Skull Woods Back Mirror Spot', 'Skull Woods Forest (West)'),
+            ('Skull Woods Forgotten (West) Mirror Spot', 'Skull Woods Forgotten Path (Southwest)'),
+            ('Skull Woods Forgotten (East) Mirror Spot', 'Skull Woods Forgotten Path (Northeast)'),
+            ('Skull Woods Portal Entry Mirror Spot', 'Skull Woods Portal Entry'),
+            ('Skull Woods Forgotten (Middle) Mirror Spot', 'Skull Woods Forgotten Path (Northeast)'),
+            ('Skull Woods Front Mirror Spot', 'Skull Woods Forest')
+        ]),
+    0x02: ([
+            ('Lumberjack Mirror Spot', 'Lumberjack Area')
+        ], [
+            ('Dark Lumberjack Mirror Spot', 'Dark Lumberjack Area')
+        ]),
+    0x03: ([
+            ('Spectacle Rock Mirror Spot', 'Spectacle Rock Ledge'),
+            ('West Death Mountain (Top) Mirror Spot', 'West Death Mountain (Top)'),
+            ('West Death Mountain Teleporter', 'West Dark Death Mountain (Bottom)')
+        ], [
+            ('Spectacle Rock Leave', 'West Death Mountain (Top)'),
+            ('Spectacle Rock Approach', 'Spectacle Rock Ledge'),
+            ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'),
+            ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'),
+            ('West Dark Death Mountain (Top) Mirror Spot', 'West Dark Death Mountain (Top)'),
+            ('Bubble Boy Mirror Spot', 'West Dark Death Mountain (Bottom)'),
+            ('West Dark Death Mountain (Bottom) Mirror Spot', 'West Dark Death Mountain (Bottom)'),
+            ('Dark Death Mountain Teleporter (West)', 'West Death Mountain (Bottom)')
+        ]),
+    0x05: ([
+            ('East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top West)'),
+            ('East Death Mountain (Top East) Mirror Spot', 'East Death Mountain (Top East)'),
+            ('Spiral Cave Mirror Spot', 'Spiral Cave Ledge'),
+            ('Mimic Cave Mirror Spot', 'Mimic Cave Ledge'),
+            ('Isolated Ledge Mirror Spot', 'Fairy Ascension Ledge'),
+            ('Fairy Ascension Mirror Spot', 'Fairy Ascension Plateau'),
+            ('Death Mountain Bridge Mirror Spot', 'East Death Mountain (Bottom Left)'),
+            ('Floating Island Mirror Spot', 'Death Mountain Floating Island'),
+            ('East Death Mountain Teleporter', 'East Dark Death Mountain (Bottom)')
+        ], [
+            ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'),
+            ('Floating Island Bridge (East)', 'Death Mountain Floating Island'),
+            ('East Death Mountain Mimic Ledge Drop', 'Mimic Cave Ledge'),
+            ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'),
+            ('East Dark Death Mountain (Top West) Mirror Spot', 'East Dark Death Mountain (Top)'),
+            ('East Dark Death Mountain (Top East) Mirror Spot', 'East Dark Death Mountain (Top)'),
+            ('TR Ledge (West) Mirror Spot', 'Dark Death Mountain Ledge'),
+            ('TR Ledge (East) Mirror Spot', 'Dark Death Mountain Ledge'),
+            ('TR Isolated Mirror Spot', 'Dark Death Mountain Isolated Ledge'),
+            ('East Dark Death Mountain (Bottom Plateau) Mirror Spot', 'East Dark Death Mountain (Bottom)'),
+            ('East Dark Death Mountain (Bottom Left) Mirror Spot', 'East Dark Death Mountain (Bottom Left)'),
+            ('East Dark Death Mountain (Bottom) Mirror Spot', 'East Dark Death Mountain (Bottom)'),
+            ('Dark Floating Island Mirror Spot', 'Dark Death Mountain Floating Island'),
+            ('Dark Death Mountain Teleporter (East)', 'East Death Mountain (Bottom)')
+        ]),
+    0x07: ([
+            ('TR Pegs Area Mirror Spot', 'Death Mountain TR Pegs'),
+            ('TR Pegs Teleporter', 'Turtle Rock Ledge')
+        ], [
+            ('Turtle Rock Tail Ledge Drop', 'Turtle Rock Ledge'),
+            ('Turtle Rock Mirror Spot', 'Turtle Rock Area'),
+            ('Turtle Rock Ledge Mirror Spot', 'Turtle Rock Ledge'),
+            ('Turtle Rock Teleporter', 'Death Mountain TR Pegs Ledge')
+        ]),
+    0x0a: ([
+            ('Mountain Entry Mirror Spot', 'Mountain Entry Area'),
+            ('Mountain Entry Entrance Mirror Spot', 'Mountain Entry Entrance'),
+            ('Mountain Entry Ledge Mirror Spot', 'Mountain Entry Ledge')
+        ], [
+            ('Bumper Cave Area Mirror Spot', 'Bumper Cave Area'),
+            ('Bumper Cave Entry Mirror Spot', 'Bumper Cave Entrance'),
+            ('Bumper Cave Ledge Mirror Spot', 'Bumper Cave Ledge')
+        ]),
+    0x0f: ([
+            ('Zora Waterfall Mirror Spot', 'Zora Waterfall Area')
+        ], [
+            ('Catfish Mirror Spot', 'Catfish Area')
+        ]),
+    0x10: ([
+            ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
+            ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
+            ('Lost Woods Pass East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
+            ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),
+            ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area')
+        ], [
+            ('Skull Woods Pass West Mirror Spot', 'Skull Woods Pass West Area'),
+            ('Skull Woods Pass East Top Mirror Spot', 'Skull Woods Pass East Top Area'),
+            ('Skull Woods Pass East Bottom Mirror Spot', 'Skull Woods Pass East Bottom Area'),
+            ('West Dark World Teleporter (Hammer)', 'Lost Woods Pass East Top Area'),
+            ('West Dark World Teleporter (Rock)', 'Lost Woods Pass East Bottom Area')
+        ]),
+    0x11: ([
+            ('Kakariko Fortune Mirror Spot', 'Kakariko Fortune Area')
+        ], [
+            ('Outcast Fortune Mirror Spot', 'Dark Fortune Area')
+        ]),
+    0x12: ([
+            ('Kakariko Pond Mirror Spot', 'Kakariko Pond Area')
+        ], [
+            ('Outcast Pond Mirror Spot', 'Outcast Pond Area')
+        ]),
+    0x13: ([
+            ('Sanctuary Mirror Spot', 'Sanctuary Area'),
+            ('Bonk Rock Ledge Mirror Spot', 'Bonk Rock Ledge')
+        ], [
+            ('Dark Chapel Mirror Spot', 'Dark Chapel Area'),
+            ('Dark Chapel Ledge Mirror Spot', 'Dark Chapel Area')
+        ]),
+    0x14: ([
+            ('Graveyard Ledge Mirror Spot', 'Graveyard Ledge'),
+            ('Kings Grave Mirror Spot', 'Kings Grave Area')
+        ], [
+            ('Graveyard Ladder (Top)', 'Graveyard Area'),
+            ('Graveyard Ladder (Bottom)', 'Graveyard Ledge'),
+            ('Dark Graveyard Mirror Spot', 'Dark Graveyard Area'),
+            ('Dark Graveyard Ledge Mirror Spot', 'Dark Graveyard Area'),
+            ('Dark Graveyard Grave Mirror Spot', 'Dark Graveyard Area')
+        ]),
+    0x15: ([
+            ('River Bend Mirror Spot', 'River Bend Area'),
+            ('River Bend East Mirror Spot', 'River Bend East Bank')
+        ], [
+            ('Qirn Jump Mirror Spot', 'Qirn Jump Area'),
+            ('Qirn Jump East Mirror Spot', 'Qirn Jump East Bank')
+        ]),
+    0x16: ([
+            ('Potion Shop Mirror Spot', 'Potion Shop Area'),
+            ('Potion Shop Northeast Mirror Spot', 'Potion Shop Northeast')
+        ], [
+            ('Dark Witch Mirror Spot', 'Dark Witch Area'),
+            ('Dark Witch Northeast Mirror Spot', 'Dark Witch Northeast')
+        ]),
+    0x17: ([
+            ('Zora Approach Mirror Spot', 'Zora Approach Area'),
+            ('Zora Approach Ledge Mirror Spot', 'Zora Approach Ledge')
+        ], [
+            ('Catfish Approach Mirror Spot', 'Catfish Approach Area'),
+            ('Catfish Approach Ledge Mirror Spot', 'Catfish Approach Ledge')
+        ]),
+    0x18: ([
+            ('Kakariko Mirror Spot', 'Kakariko Area'),
+            ('Kakariko Grass Mirror Spot', 'Kakariko Area')
+        ], [
+            ('Village of Outcasts Mirror Spot', 'Village of Outcasts Area'),
+            ('Village of Outcasts Southwest Mirror Spot', 'Village of Outcasts Area'),
+            ('Hammer House Mirror Spot', 'Dark Grassy Lawn')
+        ]),
+    0x1a: ([
+            ('Forgotton Forest Mirror Spot', 'Forgotten Forest Area'),
+            ('Forgotton Forest Fence Mirror Spot', 'Forgotten Forest Area')
+        ], [
+            ('Shield Shop Mirror Spot', 'Shield Shop Area')
+        ]),
+    0x1b: ([
+            ('HC Ledge Mirror Spot', 'Hyrule Castle Ledge'),
+            ('HC Courtyard Mirror Spot', 'Hyrule Castle Courtyard'),
+            ('HC Area Mirror Spot', 'Hyrule Castle Area'),
+            ('HC Area South Mirror Spot', 'Hyrule Castle Area'),
+            ('HC East Entry Mirror Spot', 'Hyrule Castle East Entry'),
+            ('Top of Pyramid', 'Pyramid Area'),
+            ('Top of Pyramid (Inner)', 'Pyramid Area')
+        ], [
+            ('Pyramid Mirror Spot', 'Pyramid Area'),
+            ('Pyramid Pass Mirror Spot', 'Pyramid Pass'),
+            ('Pyramid Courtyard Mirror Spot', 'Pyramid Area'),
+            ('Pyramid Uncle Mirror Spot', 'Pyramid Area'),
+            ('Pyramid From Ledge Mirror Spot', 'Pyramid Area'),
+            ('Pyramid Entry Mirror Spot', 'Pyramid Area'),
+            ('Post Aga Inverted Teleporter', 'Hyrule Castle Area')
+        ]),
+    0x1d: ([
+            ('Wooden Bridge Mirror Spot', 'Wooden Bridge Area'),
+            ('Wooden Bridge Northeast Mirror Spot', 'Wooden Bridge Area'),
+            ('Wooden Bridge West Mirror Spot', 'Wooden Bridge Area')
+        ], [
+            ('Broken Bridge West Mirror Spot', 'Broken Bridge West'),
+            ('Broken Bridge East Mirror Spot', 'Broken Bridge Area'),
+            ('Broken Bridge Northeast Mirror Spot', 'Broken Bridge Northeast')
+        ]),
+    0x1e: ([
+            ('Eastern Palace Mirror Spot', 'Eastern Palace Area')
+        ], [
+            ('Palace of Darkness Mirror Spot', 'Palace of Darkness Area')
+        ]),
+    0x22: ([
+            ('Blacksmith Mirror Spot', 'Blacksmith Area'),
+            ('Blacksmith Entry Mirror Spot', 'Blacksmith Area'),
+            ('Bat Cave Ledge Mirror Spot', 'Bat Cave Ledge')
+        ], [
+            ('Hammer Pegs Mirror Spot', 'Hammer Peg Area'),
+            ('Hammer Pegs Entry Mirror Spot', 'Hammer Peg Entry')
+        ]),
+    0x25: ([
+            ('Sand Dunes Mirror Spot', 'Sand Dunes Area')
+        ], [
+            ('Dark Dunes Mirror Spot', 'Dark Dunes Area')
+        ]),
+    0x28: ([
+            ('Maze Race Mirror Spot', 'Maze Race Ledge'),
+            ('Maze Race Ledge Mirror Spot', 'Maze Race Ledge')
+        ], [
+            ('Dig Game Mirror Spot', 'Dig Game Area'),
+            ('Dig Game Ledge Mirror Spot', 'Dig Game Ledge')
+        ]),
+    0x29: ([
+            ('Kakariko Suburb Mirror Spot', 'Kakariko Suburb Area'),
+            ('Kakariko Suburb South Mirror Spot', 'Kakariko Suburb Area')
+        ], [
+            ('Frog Mirror Spot', 'Frog Area'),
+            ('Frog Prison Mirror Spot', 'Frog Prison'),
+            ('Archery Game Mirror Spot', 'Archery Game Area')
+        ]),
+    0x2a: ([
+            ('Flute Boy Mirror Spot', 'Flute Boy Area'),
+            ('Flute Boy Pass Mirror Spot', 'Flute Boy Pass')
+        ], [
+            ('Stumpy Mirror Spot', 'Stumpy Area'),
+            ('Stumpy Pass Mirror Spot', 'Stumpy Pass')
+        ]),
+    0x2b: ([
+            ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area')
+        ], [
+            ('Dark Bonk Rocks Mirror Spot', 'Dark Bonk Rocks Area')
+        ]),
+    0x2c: ([
+            ('Links House Mirror Spot', 'Links House Area')
+        ], [
+            ('Big Bomb Shop Mirror Spot', 'Big Bomb Shop Area')
+        ]),
+    0x2d: ([
+            ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
+            ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
+            ('Hobo Mirror Spot', 'Stone Bridge Water')
+        ], [
+            ('Hammer Bridge North Mirror Spot', 'Hammer Bridge North Area'),
+            ('Hammer Bridge South Mirror Spot', 'Hammer Bridge South Area'),
+            ('Dark Hobo Mirror Spot', 'Hammer Bridge Water')
+        ]),
+    0x2e: ([
+            ('Tree Line Mirror Spot', 'Tree Line Area')
+        ], [
+            ('Dark Tree Line Mirror Spot', 'Dark Tree Line Area')
+        ]),
+    0x2f: ([
+            ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
+            ('East Hyrule Teleporter', 'Palace of Darkness Nook Area')
+        ], [
+            ('Darkness Nook Mirror Spot', 'Palace of Darkness Nook Area'),
+            ('East Dark World Teleporter', 'Eastern Nook Area')
+        ]),
+    0x30: ([
+            ('Desert Mirror Spot', 'Desert Area'),
+            ('Desert Ledge Mirror Spot', 'Desert Ledge'),
+            ('Checkerboard Mirror Spot', 'Desert Checkerboard Ledge'),
+            ('DP Stairs Mirror Spot', 'Desert Palace Stairs'),
+            ('DP Entrance (North) Mirror Spot', 'Desert Palace Entrance (North) Spot'),
+            ('Bombos Tablet Ledge Mirror Spot', 'Bombos Tablet Ledge'),
+            ('Desert Teleporter', 'Misery Mire Teleporter Ledge')
+        ], [
+            ('Checkerboard Ledge Approach', 'Desert Checkerboard Ledge'),
+            ('Checkerboard Ledge Leave', 'Desert Area'),
+            ('Misery Mire Mirror Spot', 'Misery Mire Area'),
+            ('Misery Mire Ledge Mirror Spot', 'Misery Mire Area'),
+            ('Misery Mire Blocked Mirror Spot', 'Misery Mire Area'),
+            ('Misery Mire Main Mirror Spot', 'Misery Mire Area'),
+            ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge')
+        ]),
+    0x32: ([
+            ('Flute Boy Entry Mirror Spot', 'Flute Boy Bush Entry'),
+            ('Cave 45 Mirror Spot', 'Cave 45 Ledge')
+        ], [
+            ('Cave 45 Inverted Leave', 'Flute Boy Approach Area'),
+            ('Cave 45 Inverted Approach', 'Cave 45 Ledge'),
+            ('Stumpy Approach Mirror Spot', 'Stumpy Approach Area'),
+            ('Stumpy Bush Entry Mirror Spot', 'Stumpy Approach Bush Entry')
+        ]),
+    0x33: ([
+            ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
+            ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
+            ('South Hyrule Teleporter', 'Dark C Whirlpool Area')
+        ], [
+            ('Dark C Whirlpool Mirror Spot', 'Dark C Whirlpool Area'),
+            ('Dark C Whirlpool Outer Mirror Spot', 'Dark C Whirlpool Outer Area'),
+            ('South Dark World Teleporter', 'C Whirlpool Area'),
+            ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs') #OWG only, needs glove
+        ]),
+    0x34: ([
+            ('Statues Mirror Spot', 'Statues Area')
+        ], [
+            ('Hype Cave Mirror Spot', 'Hype Cave Area')
+        ]),
+    0x35: ([
+            ('Lake Hylia Mirror Spot', 'Lake Hylia Area'),
+            ('Lake Hylia Northeast Mirror Spot', 'Lake Hylia Northeast Bank'),
+            ('South Shore Mirror Spot', 'Lake Hylia South Shore'),
+            ('South Shore East Mirror Spot', 'Lake Hylia South Shore'),
+            ('Lake Hylia Island Mirror Spot', 'Lake Hylia Island'),
+            ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
+            ('Lake Hylia Water Mirror Spot', 'Lake Hylia Water'),
+            ('Lake Hylia Teleporter', 'Ice Palace Area')
+        ], [
+            ('Lake Hylia Island Pier', 'Lake Hylia Island'),
+            ('Ice Palace Approach', 'Ice Palace Area'),
+            ('Ice Palace Leave', 'Ice Lake Moat'),
+            ('Ice Lake Mirror Spot', 'Ice Lake Area'),
+            ('Ice Lake Southwest Mirror Spot', 'Ice Lake Ledge (West)'),
+            ('Ice Lake Southeast Mirror Spot', 'Ice Lake Ledge (East)'),
+            ('Ice Lake Northeast Mirror Spot', 'Ice Lake Northeast Bank'),
+            ('Ice Palace Mirror Spot', 'Ice Palace Area'),
+            ('Ice Palace Teleporter', 'Lake Hylia Central Island')
+        ]),
+    0x37: ([
+            ('Ice Cave Mirror Spot', 'Ice Cave Area')
+        ], [
+            ('Shopping Mall Mirror Spot', 'Shopping Mall Area')
+        ]),
+    0x3a: ([
+            ('Desert Pass Ledge Mirror Spot', 'Desert Pass Ledge'),
+            ('Desert Pass Mirror Spot', 'Desert Pass Area')
+        ], [
+            ('Desert Pass Ladder (North)', 'Desert Pass Area'),
+            ('Desert Pass Ladder (South)', 'Desert Pass Ledge'),
+            ('Swamp Nook Mirror Spot', 'Swamp Nook Area'),
+            ('Swamp Nook Southeast Mirror Spot', 'Swamp Nook Area'),
+            ('Swamp Nook Pegs Mirror Spot', 'Swamp Nook Area')
+        ]),
+    0x3b: ([
+            ('Dam Mirror Spot', 'Dam Area')
+        ], [
+            ('Swamp Mirror Spot', 'Swamp Area')
+        ]),
+    0x3c: ([
+            ('South Pass Mirror Spot', 'South Pass Area')
+        ], [
+            ('Dark South Pass Mirror Spot', 'Dark South Pass Area')
+        ]),
+    0x3f: ([
+            ('Octoballoon Mirror Spot', 'Octoballoon Area')
+        ], [
+            ('Bomber Corner Mirror Spot', 'Bomber Corner Area')
+        ])
+}
 
 parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
                                 ('Dig Game EC', 'Frog WC'),
