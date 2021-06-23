@@ -189,11 +189,15 @@ def link_overworld(world, player):
                     connected_edges.append(back_edge)
                     if world.owShuffle[player] == 'parallel':
                         if forward_edge in parallel_links.keys() or forward_edge in parallel_links.inverse.keys():
-                            parallel_forward_edge = parallel_links[forward_edge] if forward_edge in parallel_links.keys() else parallel_links.inverse[forward_edge][0]
-                            parallel_back_edge = parallel_links[back_edge] if back_edge in parallel_links.keys() else parallel_links.inverse[back_edge][0]
-                            connect_two_way(world, parallel_forward_edge, parallel_back_edge, player)
-                            connected_edges.append(parallel_forward_edge)
-                            connected_edges.append(parallel_back_edge)
+                            try:
+                                parallel_forward_edge = parallel_links[forward_edge] if forward_edge in parallel_links.keys() else parallel_links.inverse[forward_edge][0]
+                                parallel_back_edge = parallel_links[back_edge] if back_edge in parallel_links.keys() else parallel_links.inverse[back_edge][0]
+                                connect_two_way(world, parallel_forward_edge, parallel_back_edge, player)
+                                connected_edges.append(parallel_forward_edge)
+                                connected_edges.append(parallel_back_edge)
+                            except KeyError:
+                                # TODO: Figure out why non-parallel edges are getting into parallel groups
+                                raise KeyError('No parallel edge for edge %d' % back_edge)
         
         assert len(connected_edges) == len(default_connections) * 2, connected_edges
 
