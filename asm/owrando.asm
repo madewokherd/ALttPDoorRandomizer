@@ -231,18 +231,17 @@ OWNewDestination:
         inc : pha : lda $06 : and #$fe00 : !add 1,s : sta $06 : pla
 
         ; adjust and set other VRAM addresses
-        lda OWMode : and #$00ff : bne .modifyOtherVram
-            lda.w $0006,x : pha : lda $06 : !sub 1,s 
-            jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : pha ; number of tiles
-            lda $418 : dec #2 : bmi +
-                pla : pea $0000 : bra ++ ;pla : asl #7 : pha : bra ++ ; y-axis shifts VRAM by increments of 0x80 (disabled for now)
-            + pla : asl : pha ; x-axis shifts VRAM by increments of 0x02
-            ++ lda $84 : !add 1,s : sta $84 : pla : pla
-        .modifyOtherVram
-        LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
-        LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
+        lda.w $0006,x : pha : lda $06 : !sub 1,s 
+        jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : pha ; number of tiles
+        lda $418 : dec #2 : bmi +
+            pla : pea $0000 : bra ++ ;pla : asl #7 : pha : bra ++ ; y-axis shifts VRAM by increments of 0x80 (disabled for now)
+        + pla : asl : pha ; x-axis shifts VRAM by increments of 0x02
+        ++ lda $84 : !add 1,s : sta $84 : pla : pla
 
     .adjustMainAxis
+    LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88 ; vram
+    LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
+
     pla : pla : sep #$10 : ldy $418
     ldx OWCoordIndex,y : lda $20,x : and #$fe00 : pha
         lda $20,x : and #$01ff : pha ;s1 = relative cur, s3 = ow cur
