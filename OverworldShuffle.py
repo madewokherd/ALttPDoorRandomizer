@@ -1,6 +1,6 @@
 import random, logging, copy
-from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain
-from OWEdges import OWTileGroups, OWEdgeGroups, parallel_links, IsParallel
+from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot
+from OWEdges import OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
 
 __version__ = '0.1.5.2-u'
 
@@ -76,7 +76,7 @@ def link_overworld(world, player):
         getSwappedEdges(world, world.owswaps[player][1], player)
         getSwappedEdges(world, world.owswaps[player][2], player)
 
-        def performSwap(groups, swaps):
+        def performSwap(groups, swaps, nonParallelOnly=False):
             try:
                 for group in groups.keys():
                     (mode, wrld, dir, terrain, parallel, count) = group
@@ -87,14 +87,15 @@ def link_overworld(world, player):
                                 for e in range(0, len(edgepool[s])):
                                     if len(edgepool) > 0 and edgepool[s][e] in swaps:
                                         if parallel == IsParallel.Yes:
-                                            if wrld == WorldType.Light and edgepool[s][e] in parallel_links:
-                                                logging.getLogger('').debug('%s was moved', edgepool[s][e])
-                                                swaps.remove(edgepool[s][e])
-                                                groups[group][p][s][e] = parallel_links[edgepool[s][e]]
-                                            elif wrld == WorldType.Dark and edgepool[s][e] in parallel_links.inverse:
-                                                logging.getLogger('').debug('%s was moved', edgepool[s][e])
-                                                swaps.remove(edgepool[s][e])
-                                                groups[group][p][s][e] = parallel_links.inverse[edgepool[s][e]][0]  
+                                            if not nonParallelOnly:
+                                                if wrld == WorldType.Light and edgepool[s][e] in parallel_links:
+                                                    logging.getLogger('').debug('%s was moved', edgepool[s][e])
+                                                    swaps.remove(edgepool[s][e])
+                                                    groups[group][p][s][e] = parallel_links[edgepool[s][e]]
+                                                elif wrld == WorldType.Dark and edgepool[s][e] in parallel_links.inverse:
+                                                    logging.getLogger('').debug('%s was moved', edgepool[s][e])
+                                                    swaps.remove(edgepool[s][e])
+                                                    groups[group][p][s][e] = parallel_links.inverse[edgepool[s][e]][0]  
                                         else:
                                             for edge in edgepool[s]:
                                                 logging.getLogger('').debug('%s was moved', edge)
@@ -105,6 +106,23 @@ def link_overworld(world, player):
                 #TODO: Figure out a way to handle index changes on the fly when removing items
                 logging.getLogger('').warning('OW Tile Swap encountered minor IndexError... retrying')
         
+        if 0x28 in world.owswaps[player][0]: #handle Frog/Dig Game swap manually due to NP/P relationship with LW
+            trimmed_groups[(OpenStd.Open, WorldType.Dark, PolSlot.EastWest, Terrain.Land, IsParallel.Yes, 1)][0].append(['Maze Race ES'])
+            trimmed_groups[(OpenStd.Open, WorldType.Dark, PolSlot.EastWest, Terrain.Land, IsParallel.Yes, 1)][1].append(['Kakariko Suburb WS'])
+            trimmed_groups[(OpenStd.Open, WorldType.Light, PolSlot.EastWest, Terrain.Land, IsParallel.Yes, 1)][0].remove(['Maze Race ES'])
+            trimmed_groups[(OpenStd.Open, WorldType.Light, PolSlot.EastWest, Terrain.Land, IsParallel.Yes, 1)][1].remove(['Kakariko Suburb WS'])
+            
+            trimmed_groups[(OpenStd.Open, WorldType.Light, PolSlot.EastWest, Terrain.Land, IsParallel.No, 2)][0].append(['Dig Game EC', 'Dig Game ES'])
+            trimmed_groups[(OpenStd.Open, WorldType.Light, PolSlot.EastWest, Terrain.Land, IsParallel.No, 2)][1].append(['Frog WC', 'Frog WS'])
+            trimmed_groups[(OpenStd.Open, WorldType.Dark, PolSlot.EastWest, Terrain.Land, IsParallel.No, 2)] = [[],[]]
+            
+            swapped_edges.remove('Maze Race ES')
+            swapped_edges.remove('Kakariko Suburb WS')
+            swapped_edges.remove('Dig Game EC')
+            swapped_edges.remove('Dig Game ES')
+            swapped_edges.remove('Frog WC')
+            swapped_edges.remove('Frog WS')
+        
         tries = 5
         while tries > 0:
             performSwap(trimmed_groups, swapped_edges)
@@ -113,7 +131,7 @@ def link_overworld(world, player):
                 continue
             tries -= 1
         assert len(swapped_edges) == 0
-
+        
         #move swapped regions to other world
         if world.owSwap[player] == 'mixed':
             for name in world.owswaps[player][1]:
