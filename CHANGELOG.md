@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.5.3
+- Fixed issue with Aga portal mirror bonking in Mixed Shuffle
+- Fixed issue with Frog/Dig Game edges duplicating in edge pool, causing Insanity-like behavior
+
 ### 0.1.5.2
 - Partial revert of horizontal VRAM fix from v0.1.5.0
 
