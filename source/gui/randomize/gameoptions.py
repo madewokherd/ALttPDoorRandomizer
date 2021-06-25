@@ -1,4 +1,4 @@
-from tkinter import ttk, StringVar, Button, Entry, Frame, Label, E, W, LEFT, RIGHT
+from tkinter import ttk, StringVar, Button, Entry, Frame, Label, NE, NW, E, W, LEFT, RIGHT
 from functools import partial
 import source.classes.SpriteSelector as spriteSelector
 import source.gui.widgets as widgets
@@ -20,8 +20,8 @@ def gameoptions_page(top, parent):
     # Game Options frames
     self.frames["leftRomOptionsFrame"] = Frame(self)
     self.frames["rightRomOptionsFrame"] = Frame(self)
-    self.frames["leftRomOptionsFrame"].pack(side=LEFT)
-    self.frames["rightRomOptionsFrame"].pack(side=RIGHT)
+    self.frames["leftRomOptionsFrame"].pack(side=LEFT, anchor=NW)
+    self.frames["rightRomOptionsFrame"].pack(side=RIGHT, anchor=NE)
 
     # Load Game Options widgets as defined by JSON file
     # Defns include frame name, widget type, widget options, widget placement attributes
@@ -34,9 +34,9 @@ def gameoptions_page(top, parent):
             dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
             for key in dictWidgets:
                 self.widgets[key] = dictWidgets[key]
-                packAttrs = {"anchor":E}
+                packAttrs = {"anchor":NE}
                 if self.widgets[key].type == "checkbox":
-                    packAttrs["anchor"] = W
+                    packAttrs["anchor"] = NW
                 self.widgets[key].pack(packAttrs)
 
     ## Sprite selection
