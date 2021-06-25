@@ -1,9 +1,5 @@
 {
-  "widgets": {
-    "keepsimilar": {
-      "type": "checkbox",
-      "default": true
-    },
+  "leftOverworldFrame": {
     "overworldshuffle": {
       "type": "selectbox",
       "default": "vanilla",
@@ -21,6 +17,12 @@
         "mixed",
         "crossed"
       ]
+    }
+  },
+  "rightOverworldFrame": {
+    "keepsimilar": {
+      "type": "checkbox",
+      "default": true
     }
   }
 }
