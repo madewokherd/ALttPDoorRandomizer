@@ -12,6 +12,12 @@ dw 0
 org $02a999
 jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 
+; flute menu cancel
+org $0ab7af ;LDA $F2 : ORA $F0 : AND #$C0
+jml OWFluteCancel2 : nop
+org $0ab90d ;JSL $02E99D
+jsl OWFluteCancel
+
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm 4068 ()
 jsl.l OWWorldCheck
@@ -84,6 +90,7 @@ DivideByTwoPreserveSign:
 {
     asl : php : ror : plp : ror : rtl
 }
+
 OWWorldCheck:
 {
     phx
@@ -95,6 +102,25 @@ OWWorldCheck16:
     phx
         ldx $8a : lda.l OWTileWorldAssoc,x
     plx : and.w #$00ff : rtl
+}
+
+OWFluteCancel:
+{
+    lda.l OWFlags+1 : and #$10 : bne +
+        jsl $02e99d : rtl
+    + lda $7f5006 : cmp #$01 : beq +
+        jsl $02e99d
+    + lda #$00 : sta $7f5006 : rtl
+}
+OWFluteCancel2:
+{
+    lda $f2 : ora $f0 : and #$c0 : bne +
+        jml $0ab7bd
+    + inc $0200
+    lda.l OWFlags+1 : and #$10 : beq +
+    lda $f2 : cmp #$40 : bne +
+        lda #$01 : sta $7f5006
+    + rtl 
 }
 
 org $aa9000
