@@ -1,4 +1,4 @@
-from tkinter import ttk, Frame, Label, E, NW, LEFT, RIGHT, X, TOP
+from tkinter import ttk, Frame, Label, W, E, NW, LEFT, RIGHT, X, TOP
 import source.gui.widgets as widgets
 import json
 import os
@@ -19,10 +19,9 @@ def overworld_page(parent):
     self.frames["widgets"] = Frame(self)
     self.frames["leftOverworldFrame"] = Frame(self.frames["widgets"])
     self.frames["rightOverworldFrame"] = Frame(self.frames["widgets"])
-    self.frames["bottomEnemizerFrame"] = Frame(self)
     self.frames["widgets"].pack(fill=X)
     self.frames["leftOverworldFrame"].pack(side=LEFT)
-    self.frames["rightOverworldFrame"].pack(side=TOP, anchor=NW)
+    self.frames["rightOverworldFrame"].pack(side=LEFT, anchor=NW)
     
     with open(os.path.join("resources","app","gui","randomize","overworld","widgets.json")) as overworldWidgets:
         myDict = json.load(overworldWidgets)
@@ -31,7 +30,7 @@ def overworld_page(parent):
             for key in dictWidgets:
                 self.widgets[key] = dictWidgets[key]
                 if key == "rightOverworldFrame":
-                    self.widgets[key].pack(anchor=NW)
+                    self.widgets[key].pack(anchor=E)
                 else:
                     self.widgets[key].pack(anchor=E)
 
