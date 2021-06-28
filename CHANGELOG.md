@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.6.0
+- Added Flute Shuffle setting
+- Minor GUI changes
+
 ### 0.1.5.3
 - Fixed issue with Aga portal mirror bonking in Mixed Shuffle
 - Fixed issue with Frog/Dig Game edges duplicating in edge pool, causing Insanity-like behavior
