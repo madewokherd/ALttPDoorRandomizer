@@ -664,19 +664,25 @@ OWEdgeGroups = {
 OWTileGroups = {
     ("Woods", "Regular"): (
         [
-            0x00, 0x40, 0x80
+            0x00, 0x2d, 0x40, 0x6d, 0x80
         ],
         [
             'Master Sword Meadow',
             'Lost Woods West Area',
-            'Lost Woods East Area'
+            'Lost Woods East Area',
+            'Stone Bridge Area',
+            'Stone Bridge Water',
+            'Hobo Bridge'
         ],
         [
             'Skull Woods Forest',
             'Skull Woods Portal Entry',
             'Skull Woods Forest (West)',
             'Skull Woods Forgotten Path (Southwest)',
-            'Skull Woods Forgotten Path (Northeast)'
+            'Skull Woods Forgotten Path (Northeast)',
+            'Hammer Bridge North Area',
+            'Hammer Bridge South Area',
+            'Hammer Bridge Water'
         ]
     ),
     ("Lumberjack", "Regular"): (
@@ -1021,21 +1027,6 @@ OWTileGroups = {
     #         'Big Bomb Shop Area'
     #     ]
     # ),
-    ("Bridge", "Regular"): (
-        [
-            0x2d, 0x6d, 0x80
-        ],
-        [
-            'Stone Bridge Area',
-            'Stone Bridge Water',
-            'Hobo Bridge'
-        ],
-        [
-            'Hammer Bridge North Area',
-            'Hammer Bridge South Area',
-            'Hammer Bridge Water'
-        ]
-    ),
     ("Tree Line", "Regular"): (
         [
             0x2e, 0x6e

@@ -56,10 +56,6 @@ def link_overworld(world, player):
             exist_dw_regions.extend(dw_regions)
             world.owswaps[player] = [exist_owids, exist_lw_regions, exist_dw_regions]
 
-        #dont perform moon pearl check unless both hobo and ped are swapped
-        if 0x80 in world.owswaps[player][0]:
-            world.owswaps[player][0].remove(0x80)
-
         #replace LW edges with DW
         ignore_list = list() #TODO: Remove ignore_list when special OW areas are included in pool
         for edgeset in temporary_mandatory_connections:
@@ -189,8 +185,6 @@ def link_overworld(world, player):
 
     # layout shuffle
     if world.owShuffle[player] == 'vanilla':
-        #for exitname, destname in default_connections:
-         #   connect_two_way(world, exitname, destname, player)
         for grouping in (trimmed_groups,):
             groups = list(trimmed_groups.values())
         for (forward_edge_sets, back_edge_sets) in groups:
