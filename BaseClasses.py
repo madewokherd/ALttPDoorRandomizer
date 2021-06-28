@@ -26,6 +26,7 @@ class World(object):
         self.owShuffle = owShuffle.copy()
         self.owSwap = owSwap.copy()
         self.owKeepSimilar = {}
+        self.owFluteShuffle = {}
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
         self.intensity = {}
@@ -76,6 +77,7 @@ class World(object):
         self.owswaps = {}
         self.owedges = []
         self._owedge_cache = {}
+        self.owflutespots = {}
         self.doors = []
         self._door_cache = {}
         self.paired_doors = {}
@@ -2157,6 +2159,7 @@ class Spoiler(object):
                          'ow_shuffle': self.world.owShuffle,
                          'ow_swap': self.world.owSwap,
                          'ow_keepsimilar': self.world.owKeepSimilar,
+                         'ow_fluteshuffle': self.world.owFluteShuffle,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
                          'intensity': self.world.intensity,
@@ -2239,6 +2242,7 @@ class Spoiler(object):
                 outfile.write('Overworld Tile Swap:'.ljust(line_width) + '%s\n' % self.metadata['ow_swap'][player])
                 if self.metadata['ow_shuffle'][player] != 'vanilla':
                     outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
+                outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_fluteshuffle'][player] != 'vanilla' else 'No'))
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
                 outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])

@@ -106,7 +106,7 @@ OWWorldCheck16:
 
 OWFluteCancel:
 {
-    lda.l OWFlags+1 : and #$10 : bne +
+    lda.l OWFlags+1 : and #$01 : bne +
         jsl $02e99d : rtl
     + lda $7f5006 : cmp #$01 : beq +
         jsl $02e99d
@@ -117,7 +117,7 @@ OWFluteCancel2:
     lda $f2 : ora $f0 : and #$c0 : bne +
         jml $0ab7bd
     + inc $0200
-    lda.l OWFlags+1 : and #$10 : beq +
+    lda.l OWFlags+1 : and #$01 : beq +
     lda $f2 : cmp #$40 : bne +
         lda #$01 : sta $7f5006
     + rtl 

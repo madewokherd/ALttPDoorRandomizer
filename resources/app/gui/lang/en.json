@@ -120,6 +120,10 @@
     "randomizer.overworld.overworldswap.crossed": "Crossed",
 
     "randomizer.overworld.keepsimilar": "Keep Similar Edges Together",
+
+    "randomizer.overworld.overworldflute": "Flute Shuffle",
+    "randomizer.overworld.overworldflute.vanilla": "Vanilla",
+    "randomizer.overworld.overworldflute.random": "Random",
     
     "randomizer.entrance.openpyramid": "Pre-open Pyramid Hole",
     "randomizer.entrance.shuffleganon": "Include Ganon's Tower and Pyramid Hole in shuffle pool",

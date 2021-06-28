@@ -85,29 +85,45 @@ OW tiles remain in their original world, but transitions can now be travel cross
 
 This keeps similar edge transitions together. ie. The 2 west edges of Potion Shop will be paired to another set of two similar edges
 
+## Flute Shuffle (--ow_fluteshuffle)
+
+### Vanilla
+
+Flute spots remain unchanged.
+
+### Random
+
+New flute spots are chosen at random. You can also cancel out of the flute menu by pressing X.
+
 
 # Command Line Options
 
 ```
--h, --help            
+-h, --help
 ```
 
 Show the help message and exit.
 
 ```
---ow_shuffle <mode>     
+--ow_shuffle <mode>
 ```
 
 For specifying the overworld layout shuffle you want as above. (default: vanilla)
 
 ```
---ow_swap <mode>     
+--ow_swap <mode>
 ```
 
 For specifying the overworld tile swap you want as above. (default: vanilla)
 
 ```
---ow_keepsimilar     
+--ow_keepsimilar
 ```
 
 This keeps similar edge transitions paired together with other pairs of transitions
+
+```
+--ow_fluteshuffle <mode>
+```
+
+For randomizing the flute spots around the overworld

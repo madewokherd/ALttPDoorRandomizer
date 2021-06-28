@@ -127,6 +127,12 @@
     "action": "store_true",
     "type": "bool"
   },
+  "ow_fluteshuffle": {
+    "choices": [
+      "vanilla",
+      "random"
+    ]
+  },
   "shuffle": {
     "choices": [
       "vanilla",

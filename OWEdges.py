@@ -722,8 +722,8 @@ OWTileGroups = {
         ],
         [
             'East Dark Death Mountain (Top)',
-            'East Dark Death Mountain (Bottom)',
-            'East Dark Death Mountain (Bottom Left)'
+            'East Dark Death Mountain (Bottom Left)',
+            'East Dark Death Mountain (Bottom)'
         ]
     ),
     ("East Mountain", "Entrance"): (

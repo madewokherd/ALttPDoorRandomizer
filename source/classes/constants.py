@@ -75,7 +75,8 @@ SETTINGSTOPROCESS = {
     "overworld": {
       "overworldshuffle": "ow_shuffle",
       "overworldswap": "ow_swap",
-      "keepsimilar": "ow_keepsimilar"
+      "keepsimilar": "ow_keepsimilar",
+      "overworldflute": "ow_fluteshuffle"
     },
     "entrance": {
       "openpyramid": "openpyramid",

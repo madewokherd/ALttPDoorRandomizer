@@ -17,6 +17,14 @@
         "mixed",
         "crossed"
       ]
+    },
+    "overworldflute": {
+      "type": "selectbox",
+      "default": "vanilla",
+      "options": [
+        "vanilla",
+        "random"
+      ]
     }
   },
   "rightOverworldFrame": {
