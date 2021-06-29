@@ -593,19 +593,20 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         write_pots_to_rom(rom, world.pot_contents[player])
 
     # patch overworld edges
+    inverted_buffer = [0] * 0x82
     if world.owShuffle[player] != 'vanilla' or world.owSwap[player] != 'vanilla':
         rom.write_byte(0x18004C, 0x01) #patch for allowing Frogsmith to enter multi-entrance caves
-        #patches map data specific for OW Shuffle
-        rom.write_byte(0x153B03, rom.buffer[0x153B03] | 0x2) #convenient portal on WDM
-        rom.write_byte(0x153B1A, rom.buffer[0x153B1A] | 0x2) #rocks added to prevent OWG hardlock
-        rom.write_byte(0x153B1B, rom.buffer[0x153B1B] | 0x2) #rocks added to prevent OWG hardlock
-        rom.write_byte(0x153B22, rom.buffer[0x153B22] | 0x2) #rocks added to prevent OWG hardlock
-        rom.write_byte(0x153B3F, rom.buffer[0x153B3F] | 0x2) #added C to terrain
-        rom.write_byte(0x153B43, rom.buffer[0x153B43] | 0x2) #convenient portal on WDDM
-        rom.write_byte(0x153B5A, rom.buffer[0x153B5A] | 0x2) #rocks added to prevent OWG hardlock
-        rom.write_byte(0x153B5B, rom.buffer[0x153B5B] | 0x2) #rocks added to prevent OWG hardlock
-        rom.write_byte(0x153B62, rom.buffer[0x153B62] | 0x2) #rocks added to prevent OWG hardlock
-        rom.write_byte(0x153B7F, rom.buffer[0x153B7F] | 0x2) #added C to terrain
+        # patches map data specific for OW Shuffle
+        inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
+        inverted_buffer[0x1A] = inverted_buffer[0x1A] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x1B] = inverted_buffer[0x1B] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x22] = inverted_buffer[0x22] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x3F] = inverted_buffer[0x3F] | 0x2  # added C to terrain
+        inverted_buffer[0x43] = inverted_buffer[0x43] | 0x2  # convenient portal on WDDM
+        inverted_buffer[0x5A] = inverted_buffer[0x5A] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x5B] = inverted_buffer[0x5B] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x62] = inverted_buffer[0x62] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x7F] = inverted_buffer[0x7F] | 0x2  # added C to terrain
 
         owMode = 0
         if world.owShuffle[player] == 'parallel':
@@ -633,14 +634,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         if world.owSwap[player] == 'mixed':
             for b in world.owswaps[player][0]:
                 # load inverted maps
-                v = rom.buffer[0x153B00 + b]
-                v = (v & 0xFE) | ((v + 1) % 2)
-                rom.write_byte(0x153B00 + b, v)
+                inverted_buffer[b] = (inverted_buffer[b] & 0xFE) | ((inverted_buffer[b] + 1) % 2)
 
                 # set world flag
-                v = rom.buffer[0x153A00 + b]
-                v = (v & 0xBF) | ((((v >> 6) + 1) % 2) << 6)
-                rom.write_byte(0x153A00 + b, v)
+                rom.write_byte(0x153A00 + b, 0x00 if b >= 0x40 else 0x40)
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
@@ -952,7 +949,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     elif world.mode[player] == 'standard':
         rom.write_byte(0x180032, 0x00)  # standard mode
 
-    set_inverted_mode(world, player, rom)
+    set_inverted_mode(world, player, rom, inverted_buffer)
 
     uncle_location = world.get_location('Link\'s Uncle', player)
     if uncle_location.item is None or uncle_location.item.name not in ['Master Sword', 'Tempered Sword', 'Fighter Sword', 'Golden Sword', 'Progressive Sword']:
@@ -2274,12 +2271,11 @@ def write_strings(rom, world, player, team):
     rom.write_bytes(0x181500, data)
     rom.write_bytes(0x76CC0, [byte for p in pointers for byte in [p & 0xFF, p >> 8 & 0xFF]])
 
-def set_inverted_mode(world, player, rom):
+def set_inverted_mode(world, player, rom, inverted_buffer):
     if world.mode[player] == 'inverted':
         # load inverted maps
-        for b in range(0x00, 0x82):
-            v = rom.buffer[0x153B00 + b]
-            rom.write_byte(0x153B00 + b, (v & 0xFE) | ((v + 1) % 2))
+        for b in range(0x00, len(inverted_buffer)):
+            inverted_buffer[b] = (inverted_buffer[b] & 0xFE) | ((inverted_buffer[b] + 1) % 2)
     
         rom.write_byte(snes_to_pc(0x0283E0), 0xF0) # residual portals
         rom.write_byte(snes_to_pc(0x02B34D), 0xF0)
@@ -2505,6 +2501,10 @@ def set_inverted_mode(world, player, rom):
         rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
+    
+    # apply inverted map changes
+    for b in range(0x00, len(inverted_buffer)):
+        rom.write_byte(0x153B00 + b, inverted_buffer[b])
     
 def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc = world.get_region('Dark Sanctuary Hint', player)
