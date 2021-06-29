@@ -141,9 +141,9 @@ def link_overworld(world, player):
     # flute shuffle
     def connect_flutes(flute_destinations):
         for o in range(0, len(flute_destinations)):
-            owid = flute_destinations[o]
-            regions = flute_data[owid][0]
-            if (world.mode[player] == 'inverted') == (owid in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            owslot = flute_destinations[o]
+            regions = flute_data[owslot][0]
+            if (world.mode[player] == 'inverted') == (flute_data[owslot][1] in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
                 connect_simple(world, 'Flute Spot ' + str(o + 1), regions[0], player)
             else:
                 connect_simple(world, 'Flute Spot ' + str(o + 1), regions[1], player)
@@ -155,12 +155,13 @@ def link_overworld(world, player):
         new_spots = SortedList()
 
         # guarantee desert/mire access
-        flute_pool.remove(0x30)
-        new_spots.add(0x30)
+        flute_pool.remove(0x38)
+        new_spots.add(0x38)
         # guarantee mountain access
-        owid = random.randint(0, 2) * 2 + 3
-        flute_pool.remove(owid)
-        new_spots.add(owid)
+        mountainIds = [0x0b, 0x0e, 0x07]
+        owslot = mountainIds[random.randint(0, 2)]
+        flute_pool.remove(owslot)
+        new_spots.add(owslot)
 
         random.shuffle(flute_pool)
         f = 0
