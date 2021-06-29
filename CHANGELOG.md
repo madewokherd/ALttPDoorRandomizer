@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.6.1
+- Fixed issue with Flute Spot to VoO softlocking
+- Fixed Houlihan to exit where Link's House does
+- Fixed issue with jsonout not correctly showing rom mods for some OW Shuffle data
+
 ### 0.1.6.0
 - Added Flute Shuffle setting
 - Minor GUI changes
