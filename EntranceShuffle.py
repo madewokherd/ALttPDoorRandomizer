@@ -1400,7 +1400,6 @@ def link_entrances(world, player):
             caves.append(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'))
         else:
             doors.append('Hyrule Castle Entrance (South)')
-            entrances.append('Hyrule Castle Entrance (South)')
             caves.append(('Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'))
         
         if not world.shufflelinks[player]:
@@ -1420,7 +1419,7 @@ def link_entrances(world, player):
         exit_pool.remove(links_house)
 
         if not invFlag:
-            sanc_doors = [door for door in Sanctuary_Doors if door in exit_pool]
+            sanc_doors = [door for door in exit_pool] #[door for door in Sanctuary_Doors if door in exit_pool]
         else:
             sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in exit_pool]
         sanc_door = random.choice(sanc_doors)
@@ -1472,17 +1471,7 @@ def link_entrances(world, player):
         connect_entrance(world, doors.pop(), 'Old Man Cave Exit (East)', player)
         caves.append('Old Man Cave Exit (West)')
 
-        # handle remaining caves
-        for cave in caves:
-            if isinstance(cave, str):
-                cave = (cave,)
-
-            for exit in cave:
-                connect_exit(world, exit, entrances.pop(), player)
-                connect_entrance(world, doors.pop(), exit, player)
-
         # handle simple doors
-
         single_doors = list(Single_Cave_Doors)
         bomb_shop_doors = list(Bomb_Shop_Single_Cave_Doors)
         blacksmith_doors = list(Blacksmith_Single_Cave_Doors)
