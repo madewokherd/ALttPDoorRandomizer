@@ -130,6 +130,7 @@
   "ow_fluteshuffle": {
     "choices": [
       "vanilla",
+      "balanced",
       "random"
     ]
   },
