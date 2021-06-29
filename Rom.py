@@ -2318,7 +2318,6 @@ def set_inverted_mode(world, player, rom):
                 write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
         
     if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E849), 0x0043) #flute spot
         if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
             rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01]) # mountain cave starts on OW
             
@@ -2385,12 +2384,6 @@ def set_inverted_mode(world, player, rom):
                 write_int16(rom, 0x15AEE + 2*0x18, 0x00E6) # DMD west UW to bumper cave top entrance
     if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
-    #if (world.mode[player] == 'inverted') != (0x16 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E84B), 0x0056) #flute spot
-    #if (world.mode[player] == 'inverted') != (0x18 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E84D), 0x0058) #flute spot
-        #write_int16(rom, snes_to_pc(0x02E8D5), 0x07C8) #flute spot
-        #write_int16(rom, snes_to_pc(0x02E8F7), 0x01F8) #flute spot
     if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
         rom.write_byte(0x15B8C + 0x06, 0x1B)
@@ -2499,41 +2492,20 @@ def set_inverted_mode(world, player, rom):
     if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05]) #frog pickup on contact
     if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E84F), 0x006C) #flute spot
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
             rom.write_byte(0x15B8C, 0x6C) #exit links at bomb shop area
             rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
             rom.write_byte(0xDBB73 + 0x52, 0x01)
     if (world.mode[player] == 'inverted') != (0x2F in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E851), 0x006F) #flute spot
         rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E853), 0x0070) #flute spot
         rom.write_bytes(snes_to_pc(0x1BC81E), [0x94, 0x1D, 0x82])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x33 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x1BC3DF), [0xD8, 0xD1])  # add warp under rock
         rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
-    #if (world.mode[player] == 'inverted') != (0x3B in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E855), 0x007B) #flute spot
-    #if (world.mode[player] == 'inverted') != (0x3F in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        #write_int16(rom, snes_to_pc(0x02E857), 0x007F) #flute spot
     
-    if world.mode[player] == 'inverted':
-        rom.write_byte(0x15B8C + 0x3D, rom.buffer[0x15B8C])  # houlihan exit
-        write_int16(rom, 0x15BDB + 2 * 0x3D, rom.buffer[0x15BDB] + (rom.buffer[0x15BDC] << 8))
-        write_int16(rom, 0x15C79 + 2 * 0x3D, rom.buffer[0x15C79] + (rom.buffer[0x15C7A] << 8))
-        write_int16(rom, 0x15D17 + 2 * 0x3D, rom.buffer[0x15D17] + (rom.buffer[0x15D18] << 8))
-        write_int16(rom, 0x15DB5 + 2 * 0x3D, rom.buffer[0x15DB5] + (rom.buffer[0x15DB6] << 8))
-        write_int16(rom, 0x15E53 + 2 * 0x3D, rom.buffer[0x15E53] + (rom.buffer[0x15E54] << 8))
-        write_int16(rom, 0x15EF1 + 2 * 0x3D, rom.buffer[0x15EF1] + (rom.buffer[0x15EF2] << 8))
-        write_int16(rom, 0x15F8F + 2 * 0x3D, rom.buffer[0x15F8F] + (rom.buffer[0x15F90] << 8))
-        rom.write_byte(0x1602D + 0x3D, rom.buffer[0x1602D])
-        rom.write_byte(0x1607C + 0x3D, rom.buffer[0x1607C])
-        write_int16(rom, 0x160CB + 2 * 0x3D, rom.buffer[0x160CB] + (rom.buffer[0x160CC] << 8))
-        write_int16(rom, 0x16169 + 2 * 0x3D, rom.buffer[0x16169] + (rom.buffer[0x1616A] << 8))
-        
 def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc = world.get_region('Dark Sanctuary Hint', player)
     dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)

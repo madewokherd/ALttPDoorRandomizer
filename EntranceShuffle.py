@@ -6,11 +6,6 @@ from collections import defaultdict
 
 def link_entrances(world, player):
     invFlag = world.mode[player] == 'inverted'
-
-    if not invFlag:
-        connect_exit(world, 'Chris Houlihan Room Exit', 'Links House', player) # should always match link's house, except for plandos
-    else:
-        connect_exit(world, 'Chris Houlihan Room Exit', 'Pyramid Entrance', player)
     
     Dungeon_Exits = Dungeon_Exits_Base.copy() if not invFlag else Inverted_Dungeon_Exits_Base.copy()
     Cave_Exits = Cave_Exits_Base.copy()
@@ -192,6 +187,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in LW_Single_Cave_Doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
         if links_house in blacksmith_doors:
@@ -302,6 +298,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in lw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if links_house in lw_entrances:
             if not invFlag:
                 lw_entrances.remove(links_house)
@@ -526,6 +523,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in dw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if not invFlag:
             if links_house in lw_entrances:
                 lw_entrances.remove(links_house)
@@ -716,6 +714,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(list(links_house_doors))
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if links_house in entrances:
             entrances.remove(links_house)
         elif links_house in must_exits:
@@ -1226,6 +1225,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         exit_pool.remove(links_house)
         doors.remove(links_house)
 
@@ -1415,6 +1415,7 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
+        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         doors.remove(links_house)
         exit_pool.remove(links_house)
 
