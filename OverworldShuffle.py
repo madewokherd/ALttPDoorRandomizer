@@ -173,7 +173,7 @@ def link_overworld(world, player):
                     or flute_pool[f] - 1 in new_spots \
                     or flute_pool[f] + 8 in new_spots \
                     or flute_pool[f] - 8 in new_spots) \
-                        or (random.randint(0, 3) != 0 \
+                        or (random.randint(0, 9) != 0 \
                         and (flute_pool[f] + 7 in new_spots 
                             or flute_pool[f] - 7 in new_spots 
                             or flute_pool[f] + 9 in new_spots 
@@ -725,7 +725,7 @@ mandatory_connections = [('Flute Away', 'Flute Sky'),
                          ]
 
 default_flute_connections = [
-    0x03, 0x16, 0x18, 0x2c, 0x2f, 0x30, 0x3b, 0x3f
+    0x0b, 0x16, 0x18, 0x2c, 0x2f, 0x38, 0x3b, 0x3f
 ]
                          
 ow_connections = {
