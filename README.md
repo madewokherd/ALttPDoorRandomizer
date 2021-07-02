@@ -32,13 +32,15 @@ All feedback and dev conversation happens in the #ow-rando channel on the [ALTTP
 
 # Installation from Source
 
-See these instructions.
+Download the source code from the repository directly and put it in a folder of your choosing.
 
-https://github.com/codemann8/ALttPDoorRandomizer/blob/OverworldShuffle/docs/BUILDING.md
+You must have Python installed (version 3.6 - 3.9 supported)
 
 This program requires all python dependencies that are necessary to run Aerinon's Door Randomizer plus an additional 'sortedcontainers' package. Try running ```pip install sortedcontainers``` on the command line to install the dependency.
 
 Alternatively, run ```resources/ci/common/local_install.py``` to install all the missing dependencies as well.
+
+See the following link if you have additional trouble: https://github.com/codemann8/ALttPDoorRandomizer/blob/OverworldShuffle/docs/BUILDING.md
 
 # Running the Program
 
