@@ -20,7 +20,7 @@ jsl OWFluteCancel
 
 ; allows Frog sprite to spawn in LW and also allows his friend to spawn in their house
 org $068a76 ; < 30a76 - sprite_prep.asm:785 (LDA $7EF3CA : AND.w #$40)
-lda $1b : eor #1 : nop #2
+lda $1b : eor.b #1 : nop #2
 
 ; allows Frog to be accepted at Blacksmith
 org $06b3ee ; < 333ee - sprite_smithy_bros.asm:347 (LDA $7EF3CC : CMP.b #$08 : BEQ .no_returning_smithy_tagalong)
@@ -29,7 +29,7 @@ db #$b0 ; BCS to replace BEQ
 
 ; load Stumpy per screen's original world, not current world flag
 org $06907f ; < 3107f - sprite_prep.asm:2170 (LDA $7EF3CA)
-lda $8a : eor #$40
+lda $8a : and.b #$40
 
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm:4068 ()
