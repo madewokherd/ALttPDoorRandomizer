@@ -74,8 +74,6 @@ def set_rules(world, player):
 
     # TODO: Remove these rules when these scenarios aren't a problem
     if world.owSwap[player] == 'mixed':
-        if 'Frog Area' in world.owswaps[player][2]:
-            set_rule(world.get_location('Frog', player), lambda state: False)
         if 'Stumpy Area' in world.owswaps[player][2]:
             set_rule(world.get_location('Stumpy', player), lambda state: False)
 

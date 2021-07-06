@@ -18,6 +18,15 @@ jml OWFluteCancel2 : nop
 org $0ab90d ;JSL $02E99D
 jsl OWFluteCancel
 
+; allows Frog sprite to spawn in LW and also allows his friend to spawn in their house
+org $068a76 ;LDA $7EF3CA : AND.w #$40
+lda $1b : eor #1 : nop #2
+
+; allows Frog to be accepted at Blacksmith
+org $06b3ee ;LDA $7EF3CC : CMP #$07 : BEQ $06B42E
+jsl OWSmithAccept : nop #2
+db #$b0 ; BCS instead of BEQ
+
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm 4068 ()
 jsl.l OWWorldCheck
@@ -121,6 +130,13 @@ OWFluteCancel2:
     lda $f2 : cmp #$40 : bne +
         lda #$01 : sta $7f5006
     + rtl 
+}
+OWSmithAccept:
+{
+    lda $7ef3cc : cmp #$07 : beq +
+    cmp #$08 : beq +
+        clc : rtl
+    + sec : rtl
 }
 
 org $aa9000
