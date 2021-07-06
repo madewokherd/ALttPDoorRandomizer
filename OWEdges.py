@@ -967,8 +967,8 @@ OWTileGroups = {
             'Bat Cave Ledge'
         ],
         [
-            'Hammer Peg Area',
-            'Hammer Peg Entry'
+            'Hammer Pegs Area',
+            'Hammer Pegs Entry'
         ]
     ),
     ("Dunes", "Regular"): (
