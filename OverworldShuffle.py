@@ -173,7 +173,7 @@ def link_overworld(world, player):
                     or flute_pool[f] - 1 in new_spots \
                     or flute_pool[f] + 8 in new_spots \
                     or flute_pool[f] - 8 in new_spots) \
-                        or (random.randint(0, 9) != 0 \
+                        or (random.randint(0, 31) != 0 \
                         and (flute_pool[f] + 7 in new_spots 
                             or flute_pool[f] - 7 in new_spots 
                             or flute_pool[f] + 9 in new_spots 
