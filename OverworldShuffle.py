@@ -1,7 +1,10 @@
 import random, logging, copy
-from sortedcontainers import SortedList
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot
 from OWEdges import OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
+try:
+    from sortedcontainers import SortedList
+except ImportError:
+    raise Exception('Could not load sortedcontainers module')
 
 __version__ = '0.1.6.4-u'
 
