@@ -28,7 +28,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.4.0.6-u'
+__version__ = '0.4.0.8-u'
 
 
 class EnemizerError(RuntimeError):
@@ -93,6 +93,7 @@ def main(args, seed=None, fish=None):
     world.treasure_hunt_count = args.triforce_goal.copy()
     world.treasure_hunt_total = args.triforce_pool.copy()
     world.shufflelinks = args.shufflelinks.copy()
+    world.fakeboots = args.fakeboots.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
 
@@ -263,12 +264,10 @@ def main(args, seed=None, fish=None):
                                 or world.enemy_health[player] != 'default' or world.enemy_damage[player] != 'default'
                                 or sprite_random_on_hit)
 
-                if use_enemizer:
-                    base_patch = LocalRom(args.rom)  # update base2current.json
-
                 rom = JsonRom() if args.jsonout or use_enemizer else LocalRom(args.rom)
 
                 if use_enemizer and (args.enemizercli or not args.jsonout):
+                    base_patch = LocalRom(args.rom)  # update base2current.json (side effect)
                     if args.rom and not(os.path.isfile(args.rom)):
                         raise RuntimeError("Could not find valid base rom for enemizing at expected path %s." % args.rom)
                     if os.path.exists(args.enemizercli):
