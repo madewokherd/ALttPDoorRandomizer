@@ -20,14 +20,14 @@ def link_overworld(world, player):
     if world.owSwap[player] != 'vanilla':
         tile_groups = {}
         for (name, groupType) in OWTileGroups.keys():
-            if world.mode[player] != 'standard' or name not in ['Castle', 'Links']:
+            if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
                 if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
                     tile_groups[(name,)] = ([], [], [])
                 else:
                     tile_groups[(name, groupType)] = ([], [], [])
 
         for (name, groupType) in OWTileGroups.keys():
-            if world.mode[player] != 'standard' or name not in ['Castle', 'Links']:
+            if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
                 (owids, lw_regions, dw_regions) = OWTileGroups[(name, groupType,)]
                 if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
                     (exist_owids, exist_lw_regions, exist_dw_regions) = tile_groups[(name,)]
