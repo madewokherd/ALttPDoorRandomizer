@@ -2603,23 +2603,21 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         
         write_int16(rom, 0xDB96F + 2 * 0x35, 0x001B)  # move pyramid exit door
         write_int16(rom, 0xDBA71 + 2 * 0x35, 0x011C)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            rom.write_byte(0xDBB73 + 0x35, 0x36)
+        rom.write_byte(0xDBB73 + 0x35, 0x36)
         
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            write_int16(rom, 0x15AEE + 2 * 0x37, 0x0010)  # pyramid exit to new hc area
-            rom.write_byte(0x15B8C + 0x37, 0x1B)
-            write_int16(rom, 0x15BDB + 2 * 0x37, 0x000E)
-            write_int16(rom, 0x15C79 + 2 * 0x37, 0x0600)
-            write_int16(rom, 0x15D17 + 2 * 0x37, 0x0676)
-            write_int16(rom, 0x15DB5 + 2 * 0x37, 0x0604)
-            write_int16(rom, 0x15E53 + 2 * 0x37, 0x06E8)
-            write_int16(rom, 0x15EF1 + 2 * 0x37, 0x066D)
-            write_int16(rom, 0x15F8F + 2 * 0x37, 0x06F3)
-            rom.write_byte(0x1602D + 0x37, 0x00)
-            rom.write_byte(0x1607C + 0x37, 0x0A)
-            write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
-            write_int16(rom, 0x16169 + 2 * 0x37, 0x811c)
+        write_int16(rom, 0x15AEE + 2 * 0x37, 0x0010)  # pyramid exit to new hc area
+        rom.write_byte(0x15B8C + 0x37, 0x1B)
+        write_int16(rom, 0x15BDB + 2 * 0x37, 0x000E)
+        write_int16(rom, 0x15C79 + 2 * 0x37, 0x0600)
+        write_int16(rom, 0x15D17 + 2 * 0x37, 0x0676)
+        write_int16(rom, 0x15DB5 + 2 * 0x37, 0x0604)
+        write_int16(rom, 0x15E53 + 2 * 0x37, 0x06E8)
+        write_int16(rom, 0x15EF1 + 2 * 0x37, 0x066D)
+        write_int16(rom, 0x15F8F + 2 * 0x37, 0x06F3)
+        rom.write_byte(0x1602D + 0x37, 0x00)
+        rom.write_byte(0x1607C + 0x37, 0x0A)
+        write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
+        write_int16(rom, 0x16169 + 2 * 0x37, 0x811C)
     if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])  # frog pickup on contact
     if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
