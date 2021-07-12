@@ -780,7 +780,7 @@ OWTileGroups = {
             'Ice Palace Area'
         ]
     ),
-    ("West Mountain", "Entrance"): (
+    ("Mountain Entry", "Regular"): (
         [
             0x0a, 0x4a
         ],

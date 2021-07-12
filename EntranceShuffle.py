@@ -47,7 +47,24 @@ def link_entrances(world, player):
             if world.shuffle[player] == 'vanilla':
                 for exitname, regionname in inverted_default_dungeon_connections:
                     connect_simple(world, exitname, regionname, player)
+
+        # inverted entrance mods
+        for owid in swapped_connections.keys():
+            if (world.mode[player] == 'inverted') != (owid in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                for (entrancename, exitname) in swapped_connections[owid]:
+                    try:
+                        connect_two_way(world, entrancename, exitname, player)
+                    except RuntimeError:
+                        connect_entrance(world, entrancename, exitname, player)
         
+        if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed') and \
+            (world.mode[player] == 'inverted') == (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            connect_entrance(world, 'Death Mountain Return Cave (West)', 'Dark Death Mountain Healer Fairy', player)
+        elif (world.mode[player] == 'inverted') != (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed') and \
+            (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            connect_two_way(world, 'Bumper Cave (Top)', 'Death Mountain Return Cave Exit (West)', player)
+
+        # dungeon entrance shuffle
         if world.shuffle[player] == 'dungeonssimple':
             simple_shuffle_dungeons(world, player)
         elif world.shuffle[player] == 'dungeonsfull':
@@ -1533,7 +1550,9 @@ def connect_entrance(world, entrancename, exitname, player):
     addresses = door_addresses[entrance.name][0]
 
     entrance.connect(region, addresses, target)
-    world.spoiler.set_entrance(entrance.name, exit.name if exit is not None else region.name, 'entrance', player)
+    
+    if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+        world.spoiler.set_entrance(entrance.name, exit.name if exit is not None else region.name, 'entrance', player)
 
 def connect_exit(world, exitname, entrancename, player):
     entrance = world.get_entrance(entrancename, player)
@@ -1544,7 +1563,9 @@ def connect_exit(world, exitname, entrancename, player):
         exit.connected_region.entrances.remove(exit)
 
     exit.connect(entrance.parent_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
-    world.spoiler.set_entrance(entrance.name, exit.name, 'exit', player)
+    
+    if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+        world.spoiler.set_entrance(entrance.name, exit.name, 'exit', player)
 
 
 def connect_two_way(world, entrancename, exitname, player):
@@ -1559,7 +1580,9 @@ def connect_two_way(world, entrancename, exitname, player):
 
     entrance.connect(exit.parent_region, door_addresses[entrance.name][0], exit_ids[exit.name][0])
     exit.connect(entrance.parent_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
-    world.spoiler.set_entrance(entrance.name, exit.name, 'both', player)
+    
+    if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+        world.spoiler.set_entrance(entrance.name, exit.name, 'both', player)
 
 
 def scramble_holes(world, player):
@@ -2853,46 +2876,34 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Pyramid Hole', 'Pyramid'),
                        ('Pyramid Entrance', 'Bottom of Pyramid'),
                        ('Inverted Pyramid Hole', 'Pyramid'),
-                       ('Inverted Pyramid Entrance', 'Bottom of Pyramid')
+                       ('Inverted Pyramid Entrance', 'Bottom of Pyramid'),
+                       ('Pyramid Exit', 'Pyramid Exit Ledge')
                       ]
 
-open_default_connections =  [('Old Man Cave (West)', 'Old Man Cave Ledge'),
-                            ('Old Man Cave (East)', 'Old Man Cave'),
-                            ('Old Man Cave Exit (West)', 'Mountain Entry Entrance'),
-                            ('Old Man Cave Exit (East)', 'West Death Mountain (Bottom)'),
-                            ('Death Mountain Return Cave (East)', 'Death Mountain Return Cave'),
-                            ('Death Mountain Return Cave (West)', 'Death Mountain Return Cave'),
-                            ('Death Mountain Return Cave Exit (West)', 'Mountain Entry Ledge'),
-                            ('Death Mountain Return Cave Exit (East)', 'West Death Mountain (Bottom)'),
-                            ('Bumper Cave (Bottom)', 'Bumper Cave'),
-                            ('Bumper Cave (Top)', 'Bumper Cave'),
-                            ('Bumper Cave Exit (Top)', 'Bumper Cave Ledge'),
-                            ('Bumper Cave Exit (Bottom)', 'Bumper Cave Entrance'),
-                            ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
+swapped_connections = {
+    0x03: [
+            ('Old Man Cave (East)', 'Death Mountain Return Cave Exit (West)'),
+            #('Death Mountain Return Cave (East)', 'Death Mountain Return Cave Exit (East)'),
+            ('Dark Death Mountain Fairy', 'Old Man Cave Exit (East)')
+        ],
+    0x0a: [
+            ('Old Man Cave (West)', 'Bumper Cave Exit (Bottom)'),
+            ('Death Mountain Return Cave (West)', 'Bumper Cave Exit (Top)'),
+            ('Bumper Cave (Bottom)', 'Old Man Cave Exit (West)'),
+            ('Bumper Cave (Top)', 'Dark Death Mountain Healer Fairy')
+        ],
+    0x1b: [
+            ('Inverted Pyramid Entrance', 'Pyramid Exit')
+        ]
+}
 
-                            ('Links House', 'Links House'),
+open_default_connections =  [('Links House', 'Links House'),
                             ('Links House Exit', 'Links House Area'),
-                            ('Big Bomb Shop', 'Big Bomb Shop'),
-                            ('Pyramid Exit', 'Pyramid Exit Ledge')]
+                            ('Big Bomb Shop', 'Big Bomb Shop')]
 
-inverted_default_connections =  [('Old Man Cave (West)', 'Bumper Cave'),
-                                 ('Old Man Cave (East)', 'Death Mountain Return Cave'),
-                                 ('Old Man Cave Exit (West)', 'Bumper Cave Entrance'),
-                                 ('Old Man Cave Exit (East)', 'West Dark Death Mountain (Bottom)'),
-                                 ('Death Mountain Return Cave (West)', 'Bumper Cave'),
-                                 ('Death Mountain Return Cave (East)', 'Death Mountain Return Cave'),
-                                 ('Death Mountain Return Cave Exit (West)', 'West Death Mountain (Bottom)'),
-                                 ('Death Mountain Return Cave Exit (East)', 'West Death Mountain (Bottom)'),
-                                 ('Bumper Cave (Bottom)', 'Old Man Cave Ledge'),
-                                 ('Bumper Cave (Top)', 'Dark Death Mountain Healer Fairy'),
-                                 ('Bumper Cave Exit (Top)', 'Mountain Entry Ledge'),
-                                 ('Bumper Cave Exit (Bottom)', 'Mountain Entry Entrance'),
-                                 ('Dark Death Mountain Fairy', 'Old Man Cave'),
-                                 
-                                 ('Links House', 'Big Bomb Shop'),
+inverted_default_connections =  [('Links House', 'Big Bomb Shop'),
                                  ('Links House Exit', 'Big Bomb Shop Area'),
-                                 ('Big Bomb Shop', 'Links House'),
-                                 ('Pyramid Exit', 'Hyrule Castle Ledge')]
+                                 ('Big Bomb Shop', 'Links House')]
 
 # non shuffled dungeons
 default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),

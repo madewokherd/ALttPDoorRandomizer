@@ -2471,28 +2471,6 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
 
             rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  #indicates the overworld door being used for the single entrance spawn point
-        
-            rom.write_byte(0xDBB73 + 0x6F, 0x07)  # DDM fairy entrance to old man fetch east UW
-            write_int16(rom, 0x15AEE + 2*0x18, 0x00F1)  # old man fetch UW to DDM fairy entrance
-            rom.write_byte(0x15B8C + 0x18, 0x43)
-            write_int16(rom, 0x15BDB + 2 * 0x18, 0x1400)
-            write_int16(rom, 0x15C79 + 2 * 0x18, 0x0294)
-            write_int16(rom, 0x15D17 + 2 * 0x18, 0x0600)
-            write_int16(rom, 0x15DB5 + 2 * 0x18, 0x02E8)
-            write_int16(rom, 0x15E53 + 2 * 0x18, 0x0678)
-            write_int16(rom, 0x15EF1 + 2 * 0x18, 0x0303)
-            write_int16(rom, 0x15F8F + 2 * 0x18, 0x0685)
-            rom.write_byte(0x1602D + 0x18, 0x0A)
-            rom.write_byte(0x1607C + 0x18, 0xF6)
-            write_int16(rom, 0x160CB + 2 * 0x18, 0x0000)
-            write_int16(rom, 0x16169 + 2 * 0x18, 0x0000)
-            
-            rom.write_byte(0xDBB73 + 0x06, 0x2E)  # old man fetch east entrance to DMD west UW
-            write_int16(rom, 0x15AEE + 2*0x08, 0x00E6)  # DMD west UW to old man fetch east entrance 
-            if (world.mode[player] == 'inverted') != (0x0A in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-                rom.write_byte(0xDBB73 + 0x16, 0x5E)  # bumper cave top entrance to DDM Fairy UW
-            else:
-                rom.write_byte(0xDBB73 + 0x2D, 0x5E)  # DMD west entrance to DDM Fairy
     if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
@@ -2502,17 +2480,6 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         rom.write_bytes(0x0086E, [0x5C, 0x00, 0xA0, 0xA1]) # TR tail
         if world.shuffle[player] in ['vanilla']:
             world.fix_trock_doors[player] = True
-    if (world.mode[player] == 'inverted') != (0x0A in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            rom.write_byte(0xDBB73 + 0x15, 0x06)  # bumper cave bottom entrance to old man fetch west UW
-            write_int16(rom, 0x15AEE + 2*0x17, 0x00F0)  # old man fetch west UW to bumper cave bottom entrance
-            rom.write_byte(0xDBB73 + 0x05, 0x16)  # old man fetch west entrance to bumper cave bottom UW
-            write_int16(rom, 0x15AEE + 2*0x07, 0x00FB)  # bumper cave bottom UW to old man fetch west entrance
-            rom.write_byte(0xDBB73 + 0x2D, 0x17)  # DMD west entrance to bumper cave top UW
-            write_int16(rom, 0x15AEE + 2*0x2F, 0x00EB)  # bumper cave top UW to DMD west entrance
-            if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-                rom.write_byte(0xDBB73 + 0x16, 0x2E)  # bumper cave top entrance to DMD west UW
-                write_int16(rom, 0x15AEE + 2*0x18, 0x00E6)  # DMD west UW to bumper cave top entrance
     if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
@@ -2603,21 +2570,6 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         
         write_int16(rom, 0xDB96F + 2 * 0x35, 0x001B)  # move pyramid exit door
         write_int16(rom, 0xDBA71 + 2 * 0x35, 0x011C)
-        rom.write_byte(0xDBB73 + 0x35, 0x36)
-        
-        write_int16(rom, 0x15AEE + 2 * 0x37, 0x0010)  # pyramid exit to new hc area
-        rom.write_byte(0x15B8C + 0x37, 0x1B)
-        write_int16(rom, 0x15BDB + 2 * 0x37, 0x000E)
-        write_int16(rom, 0x15C79 + 2 * 0x37, 0x0600)
-        write_int16(rom, 0x15D17 + 2 * 0x37, 0x0676)
-        write_int16(rom, 0x15DB5 + 2 * 0x37, 0x0604)
-        write_int16(rom, 0x15E53 + 2 * 0x37, 0x06E8)
-        write_int16(rom, 0x15EF1 + 2 * 0x37, 0x066D)
-        write_int16(rom, 0x15F8F + 2 * 0x37, 0x06F3)
-        rom.write_byte(0x1602D + 0x37, 0x00)
-        rom.write_byte(0x1607C + 0x37, 0x0A)
-        write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
-        write_int16(rom, 0x16169 + 2 * 0x37, 0x811C)
     if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
         rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])  # frog pickup on contact
     if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
