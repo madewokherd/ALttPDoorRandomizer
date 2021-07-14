@@ -1,6 +1,6 @@
 import random, logging, copy
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot
-from OWEdges import OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
+from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
 try:
     from sortedcontainers import SortedList
 except ImportError:
@@ -28,18 +28,24 @@ def link_overworld(world, player):
 
         for (name, groupType) in OWTileGroups.keys():
             if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
-                (owids, lw_regions, dw_regions) = OWTileGroups[(name, groupType,)]
+                (lw_owids, dw_owids) = OWTileGroups[(name, groupType,)]
                 if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
                     (exist_owids, exist_lw_regions, exist_dw_regions) = tile_groups[(name,)]
-                    exist_owids.extend(owids)
-                    exist_lw_regions.extend(lw_regions)
-                    exist_dw_regions.extend(dw_regions)
+                    exist_owids.extend(lw_owids)
+                    exist_owids.extend(dw_owids)
+                    for owid in lw_owids:
+                        exist_lw_regions.extend(OWTileRegions[owid])
+                    for owid in dw_owids:
+                        exist_dw_regions.extend(OWTileRegions[owid])
                     tile_groups[(name,)] = (exist_owids, exist_lw_regions, exist_dw_regions)
                 else:
                     (exist_owids, exist_lw_regions, exist_dw_regions) = tile_groups[(name, groupType)]
-                    exist_owids.extend(owids)
-                    exist_lw_regions.extend(lw_regions)
-                    exist_dw_regions.extend(dw_regions)
+                    exist_owids.extend(lw_owids)
+                    exist_owids.extend(dw_owids)
+                    for owid in lw_owids:
+                        exist_lw_regions.extend(OWTileRegions[owid])
+                    for owid in dw_owids:
+                        exist_dw_regions.extend(OWTileRegions[owid])
                     tile_groups[(name, groupType)] = (exist_owids, exist_lw_regions, exist_dw_regions)
         
         #tile shuffle happens here, the groups that remain in the list are the tiles that get swapped
