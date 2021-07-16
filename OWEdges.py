@@ -437,6 +437,16 @@ OWEdgeGroups = {
             ['Octoballoon NE']
         ]
     ),
+    # (Op, LW, Vt, Ld, NP, 1): (
+    #     [
+    #         ['Master Sword Meadow SC'],
+    #         ['Zoras Domain SW']
+    #     ],
+    #     [
+    #         ['Lost Woods NW'],
+    #         ['Zora Waterfall NE']
+    #     ]
+    # ),
     (Op, LW, Hz, Ld, PL, 2): (
         [
             ['Kakariko Fortune EN', 'Kakariko Fortune ES'],
@@ -493,6 +503,14 @@ OWEdgeGroups = {
             ['Statues WC']
         ]
     ),
+    # (Op, LW, Hz, Wr, NP, 1): (
+    #     [
+    #         ['Hobo EC']
+    #     ],
+    #     [
+    #         ['Stone Bridge WC']
+    #     ]
+    # ),
     (Op, LW, Vt, Wr, PL, 1): (
         [
             ['Tree Line SC'],
