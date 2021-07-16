@@ -7,6 +7,7 @@
 - Fixed Boss Music when boss room is entered thru straight stairs
 - Suppressed in-dungeon music changes when DR is enabled
 - Fixed issue with Pyramid Exit exiting to wrong location in ER
+- Removed sortedcontainers dependency
 - ~~Merged DR v0.4.0.11 - Various DR changes~~
 
 ### 0.1.6.6
