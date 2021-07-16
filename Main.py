@@ -400,6 +400,7 @@ def copy_world(world):
     ret.mixed_travel = world.mixed_travel.copy()
     ret.standardize_palettes = world.standardize_palettes.copy()
     ret.owswaps = world.owswaps.copy()
+    ret.owflutespots = world.owflutespots.copy()
 
     for player in range(1, world.players + 1):
         create_regions(ret, player)
