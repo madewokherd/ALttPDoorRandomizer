@@ -31,7 +31,7 @@ from OverworldShuffle import default_flute_connections, flute_data
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '1dc1961e57d4e588a262fa706de6c753'
+RANDOMIZERBASEHASH = '487a04cf965bb89636f9b1621dd606d1'
 
 
 class JsonRom(object):
@@ -1248,7 +1248,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
 
     # Starting equipment
-    if world.fakeboots[player]:
+    if world.pseudoboots[player]:
         rom.write_byte(0x18008E, 0x01)
 
     equip = [0] * (0x340 + 0x4F)
