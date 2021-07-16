@@ -1,11 +1,18 @@
 # Changelog
 
+### 0.1.6.7
+- Fixed issue with Pyramid Exit exiting to wrong location in ER
+- Mountain Entry and West Death Mountain are now Swapped independently (Old Man rescue is always in your starting world)
+- Fixed issue with AT/GT access logic
+- Improved spoiler log playthru accuracy
+- ~~Merged DR v0.4.0.11 - Various DR changes~~
+
 ### 0.1.6.6
 - ~~Merged DR v0.4.0.9 - P/C Indicator / Credits fix / CLI Hints Fix~~
 
 ### 0.1.6.5
 - Reduced chance of diagonal flute spot in Balanced
-- ~~Merged DR v0.4.0.8 - Boss Indicator / Fake Boots / Quickswap Update / Credits Updates~~
+- ~~Merged DR v0.4.0.8 - Boss Indicator / Psuedo Boots / Quickswap Update / Credits Updates~~
 
 ### 0.1.6.4
 - Fixed Frogsmith and Stumpy and restored progression in these locations

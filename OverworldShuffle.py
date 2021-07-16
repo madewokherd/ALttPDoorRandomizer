@@ -6,7 +6,7 @@ try:
 except ImportError:
     raise Exception('Could not load sortedcontainers module')
 
-__version__ = '0.1.6.6-u'
+__version__ = '0.1.6.7-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
