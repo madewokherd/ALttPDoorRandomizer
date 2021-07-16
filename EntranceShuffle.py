@@ -2873,10 +2873,6 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Hookshot Cave Back Entrance', 'Hookshot Cave'),
                        ('Mimic Cave', 'Mimic Cave'),
 
-                       ('Pyramid Hole', 'Pyramid'),
-                       ('Pyramid Entrance', 'Bottom of Pyramid'),
-                       ('Inverted Pyramid Hole', 'Pyramid'),
-                       ('Inverted Pyramid Entrance', 'Bottom of Pyramid'),
                        ('Pyramid Exit', 'Pyramid Exit Ledge')
                       ]
 
@@ -2899,11 +2895,17 @@ swapped_connections = {
 
 open_default_connections =  [('Links House', 'Links House'),
                             ('Links House Exit', 'Links House Area'),
-                            ('Big Bomb Shop', 'Big Bomb Shop')]
+                            ('Big Bomb Shop', 'Big Bomb Shop'),
+                            ('Pyramid Hole', 'Pyramid'),
+                            ('Pyramid Entrance', 'Bottom of Pyramid')
+                       ]
 
 inverted_default_connections =  [('Links House', 'Big Bomb Shop'),
                                  ('Links House Exit', 'Big Bomb Shop Area'),
-                                 ('Big Bomb Shop', 'Links House')]
+                                 ('Big Bomb Shop', 'Links House'),
+                                 ('Inverted Pyramid Hole', 'Pyramid'),
+                                 ('Inverted Pyramid Entrance', 'Bottom of Pyramid')
+                            ]
 
 # non shuffled dungeons
 default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
