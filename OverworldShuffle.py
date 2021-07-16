@@ -1,10 +1,6 @@
 import random, logging, copy
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
-try:
-    from sortedcontainers import SortedList
-except ImportError:
-    raise Exception('Could not load sortedcontainers module')
 
 __version__ = '0.1.6.7-u'
 
@@ -161,16 +157,16 @@ def link_overworld(world, player):
         connect_flutes(default_flute_connections)
     else:
         flute_pool = list(flute_data.keys())
-        new_spots = SortedList()
+        new_spots = list()
 
         # guarantee desert/mire access
         flute_pool.remove(0x38)
-        new_spots.add(0x38)
+        new_spots.append(0x38)
         # guarantee mountain access
         mountainIds = [0x0b, 0x0e, 0x07]
         owslot = mountainIds[random.randint(0, 2)]
         flute_pool.remove(owslot)
-        new_spots.add(owslot)
+        new_spots.append(owslot)
 
         random.shuffle(flute_pool)
         f = 0
@@ -190,8 +186,9 @@ def link_overworld(world, player):
                     f += 1
                     continue
             if flute_pool[f] not in new_spots:
-                new_spots.add(flute_pool[f])
+                new_spots.append(flute_pool[f])
             f += 1
+        new_spots.sort()
         world.owflutespots[player] = new_spots
         connect_flutes(new_spots)
 
