@@ -30,18 +30,18 @@ def link_overworld(world, player):
                     exist_owids.extend(lw_owids)
                     exist_owids.extend(dw_owids)
                     for owid in lw_owids:
-                        exist_lw_regions.extend(OWTileRegions[owid])
+                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
                     for owid in dw_owids:
-                        exist_dw_regions.extend(OWTileRegions[owid])
+                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
                     tile_groups[(name,)] = (exist_owids, exist_lw_regions, exist_dw_regions)
                 else:
                     (exist_owids, exist_lw_regions, exist_dw_regions) = tile_groups[(name, groupType)]
                     exist_owids.extend(lw_owids)
                     exist_owids.extend(dw_owids)
                     for owid in lw_owids:
-                        exist_lw_regions.extend(OWTileRegions[owid])
+                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
                     for owid in dw_owids:
-                        exist_dw_regions.extend(OWTileRegions[owid])
+                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
                     tile_groups[(name, groupType)] = (exist_owids, exist_lw_regions, exist_dw_regions)
         
         #tile shuffle happens here, the groups that remain in the list are the tiles that get swapped
