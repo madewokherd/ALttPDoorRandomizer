@@ -143,55 +143,6 @@ def link_overworld(world, player):
                 region = world.get_region(name, player)
                 region.type = RegionType.LightWorld
     
-    # flute shuffle
-    def connect_flutes(flute_destinations):
-        for o in range(0, len(flute_destinations)):
-            owslot = flute_destinations[o]
-            regions = flute_data[owslot][0]
-            if (world.mode[player] == 'inverted') == (flute_data[owslot][1] in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
-                connect_simple(world, 'Flute Spot ' + str(o + 1), regions[0], player)
-            else:
-                connect_simple(world, 'Flute Spot ' + str(o + 1), regions[1], player)
-    
-    if world.owFluteShuffle[player] == 'vanilla':
-        connect_flutes(default_flute_connections)
-    else:
-        flute_pool = list(flute_data.keys())
-        new_spots = list()
-
-        # guarantee desert/mire access
-        flute_pool.remove(0x38)
-        new_spots.append(0x38)
-        # guarantee mountain access
-        mountainIds = [0x0b, 0x0e, 0x07]
-        owslot = mountainIds[random.randint(0, 2)]
-        flute_pool.remove(owslot)
-        new_spots.append(owslot)
-
-        random.shuffle(flute_pool)
-        f = 0
-        while len(new_spots) < 8:
-            if f >= len(flute_pool):
-                f = 0
-            if world.owFluteShuffle[player] == 'balanced':
-                if (flute_pool[f] + 1 in new_spots \
-                    or flute_pool[f] - 1 in new_spots \
-                    or flute_pool[f] + 8 in new_spots \
-                    or flute_pool[f] - 8 in new_spots) \
-                        or (random.randint(0, 31) != 0 \
-                        and (flute_pool[f] + 7 in new_spots 
-                            or flute_pool[f] - 7 in new_spots 
-                            or flute_pool[f] + 9 in new_spots 
-                            or flute_pool[f] - 9 in new_spots)):
-                    f += 1
-                    continue
-            if flute_pool[f] not in new_spots:
-                new_spots.append(flute_pool[f])
-            f += 1
-        new_spots.sort()
-        world.owflutespots[player] = new_spots
-        connect_flutes(new_spots)
-
     # make new connections
     for owid in ow_connections.keys():
         if (world.mode[player] == 'inverted') == (owid in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
@@ -260,6 +211,72 @@ def link_overworld(world, player):
                                 raise KeyError('No parallel edge for edge %d' % back_edge)
         
         assert len(connected_edges) == len(default_connections) * 2, connected_edges
+    
+    # flute shuffle
+    def connect_flutes(flute_destinations):
+        for o in range(0, len(flute_destinations)):
+            owslot = flute_destinations[o]
+            regions = flute_data[owslot][0]
+            if (world.mode[player] == 'inverted') == (flute_data[owslot][1] in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                connect_simple(world, 'Flute Spot ' + str(o + 1), regions[0], player)
+            else:
+                connect_simple(world, 'Flute Spot ' + str(o + 1), regions[1], player)
+    
+    if world.owFluteShuffle[player] == 'vanilla':
+        connect_flutes(default_flute_connections)
+    else:
+        flute_pool = list(flute_data.keys())
+        new_spots = list()
+        ignored_regions = set()
+
+        def addSpot(owid, removeFromPool = False):
+            if world.owFluteShuffle[player] == 'balanced':
+                def getIgnored(regionname, base_owid, owid):
+                    region = world.get_region(regionname, player)
+                    for exit in region.exits:
+                        if exit.connected_region is not None and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and exit.connected_region.name not in new_ignored:
+                            if OWTileRegions[exit.connected_region.name] in [base_owid, owid] or OWTileRegions[regionname] == base_owid:
+                                new_ignored.add(exit.connected_region.name)
+                                getIgnored(exit.connected_region.name, base_owid, OWTileRegions[exit.connected_region.name])
+
+                if (world.mode[player] == 'inverted') == (flute_data[owid][1] in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                    new_region = flute_data[owid][0][0]
+                else:
+                    new_region = flute_data[owid][0][1]
+
+                if new_region in ignored_regions:
+                    return False
+                
+                new_ignored = {new_region}
+                getIgnored(new_region, OWTileRegions[new_region], OWTileRegions[new_region])
+                if random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
+                    return False
+                ignored_regions.update(new_ignored)
+            if removeFromPool:
+                flute_pool.remove(owid)
+            new_spots.append(owid)
+            return True
+
+        # guarantee desert/mire access
+        addSpot(0x38, True)
+
+        # guarantee mountain access
+        if world.owShuffle[player] == 'vanilla':
+            mountainIds = [0x0b, 0x0e, 0x07]
+            addSpot(mountainIds[random.randint(0, 2)], True)
+
+        random.shuffle(flute_pool)
+        f = 0
+        while len(new_spots) < 8:
+            if f >= len(flute_pool):
+                f = 0
+            if flute_pool[f] not in new_spots:
+                addSpot(flute_pool[f])
+            f += 1
+        new_spots.sort()
+        world.owflutespots[player] = new_spots
+        connect_flutes(new_spots)
+
 
 def connect_custom(world, connected_edges, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
