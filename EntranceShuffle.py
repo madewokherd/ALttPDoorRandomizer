@@ -1,4 +1,4 @@
-import random
+import RaceRandom as random
 
 # ToDo: With shuffle_ganon option, prevent gtower from linking to an exit only location through a 2 entrance cave.
 from collections import defaultdict
@@ -493,7 +493,7 @@ def link_entrances(world, player):
         if invFlag:
             # shuffle aga door first. if it's on hc ledge, then one other hc ledge door has to be must_exit
             all_entrances_aga = lw_entrances + dw_entrances
-            aga_doors = [i for i in all_entrances_aga]
+            aga_doors = [i for i in all_entrances_aga if world.shufflelinks[player]]
             random.shuffle(aga_doors)
             aga_door = aga_doors.pop()
             
@@ -687,7 +687,8 @@ def link_entrances(world, player):
 
         if invFlag:
             # shuffle aga door. if it's on hc ledge, then one other hc ledge door has to be must_exit
-            aga_door = random.choice(entrances)
+            aga_choices = [x for x in entrances if world.shufflelinks[player]]
+            aga_door = random.choice(aga_choices)
             
             if aga_door in hc_ledge_entrances:
                 hc_ledge_entrances.remove(aga_door)

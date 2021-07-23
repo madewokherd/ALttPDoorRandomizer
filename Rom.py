@@ -5,7 +5,7 @@ import json
 import hashlib
 import logging
 import os
-import random
+import RaceRandom as random
 import struct
 import sys
 import subprocess
@@ -31,7 +31,7 @@ from OverworldShuffle import default_flute_connections, flute_data
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '487a04cf965bb89636f9b1621dd606d1'
+RANDOMIZERBASEHASH = 'abcc9ca7e5ec6eac56a70e8b248a5883'
 
 
 class JsonRom(object):
@@ -893,17 +893,17 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     write_int16(rom, 0x187010, credits_total)  # dynamic credits
     if credits_total != 216:
-        # collection rate address:
-        cr_address = 0x2391C2
+        # collection rate address (hi):
+        cr_address = 0x238057
         cr_pc = cr_address - 0x120000  # convert to pc
         mid_top, mid_bot = credits_digit((credits_total // 10) % 10)
         last_top, last_bot = credits_digit(credits_total % 10)
         # top half
-        rom.write_byte(cr_pc+0x1c, mid_top)
-        rom.write_byte(cr_pc+0x1d, last_top)
+        rom.write_byte(cr_pc+0x1, mid_top)
+        rom.write_byte(cr_pc+0x2, last_top)
         # bottom half
-        rom.write_byte(cr_pc+0x3a, mid_bot)
-        rom.write_byte(cr_pc+0x3b, last_bot)
+        rom.write_byte(cr_pc+0x1f, mid_bot)
+        rom.write_byte(cr_pc+0x20, last_bot)
 
     # patch medallion requirements
     if world.required_medallions[player][0] == 'Bombos':
@@ -1615,8 +1615,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # set rom name
     # 21 bytes
     from Main import __version__
+    seedstring = f'{world.seed:09}' if isinstance(world.seed, int) else world.seed
     # todo: change to DR when Enemizer is okay with DR
-    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{world.seed:09}\0', 'utf8')[:21]
+    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{seedstring}\0', 'utf8')[:21]
     rom.name.extend([0] * (21 - len(rom.name)))
     rom.write_bytes(0x7FC0, rom.name)
 
