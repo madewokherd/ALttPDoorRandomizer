@@ -493,7 +493,7 @@ def link_entrances(world, player):
         if invFlag:
             # shuffle aga door first. if it's on hc ledge, then one other hc ledge door has to be must_exit
             all_entrances_aga = lw_entrances + dw_entrances
-            aga_doors = [i for i in all_entrances_aga if world.shufflelinks[player]]
+            aga_doors = [i for i in all_entrances_aga]
             random.shuffle(aga_doors)
             aga_door = aga_doors.pop()
             
@@ -687,7 +687,7 @@ def link_entrances(world, player):
 
         if invFlag:
             # shuffle aga door. if it's on hc ledge, then one other hc ledge door has to be must_exit
-            aga_choices = [x for x in entrances if world.shufflelinks[player]]
+            aga_choices = [x for x in entrances]
             aga_door = random.choice(aga_choices)
             
             if aga_door in hc_ledge_entrances:
