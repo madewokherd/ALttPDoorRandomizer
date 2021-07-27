@@ -31,7 +31,7 @@ from OverworldShuffle import default_flute_connections, flute_data
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'abcc9ca7e5ec6eac56a70e8b248a5883'
+RANDOMIZERBASEHASH = '9f660065954a8ebdca25773531c93543'
 
 
 class JsonRom(object):
