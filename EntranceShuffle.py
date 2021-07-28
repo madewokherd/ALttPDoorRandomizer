@@ -7,7 +7,7 @@ from collections import defaultdict
 def link_entrances(world, player):
     invFlag = world.mode[player] == 'inverted'
     
-    Dungeon_Exits = Dungeon_Exits_Base.copy() if not invFlag else Inverted_Dungeon_Exits_Base.copy()
+    Dungeon_Exits = Dungeon_Exits_Base.copy()
     Cave_Exits = Cave_Exits_Base.copy()
     Old_Man_House = Old_Man_House_Base.copy()
     Cave_Three_Exits = Cave_Three_Exits_Base.copy()
@@ -2058,14 +2058,13 @@ Cave_Exits_Base = [['Elder House Exit (East)', 'Elder House Exit (West)'],
               ['Death Mountain Return Cave Exit (West)', 'Death Mountain Return Cave Exit (East)'],
               ['Fairy Ascension Cave Exit (Bottom)', 'Fairy Ascension Cave Exit (Top)'],
               ['Bumper Cave Exit (Top)', 'Bumper Cave Exit (Bottom)'],
-              ['Hookshot Cave Back Exit', 'Hookshot Cave Front Exit']]
+              ['Hookshot Cave Back Exit', 'Hookshot Cave Front Exit'],
+              ['Superbunny Cave Exit (Bottom)', 'Superbunny Cave Exit (Top)'],
+              ['Spiral Cave Exit (Top)', 'Spiral Cave Exit']]
 
-Cave_Exits_Base += [('Superbunny Cave Exit (Bottom)', 'Superbunny Cave Exit (Top)'),
-              ('Spiral Cave Exit (Top)', 'Spiral Cave Exit')]
 
-
-Cave_Three_Exits_Base = [('Spectacle Rock Cave Exit (Peak)', 'Spectacle Rock Cave Exit (Top)',
- 'Spectacle Rock Cave Exit'),
+Cave_Three_Exits_Base = [['Spectacle Rock Cave Exit (Peak)', 'Spectacle Rock Cave Exit (Top)',
+ 'Spectacle Rock Cave Exit'],
                     ['Paradox Cave Exit (Top)', 'Paradox Cave Exit (Middle)','Paradox Cave Exit (Bottom)']]
 
 
@@ -2386,20 +2385,6 @@ Inverted_DW_Dungeon_Entrances = ['Thieves Town',
                                  'Ganons Tower']
 
 Inverted_LW_Dungeon_Entrances_Must_Exit = ['Desert Palace Entrance (East)']
-
-Inverted_Dungeon_Exits_Base = [['Desert Palace Exit (South)', 'Desert Palace Exit (West)', 'Desert Palace Exit (East)'],
-                 'Desert Palace Exit (North)',
-                 'Eastern Palace Exit',
-                 'Tower of Hera Exit',
-                 'Thieves Town Exit',
-                 'Skull Woods Final Section Exit',
-                 'Ice Palace Exit',
-                 'Misery Mire Exit',
-                 'Palace of Darkness Exit',
-                 'Swamp Palace Exit',
-                 'Agahnims Tower Exit',
-                 ['Turtle Rock Ledge Exit (East)',
-                     'Turtle Rock Exit (Front)',  'Turtle Rock Ledge Exit (West)', 'Turtle Rock Isolated Ledge Exit']]
 
 Inverted_LW_Entrances_Must_Exit = ['Death Mountain Return Cave (West)',
                                    'Two Brothers House (West)']
