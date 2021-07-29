@@ -722,6 +722,7 @@ class CollectionState(object):
                     'Swamp Nook Area',
                     'Dark South Pass Area']
         bonk_bombs = ['Kakariko Fortune Area', 'Dark Graveyard Area'] #TODO: Flute Boy Approach Area and Bonk Rock Ledge are available post-Aga
+        bomb_caves = ['Graveyard Cave', 'Light World Bomb Hut']
 
         # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
         tree_pulls = ['Lost Woods East Area',
@@ -738,7 +739,7 @@ class CollectionState(object):
             region = self.world.get_region(regionname, player)
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
         
-        for region in bush_bombs:
+        for region in bush_bombs + bomb_caves:
             if can_reach_non_bunny(region):
                 return True
         
