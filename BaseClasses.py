@@ -672,6 +672,66 @@ class CollectionState(object):
             if shop.region.player == player and shop.has_unlimited(item) and shop.region.can_reach(self):
                 return True
         return False
+    
+    def can_farm_bombs(self, player):
+        if self.world.mode[player] == 'standard' and not self.has('Zelda Delivered', player):
+            return True
+        
+        bush_bombs = ['Flute Boy Approach Area',
+                    'Kakariko Area',
+                    'Village of Outcasts Area',
+                    'Forgotten Forest Area',
+                    'Bat Cave Ledge',
+                    'East Dark Death Mountain (Bottom)']
+        rock_bombs = ['Links House Area',
+                    'Dark Chapel Area',
+                    'Wooden Bridge Area',
+                    'Ice Cave Area',
+                    'Eastern Nook Area',
+                    'West Death Mountain (Bottom)',
+                    'Kakariko Fortune Area',
+                    'Skull Woods Forest',
+                    'Catfish Area',
+                    'Dark Fortune Area',
+                    'Qirn Jump Area',
+                    'Shield Shop Area',
+                    'Palace of Darkness Nook Area',
+                    'Swamp Nook Area',
+                    'Dark South Pass Area']
+        bonk_bombs = ['Kakariko Fortune Area', 'Dark Graveyard Area'] #TODO: Flute Boy Approach Area and Bonk Rock Ledge are available post-Aga
+
+        # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
+        tree_pulls = ['Lost Woods East Area',
+                    'Snitch Lady (East)',
+                    'Turtle Rock Area',
+                    'Pyramid Area',
+                    'Hype Cave Area',
+                    'Dark South Pass Area',
+                    'Bumper Cave Area']
+        pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
+        post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
+        
+        def can_reach_non_bunny(regionname):
+            region = self.world.get_region(regionname, player)
+            return region.can_reach(self) and (region.type == RegionType.LightWorld or self.has('Pearl', player))
+        
+        for region in bush_bombs:
+            if can_reach_non_bunny(region):
+                return True
+        
+        if self.can_lift_rocks(player):
+            for region in rock_bombs:
+                if can_reach_non_bunny(region):
+                    return True
+
+        if self.has_Boots(player):
+            for region in bonk_bombs:
+                if can_reach_non_bunny(region):
+                    return True
+
+        if self.can_reach('Archery Game', None, player) and self.can_buy_unlimited('Bombs (10)', player):
+            return True
+        return False
 
     def item_count(self, item, player):
         return self.prog_items[item, player]
@@ -731,7 +791,7 @@ class CollectionState(object):
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        return (not self.world.bomblogic[player] or self.has('Bomb Upgrade (+10)', player))
+        return (not self.world.bomblogic[player] or self.has('Bomb Upgrade (+10)', player)) and self.can_farm_bombs(player)
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)

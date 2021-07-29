@@ -750,12 +750,6 @@ def get_pool_core(progressive, owShuffle, owSwap, shuffle, difficulty, treasure_
         pool.remove('Pegasus Boots')
         pool.extend(['Rupees (20)'])
     
-    if owSwap in ['mixed', 'crossed'] and owShuffle == 'vanilla':
-        precollected_items.append('Bombs (3)')
-        precollected_items.append('Rupees (5)')
-        precollected_items.append('Rupees (5)')
-        precollected_items.append('Rupees (5)')
-
     if want_progressives():
         pool.extend(progressivegloves)
     else:
