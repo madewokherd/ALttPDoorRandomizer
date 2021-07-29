@@ -122,6 +122,7 @@ class World(object):
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', False)
             set_player_attr('bigkeyshuffle', False)
+            set_player_attr('bomblogic', False)
             set_player_attr('difficulty_requirements', None)
             set_player_attr('boss_shuffle', 'none')
             set_player_attr('enemy_shuffle', 'none')
@@ -672,6 +673,89 @@ class CollectionState(object):
                 return True
         return False
 
+    def can_farm_rupees(self, player):
+        # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
+        tree_pulls = ['Lost Woods East Area',
+                    'Snitch Lady (East)',
+                    'Turtle Rock Area',
+                    'Pyramid Area',
+                    'Hype Cave Area',
+                    'Dark South Pass Area',
+                    'Bumper Cave Area']
+        pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
+        post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
+        
+        rupee_farms = ['Archery Game', '50 Rupee Cave', '20 Rupee Cave']
+   
+        def can_reach_non_bunny(regionname):
+            region = self.world.get_region(regionname, player)
+            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
+        
+        for region in rupee_farms:
+            if can_reach_non_bunny(region):
+                return True
+        return False
+    
+    def can_farm_bombs(self, player):
+        if self.world.mode[player] == 'standard' and not self.has('Zelda Delivered', player):
+            return True
+        
+        bush_bombs = ['Flute Boy Approach Area',
+                    'Kakariko Area',
+                    'Village of Outcasts Area',
+                    'Forgotten Forest Area',
+                    'Bat Cave Ledge',
+                    'East Dark Death Mountain (Bottom)']
+        rock_bombs = ['Links House Area',
+                    'Dark Chapel Area',
+                    'Wooden Bridge Area',
+                    'Ice Cave Area',
+                    'Eastern Nook Area',
+                    'West Death Mountain (Bottom)',
+                    'Kakariko Fortune Area',
+                    'Skull Woods Forest',
+                    'Catfish Area',
+                    'Dark Fortune Area',
+                    'Qirn Jump Area',
+                    'Shield Shop Area',
+                    'Palace of Darkness Nook Area',
+                    'Swamp Nook Area',
+                    'Dark South Pass Area']
+        bonk_bombs = ['Kakariko Fortune Area', 'Dark Graveyard Area'] #TODO: Flute Boy Approach Area and Bonk Rock Ledge are available post-Aga
+
+        # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
+        tree_pulls = ['Lost Woods East Area',
+                    'Snitch Lady (East)',
+                    'Turtle Rock Area',
+                    'Pyramid Area',
+                    'Hype Cave Area',
+                    'Dark South Pass Area',
+                    'Bumper Cave Area']
+        pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
+        post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
+        
+        def can_reach_non_bunny(regionname):
+            region = self.world.get_region(regionname, player)
+            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
+        
+        for region in bush_bombs:
+            if can_reach_non_bunny(region):
+                return True
+        
+        if self.can_lift_rocks(player):
+            for region in rock_bombs:
+                if can_reach_non_bunny(region):
+                    return True
+
+        if self.has_Boots(player):
+            for region in bonk_bombs:
+                if can_reach_non_bunny(region):
+                    return True
+
+        if self.can_farm_rupees(player) and self.can_buy_unlimited('Bombs (10)', player):
+            return True
+        return False
+
     def item_count(self, item, player):
         return self.prog_items[item, player]
 
@@ -730,8 +814,7 @@ class CollectionState(object):
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        StartingBombs = True
-        return StartingBombs or self.has('Bomb Upgrade (+10)', player)
+        return (not self.world.bomblogic[player] or self.has('Bomb Upgrade (+10)', player)) and self.can_farm_bombs(player)
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)
@@ -763,6 +846,7 @@ class CollectionState(object):
     def can_get_good_bee(self, player):
         cave = self.world.get_region('Good Bee Cave', player)
         return (
+            self.can_use_bombs(player) and
             self.has_bottle(player) and
             self.has('Bug Catching Net', player) and
             (self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))) and
@@ -2156,6 +2240,7 @@ class Spoiler(object):
                          'logic': self.world.logic,
                          'mode': self.world.mode,
                          'retro': self.world.retro,
+                         'bomblogic': self.world.bomblogic,
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'ow_shuffle': self.world.owShuffle,
@@ -2267,6 +2352,7 @@ class Spoiler(object):
                 outfile.write('Experimental:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
                 outfile.write('Key Drops shuffled:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['keydropshuffle'][player] else 'No'))
                 outfile.write('Shopsanity:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shopsanity'][player] else 'No'))
+                outfile.write('Bomblogic:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['bomblogic'][player] else 'No'))
             if self.doors:
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(
