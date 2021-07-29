@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.7.1
+- Improved bomb logic to consider tree pulls, bush crabs, and stun prize
+- Fixed Mystery to use new updated OW mode terminology
+
 ### 0.1.7.0
 - Expanded new DR bomb logic to all modes (bomb usage in logic only if there is an unlimited supply of bombs available)
 - ~~Merged DR v0.5.0.1 - Bomblogic mode / Enemizer fixes~~

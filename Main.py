@@ -25,7 +25,7 @@ from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons, fill_dungeons, fill_dungeons_restrictive
 from Fill import distribute_items_cutoff, distribute_items_staleness, distribute_items_restrictive, flood_items
-from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations
+from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations, set_prize_drops
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
@@ -195,6 +195,8 @@ def main(args, seed=None, fish=None):
         else:
             lock_shop_locations(world, player)
 
+    for player in range(1, world.players + 1):
+        set_prize_drops(world, player)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.prizes"))
 
@@ -414,6 +416,7 @@ def copy_world(world):
     ret.standardize_palettes = world.standardize_palettes.copy()
     ret.owswaps = world.owswaps.copy()
     ret.owflutespots = world.owflutespots.copy()
+    ret.prizes = world.prizes.copy()
 
     for player in range(1, world.players + 1):
         create_regions(ret, player)
