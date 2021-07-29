@@ -672,6 +672,29 @@ class CollectionState(object):
             if shop.region.player == player and shop.has_unlimited(item) and shop.region.can_reach(self):
                 return True
         return False
+
+    def can_farm_rupees(self, player):
+        # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
+        tree_pulls = ['Lost Woods East Area',
+                    'Snitch Lady (East)',
+                    'Turtle Rock Area',
+                    'Pyramid Area',
+                    'Hype Cave Area',
+                    'Dark South Pass Area',
+                    'Bumper Cave Area']
+        pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
+        post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
+        
+        rupee_farms = ['Archery Game', '50 Rupee Cave', '20 Rupee Cave']
+   
+        def can_reach_non_bunny(regionname):
+            region = self.world.get_region(regionname, player)
+            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
+        
+        for region in rupee_farms:
+            if can_reach_non_bunny(region):
+                return True
+        return False
     
     def can_farm_bombs(self, player):
         if self.world.mode[player] == 'standard' and not self.has('Zelda Delivered', player):
@@ -713,7 +736,7 @@ class CollectionState(object):
         
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
-            return region.can_reach(self) and (region.type == RegionType.LightWorld or self.has('Pearl', player))
+            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
         
         for region in bush_bombs:
             if can_reach_non_bunny(region):
@@ -729,7 +752,7 @@ class CollectionState(object):
                 if can_reach_non_bunny(region):
                     return True
 
-        if self.can_reach('Archery Game', None, player) and self.can_buy_unlimited('Bombs (10)', player):
+        if self.can_farm_rupees(player) and self.can_buy_unlimited('Bombs (10)', player):
             return True
         return False
 
