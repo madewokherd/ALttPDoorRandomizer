@@ -70,6 +70,7 @@ class World(object):
         self.customitemarray = customitemarray
         self.can_take_damage = True
         self.hints = hints.copy()
+        self.prizes = {}
         self.dynamic_regions = []
         self.dynamic_locations = []
         self.spoiler = Spoiler(self)
@@ -148,6 +149,7 @@ class World(object):
             set_player_attr('standardize_palettes', 'standardize')
             set_player_attr('force_fix', {'gt': False, 'sw': False, 'pod': False, 'tr': False})
             set_player_attr('owswaps', [[],[],[]])
+            set_player_attr('prizes', {'pull': [0, 0, 0], 'crab': [0, 0], 'stun': 0, 'fish': 0})
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
@@ -674,7 +676,6 @@ class CollectionState(object):
         return False
 
     def can_farm_rupees(self, player):
-        # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
         tree_pulls = ['Lost Woods East Area',
                     'Snitch Lady (East)',
                     'Turtle Rock Area',
@@ -684,16 +685,29 @@ class CollectionState(object):
                     'Bumper Cave Area']
         pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
         post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
-        
+
         rupee_farms = ['Archery Game', '50 Rupee Cave', '20 Rupee Cave']
-   
+
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
-        
+
         for region in rupee_farms:
             if can_reach_non_bunny(region):
                 return True
+
+        if any(i in [0xda, 0xdb] for i in self.world.prizes[player]['pull']):
+            for region in tree_pulls:
+                if can_reach_non_bunny(region):
+                    return True
+            if not self.has('Beat Agahnim 1', player):
+                for region in pre_aga_tree_pulls:
+                    if can_reach_non_bunny(region):
+                        return True
+            else:
+                for region in post_aga_tree_pulls:
+                    if can_reach_non_bunny(region):
+                        return True
         return False
     
     def can_farm_bombs(self, player):
@@ -724,7 +738,6 @@ class CollectionState(object):
         bonk_bombs = ['Kakariko Fortune Area', 'Dark Graveyard Area'] #TODO: Flute Boy Approach Area and Bonk Rock Ledge are available post-Aga
         bomb_caves = ['Graveyard Cave', 'Light World Bomb Hut']
 
-        # TODO: Possibly use tree pulls also in the future, bush crabs also if enemizer is disabled
         tree_pulls = ['Lost Woods East Area',
                     'Snitch Lady (East)',
                     'Turtle Rock Area',
@@ -734,15 +747,20 @@ class CollectionState(object):
                     'Bumper Cave Area']
         pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
         post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
-        
+
+        bush_crabs = ['Lost Woods East Area', 'Mountain Entry Area']
+        pre_aga_bush_crabs = ['Lumberjack Area', 'South Pass Area']
+        rock_crabs = ['Desert Pass Area']
+
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
-        
+
+        # bomb pickups
         for region in bush_bombs + bomb_caves:
             if can_reach_non_bunny(region):
                 return True
-        
+
         if self.can_lift_rocks(player):
             for region in rock_bombs:
                 if can_reach_non_bunny(region):
@@ -753,7 +771,41 @@ class CollectionState(object):
                 if can_reach_non_bunny(region):
                     return True
 
-        if self.can_farm_rupees(player) and self.can_buy_unlimited('Bombs (10)', player):
+        # tree pulls
+        if any(i in [0xdc, 0xdd, 0xde] for i in self.world.prizes[player]['pull']):
+            for region in tree_pulls:
+                if can_reach_non_bunny(region):
+                    return True
+            if not self.has('Beat Agahnim 1', player):
+                for region in pre_aga_tree_pulls:
+                    if can_reach_non_bunny(region):
+                        return True
+            else:
+                for region in post_aga_tree_pulls:
+                    if can_reach_non_bunny(region):
+                        return True
+
+        # bush crabs (final item isn't considered)
+        if self.world.enemy_shuffle[player] != 'none':
+            if self.world.prizes[player]['crab'][0] in [0xdc, 0xdd, 0xde]:
+                for region in bush_crabs:
+                    if can_reach_non_bunny(region):
+                        return True
+                if not self.has('Beat Agahnim 1', player):
+                    for region in pre_aga_bush_crabs:
+                        if can_reach_non_bunny(region):
+                            return True
+            if self.can_lift_rocks(player) and self.world.prizes[player]['crab'][0] in [0xdc, 0xdd, 0xde]:
+                for region in rock_crabs:
+                    if can_reach_non_bunny(region):
+                        return True
+
+        # stun prize
+        if self.can_stun_enemies(player) and self.world.prizes[player]['stun'] in [0xdc, 0xdd, 0xde]:
+            return True
+
+        # bomb purchases
+        if self.can_farm_rupees(player) and (self.can_buy_unlimited('Bombs (10)', player) or self.can_reach('Big Bomb Shop', None, player)):
             return True
         return False
 
@@ -812,6 +864,16 @@ class CollectionState(object):
                 or self.can_shoot_arrows(player)
                 or self.has('Fire Rod', player)
                 )
+
+    def can_stun_enemies(self, player):
+        if self.world.difficulty_adjustments[player] == 'expert':
+            return False
+        elif self.world.difficulty_adjustments[player] == 'hard':
+            return self.has('Hookshot', player)
+        else:
+            return self.has('Hookshot', player) \
+                or self.has('Blue Boomerang', player) \
+                or self.has('Red Boomerang', player)
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
