@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.7.2
+- Fixed music algorithm to play correct track in OW Shuffle
+- Removed convenient portal on WDM in OW Layout Shuffle
+- Fixed Mystery to not spoil OW Shuffle in filename
+
 ### 0.1.7.1
 - Improved bomb logic to consider tree pulls, bush crabs, and stun prize
 - Fixed Mystery to use new updated OW mode terminology
