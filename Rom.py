@@ -639,12 +639,12 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_byte(0x18004C, 0x01) # patch for allowing Frogsmith to enter multi-entrance caves
         
         # patches map data specific for OW Shuffle
-        inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
+        #inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
         inverted_buffer[0x1A] = inverted_buffer[0x1A] | 0x2  # rocks added to prevent OWG hardlock
         inverted_buffer[0x1B] = inverted_buffer[0x1B] | 0x2  # rocks added to prevent OWG hardlock
         inverted_buffer[0x22] = inverted_buffer[0x22] | 0x2  # rocks added to prevent OWG hardlock
         inverted_buffer[0x3F] = inverted_buffer[0x3F] | 0x2  # added C to terrain
-        inverted_buffer[0x43] = inverted_buffer[0x43] | 0x2  # convenient portal on WDDM
+        #inverted_buffer[0x43] = inverted_buffer[0x43] | 0x2  # convenient portal on WDDM
         inverted_buffer[0x5A] = inverted_buffer[0x5A] | 0x2  # rocks added to prevent OWG hardlock
         inverted_buffer[0x5B] = inverted_buffer[0x5B] | 0x2  # rocks added to prevent OWG hardlock
         inverted_buffer[0x62] = inverted_buffer[0x62] | 0x2  # rocks added to prevent OWG hardlock
