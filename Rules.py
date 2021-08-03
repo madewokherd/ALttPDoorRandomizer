@@ -792,8 +792,6 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Bottom)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), lambda state: state.can_lift_rocks(player))
     
-    set_rule(world.get_entrance('Flute Away', player), lambda state: state.can_flute(player))
-    
     set_rule(world.get_entrance('Zora Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Zora Waterfall Water Entry', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Waterfall of Wishing Cave Entry', player), lambda state: state.has('Flippers', player))

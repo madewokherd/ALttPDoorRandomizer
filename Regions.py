@@ -79,7 +79,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Flute Boy Area', ['Flute Spot'], ['Stumpy Mirror Spot', 'Flute Boy SC']),
         create_lw_region(player, 'Flute Boy Pass', None, ['Stumpy Pass Mirror Spot', 'Flute Boy WS', 'Flute Boy SW']),
         create_lw_region(player, 'Central Bonk Rocks Area', None, ['Bonk Fairy (Light)', 'Dark Bonk Rocks Mirror Spot', 'Central Bonk Rocks NW', 'Central Bonk Rocks SW', 'Central Bonk Rocks EN', 'Central Bonk Rocks EC', 'Central Bonk Rocks ES']),
-        create_lw_region(player, 'Links House Area', None, ['Links House', 'Big Bomb Shop Mirror Spot', 'Links House NE', 'Links House WN', 'Links House WC', 'Links House WS', 'Links House SC', 'Links House ES', 'Flute Away']),
+        create_lw_region(player, 'Links House Area', None, ['Links House', 'Big Bomb Shop Mirror Spot', 'Links House NE', 'Links House WN', 'Links House WC', 'Links House WS', 'Links House SC', 'Links House ES']),
         create_lw_region(player, 'Stone Bridge Area', None, ['Hammer Bridge North Mirror Spot', 'Hammer Bridge South Mirror Spot', 'Stone Bridge NC', 'Stone Bridge EN', 'Stone Bridge WS', 'Stone Bridge SC']),
         create_lw_region(player, 'Stone Bridge Water', None, ['Dark Hobo Mirror Spot', 'Stone Bridge WC', 'Stone Bridge EC']),
         create_lw_region(player, 'Hobo Bridge', ['Hobo'], ['Hobo EC']),

@@ -1,5 +1,5 @@
 import RaceRandom as random, logging, copy
-from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot
+from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
 
 __version__ = '0.1.7.2-u'
@@ -500,6 +500,18 @@ def reorganize_groups(world, groups, player):
     else:
         raise NotImplementedError('Shuffling not supported yet')
 
+def create_flute_exits(world, player):
+    for region in world.regions:
+        if ((region.type == RegionType.LightWorld and region.name not in world.owswaps[player][1])
+                or (region.type == RegionType.DarkWorld and region.name in world.owswaps[player][2])) \
+                and region.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']:
+            exitname = 'Flute From ' + region.name
+            exit = Entrance(region.player, exitname, region)
+            exit.access_rule = lambda state: state.can_flute(player)
+            exit.connect(world.get_region('Flute Sky', player))
+            region.exits.append(exit)
+    world.initialize_regions()
+
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
                     #('Links House NE', 'Lost Woods Pass SW')
@@ -513,9 +525,7 @@ temporary_mandatory_connections = [
                         ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [('Flute Away', 'Flute Sky'),
-                         
-                         # Whirlpool Connections
+mandatory_connections = [# Whirlpool Connections
                          ('C Whirlpool', 'River Bend Water'),
                          ('River Bend Whirlpool', 'C Whirlpool Water'),
                          ('Lake Hylia Whirlpool', 'Zora Waterfall Water'),
