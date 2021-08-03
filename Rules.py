@@ -174,8 +174,8 @@ def global_rules(world, player):
         exit.hide_path = True
     
     world.get_region('Flute Sky', player).can_reach_private = lambda state: True
-    for exit in world.get_region('Flute Sky', player).exits:
-        exit.hide_path = True
+    #for exit in world.get_region('Flute Sky', player).exits:
+    #    exit.hide_path = True
 
     set_rule(world.get_entrance('Old Man S&Q', player), lambda state: state.can_reach('Old Man', 'Location', player))
 

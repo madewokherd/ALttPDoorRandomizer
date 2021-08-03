@@ -6,7 +6,7 @@ from BaseClasses import Region, Location, Entrance, RegionType, Shop, ShopType
 def create_regions(world, player):
     world.regions += [
         create_menu_region(player, 'Menu', None, ['Links House S&Q', 'Sanctuary S&Q', 'Old Man S&Q', 'Other World S&Q']),
-        create_menu_region(player, 'Flute Sky', None, ['Flute Spot 1', 'Flute Spot 2', 'Flute Spot 3', 'Flute Spot 4', 'Flute Spot 5', 'Flute Spot 6', 'Flute Spot 7', 'Flute Spot 8']),
+        create_cave_region(player, 'Flute Sky', None, None, ['Flute Spot 1', 'Flute Spot 2', 'Flute Spot 3', 'Flute Spot 4', 'Flute Spot 5', 'Flute Spot 6', 'Flute Spot 7', 'Flute Spot 8']),
         
         create_lw_region(player, 'Master Sword Meadow', ['Master Sword Pedestal'], ['Master Sword Meadow SC']),
         create_lw_region(player, 'Lost Woods West Area', None, ['Lost Woods Bush (West)', 'Skull Woods Back Mirror Spot', 'Skull Woods Forgotten (West) Mirror Spot', 'Skull Woods Forgotten (East) Mirror Spot', 'Skull Woods Portal Entry Mirror Spot', 'Lost Woods NW', 'Lost Woods SW', 'Lost Woods SC']),
