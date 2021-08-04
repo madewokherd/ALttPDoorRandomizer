@@ -501,10 +501,10 @@ def reorganize_groups(world, groups, player):
         raise NotImplementedError('Shuffling not supported yet')
 
 def create_flute_exits(world, player):
-    for region in world.regions:
-        if ((region.type == RegionType.LightWorld and region.name not in world.owswaps[player][1])
-                or (region.type == RegionType.DarkWorld and region.name in world.owswaps[player][2])) \
-                and region.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']:
+    for region in (r for r in world.regions if r.player == player and r.terrain == Terrain.Land and r.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']):
+        if (world.owSwap[player] != 'mixed' and region.type == RegionType.LightWorld) \
+            or (world.owSwap[player] == 'mixed' and region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
+                and (region.name not in world.owswaps[player][1] or region.name in world.owswaps[player][2])):
             exitname = 'Flute From ' + region.name
             exit = Entrance(region.player, exitname, region)
             exit.access_rule = lambda state: state.can_flute(player)

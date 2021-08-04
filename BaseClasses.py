@@ -1159,6 +1159,7 @@ class Region(object):
         self.is_light_world = False # will be set aftermaking connections.
         self.is_dark_world = False
         self.spot_type = 'Region'
+        self.terrain = None
         self.hint_text = hint
         self.recursion_count = 0
         self.player = player
