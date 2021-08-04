@@ -135,13 +135,7 @@ def link_overworld(world, player):
         assert len(swapped_edges) == 0
         
         #move swapped regions to other world
-        if world.owSwap[player] == 'mixed':
-            for name in world.owswaps[player][1]:
-                region = world.get_region(name, player)
-                region.type = RegionType.DarkWorld
-            for name in world.owswaps[player][2]:
-                region = world.get_region(name, player)
-                region.type = RegionType.LightWorld
+        update_world_regions(world, player)
     
     # make new connections
     for owid in ow_connections.keys():
@@ -511,6 +505,13 @@ def create_flute_exits(world, player):
             exit.connect(world.get_region('Flute Sky', player))
             region.exits.append(exit)
     world.initialize_regions()
+
+def update_world_regions(world, player):
+    if world.owSwap[player] == 'mixed':
+        for name in world.owswaps[player][1]:
+            world.get_region(name, player).type = RegionType.DarkWorld
+        for name in world.owswaps[player][2]:
+            world.get_region(name, player).type = RegionType.LightWorld
 
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
