@@ -1,5 +1,12 @@
 # Changelog
 
+### 0.1.7.3
+- Fixed minor issue with ambient SFX stopping and starting on OW screen load
+- MSU-1 changed to play LW2 (track 60) when Aga1 is killed instead of ped pull
+- Added dynamic flute exits for all LW OW regions
+- Improved spoiler log playthru pathing accuracy by including flute routing
+- Fixed issue with generating a filename for vanilla OW settings
+
 ### 0.1.7.2
 - Fixed music algorithm to play correct track in OW Shuffle
 - Removed convenient portal on WDM in OW Layout Shuffle

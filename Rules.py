@@ -174,8 +174,8 @@ def global_rules(world, player):
         exit.hide_path = True
     
     world.get_region('Flute Sky', player).can_reach_private = lambda state: True
-    for exit in world.get_region('Flute Sky', player).exits:
-        exit.hide_path = True
+    #for exit in world.get_region('Flute Sky', player).exits:
+    #    exit.hide_path = True
 
     set_rule(world.get_entrance('Old Man S&Q', player), lambda state: state.can_reach('Old Man', 'Location', player))
 
@@ -791,8 +791,6 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Hammer Bridge Pegs (South)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Bottom)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), lambda state: state.can_lift_rocks(player))
-    
-    set_rule(world.get_entrance('Flute Away', player), lambda state: state.can_flute(player))
     
     set_rule(world.get_entrance('Zora Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Zora Waterfall Water Entry', player), lambda state: state.has('Flippers', player))

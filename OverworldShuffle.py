@@ -1,8 +1,8 @@
 import RaceRandom as random, logging, copy
-from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot
+from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.1.7.2-u'
+__version__ = '0.1.7.3-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -135,13 +135,7 @@ def link_overworld(world, player):
         assert len(swapped_edges) == 0
         
         #move swapped regions to other world
-        if world.owSwap[player] == 'mixed':
-            for name in world.owswaps[player][1]:
-                region = world.get_region(name, player)
-                region.type = RegionType.DarkWorld
-            for name in world.owswaps[player][2]:
-                region = world.get_region(name, player)
-                region.type = RegionType.LightWorld
+        update_world_regions(world, player)
     
     # make new connections
     for owid in ow_connections.keys():
@@ -500,6 +494,25 @@ def reorganize_groups(world, groups, player):
     else:
         raise NotImplementedError('Shuffling not supported yet')
 
+def create_flute_exits(world, player):
+    for region in (r for r in world.regions if r.player == player and r.terrain == Terrain.Land and r.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']):
+        if (world.owSwap[player] != 'mixed' and region.type == RegionType.LightWorld) \
+            or (world.owSwap[player] == 'mixed' and region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
+                and (region.name not in world.owswaps[player][1] or region.name in world.owswaps[player][2])):
+            exitname = 'Flute From ' + region.name
+            exit = Entrance(region.player, exitname, region)
+            exit.access_rule = lambda state: state.can_flute(player)
+            exit.connect(world.get_region('Flute Sky', player))
+            region.exits.append(exit)
+    world.initialize_regions()
+
+def update_world_regions(world, player):
+    if world.owSwap[player] == 'mixed':
+        for name in world.owswaps[player][1]:
+            world.get_region(name, player).type = RegionType.DarkWorld
+        for name in world.owswaps[player][2]:
+            world.get_region(name, player).type = RegionType.LightWorld
+
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
                     #('Links House NE', 'Lost Woods Pass SW')
@@ -513,9 +526,7 @@ temporary_mandatory_connections = [
                         ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [('Flute Away', 'Flute Sky'),
-                         
-                         # Whirlpool Connections
+mandatory_connections = [# Whirlpool Connections
                          ('C Whirlpool', 'River Bend Water'),
                          ('River Bend Whirlpool', 'C Whirlpool Water'),
                          ('Lake Hylia Whirlpool', 'Zora Waterfall Water'),

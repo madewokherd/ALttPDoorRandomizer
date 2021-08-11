@@ -16,7 +16,7 @@ from OverworldGlitchRules import create_owg_connections
 from PotShuffle import shuffle_pots
 from Regions import create_regions, create_shops, mark_light_world_regions, mark_dark_world_regions, create_dungeon_regions, adjust_locations
 from OWEdges import create_owedges
-from OverworldShuffle import link_overworld
+from OverworldShuffle import link_overworld, update_world_regions, create_flute_exits
 from EntranceShuffle import link_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
@@ -162,6 +162,8 @@ def main(args, seed=None, fish=None):
 
     for player in range(1, world.players + 1):
         link_overworld(world, player)
+        update_world_regions(world, player)
+        create_flute_exits(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
@@ -261,7 +263,7 @@ def main(args, seed=None, fish=None):
             customize_shops(world, player)
     balance_money_progression(world)
 
-    if world.owShuffle[1] != 'vanilla' or world.owSwap[1] != 'vanilla' or world.seed.startsWith('M'):
+    if world.owShuffle[1] != 'vanilla' or world.owSwap[1] != 'vanilla' or str(world.seed).startswith('M'):
         outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
     else:
         outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
@@ -420,6 +422,8 @@ def copy_world(world):
 
     for player in range(1, world.players + 1):
         create_regions(ret, player)
+        update_world_regions(ret, player)
+        create_flute_exits(ret, player)
         create_dungeon_regions(ret, player)
         create_shops(ret, player)
         create_rooms(ret, player)

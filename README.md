@@ -18,9 +18,8 @@ This is a very new mode of LTTPR so the tools and info is very limited.
 
 ### If you want to playtest this, know these things:
 - Big Red Bomb may require bomb duping as ledge drops may be in the way of your path to the Pyramid Fairy crack
-- Do NOT grab the Frogsmith until you have seen the Blacksmith location. Doing so may prevent you from continuing in your save file.
 - If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to NOT make any other movements and S+Q immediately when the game allows you to (might take several seconds, the game has to scroll back to the original point of water entry) or there will be a hardlock. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
-- In Crossed OW Tile Swap, there are some interesting bunny water-walk situations that can occur, these are mean to be out-of-logic but beware of logic bugs around this area.
+- In Crossed OW Tile Swap, there are some interesting bunny water-walk situations that can occur, these are meant to be out-of-logic but beware of logic bugs around this area.
 
 ### Known bugs:
 - ~~In Mixed OW Tile Swap, Smith and Stumpy have issues when their tiles are swapped. Progression cannot be found on them when these tiles are swapped~~ (Fixed in 0.1.6.4)
