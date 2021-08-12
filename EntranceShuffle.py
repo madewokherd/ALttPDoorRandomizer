@@ -2863,8 +2863,12 @@ default_connections = [('Waterfall of Wishing', 'Waterfall of Wishing'),
                        ('Hookshot Cave Back Entrance', 'Hookshot Cave (Back)'),
                        ('Mimic Cave', 'Mimic Cave'),
 
-                       ('Pyramid Exit', 'Pyramid Exit Ledge')
-                      ]
+                       ('Pyramid Exit', 'Pyramid Exit Ledge'),
+                       ('Pyramid Hole', 'Pyramid'),
+                       ('Pyramid Entrance', 'Bottom of Pyramid'),
+                       ('Inverted Pyramid Hole', 'Pyramid'),
+                       ('Inverted Pyramid Entrance', 'Bottom of Pyramid')
+                    ]
 
 swapped_connections = {
     0x03: [
@@ -2883,18 +2887,14 @@ swapped_connections = {
         ]
 }
 
-open_default_connections =  [('Links House', 'Links House'),
+open_default_connections = [('Links House', 'Links House'),
                             ('Links House Exit', 'Links House Area'),
-                            ('Big Bomb Shop', 'Big Bomb Shop'),
-                            ('Pyramid Hole', 'Pyramid'),
-                            ('Pyramid Entrance', 'Bottom of Pyramid')
+                            ('Big Bomb Shop', 'Big Bomb Shop')
                        ]
 
-inverted_default_connections =  [('Links House', 'Big Bomb Shop'),
-                                 ('Links House Exit', 'Big Bomb Shop Area'),
-                                 ('Big Bomb Shop', 'Links House'),
-                                 ('Inverted Pyramid Hole', 'Pyramid'),
-                                 ('Inverted Pyramid Entrance', 'Bottom of Pyramid')
+inverted_default_connections = [('Links House', 'Big Bomb Shop'),
+                                ('Links House Exit', 'Big Bomb Shop Area'),
+                                ('Big Bomb Shop', 'Links House')
                             ]
 
 # non shuffled dungeons
@@ -2950,19 +2950,19 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South 
                                ('Dark Death Mountain Ledge (East)', 'Turtle Rock Chest Portal'),
                                ('Turtle Rock Isolated Ledge Exit', 'Dark Death Mountain Isolated Ledge'),
                                ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Eye Bridge Portal')
-                               ]
+                            ]
 
 open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Portal'),
                                     ('Ganons Tower Exit', 'West Dark Death Mountain (Top)'),
                                     ('Agahnims Tower', 'Agahnims Tower Portal'),
                                     ('Agahnims Tower Exit', 'Hyrule Castle Ledge')
-                                    ]
+                                ]
 
 inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Portal'),
                                         ('Ganons Tower Exit', 'Hyrule Castle Ledge'),
                                         ('Agahnims Tower', 'Ganons Tower Portal'),
                                         ('Agahnims Tower Exit', 'West Dark Death Mountain (Top)')
-                                        ]
+                                    ]
 
 indirect_connections = {
     'Turtle Rock Ledge': 'Turtle Rock',
