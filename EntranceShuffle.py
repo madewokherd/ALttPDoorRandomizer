@@ -225,7 +225,7 @@ def link_entrances(world, player):
             random.shuffle(remaining_entrances)
             old_man_entrance = remaining_entrances.pop()
 
-        connect_two_way(world, old_man_entrance if not invFlag else 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
+        connect_two_way(world, old_man_entrance if invFlag == (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
         connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
         if invFlag and old_man_exit == 'Spike Cave':
             bomb_shop_doors.remove('Spike Cave')
@@ -469,9 +469,7 @@ def link_entrances(world, player):
             connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
         elif invFlag or world.doorShuffle[player] == 'vanilla':
             caves.append(tuple(random.sample(['Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'],3)))
-            lw_entrances.append('Hyrule Castle Entrance (South)')
-        else:
-            lw_entrances.append('Hyrule Castle Entrance (South)')
+        lw_entrances.append('Hyrule Castle Entrance (South)')
 
         if not world.shuffle_ganon:
             connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
@@ -1166,20 +1164,28 @@ def link_entrances(world, player):
 
         if not world.shuffle_ganon:
             connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
-            connect_two_way(world, 'Pyramid Entrance' if not invFlag else 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
-            connect_entrance(world, 'Pyramid Hole' if not invFlag else 'Inverted Pyramid Hole', 'Pyramid', player)
+            connect_two_way(world, 'Pyramid Entrance' if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
+            connect_entrance(world, 'Pyramid Hole' if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Inverted Pyramid Hole', 'Pyramid', player)
         else:
             caves.extend(['Ganons Tower Exit', 'Pyramid Exit'])
             hole_targets.append('Pyramid')
+
             if not invFlag:
-                exit_pool.extend(['Ganons Tower', 'Pyramid Entrance'])
+                exit_pool.extend(['Ganons Tower'])
+                doors.extend(['Ganons Tower'])
+            else:
+                exit_pool.extend(['Agahnims Tower'])
+                doors.extend(['Agahnims Tower'])
+            
+            if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                exit_pool.extend(['Pyramid Entrance'])
                 hole_entrances.append('Pyramid Hole')
                 entrances_must_exits.append('Pyramid Entrance')
-                doors.extend(['Ganons Tower', 'Pyramid Entrance'])
+                doors.extend(['Pyramid Entrance'])
             else:
-                exit_pool.extend(['Agahnims Tower', 'Inverted Pyramid Entrance'])
+                exit_pool.extend(['Inverted Pyramid Entrance'])
                 hole_entrances.append('Inverted Pyramid Hole')
-                doors.extend(['Agahnims Tower', 'Inverted Pyramid Entrance'])
+                doors.extend(['Inverted Pyramid Entrance'])
 
         random.shuffle(hole_entrances)
         random.shuffle(hole_targets)
@@ -1355,24 +1361,31 @@ def link_entrances(world, player):
 
         if not world.shuffle_ganon:
             connect_two_way(world, 'Ganons Tower', 'Ganons Tower Exit', player)
-            if not invFlag:
+            if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
                 connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
                 connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
             else:
                 connect_two_way(world, 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
                 connect_entrance(world, 'Inverted Pyramid Hole', 'Pyramid', player)
         else:
-
             caves.extend(['Ganons Tower Exit', 'Pyramid Exit'])
             hole_targets.append('Pyramid')
+
             if not invFlag:
+                doors.extend(['Ganons Tower'])
+                exit_pool.extend(['Ganons Tower'])
+            else:
+                doors.extend(['Agahnims Tower'])
+                exit_pool.extend(['Agahnims Tower'])
+            
+            if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
                 hole_entrances.append('Pyramid Hole')
-                doors.extend(['Agahnims Tower', 'Pyramid Entrance'])
-                exit_pool.extend(['Agahnims Tower', 'Pyramid Entrance'])
+                doors.extend(['Pyramid Entrance'])
+                exit_pool.extend(['Pyramid Entrance'])
             else:
                 hole_entrances.append('Inverted Pyramid Hole')
-                doors.extend(['Agahnims Tower', 'Inverted Pyramid Entrance'])
-                exit_pool.extend(['Agahnims Tower', 'Inverted Pyramid Entrance'])
+                doors.extend(['Inverted Pyramid Entrance'])
+                exit_pool.extend(['Inverted Pyramid Entrance'])
 
         random.shuffle(hole_entrances)
         random.shuffle(hole_targets)
@@ -1502,7 +1515,7 @@ def link_entrances(world, player):
         world.powder_patch_required[player] = True
 
     # check for ganon location
-    if world.get_entrance('Pyramid Hole' if not invFlag else 'Inverted Pyramid Hole', player).connected_region.name != 'Pyramid':
+    if world.get_entrance('Pyramid Hole' if invFlag == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Inverted Pyramid Hole', player).connected_region.name != 'Pyramid':
         world.ganon_at_pyramid[player] = False
 
     # check for Ganon's Tower location
@@ -2926,12 +2939,12 @@ inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Portal'
 indirect_connections = {
     'Turtle Rock Ledge': 'Turtle Rock',
     'Pyramid Area': 'Pyramid Fairy',
-    'East Dark World': 'Pyramid Fairy',
+    #'East Dark World': 'Pyramid Fairy',
     'Big Bomb Shop': 'Pyramid Fairy',
-    'Dark Desert': 'Pyramid Fairy',
-    'West Dark World': 'Pyramid Fairy',
-    'South Dark World': 'Pyramid Fairy',
-    'Light World': 'Pyramid Fairy',
+    #'Dark Desert': 'Pyramid Fairy',
+    #'West Dark World': 'Pyramid Fairy',
+    #'South Dark World': 'Pyramid Fairy',
+    #'Light World': 'Pyramid Fairy',
     'Old Man Cave': 'Old Man S&Q'
 }
 # format:
