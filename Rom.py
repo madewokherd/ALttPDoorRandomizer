@@ -29,6 +29,8 @@ from Items import ItemFactory
 from EntranceShuffle import door_addresses, exit_ids
 from OverworldShuffle import default_flute_connections, flute_data
 
+from source.classes.SFX import randomize_sfx
+
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
 RANDOMIZERBASEHASH = 'cc8fc59caa0bbe6d26ac64b9d2893709'
@@ -1136,7 +1138,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
         0x12, 0x01, 0x35, 0xFF, # lamp -> 5 rupees
-        0x51, 0x00 if world.bomblogic[player] else 0x06, 0x31 if world.bomblogic[player] else 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade. If bomblogic -> turns into Bombs (10)
+        0x51, 0x00 if world.bombbag[player] else 0x06, 0x31 if world.bombbag[player] else 0x52, 0xFF, # 6 +5 bomb upgrades -> +10 bomb upgrade. If bombbag -> turns into Bombs (10)
         0x53, 0x06, 0x54, 0xFF, # 6 +5 arrow upgrades -> +10 arrow upgrade
         0x58, 0x01, 0x36 if world.retro[player] else 0x43, 0xFF, # silver arrows -> single arrow (red 20 in retro mode)
         0x3E, difficulty.boss_heart_container_limit, 0x47, 0xff, # boss heart -> green 20
@@ -1273,7 +1275,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     equip[0x36C] = 0x18
     equip[0x36D] = 0x18
     equip[0x379] = 0x68
-    if world.bomblogic[player]:
+    if world.bombbag[player]:
         starting_max_bombs = 0
     else:
         starting_max_bombs = 10
@@ -1568,7 +1570,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_bytes(0x180188, [0, 0, 10])  # Zelda respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x18018B, [0, 0, 10])  # Mantle respawn refills (magic, bombs, arrows)
             bow_max, bow_small = 70, 10
-        elif uncle_location.item is not None and uncle_location.item.name in ['Bomb Upgrade (+10)' if world.bomblogic[player] else 'Bombs (10)']:
+        elif uncle_location.item is not None and uncle_location.item.name in ['Bomb Upgrade (+10)' if world.bombbag[player] else 'Bombs (10)']:
             rom.write_byte(0x18004E, 2)  # Escape Fill (bombs)
             rom.write_bytes(0x180185, [0, 50, 0])  # Uncle respawn refills (magic, bombs, arrows)
             rom.write_bytes(0x180188, [0, 3, 0])  # Zelda respawn refills (magic, bombs, arrows)
@@ -1732,7 +1734,7 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
-                       ow_palettes, uw_palettes, reduce_flashing):
+                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx):
 
     if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
@@ -1833,6 +1835,9 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         randomize_uw_palettes(rom)
     elif uw_palettes == 'blackout':
         blackout_uw_palettes(rom)
+
+    if shuffle_sfx:
+        randomize_sfx(rom)
 
     if isinstance(rom, LocalRom):
         rom.write_crc()

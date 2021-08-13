@@ -243,6 +243,10 @@
     "action": "store_true",
     "type": "bool"
   },
+  "shuffle_sfx": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "mapshuffle": {
     "action": "store_true",
     "type": "bool"
@@ -264,7 +268,7 @@
     "type": "bool",
     "help": "suppress"
   },
-  "bomblogic": {
+  "bombbag": {
     "action": "store_true",
     "type": "bool"
   },

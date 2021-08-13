@@ -123,7 +123,7 @@ class World(object):
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', False)
             set_player_attr('bigkeyshuffle', False)
-            set_player_attr('bomblogic', False)
+            set_player_attr('bombbag', False)
             set_player_attr('difficulty_requirements', None)
             set_player_attr('boss_shuffle', 'none')
             set_player_attr('enemy_shuffle', 'none')
@@ -877,7 +877,7 @@ class CollectionState(object):
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        return (not self.world.bomblogic[player] or self.has('Bomb Upgrade (+10)', player)) and self.can_farm_bombs(player)
+        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player)) and self.can_farm_bombs(player)
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)
@@ -2304,7 +2304,7 @@ class Spoiler(object):
                          'logic': self.world.logic,
                          'mode': self.world.mode,
                          'retro': self.world.retro,
-                         'bomblogic': self.world.bomblogic,
+                         'bombbag': self.world.bombbag,
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'ow_shuffle': self.world.owShuffle,
@@ -2416,7 +2416,7 @@ class Spoiler(object):
                 outfile.write('Experimental:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
                 outfile.write('Key Drops shuffled:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['keydropshuffle'][player] else 'No'))
                 outfile.write('Shopsanity:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shopsanity'][player] else 'No'))
-                outfile.write('Bomblogic:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['bomblogic'][player] else 'No'))
+                outfile.write('Bombbag:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['bombbag'][player] else 'No'))
             if self.doors:
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(

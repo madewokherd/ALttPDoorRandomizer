@@ -183,7 +183,7 @@ def roll_settings(weights):
         ret.retro = True
     ret.retro = get_choice('retro') == 'on'  # this overrides world_state if used
 
-    ret.bomblogic = get_choice('bomblogic') == 'on'
+    ret.bombbag = get_choice('bombbag') == 'on'
 
     ret.hints = get_choice('hints') == 'on'
 
@@ -241,6 +241,7 @@ def roll_settings(weights):
         ret.heartbeep = get_choice('heartbeep', romweights)
         ret.ow_palettes = get_choice('ow_palettes', romweights)
         ret.uw_palettes = get_choice('uw_palettes', romweights)
+        ret.shuffle_sfx = get_choice('shuffle_sfx', romweights) == 'on'
 
     return ret
 
