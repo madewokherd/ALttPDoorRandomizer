@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.7.4
+- Fixed issue with Mixed OW failing to generate when HC/Pyramid is swapped
+- Various fixes to improve generation rates for Mixed OW Shuffle
+- ~~Merged DR v0.5.0.2 - Shuffle SFX~~
+
 ### 0.1.7.3
 - Fixed minor issue with ambient SFX stopping and starting on OW screen load
 - MSU-1 changed to play LW2 (track 60) when Aga1 is killed instead of ped pull
