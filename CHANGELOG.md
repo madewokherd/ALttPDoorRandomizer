@@ -18,7 +18,7 @@
 
 ### 0.1.7.0
 - Expanded new DR bomb logic to all modes (bomb usage in logic only if there is an unlimited supply of bombs available)
-- ~~Merged DR v0.5.0.1 - Bomblogic mode / Enemizer fixes~~
+- ~~Merged DR v0.5.0.1 - Bombbag mode / Enemizer fixes~~
 
 ### 0.1.6.9
 - ~~Merged DR v0.4.0.12 - Secure random update / Credits fix~~

@@ -57,7 +57,7 @@ SETTINGSTOPROCESS = {
     "item": {
       "hints": "hints",
       "retro": "retro",
-      "bomblogic": "bomblogic",
+      "bombbag": "bombbag",
       "shopsanity": "shopsanity",
       "pseudoboots": "pseudoboots",
       "worldstate": "mode",
@@ -104,7 +104,7 @@ SETTINGSTOPROCESS = {
       "experimental": "experimental",
       "dungeon_counters": "dungeon_counters",
       "mixed_travel": "mixed_travel",
-      "standardize_palettes": "standardize_palettes",
+      "standardize_palettes": "standardize_palettes"
     },
     "gameoptions": {
       "nobgm": "disablemusic",
@@ -114,7 +114,8 @@ SETTINGSTOPROCESS = {
       "menuspeed": "fastmenu",
       "owpalettes": "ow_palettes",
       "uwpalettes": "uw_palettes",
-      "reduce_flashing": "reduce_flashing"
+      "reduce_flashing": "reduce_flashing",
+      "shuffle_sfx": "shuffle_sfx"
     },
     "generation": {
       "createspoiler": "create_spoiler",
