@@ -189,10 +189,8 @@
       "                which they are entered.",
       "Vanilla:        All entrances are in the same locations they were",
       "                in the base game.",
-      "Legacy shuffles preserve behavior from older versions of the",
-      "entrance randomizer including significant technical limitations.",
       "The dungeon variants only mix up dungeons and keep the rest of",
-      "the overworld vanilla."
+      "the entrances vanilla."
     ],
     "ow_shuffle": [
       "This shuffles the layout of the overworld.",

@@ -2553,11 +2553,11 @@ class Pot(object):
         self.flags = flags
 
 
-# byte 0: DDOO EEEE (DR, OR, ER)
+# byte 0: DDOO OEEE (DR, OR, ER)
 dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0}
-or_mode = {"parallel": 1, "full": 2, "vanilla": 0}
-er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, "restricted_legacy": 8,
-           "full_legacy": 9, "madness_legacy": 10, "insanity_legacy": 11, "dungeonsfull": 7, "dungeonssimple": 6}
+or_mode = {"vanilla": 0, "parallel": 1, "full": 2}
+orswap_mode = {"vanilla": 0, "mixed": 1, "crossed": 1}
+er_mode = {"vanilla": 0, "simple": 1, "restricted": 3, "full": 3, "crossed": 4, "insanity": 5, "dungeonsfull": 7, "dungeonssimple": 7}
 
 # byte 1: LLLW WSSR (logic, mode, sword, retro)
 logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owglitches": 3, "majorglitches": 4}
@@ -2592,7 +2592,7 @@ class Settings(object):
     @staticmethod
     def make_code(w, p):
         code = bytes([
-            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 4) | er_mode[w.shuffle[p]],
+            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 4) | (orswap_mode[w.owSwap[p]] << 3) | er_mode[w.shuffle[p]],
 
             (logic_mode[w.logic[p]] << 5) | (world_mode[w.mode[p]] << 3)
             | (sword_mode[w.swords[p]] << 1) | (1 if w.retro[p] else 0),

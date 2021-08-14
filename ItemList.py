@@ -986,12 +986,12 @@ def test():
                 for mode in ['open', 'standard', 'inverted', 'retro']:
                     for swords in ['random', 'assured', 'swordless', 'vanilla']:
                         for progressive in ['on', 'off']:
-                            for shuffle in ['full', 'insanity_legacy']:
+                            for shuffle in ['vanilla', 'full', 'crossed', 'insanity']:
                                 for logic in ['noglitches', 'minorglitches', 'owglitches', 'nologic']:
                                     for retro in [True, False]:
                                         for door_shuffle in ['basic', 'crossed', 'vanilla']:
-                                            for owShuffle in ['full', 'vanilla']:
-                                                for owSwap in ['mixed', 'vanilla']:
+                                            for owShuffle in ['full', 'parallel', 'vanilla']:
+                                                for owSwap in ['vanilla', 'mixed', 'crossed']:
                                                     out = get_pool_core(progressive, owShuffle, owSwap, shuffle, difficulty, 30, timer, goal, mode, swords, retro, bombbag, door_shuffle, logic)
                                                     count = len(out[0]) + len(out[1])
 
