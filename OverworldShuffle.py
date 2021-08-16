@@ -152,8 +152,7 @@ def link_overworld(world, player):
 
     # layout shuffle
     if world.owShuffle[player] == 'vanilla':
-        for grouping in (trimmed_groups,):
-            groups = list(trimmed_groups.values())
+        groups = list(trimmed_groups.values())
         for (forward_edge_sets, back_edge_sets) in groups:
             assert len(forward_edge_sets) == len(back_edge_sets)
             for (forward_set, back_set) in zip(forward_edge_sets, back_edge_sets):
