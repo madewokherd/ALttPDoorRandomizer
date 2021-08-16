@@ -2177,10 +2177,10 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
             if world.shuffle_ganon:
-                if world.mode[player] == 'inverted':
+                if world.mode[player] == 'inverted' != (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
-                    entrances_to_hint.update({'Pyramid Ledge': 'The pyramid ledge'})
+                    entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
         hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 0
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
