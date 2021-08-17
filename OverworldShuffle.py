@@ -164,8 +164,6 @@ def link_overworld(world, player):
 
     connected_edges = []
 
-    connect_custom(world, connected_edges, player)
-
     # layout shuffle
     if world.owShuffle[player] == 'vanilla' and not world.owCrossed[player]:
         # vanilla transitions
@@ -207,6 +205,8 @@ def link_overworld(world, player):
         #TODO: Remove, just for testing
         for exitname, destname in test_connections:
             connect_two_way(world, exitname, destname, player, connected_edges)
+        
+        connect_custom(world, connected_edges, player)
         
         trimmed_groups = remove_reserved(world, trimmed_groups, connected_edges, player)
         
@@ -321,7 +321,15 @@ def link_overworld(world, player):
 def connect_custom(world, connected_edges, player):
     if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
         for edgename1, edgename2 in world.custom_overworld[player]:
+            if edgename1 in connected_edges or edgename2 in connected_edges:
+                owedge1 = world.check_for_owedge(edgename1, player)
+                owedge2 = world.check_for_owedge(edgename2, player)
+                if owedge1.dest is not None and owedge1.dest.name == owedge2.name:
+                    continue # if attempting to connect a pair that was already connected earlier, allow it to continue
+                raise RuntimeError('Invalid plando connection: rule violation based on current settings')
             connect_two_way(world, edgename1, edgename2, player, connected_edges)
+            if world.owKeepSimilar[player]: #TODO: If connecting an edge that belongs to a similar pair, the remaining edges need to get connected automatically
+                continue
 
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
