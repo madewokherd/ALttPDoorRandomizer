@@ -697,7 +697,6 @@ OWTileRegions = bidict({
     'Spectacle Rock Ledge': 0x03,
     'West Death Mountain (Bottom)': 0x03,
 
-    'Death Mountain Floating Island': 0x05,
     'East Death Mountain (Top West)': 0x05,
     'East Death Mountain (Top East)': 0x05,
     'Spiral Cave Ledge': 0x05,
@@ -706,6 +705,7 @@ OWTileRegions = bidict({
     'Fairy Ascension Plateau': 0x05,
     'East Death Mountain (Bottom Left)': 0x05,
     'East Death Mountain (Bottom)': 0x05,
+    'Death Mountain Floating Island': 0x05,
 
     'Death Mountain TR Pegs': 0x07,
     'Death Mountain TR Pegs Ledge': 0x07,
@@ -846,6 +846,9 @@ OWTileRegions = bidict({
     'East Dark Death Mountain (Top)': 0x45,
     'East Dark Death Mountain (Bottom Left)': 0x45,
     'East Dark Death Mountain (Bottom)': 0x45,
+    'Dark Death Mountain Ledge': 0x45,
+    'Dark Death Mountain Isolated Ledge': 0x45,
+    'Dark Death Mountain Floating Island': 0x45,
 
     'Turtle Rock Area': 0x47,
     'Turtle Rock Ledge': 0x47,
