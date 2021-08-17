@@ -9,15 +9,6 @@
         "full"
       ]
     },
-    "overworldswap": {
-      "type": "selectbox",
-      "default": "mixed",
-      "options": [
-        "vanilla",
-        "mixed",
-        "crossed"
-      ]
-    },
     "overworldflute": {
       "type": "selectbox",
       "default": "vanilla",
@@ -29,6 +20,14 @@
     }
   },
   "rightOverworldFrame": {
+    "crossed": {
+      "type": "checkbox",
+      "default": false
+    },
+    "mixed": {
+      "type": "checkbox",
+      "default": true
+    },
     "keepsimilar": {
       "type": "checkbox",
       "default": true

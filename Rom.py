@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'cc8fc59caa0bbe6d26ac64b9d2893709'
+RANDOMIZERBASEHASH = '99f3f57ab2c9449172cade4927a462d6'
 
 
 class JsonRom(object):
@@ -612,71 +612,20 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if world.pot_contents[player]:
         write_pots_to_rom(rom, world.pot_contents[player])
 
-    # patch overworld edges
-    inverted_buffer = [0] * 0x82
-    if world.owShuffle[player] != 'vanilla' or world.owSwap[player] != 'vanilla':
-        owMode = 0
-        if world.owShuffle[player] == 'parallel':
-            owMode = 1
-        elif world.owShuffle[player] == 'full':
-            owMode = 2
-        
-        if world.owSwap[player] == 'mixed':
-            owMode |= 0x100
-            world.fix_fake_world[player] = True
-        elif world.owSwap[player] == 'crossed':
-            owMode |= 0x200
-            world.fix_fake_world[player] = True
-        
-        write_int16(rom, 0x150002, owMode)
-
-        owFlags = 0
-        if world.owKeepSimilar[player]:
-            owFlags |= 0x1
-        if world.owFluteShuffle[player] != 'vanilla':
-            owFlags |= 0x100
-
-        write_int16(rom, 0x150004, owFlags)
-
-        rom.write_byte(0x18004C, 0x01) # patch for allowing Frogsmith to enter multi-entrance caves
-        
-        # patches map data specific for OW Shuffle
-        #inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
-        inverted_buffer[0x1A] = inverted_buffer[0x1A] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x1B] = inverted_buffer[0x1B] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x22] = inverted_buffer[0x22] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x3F] = inverted_buffer[0x3F] | 0x2  # added C to terrain
-        #inverted_buffer[0x43] = inverted_buffer[0x43] | 0x2  # convenient portal on WDDM
-        inverted_buffer[0x5A] = inverted_buffer[0x5A] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x5B] = inverted_buffer[0x5B] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x62] = inverted_buffer[0x62] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x7F] = inverted_buffer[0x7F] | 0x2  # added C to terrain
-
-        if world.owSwap[player] == 'mixed':
-            for b in world.owswaps[player][0]:
-                # load inverted maps
-                inverted_buffer[b] = (inverted_buffer[b] & 0xFE) | ((inverted_buffer[b] + 1) % 2)
-
-                # set world flag
-                rom.write_byte(0x153A00 + b, 0x00 if b >= 0x40 else 0x40)
-        
-        for edge in world.owedges:
-            if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
-                write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
-                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
-    
     # patch flute spots
+    owFlags = 0
     if world.owFluteShuffle[player] == 'vanilla':
         flute_spots = default_flute_connections
     else:
         flute_spots = world.owflutespots[player]
+        owFlags |= 0x100
 
     for o in range(0, len(flute_spots)):
         owslot = flute_spots[o]
         offset = 0
         data = flute_data[owslot]
 
-        if (world.mode[player] == 'inverted') != (data[1] in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        if (world.mode[player] == 'inverted') != (data[1] in world.owswaps[player][0] and world.owMixed[player]):
             offset = 0x40
         
         write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), data[1] + offset) # owid
@@ -695,7 +644,55 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_byte(snes_to_pc(0x0AB78B + o), data[12] // 0x100) # X high byte
         rom.write_byte(snes_to_pc(0x0AB793 + o), data[11] & 0xff) # Y low byte
         rom.write_byte(snes_to_pc(0x0AB79B + o), data[11] // 0x100) # Y high byte
+
+    # patch overworld edges
+    inverted_buffer = [0] * 0x82
+    if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] or world.owMixed[player]:
+        owMode = 0
+        if world.owShuffle[player] == 'parallel':
+            owMode = 1
+        elif world.owShuffle[player] == 'full':
+            owMode = 2
+
+        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player]):
+            owMode |= 0x100
+        if world.owCrossed[player]:
+            owMode |= 0x200
+            world.fix_fake_world[player] = True
+        if world.owMixed[player]:
+            owMode |= 0x400
         
+        write_int16(rom, 0x150002, owMode)
+
+        write_int16(rom, 0x150004, owFlags)
+
+        rom.write_byte(0x18004C, 0x01) # patch for allowing Frogsmith to enter multi-entrance caves
+        
+        # patches map data specific for OW Shuffle
+        #inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
+        inverted_buffer[0x1A] = inverted_buffer[0x1A] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x1B] = inverted_buffer[0x1B] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x22] = inverted_buffer[0x22] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x3F] = inverted_buffer[0x3F] | 0x2  # added C to terrain
+        #inverted_buffer[0x43] = inverted_buffer[0x43] | 0x2  # convenient portal on WDDM
+        inverted_buffer[0x5A] = inverted_buffer[0x5A] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x5B] = inverted_buffer[0x5B] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x62] = inverted_buffer[0x62] | 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x7F] = inverted_buffer[0x7F] | 0x2  # added C to terrain
+
+        if world.owMixed[player]:
+            for b in world.owswaps[player][0]:
+                # load inverted maps
+                inverted_buffer[b] = (inverted_buffer[b] & 0xFE) | ((inverted_buffer[b] + 1) % 2)
+
+                # set world flag
+                rom.write_byte(0x153A00 + b, 0x00 if b >= 0x40 else 0x40)
+        
+        for edge in world.owedges:
+            if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
+                write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
+                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
+    
     
     # patch entrance/exits/holes
     for region in world.regions:
@@ -2177,7 +2174,7 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
             if world.shuffle_ganon:
-                if world.mode[player] == 'inverted' != (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+                if world.mode[player] == 'inverted' != (0x1b in world.owswaps[player][0] and world.owMixed[player]):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
                     entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
@@ -2247,7 +2244,7 @@ def write_strings(rom, world, player, team):
                 tt[hint_locations.pop(0)] = this_hint
 
         # Adding a guaranteed hint for the Flute in overworld shuffle.
-        if world.owShuffle[player] in ['parallel','full']:
+        if world.owShuffle[player] != 'vanilla' or world.owMixed[player]:
             this_location = world.find_items_not_key_only('Ocarina', player)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
@@ -2255,7 +2252,7 @@ def write_strings(rom, world, player, team):
 
         # Lastly we write hints to show where certain interesting items are. It is done the way it is to re-use the silver code and also to give one hint per each type of item regardless of how many exist. This supports many settings well.
         items_to_hint = RelevantItems.copy()
-        if world.owShuffle[player] in ['parallel','full']:
+        if world.owShuffle[player] != 'vanilla' or world.owMixed[player]:
             items_to_hint.remove('Ocarina')
         if world.keyshuffle[player]:
             items_to_hint.extend(SmallKeys)
@@ -2264,7 +2261,7 @@ def write_strings(rom, world, player, team):
         random.shuffle(items_to_hint)
         hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 8
         hint_count += 2 if world.doorShuffle[player] == 'crossed' else 0
-        hint_count += 1 if world.owShuffle[player] in ['parallel', 'full'] else 0
+        hint_count += 1 if world.owShuffle[player] != 'vanilla' or world.owMixed[player] else 0
         while hint_count > 0:
             this_item = items_to_hint.pop(0)
             this_location = world.find_items_not_key_only(this_item, player)
@@ -2475,7 +2472,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
                 write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
                 write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
-    if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owMixed[player]):
         if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
             rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01])  # mountain cave starts on OW
             
@@ -2498,18 +2495,18 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
 
             rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  #indicates the overworld door being used for the single entrance spawn point
-    if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
-    if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC387), [0xDD, 0xD1])  # add warps under rocks
         rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF])  # add warps under rocks
         rom.write_byte(0x180089, 0x01)  # open TR after exit
         rom.write_bytes(0x0086E, [0x5C, 0x00, 0xA0, 0xA1]) # TR tail
         if world.shuffle[player] in ['vanilla']:
             world.fix_trock_doors[player] = True
-    if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
-    if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owMixed[player]):
         write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
         rom.write_byte(0x15B8C + 0x06, 0x1B)
         write_int16(rom, 0x15BDB + 2 * 0x06, 0x00AE)
@@ -2597,21 +2594,21 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         
         write_int16(rom, 0xDB96F + 2 * 0x35, 0x001B)  # move pyramid exit door
         write_int16(rom, 0xDBA71 + 2 * 0x35, 0x011C)
-    if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])  # frog pickup on contact
-    if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owMixed[player]):
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
             rom.write_byte(0x15B8C, 0x6C)  # exit links at bomb shop area
             rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
             rom.write_byte(0xDBB73 + 0x52, 0x01)
-    if (world.mode[player] == 'inverted') != (0x2F in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x2F in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])  # add warp under rock
-    if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC81E), [0x94, 0x1D, 0x82])  # add warp under rock
-    if (world.mode[player] == 'inverted') != (0x33 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x33 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC3DF), [0xD8, 0xD1])  # add warp under rock
         rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
-    if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+    if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
     
     # apply inverted map changes

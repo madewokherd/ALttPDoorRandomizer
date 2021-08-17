@@ -50,18 +50,18 @@ def link_entrances(world, player):
 
         # inverted entrance mods
         for owid in swapped_connections.keys():
-            if invFlag != (owid in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            if invFlag != (owid in world.owswaps[player][0] and world.owMixed[player]):
                 for (entrancename, exitname) in swapped_connections[owid]:
                     try:
                         connect_two_way(world, entrancename, exitname, player)
                     except RuntimeError:
                         connect_entrance(world, entrancename, exitname, player)
         
-        if invFlag != (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed') and \
-            invFlag == (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        if invFlag != (0x03 in world.owswaps[player][0] and world.owMixed[player]) and \
+            invFlag == (0x0a in world.owswaps[player][0] and world.owMixed[player]):
             connect_entrance(world, 'Death Mountain Return Cave (West)', 'Dark Death Mountain Healer Fairy', player)
-        elif invFlag != (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed') and \
-            invFlag == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        elif invFlag != (0x0a in world.owswaps[player][0] and world.owMixed[player]) and \
+            invFlag == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
             connect_two_way(world, 'Bumper Cave (Top)', 'Death Mountain Return Cave Exit (West)', player)
 
         # dungeon entrance shuffle
@@ -225,7 +225,7 @@ def link_entrances(world, player):
             random.shuffle(remaining_entrances)
             old_man_entrance = remaining_entrances.pop()
 
-        connect_two_way(world, old_man_entrance if invFlag == (0x0a in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
+        connect_two_way(world, old_man_entrance if invFlag == (0x0a in world.owswaps[player][0] and world.owMixed[player]) else 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
         connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
         if invFlag and old_man_exit == 'Spike Cave':
             bomb_shop_doors.remove('Spike Cave')
@@ -791,8 +791,8 @@ def link_entrances(world, player):
 
         if not world.shuffle_ganon:
             connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
-            connect_two_way(world, 'Pyramid Entrance' if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
-            connect_entrance(world, 'Pyramid Hole' if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Inverted Pyramid Hole', 'Pyramid', player)
+            connect_two_way(world, 'Pyramid Entrance' if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]) else 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
+            connect_entrance(world, 'Pyramid Hole' if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]) else 'Inverted Pyramid Hole', 'Pyramid', player)
         else:
             caves.extend(['Ganons Tower Exit', 'Pyramid Exit'])
             hole_targets.append('Pyramid')
@@ -804,7 +804,7 @@ def link_entrances(world, player):
                 exit_pool.extend(['Agahnims Tower'])
                 doors.extend(['Agahnims Tower'])
             
-            if invFlag == (0x1b in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+            if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]):
                 exit_pool.extend(['Pyramid Entrance'])
                 hole_entrances.append('Pyramid Hole')
                 entrances_must_exits.append('Pyramid Entrance')
@@ -943,7 +943,7 @@ def link_entrances(world, player):
         world.powder_patch_required[player] = True
 
     # check for ganon location
-    if world.get_entrance('Pyramid Hole' if invFlag == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed') else 'Inverted Pyramid Hole', player).connected_region.name != 'Pyramid':
+    if world.get_entrance('Pyramid Hole' if invFlag == (0x03 in world.owswaps[player][0] and world.owMixed[player]) else 'Inverted Pyramid Hole', player).connected_region.name != 'Pyramid':
         world.ganon_at_pyramid[player] = False
 
     # check for Ganon's Tower location
@@ -1030,7 +1030,7 @@ def scramble_holes(world, player):
                     ('Lumberjack Tree Exit', 'Lumberjack Tree (top)')]
 
     if not world.shuffle_ganon:
-        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
             connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
             connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
         else:
@@ -1053,7 +1053,7 @@ def scramble_holes(world, player):
     if world.shuffle_ganon:
         random.shuffle(hole_targets)
         exit, target = hole_targets.pop()
-        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owSwap[player] == 'mixed'):
+        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
             connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
             connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
         else:
