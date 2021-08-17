@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.1.8.0
+- Moved Crossed to its own checkbox option
+- Removed Legacy ER shuffles
+- Added OW Shuffle support for Plando module (needs user testing)
+- Fixed issue with Sanc start at TR as bunny when it is LW
+- Fixed issue with Pyramid Hole not getting shuffled
+- ~~Merged DR v0.5.0.3 - Minor DR fixes~~
+
 ### 0.1.7.4
 - Fixed issue with Mixed OW failing to generate when HC/Pyramid is swapped
 - Various fixes to improve generation rates for Mixed OW Shuffle
