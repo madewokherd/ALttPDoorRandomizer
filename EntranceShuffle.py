@@ -1029,16 +1029,6 @@ def scramble_holes(world, player):
                     ('Lost Woods Hideout Exit', 'Lost Woods Hideout (top)'),
                     ('Lumberjack Tree Exit', 'Lumberjack Tree (top)')]
 
-    if not world.shuffle_ganon:
-        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
-            connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
-            connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
-        else:
-            connect_two_way(world, 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
-            connect_entrance(world, 'Inverted Pyramid Hole', 'Pyramid', player)
-    else:
-        hole_targets.append(('Pyramid Exit', 'Pyramid'))
-
     if world.mode[player] == 'standard':
         # cannot move uncle cave
         connect_two_way(world, 'Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit', player)
@@ -1050,18 +1040,31 @@ def scramble_holes(world, player):
     # do not shuffle sanctuary into pyramid hole unless shuffle is crossed
     if world.shuffle[player] == 'crossed':
         hole_targets.append(('Sanctuary Exit', 'Sewer Drop'))
-    if world.shuffle_ganon:
-        random.shuffle(hole_targets)
-        exit, target = hole_targets.pop()
+
+    # determine pyramid hole
+    if not world.shuffle_ganon:
         if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
             connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
             connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
         else:
             connect_two_way(world, 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
             connect_entrance(world, 'Inverted Pyramid Hole', 'Pyramid', player)
+    else:
+        hole_targets.append(('Pyramid Exit', 'Pyramid'))
+
+        random.shuffle(hole_targets)
+        exit, target = hole_targets.pop()
+        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
+            connect_two_way(world, 'Pyramid Entrance', exit, player)
+            connect_entrance(world, 'Pyramid Hole', target, player)
+        else:
+            connect_two_way(world, 'Inverted Pyramid Entrance', exit, player)
+            connect_entrance(world, 'Inverted Pyramid Hole', target, player)
+
     if world.shuffle[player] != 'crossed':
         hole_targets.append(('Sanctuary Exit', 'Sewer Drop'))
 
+    # shuffle the rest
     random.shuffle(hole_targets)
     for entrance, drop in hole_entrances:
         exit, target = hole_targets.pop()
