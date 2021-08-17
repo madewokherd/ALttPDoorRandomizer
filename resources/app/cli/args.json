@@ -116,14 +116,15 @@
       "full"
     ]
   },
-  "ow_swap": {
-    "choices": [
-      "vanilla",
-      "mixed",
-      "crossed"
-    ]
+  "ow_crossed": {
+    "action": "store_true",
+    "type": "bool"
   },
   "ow_keepsimilar": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "ow_mixed": {
     "action": "store_true",
     "type": "bool"
   },
@@ -142,10 +143,6 @@
       "full",
       "crossed",
       "insanity",
-      "restricted_legacy",
-      "full_legacy",
-      "madness_legacy",
-      "insanity_legacy",
       "dungeonsfull",
       "dungeonssimple"
     ]

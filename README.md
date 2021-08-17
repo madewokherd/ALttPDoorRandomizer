@@ -66,19 +66,9 @@ OW Transitions are shuffled, but both worlds will have a matching layout.
 
 OW Transitions are shuffled within each world separately.
 
-## Overworld Tile Swap (--ow_swap)
+## Crossed (--ow_crossed)
 
-### Vanilla
-
-OW tiles remain in their original worlds.
-
-### Mixed
-
-OW tiles are randomly chosen to become a part of the opposite world
-
-### Crossed
-
-OW tiles remain in their original world, but transitions can now be travel cross-world.
+This allows OW connections to be shuffled cross-world.
 
 ## Visual Representation of Main OW Shuffle Settings
 
@@ -87,6 +77,10 @@ OW tiles remain in their original world, but transitions can now be travel cross
 ## Keep Similar Edges Together (--ow_keepsimilar)
 
 This keeps similar edge transitions together. ie. The 2 west edges of Potion Shop will be paired to another set of two similar edges
+
+## Mixed Overworld (--ow_mixed)
+
+OW tiles are randomly chosen to become a part of the opposite world
 
 ## Flute Shuffle (--ow_fluteshuffle)
 
@@ -120,16 +114,22 @@ Show the help message and exit.
 For specifying the overworld layout shuffle you want as above. (default: vanilla)
 
 ```
---ow_swap <mode>
+--ow_crossed
 ```
 
-For specifying the overworld tile swap you want as above. (default: vanilla)
+This allows cross-world connections on the overworld
 
 ```
 --ow_keepsimilar
 ```
 
 This keeps similar edge transitions paired together with other pairs of transitions
+
+```
+--ow_mixed
+```
+
+This gives each OW tile a random chance to be swapped to the opposite world
 
 ```
 --ow_fluteshuffle <mode>

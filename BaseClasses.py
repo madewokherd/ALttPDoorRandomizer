@@ -19,13 +19,14 @@ from RoomData import Room
 
 class World(object):
 
-    def __init__(self, players, owShuffle, owSwap, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
+    def __init__(self, players, owShuffle, owCrossed, owMixed, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
                  timer, progressive, goal, algorithm, accessibility, shuffle_ganon, retro, custom, customitemarray, hints):
         self.players = players
         self.teams = 1
         self.owShuffle = owShuffle.copy()
-        self.owSwap = owSwap.copy()
+        self.owCrossed = owCrossed.copy()
         self.owKeepSimilar = {}
+        self.owMixed = owMixed.copy()
         self.owFluteShuffle = {}
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
@@ -2308,8 +2309,9 @@ class Spoiler(object):
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'ow_shuffle': self.world.owShuffle,
-                         'ow_swap': self.world.owSwap,
+                         'ow_crossed': self.world.owCrossed,
                          'ow_keepsimilar': self.world.owKeepSimilar,
+                         'ow_mixed': self.world.owMixed,
                          'ow_fluteshuffle': self.world.owFluteShuffle,
                          'shuffle': self.world.shuffle,
                          'door_shuffle': self.world.doorShuffle,
@@ -2390,9 +2392,10 @@ class Spoiler(object):
                 outfile.write('Difficulty:'.ljust(line_width) + '%s\n' % self.metadata['item_pool'][player])
                 outfile.write('Item Functionality:'.ljust(line_width) + '%s\n' % self.metadata['item_functionality'][player])
                 outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
-                outfile.write('Overworld Tile Swap:'.ljust(line_width) + '%s\n' % self.metadata['ow_swap'][player])
                 if self.metadata['ow_shuffle'][player] != 'vanilla':
+                    outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_crossed'][player] else 'No'))
                     outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
+                outfile.write('Mixed OW:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_mixed'][player] else 'No'))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
@@ -2553,11 +2556,10 @@ class Pot(object):
         self.flags = flags
 
 
-# byte 0: DDOO EEEE (DR, OR, ER)
+# byte 0: DDOO OEEE (DR, OR, ER)
 dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0}
-or_mode = {"parallel": 1, "full": 2, "vanilla": 0}
-er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, "restricted_legacy": 8,
-           "full_legacy": 9, "madness_legacy": 10, "insanity_legacy": 11, "dungeonsfull": 7, "dungeonssimple": 6}
+or_mode = {"vanilla": 0, "parallel": 1, "full": 1}
+er_mode = {"vanilla": 0, "simple": 1, "restricted": 3, "full": 3, "crossed": 4, "insanity": 5, "dungeonsfull": 7, "dungeonssimple": 7}
 
 # byte 1: LLLW WSSR (logic, mode, sword, retro)
 logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owglitches": 3, "majorglitches": 4}
@@ -2592,7 +2594,7 @@ class Settings(object):
     @staticmethod
     def make_code(w, p):
         code = bytes([
-            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 4) | er_mode[w.shuffle[p]],
+            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 5) | (0x10 if w.owCrossed[p] else 0) | (0x08 if w.owMixed[p] else 0) | er_mode[w.shuffle[p]],
 
             (logic_mode[w.logic[p]] << 5) | (world_mode[w.mode[p]] << 3)
             | (sword_mode[w.swords[p]] << 1) | (1 if w.retro[p] else 0),

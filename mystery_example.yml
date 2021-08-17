@@ -3,13 +3,15 @@
     vanilla: 0
     parallel: 2
     full: 2
+  overworld_crossed:
+    on: 1
+    off: 1
   overworld_keepsimilar:
     on: 1
     off: 1
-  overworld_swap:
-    vanilla: 0
-    mixed: 2
-    crossed: 2
+  overworld_mixed:
+    on: 1
+    off: 1
   flute_shuffle:
     vanilla: 0
     balanced: 1

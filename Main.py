@@ -29,7 +29,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.5.0.2-u'
+__version__ = '0.5.0.3-u'
 
 from source.classes.BabelFish import BabelFish
 
@@ -61,7 +61,7 @@ def main(args, seed=None, fish=None):
         for player, code in args.code.items():
             if code:
                 Settings.adjust_args_from_code(code, player, args)
-    world = World(args.multi, args.ow_shuffle, args.ow_swap, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
+    world = World(args.multi, args.ow_shuffle, args.ow_crossed, args.ow_mixed, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
                   args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
                   args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
     logger = logging.getLogger('')
@@ -263,7 +263,7 @@ def main(args, seed=None, fish=None):
             customize_shops(world, player)
     balance_money_progression(world)
 
-    if world.owShuffle[1] != 'vanilla' or world.owSwap[1] != 'vanilla' or str(world.seed).startswith('M'):
+    if world.owShuffle[1] != 'vanilla' or world.owCrossed[1] or world.owMixed[1] or str(world.seed).startswith('M'):
         outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
     else:
         outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
@@ -369,7 +369,7 @@ def main(args, seed=None, fish=None):
 
 def copy_world(world):
     # ToDo: Not good yet
-    ret = World(world.players, world.owShuffle, world.owSwap, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
+    ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
                 world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
     ret.teams = world.teams

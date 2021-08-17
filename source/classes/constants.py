@@ -76,8 +76,9 @@ SETTINGSTOPROCESS = {
     },
     "overworld": {
       "overworldshuffle": "ow_shuffle",
-      "overworldswap": "ow_swap",
+      "crossed": "ow_crossed",
       "keepsimilar": "ow_keepsimilar",
+      "mixed": "ow_mixed",
       "overworldflute": "ow_fluteshuffle"
     },
     "entrance": {
