@@ -1263,6 +1263,8 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (East)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Rock (Top)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Rock (Bottom)', player), player)
+    add_bunny_rule(world.get_entrance('Dark Graveyard Bush (South)', player), player)
+    add_bunny_rule(world.get_entrance('Dark Graveyard Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Dark Witch Rock (North)', player), player)
     add_bunny_rule(world.get_entrance('Dark Witch Rock (South)', player), player)
     add_bunny_rule(world.get_entrance('Catfish Approach Rocks (West)', player), player)

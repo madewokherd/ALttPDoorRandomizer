@@ -964,6 +964,8 @@ mandatory_connections = [# Whirlpool Connections
                          ('Skull Woods Pass Bush Row (East)', 'Skull Woods Pass West Area'), #pearl
                          ('Skull Woods Pass Rock (Top)', 'Skull Woods Pass East Bottom Area'), #mitts
                          ('Skull Woods Pass Rock (Bottom)', 'Skull Woods Pass East Top Area'), #mitts
+                         ('Dark Graveyard Bush (South)', 'Dark Graveyard North'), #pearl
+                         ('Dark Graveyard Bush (North)', 'Dark Graveyard Area'), #pearl
                          ('Qirn Jump Water Drop', 'Qirn Jump Water'), #flippers
                          ('Qirn Jump East Water Drop', 'Qirn Jump Water'), #flippers
                          ('Qirn Jump Pier', 'Qirn Jump East Bank'),
