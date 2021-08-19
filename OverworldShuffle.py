@@ -230,11 +230,15 @@ def link_overworld(world, player):
                             f += 1
                             if f < len(forward_edge_sets):
                                 forward_set = forward_edge_sets[f]
+                            else:
+                                break
                         f += 1
                         while back_set[0] in connected_edges:
                             b += 1
                             if b < len(back_edge_sets):
                                 back_set = back_edge_sets[b]
+                            else:
+                                break
                         b += 1
                         assert len(forward_set) == len(back_set)
                         for (forward_edge, back_edge) in zip(forward_set, back_set):
