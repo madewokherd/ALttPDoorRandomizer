@@ -870,6 +870,7 @@ OWTileRegions = bidict({
     'Dark Chapel Area': 0x53,
 
     'Dark Graveyard Area': 0x54,
+    'Dark Graveyard North': 0x54,
 
     'Qirn Jump Area': 0x55,
     'Qirn Jump East Bank': 0x55,

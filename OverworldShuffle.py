@@ -2,7 +2,7 @@ import RaceRandom as random, logging, copy
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.1.8.0-u'
+__version__ = '0.1.8.1-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -230,15 +230,26 @@ def link_overworld(world, player):
                             f += 1
                             if f < len(forward_edge_sets):
                                 forward_set = forward_edge_sets[f]
+                            else:
+                                forward_set = None
+                                break
                         f += 1
                         while back_set[0] in connected_edges:
                             b += 1
                             if b < len(back_edge_sets):
                                 back_set = back_edge_sets[b]
+                            else:
+                                back_set = None
+                                break
                         b += 1
-                        assert len(forward_set) == len(back_set)
-                        for (forward_edge, back_edge) in zip(forward_set, back_set):
-                            connect_two_way(world, forward_edge, back_edge, player, connected_edges)
+                        if forward_set is not None and back_set is not None:
+                            assert len(forward_set) == len(back_set)
+                            for (forward_edge, back_edge) in zip(forward_set, back_set):
+                                connect_two_way(world, forward_edge, back_edge, player, connected_edges)
+                        elif forward_set is not None:
+                            logging.getLogger('').warning("Edge '%s' could not find a valid connection" % forward_set[0])
+                        elif back_set is not None:
+                            logging.getLogger('').warning("Edge '%s' could not find a valid connection" % back_set[0])
         else:
             # vanilla/crossed shuffle
             for (forward_edge_sets, back_edge_sets) in groups:
@@ -964,6 +975,8 @@ mandatory_connections = [# Whirlpool Connections
                          ('Skull Woods Pass Bush Row (East)', 'Skull Woods Pass West Area'), #pearl
                          ('Skull Woods Pass Rock (Top)', 'Skull Woods Pass East Bottom Area'), #mitts
                          ('Skull Woods Pass Rock (Bottom)', 'Skull Woods Pass East Top Area'), #mitts
+                         ('Dark Graveyard Bush (South)', 'Dark Graveyard North'), #pearl
+                         ('Dark Graveyard Bush (North)', 'Dark Graveyard Area'), #pearl
                          ('Qirn Jump Water Drop', 'Qirn Jump Water'), #flippers
                          ('Qirn Jump East Water Drop', 'Qirn Jump Water'), #flippers
                          ('Qirn Jump Pier', 'Qirn Jump East Bank'),
