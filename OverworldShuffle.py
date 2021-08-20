@@ -231,6 +231,7 @@ def link_overworld(world, player):
                             if f < len(forward_edge_sets):
                                 forward_set = forward_edge_sets[f]
                             else:
+                                forward_set = None
                                 break
                         f += 1
                         while back_set[0] in connected_edges:
@@ -238,11 +239,17 @@ def link_overworld(world, player):
                             if b < len(back_edge_sets):
                                 back_set = back_edge_sets[b]
                             else:
+                                back_set = None
                                 break
                         b += 1
-                        assert len(forward_set) == len(back_set)
-                        for (forward_edge, back_edge) in zip(forward_set, back_set):
-                            connect_two_way(world, forward_edge, back_edge, player, connected_edges)
+                        if forward_set is not None and back_set is not None:
+                            assert len(forward_set) == len(back_set)
+                            for (forward_edge, back_edge) in zip(forward_set, back_set):
+                                connect_two_way(world, forward_edge, back_edge, player, connected_edges)
+                        elif forward_set is not None:
+                            logging.getLogger('').warning("Edge '%s' could not find a valid connection" % forward_set[0])
+                        elif back_set is not None:
+                            logging.getLogger('').warning("Edge '%s' could not find a valid connection" % back_set[0])
         else:
             # vanilla/crossed shuffle
             for (forward_edge_sets, back_edge_sets) in groups:
