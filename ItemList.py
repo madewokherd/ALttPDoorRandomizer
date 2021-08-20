@@ -398,6 +398,7 @@ def set_up_take_anys(world, player):
     if world.mode[player] == 'inverted':
         if 'Dark Sanctuary Hint' in take_any_locations:
             take_any_locations.remove('Dark Sanctuary Hint')
+    if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owMixed[player]):
         if 'Archery Game' in take_any_locations:
             take_any_locations.remove('Archery Game')
 

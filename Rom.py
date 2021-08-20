@@ -2471,6 +2471,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
                 write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
                 write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
+
     if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owMixed[player]):
         if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
             rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01])  # mountain cave starts on OW

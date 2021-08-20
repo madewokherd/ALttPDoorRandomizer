@@ -89,7 +89,7 @@ def link_doors_main(world, player):
             if world.mode[player] == 'standard':
                 world.get_portal('Sanctuary', player).destination = True
             world.get_portal('Desert East', player).destination = True
-            if world.mode[player] == 'inverted':
+            if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owMixed[player]):
                 world.get_portal('Desert West', player).destination = True
             else:
                 world.get_portal('Skull 2 West', player).destination = True
@@ -1838,7 +1838,9 @@ def find_accessible_entrances(world, player, builder):
     elif world.mode[player] != 'inverted':
         start_regions = ['Links House', 'Sanctuary']
     else:
-        start_regions = ['Links House', 'Dark Sanctuary Hint', 'Hyrule Castle Ledge']
+        start_regions = ['Links House', 'Dark Sanctuary Hint']
+    if (world.mode[player] == 'inverted') != (0x1b in world.owswaps[player][0] and world.owMixed[player]):
+        start_regions.append('Hyrule Castle Ledge')
     regs = convert_regions(start_regions, world, player)
     visited_regions = set()
     visited_entrances = []
@@ -1853,7 +1855,7 @@ def find_accessible_entrances(world, player, builder):
     while len(queue) > 0:
         next_region = queue.popleft()
         visited_regions.add(next_region)
-        if world.mode[player] == 'inverted' and next_region.name == 'Tower Agahnim 1':
+        if (world.mode[player] == 'inverted') != (0x1b in world.owswaps[player][0] and world.owMixed[player]) and next_region.name == 'Tower Agahnim 1':
             connect = world.get_region('Hyrule Castle Ledge', player)
             if connect not in queue and connect not in visited_regions:
                 queue.append(connect)

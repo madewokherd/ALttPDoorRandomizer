@@ -1230,6 +1230,7 @@ def simple_shuffle_dungeons(world, player):
             dungeon_entrances.append('Ganons Tower')
             dungeon_exits.append('Ganons Tower Exit')
     else:
+        # TODO: Should we be ignoring world.shuffle_ganon??
         dungeon_entrances.append('Ganons Tower')
         dungeon_exits.append('Agahnims Tower Exit')
 

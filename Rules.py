@@ -1491,8 +1491,8 @@ def swordless_rules(world, player):
 
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_misery_mire_medallion(player))   # sword not required to use medallion for opening in swordless (!)
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock Ledge', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
-    add_bunny_rule(world.get_entrance('Turtle Rock', player), player)
     add_bunny_rule(world.get_entrance('Misery Mire', player), player)
+    add_bunny_rule(world.get_entrance('Turtle Rock', player), player)
 
 std_kill_rooms = {
     'Hyrule Dungeon Armory Main': ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES'], # One green guard
