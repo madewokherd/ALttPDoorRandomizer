@@ -1,5 +1,12 @@
 # Changelog
 
+### 0.1.8.1
+- Fixed issue with activating flute in DW (OW Mixed)
+- Fixed issue with Parallel+Crossed not generating
+- Fixed issue with Standard not generating
+- Fixed issue with Swordless not generating
+- Fixed logic for Graveyard Ledge and Kings Tomb
+
 ### 0.1.8.0
 - Moved Crossed to its own checkbox option
 - Removed Legacy ER shuffles
