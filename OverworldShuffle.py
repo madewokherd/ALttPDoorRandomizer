@@ -215,7 +215,11 @@ def link_overworld(world, player):
         # all layout shuffling occurs here
         if world.owShuffle[player] != 'vanilla':
             # layout shuffle
-            random.shuffle(groups)
+            if world.mode[player] == 'standard':
+                random.shuffle(groups[2:]) # keep first 2 groups (Standard) first
+            else:
+                random.shuffle(groups)
+
             for (forward_edge_sets, back_edge_sets) in groups:
                 assert len(forward_edge_sets) == len(back_edge_sets)
                 random.shuffle(forward_edge_sets)
