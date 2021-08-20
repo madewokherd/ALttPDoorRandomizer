@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '3f7cd4772ea4a3f503691ef8807f5d84'
+RANDOMIZERBASEHASH = '6d8c7d1f0530c1ed1da5afa60e7a6d98'
 
 
 class JsonRom(object):
