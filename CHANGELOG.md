@@ -3,6 +3,10 @@
 ### 0.1.8.2
 - Fixed issue with game crashing on using Flute
 - Fixed issues with Link/Bunny state in Crossed OW
+- Fixed issue with Standard+Parallel not using vanilla connections for Escape
+- Fixed issue with Mystery for OW boolean options
+- ~~Merged DR v0.5.1.0 - Major Keylogic Update~~
+
 
 ### 0.1.8.1
 - Fixed issue with activating flute in DW (OW Mixed)
