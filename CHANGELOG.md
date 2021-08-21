@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.8.2
+- Fixed issue with game crashing on using Flute
+- Fixed issues with Link/Bunny state in Crossed OW
+
 ### 0.1.8.1
 - Fixed issue with activating flute in DW (OW Mixed)
 - Fixed issue with Parallel+Crossed not generating

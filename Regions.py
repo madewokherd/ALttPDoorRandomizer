@@ -1116,7 +1116,7 @@ def mark_dark_world_regions(world, player):
 def create_shops(world, player):
     world.shops[player] = []
     for region_name, (room_id, type, shopkeeper, custom, locked, inventory, sram) in shop_table.items():
-        if world.mode[player] == 'inverted' and region_name == 'Dark Lake Hylia Shop':
+        if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owMixed[player]) and region_name == 'Dark Lake Hylia Shop':
             locked = True
             inventory = [('Blue Potion', 160), ('Blue Shield', 50), ('Bombs (10)', 50)]
         region = world.get_region(region_name, player)
