@@ -351,12 +351,15 @@ OWNewDestination:
             .inverted lda $7ef3ca : and.b #$40 : eor #$40
         + cmp #$40 : bne .nobunny
             ; turn into bunny
-            lda #$17 : sta $5d
-            lda #$01 : sta $02e0 : sta $56
+            lda $5d : cmp #$04 : beq + ; if swimming, continue
+                lda #$17 : sta $5d
+            + lda #$01 : sta $02e0 : sta $56
             bra .return
 
         .nobunny
-        stz $5d : stz $02e0 : stz $56
+        lda $5d : cmp #$17 : bne + ; retain current state unless bunny
+            stz $5d
+        + stz $02e0 : stz $56
 
     .return
     lda $05 : sta $8a
