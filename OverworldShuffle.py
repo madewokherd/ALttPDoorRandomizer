@@ -93,7 +93,7 @@ def link_overworld(world, player):
                         raise NotImplementedError('Cannot move one side of a non-parallel connection')
                 else:
                     raise NotImplementedError('Invalid OW Edge swap scenario')
-        groups = new_groups
+        return new_groups
     
     tile_groups = reorganize_tile_groups(world, player)
     trimmed_groups = copy.deepcopy(OWEdgeGroups)
@@ -132,7 +132,7 @@ def link_overworld(world, player):
         swapped_edges = shuffle_tiles(world, tile_groups, world.owswaps[player], player)
         
         # move swapped regions/edges to other world
-        performSwap(trimmed_groups, swapped_edges)
+        trimmed_groups = performSwap(trimmed_groups, swapped_edges)
         assert len(swapped_edges) == 0, 'Not all edges were swapped successfully: ' + ', '.join(swapped_edges )
         
         update_world_regions(world, player)
@@ -148,7 +148,7 @@ def link_overworld(world, player):
 
     # crossed shuffle
     logging.getLogger('').debug('Crossing overworld edges')
-    if world.owCrossed[player] in ['grouped', 'limited']:
+    if world.owCrossed[player] in ['grouped', 'limited', 'chaos']:
         if world.owCrossed[player] == 'grouped':
             crossed_edges = shuffle_tiles(world, tile_groups, [[],[],[]], player)
         elif world.owCrossed[player] in ['limited', 'chaos']:
@@ -182,7 +182,7 @@ def link_overworld(world, player):
                 elif edge in parallel_links.inverse:
                     crossed_edges.append(parallel_links.inverse[edge][0])
         
-        performSwap(trimmed_groups, crossed_edges)
+        trimmed_groups = performSwap(trimmed_groups, crossed_edges)
         assert len(crossed_edges) == 0, 'Not all edges were crossed successfully: ' + ', '.join(crossed_edges)
 
     # layout shuffle
