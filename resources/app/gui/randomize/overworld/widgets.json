@@ -21,8 +21,15 @@
   },
   "rightOverworldFrame": {
     "crossed": {
-      "type": "checkbox",
-      "default": false
+      "type": "selectbox",
+      "default": "vanilla",
+      "options": [
+        "none",
+        "polar",
+        "grouped",
+        "limited",
+        "chaos"
+      ]
     },
     "mixed": {
       "type": "checkbox",

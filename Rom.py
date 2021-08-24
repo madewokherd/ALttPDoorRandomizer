@@ -646,16 +646,16 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # patch overworld edges
     inverted_buffer = [0] * 0x82
-    if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] or world.owMixed[player]:
+    if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] != 'none' or world.owMixed[player]:
         owMode = 0
         if world.owShuffle[player] == 'parallel':
             owMode = 1
         elif world.owShuffle[player] == 'full':
             owMode = 2
 
-        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player]):
+        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player] in ['limited', 'chaos']):
             owMode |= 0x100
-        if world.owCrossed[player]:
+        if world.owCrossed[player] != 'none':
             owMode |= 0x200
             world.fix_fake_world[player] = True
         if world.owMixed[player]:

@@ -263,7 +263,7 @@ def main(args, seed=None, fish=None):
             customize_shops(world, player)
     balance_money_progression(world)
 
-    if world.owShuffle[1] != 'vanilla' or world.owCrossed[1] or world.owMixed[1] or str(world.seed).startswith('M'):
+    if world.owShuffle[1] != 'vanilla' or world.owCrossed[1] != 'none' or world.owMixed[1] or str(world.seed).startswith('M'):
         outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
     else:
         outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'

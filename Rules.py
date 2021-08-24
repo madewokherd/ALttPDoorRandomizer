@@ -2053,7 +2053,7 @@ def set_inverted_big_bomb_rules(world, player):
     else:
         raise Exception('No logic found for routing from %s to the pyramid.' % bombshop_entrance.name)
     
-    if world.owShuffle[player] != 'vanilla' or world.owMixed[player] or world.owCrossed[player]:
+    if world.owShuffle[player] != 'vanilla' or world.owMixed[player] or world.owCrossed[player] != 'none':
         add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False) #temp disable progression until routing to Pyramid get be guaranteed
 
 

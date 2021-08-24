@@ -246,6 +246,6 @@ Ganon: Triforce
 # set Overworld connections (lines starting with $, separate edges with =)
 !owShuffle: parallel
 #!owMixed: true # Mixed OW not supported yet
-!owCrossed: true
+!owCrossed: none
 !owKeepSimilar: true
 $Links House NE = Kakariko Village SE
