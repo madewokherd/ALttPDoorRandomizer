@@ -169,8 +169,7 @@ def link_overworld(world, player):
                                 if world.owCrossed[player] == 'chaos' and random.randint(0, 1):
                                     crossed_edges.append(edge)
                                 elif world.owCrossed[player] == 'limited':
-                                    crossed_candidates.append(forward_set)
-                                    break
+                                    crossed_candidates.append(edge)
             if world.owCrossed[player] == 'limited':
                 random.shuffle(crossed_candidates)
                 for edge_set in crossed_candidates[:9]:
