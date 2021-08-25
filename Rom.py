@@ -655,7 +655,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
         if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player] in ['limited', 'chaos']):
             owMode |= 0x100
-        if world.owCrossed[player] != 'none':
+        if world.owCrossed[player] != 'none' and (world.owCrossed[player] != 'polar' or world.owMixed[player]):
             owMode |= 0x200
             world.fix_fake_world[player] = True
         if world.owMixed[player]:
