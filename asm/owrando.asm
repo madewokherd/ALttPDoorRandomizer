@@ -342,10 +342,12 @@ OWNewDestination:
     
     ; crossed OW shuffle
     LDA.l OWMode+1 : AND.b #!FLAG_OW_CROSSED : beq .return
-        ldx $05 : lda.l OWTileWorldAssoc,x : sta.l $7ef3ca ; change world
+        ldx $05 : lda.l OWTileWorldAssoc,x : cmp.l $7ef3ca : beq +
+            sta.l $7ef3ca ; change world
+            lda #$38 : sta $012f ; play sfx - #$3b is an alternative
 
         ; toggle bunny mode
-        lda $7ef357 : bne .nobunny
+        + lda $7ef357 : bne .nobunny
         lda.l InvertedMode : bne .inverted
             lda $7ef3ca : and.b #$40 : bra +
             .inverted lda $7ef3ca : and.b #$40 : eor #$40
