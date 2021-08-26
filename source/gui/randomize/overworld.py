@@ -18,8 +18,9 @@ def overworld_page(parent):
     # These get split left & right
     self.frames["leftOverworldFrame"] = Frame(self)
     self.frames["rightOverworldFrame"] = Frame(self)
-    self.frames["leftOverworldFrame"].pack(side=LEFT, anchor=NW)
-    self.frames["rightOverworldFrame"].pack(anchor=NW)
+
+    self.frames["leftOverworldFrame"].pack(side=LEFT, anchor=NW, fill=Y)
+    self.frames["rightOverworldFrame"].pack(anchor=NW, fill=Y)
     
     with open(os.path.join("resources","app","gui","randomize","overworld","widgets.json")) as overworldWidgets:
         myDict = json.load(overworldWidgets)
@@ -27,9 +28,14 @@ def overworld_page(parent):
             dictWidgets = widgets.make_widgets_from_dict(self, theseWidgets, self.frames[framename])
             for key in dictWidgets:
                 self.widgets[key] = dictWidgets[key]
-                if framename == "rightOverworldFrame":
-                    self.widgets[key].pack(side=LEFT)
-                else:
-                    self.widgets[key].pack(anchor=E)
+                packAttrs = {"anchor":E}
+                if key == "keepsimilar":
+                    packAttrs = {"side":LEFT, "pady":(18,0)}
+                elif key == "overworldflute":
+                    packAttrs["pady"] = (20,0)
+                elif key == "mixed":
+                    packAttrs = {"anchor":W, "padx":(79,0)}
+                
+                self.widgets[key].pack(packAttrs)
 
     return self

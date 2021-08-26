@@ -9,17 +9,6 @@
         "full"
       ]
     },
-    "overworldflute": {
-      "type": "selectbox",
-      "default": "vanilla",
-      "options": [
-        "vanilla",
-        "balanced",
-        "random"
-      ]
-    }
-  },
-  "rightOverworldFrame": {
     "crossed": {
       "type": "selectbox",
       "default": "vanilla",
@@ -35,6 +24,17 @@
       "type": "checkbox",
       "default": true
     },
+    "overworldflute": {
+      "type": "selectbox",
+      "default": "vanilla",
+      "options": [
+        "vanilla",
+        "balanced",
+        "random"
+      ]
+    }
+  },
+  "rightOverworldFrame": {
     "keepsimilar": {
       "type": "checkbox",
       "default": true

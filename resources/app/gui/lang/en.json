@@ -124,7 +124,7 @@
     "randomizer.overworld.crossed.limited": "Limited",
     "randomizer.overworld.crossed.chaos": "Chaos",
     "randomizer.overworld.keepsimilar": "Keep Similar Edges Together",
-    "randomizer.overworld.mixed": "Mixed",
+    "randomizer.overworld.mixed": "Tile Swap (Mixed)",
 
     "randomizer.overworld.overworldflute": "Flute Shuffle",
     "randomizer.overworld.overworldflute.vanilla": "Vanilla",
