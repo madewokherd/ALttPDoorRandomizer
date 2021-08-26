@@ -117,8 +117,13 @@
     ]
   },
   "ow_crossed": {
-    "action": "store_true",
-    "type": "bool"
+    "choices": [
+      "none",
+      "polar",
+      "grouped",
+      "limited",
+      "chaos"
+    ]
   },
   "ow_keepsimilar": {
     "action": "store_true",

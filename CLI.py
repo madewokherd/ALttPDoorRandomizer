@@ -146,7 +146,7 @@ def parse_settings():
         "openpyramid": False,
         "shuffleganon": True,
         "ow_shuffle": "vanilla",
-        "ow_crossed": False,
+        "ow_crossed": "none",
         "ow_keepsimilar": False,
         "ow_mixed": False,
         "ow_fluteshuffle": "vanilla",

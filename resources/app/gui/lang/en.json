@@ -118,8 +118,13 @@
     "randomizer.overworld.overworldshuffle.full": "Full",
 
     "randomizer.overworld.crossed": "Crossed",
+    "randomizer.overworld.crossed.none": "None",
+    "randomizer.overworld.crossed.polar": "Polar",
+    "randomizer.overworld.crossed.grouped": "Grouped",
+    "randomizer.overworld.crossed.limited": "Limited",
+    "randomizer.overworld.crossed.chaos": "Chaos",
     "randomizer.overworld.keepsimilar": "Keep Similar Edges Together",
-    "randomizer.overworld.mixed": "Mixed",
+    "randomizer.overworld.mixed": "Tile Swap (Mixed)",
 
     "randomizer.overworld.overworldflute": "Flute Shuffle",
     "randomizer.overworld.overworldflute.vanilla": "Vanilla",

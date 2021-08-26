@@ -2980,7 +2980,7 @@ class Settings(object):
     @staticmethod
     def make_code(w, p):
         code = bytes([
-            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 5) | (0x10 if w.owCrossed[p] else 0) | (0x08 if w.owMixed[p] else 0) | er_mode[w.shuffle[p]],
+            (dr_mode[w.doorShuffle[p]] << 6) | (or_mode[w.owShuffle[p]] << 5) | (0x10 if w.owCrossed[p] != 'none' else 0) | (0x08 if w.owMixed[p] else 0) | er_mode[w.shuffle[p]],
 
             (logic_mode[w.logic[p]] << 5) | (world_mode[w.mode[p]] << 3)
             | (sword_mode[w.swords[p]] << 1) | (1 if w.retro[p] else 0),

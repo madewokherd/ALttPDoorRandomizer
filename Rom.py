@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '363c49821f25327f10bc200c98375bde'
+RANDOMIZERBASEHASH = '712ebda1ef6818c59cde0371b5a4e4a9'
 
 
 class JsonRom(object):
@@ -646,16 +646,16 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # patch overworld edges
     inverted_buffer = [0] * 0x82
-    if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] or world.owMixed[player]:
+    if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] != 'none' or world.owMixed[player]:
         owMode = 0
         if world.owShuffle[player] == 'parallel':
             owMode = 1
         elif world.owShuffle[player] == 'full':
             owMode = 2
 
-        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player]):
+        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player] in ['limited', 'chaos']):
             owMode |= 0x100
-        if world.owCrossed[player]:
+        if world.owCrossed[player] != 'none' and (world.owCrossed[player] != 'polar' or world.owMixed[player]):
             owMode |= 0x200
             world.fix_fake_world[player] = True
         if world.owMixed[player]:

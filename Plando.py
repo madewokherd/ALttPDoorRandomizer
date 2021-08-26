@@ -162,8 +162,7 @@ def prefill_world(world, plando, text_patches):
                     world.owShuffle = {1: modestr.strip()}
                 elif line.startswith('!owCrossed'):
                     _, modestr = line.split(':', 1)
-                    modestr = modestr.strip().lower()
-                    world.owCrossed = {1: True if modestr in ('true', 'yes', 'on', 'enabled') else False}
+                    world.owCrossed = {1: modestr.strip()}
                 elif line.startswith('!owKeepSimilar'):
                     _, modestr = line.split(':', 1)
                     modestr = modestr.strip().lower()
