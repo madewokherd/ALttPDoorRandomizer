@@ -1325,6 +1325,7 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Ice Lake Northeast Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Ice Lake Southwest Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Ice Lake Moat Water Entry', player), player)
     add_bunny_rule(world.get_entrance('Shopping Mall SW', player), player)
     add_bunny_rule(world.get_entrance('Bomber Corner Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), player)
