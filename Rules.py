@@ -828,6 +828,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Ice Lake Northeast Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Ice Lake Southwest Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Ice Lake Moat Water Entry', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Shopping Mall SW', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Bomber Corner Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
