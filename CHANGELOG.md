@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.9.1
+- Fixed logic issue with leaving IP entrance not requiring flippers
+- ~~Merged DR v0.5.1.1 - Map Indicator Fix/Boss Shuffle Bias/Shop Hints~~
+
 ### 0.1.9.0
 - Expanded Crossed OW to four separate options, see Readme for details
 - Crossed OW will now play a short SFX when changing worlds
