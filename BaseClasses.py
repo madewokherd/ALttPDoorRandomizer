@@ -87,6 +87,7 @@ class World(object):
         self._room_cache = {}
         self.dungeon_layouts = {}
         self.inaccessible_regions = {}
+        self.enabled_entrances = {}
         self.key_logic = {}
         self.pool_adjustment = {}
         self.key_layout = defaultdict(dict)
@@ -153,6 +154,7 @@ class World(object):
             set_player_attr('prizes', {'pull': [0, 0, 0], 'crab': [0, 0], 'stun': 0, 'fish': 0})
 
             set_player_attr('exp_cache', defaultdict(dict))
+            set_player_attr('enabled_entrances', {})
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
@@ -485,8 +487,6 @@ class World(object):
                 return True
             state = starting_state.copy()
         else:
-            if self.has_beaten_game(self.state):
-                return True
             state = CollectionState(self)
 
         if self.has_beaten_game(state):

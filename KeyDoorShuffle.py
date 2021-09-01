@@ -4,7 +4,7 @@ from collections import defaultdict, deque
 
 from BaseClasses import DoorType, dungeon_keys, KeyRuleType, RegionType
 from Regions import dungeon_events
-from Dungeons import dungeon_keys, dungeon_bigs, dungeon_prize
+from Dungeons import dungeon_keys, dungeon_bigs, dungeon_table
 from DungeonGenerator import ExplorationState, special_big_key_doors
 
 
@@ -282,6 +282,12 @@ def analyze_dungeon(key_layout, world, player):
         if not big_avail:
             if chest_keys == non_big_locs and chest_keys > 0 and available <= possible_smalls and not avail_bigs:
                 key_logic.bk_restricted.update(filter_big_chest(key_counter.free_locations))
+            # note to self: this is due to the enough_small_locations function in validate_key_layout_sub_loop
+            # I don't like this exception here or there
+            elif available <= possible_smalls and avail_bigs and non_big_locs > 0:
+                max_ctr = find_max_counter(key_layout)
+                bk_lockdown = [x for x in max_ctr.free_locations if x not in key_counter.free_locations]
+                key_logic.bk_restricted.update(filter_big_chest(bk_lockdown))
         # try to relax the rules here? - smallest requirement that doesn't force a softlock
         child_queue = deque()
         for child in key_counter.child_doors.keys():
@@ -1387,7 +1393,7 @@ def validate_key_layout(key_layout, world, player):
         dungeon_entrance, portal_door = find_outside_connection(region)
         if (len(key_layout.start_regions) > 1 and dungeon_entrance and
            dungeon_entrance.name in ['Ganons Tower', 'Pyramid Fairy']
-           and key_layout.key_logic.dungeon in dungeon_prize):
+           and dungeon_table[key_layout.key_logic.dungeon].prize):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
             key_layout.prize_relevant = True
@@ -1550,7 +1556,7 @@ def create_key_counters(key_layout, world, player):
         dungeon_entrance, portal_door = find_outside_connection(region)
         if (len(key_layout.start_regions) > 1 and dungeon_entrance and
            dungeon_entrance.name in ['Ganons Tower', 'Pyramid Fairy']
-           and key_layout.key_logic.dungeon in dungeon_prize):
+           and dungeon_table[key_layout.key_logic.dungeon].prize):
             state.append_door_to_list(portal_door, state.prize_doors)
             state.prize_door_set[portal_door] = dungeon_entrance
             key_layout.prize_relevant = True
@@ -1619,8 +1625,13 @@ def can_open_door_by_counter(door, counter: KeyCounter, layout, world, player):
         # ttl_small_key_only = len(counter.key_only_locations)
         return cnt_avail_small_locations_by_ctr(ttl_locations, counter, layout, world, player) > 0
     elif door.bigKey:
-        available_big_locations = cnt_avail_big_locations_by_ctr(ttl_locations, counter, layout, world, player)
-        return not counter.big_key_opened and available_big_locations > 0 and not layout.big_key_special
+        if counter.big_key_opened:
+            return False
+        if layout.big_key_special:
+            return any(x for x in counter.other_locations.keys() if x.forced_item and x.forced_item.bigkey)
+        else:
+            available_big_locations = cnt_avail_big_locations_by_ctr(ttl_locations, counter, layout, world, player)
+            return available_big_locations > 0
     else:
         return True
 
@@ -1975,8 +1986,8 @@ def validate_key_placement(key_layout, world, player):
                      len(counter.key_only_locations) + keys_outside
         if key_layout.prize_relevant:
             found_prize = any(x for x in counter.important_locations if '- Prize' in x.name)
-            if not found_prize and key_layout.sector.name in dungeon_prize:
-                prize_loc = world.get_location(dungeon_prize[key_layout.sector.name], player)
+            if not found_prize and dungeon_table[key_layout.sector.name].prize:
+                prize_loc = world.get_location(dungeon_table[key_layout.sector.name].prize, player)
                 # todo: pyramid fairy only care about crystals 5 & 6
                 found_prize = 'Crystal' not in prize_loc.item.name
         else:
