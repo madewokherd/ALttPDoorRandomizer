@@ -257,9 +257,6 @@ def link_entrances(world, player):
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
         single_doors.extend(bomb_shop_doors)
 
-        # tavern back door cannot be shuffled yet
-        connect_doors(world, ['Tavern North'], ['Tavern'], player)
-
         # place remaining doors
         connect_doors(world, single_doors, door_targets, player)
     elif world.shuffle[player] == 'restricted':
@@ -302,9 +299,6 @@ def link_entrances(world, player):
                 lw_entrances.remove(links_house)
             else:
                 dw_entrances.remove(links_house)
-
-        # tavern back door cannot be shuffled yet
-        connect_doors(world, ['Tavern North'], ['Tavern'], player)
 
         # in restricted, the only mandatory exits are in dark world (lw in inverted)
         if not invFlag:
@@ -405,9 +399,6 @@ def link_entrances(world, player):
                 lw_must_exits.append('Desert Palace Entrance (West)')
                 lw_entrances.append('Desert Palace Entrance (North)')
         old_man_house = list(Old_Man_House)
-
-        # tavern back door cannot be shuffled yet
-        connect_doors(world, ['Tavern North'], ['Tavern'], player)
 
         if world.mode[player] == 'standard':
             # must connect front of hyrule castle to do escape
@@ -664,9 +655,6 @@ def link_entrances(world, player):
             connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
             world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
 
-        # tavern back door cannot be shuffled yet
-        connect_doors(world, ['Tavern North'], ['Tavern'], player)
-        
         #place must-exit caves 
         connect_mandatory_exits(world, entrances, caves, must_exits, player)
 
@@ -772,9 +760,6 @@ def link_entrances(world, player):
 
         hole_targets = ['Kakariko Well (top)', 'Bat Cave (right)', 'North Fairy Cave', 'Lost Woods Hideout (top)', 'Lumberjack Tree (top)', 'Sewer Drop', 'Skull Back Drop',
                         'Skull Left Drop', 'Skull Pinball', 'Skull Pot Circle']
-
-        # tavern back door cannot be shuffled yet
-        connect_doors(world, ['Tavern North'], ['Tavern'], player)
 
         if world.mode[player] == 'standard':
             # cannot move uncle cave
@@ -2107,7 +2092,10 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),
                          ('Hookshot Cave Middle to Back', 'Hookshot Cave (Back)'),
                          ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
-                         ('Ganon Drop', 'Bottom of Pyramid')
+                         ('Ganon Drop', 'Bottom of Pyramid'),
+
+                         # Unshuffled Entrances
+                         ('Tavern North', 'Tavern')
                     ]
 
 open_mandatory_connections = [('Sanctuary S&Q', 'Sanctuary'),
@@ -2124,7 +2112,6 @@ default_connections = [('Lumberjack House', 'Lumberjack House'),
                        ('Lake Hylia Fortune Teller', 'Lake Hylia Fortune Teller'),
                        ('Light Hype Fairy', 'Swamp Healer Fairy'),
                        ('Desert Fairy', 'Desert Healer Fairy'),
-                       ('Tavern North', 'Tavern'),
                        ('Lost Woods Gamble', 'Lost Woods Gamble'),
                        ('Fortune Teller (Light)', 'Fortune Teller (Light)'),
                        ('Snitch Lady (East)', 'Snitch Lady (East)'),
