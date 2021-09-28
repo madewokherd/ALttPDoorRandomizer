@@ -59,7 +59,14 @@ def link_entrances(world, player):
             connect_two_way(world, 'Bumper Cave (Top)', 'Death Mountain Return Cave Exit (West)', player)
 
         # dungeon entrance shuffle
-        if world.shuffle[player] == 'dungeonssimple':
+        if world.shuffle[player] == 'vanilla':
+            if not invFlag:
+                for exitname, regionname in open_default_dungeon_connections:
+                    connect_simple(world, exitname, regionname, player)
+            else:
+                for exitname, regionname in inverted_default_dungeon_connections:
+                    connect_simple(world, exitname, regionname, player)
+        elif world.shuffle[player] == 'dungeonssimple':
             simple_shuffle_dungeons(world, player)
         elif world.shuffle[player] == 'dungeonsfull':
             full_shuffle_dungeons(world, Dungeon_Exits, player)
