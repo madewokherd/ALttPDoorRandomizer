@@ -113,10 +113,13 @@ def link_entrances(world, player):
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
+        
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
         if links_house in blacksmith_doors:
             blacksmith_doors.remove(links_house)
+        if links_house in old_man_entrances:
+            old_man_entrances.remove(links_house)
 
         if invFlag:
             if links_house in old_man_entrances:
