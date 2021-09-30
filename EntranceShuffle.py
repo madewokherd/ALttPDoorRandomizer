@@ -3,10 +3,33 @@ import RaceRandom as random
 # ToDo: With shuffle_ganon option, prevent gtower from linking to an exit only location through a 2 entrance cave.
 from collections import defaultdict
 
+entrance_pool = list()
+exit_pool = list()
 
 def link_entrances(world, player):
     invFlag = world.mode[player] == 'inverted'
     
+    global entrance_pool, exit_pool
+    entrance_pool = Entrance_Pool_Base.copy()
+    exit_pool = Exit_Pool_Base.copy()
+    default_drops = default_drop_connections.copy()
+    default_dropexits = default_dropexit_connections.copy()
+    isolated_entrances = Isolated_LH_Doors.copy()
+
+    # modifications to lists
+    if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]):
+        default_drops.append(tuple(('Pyramid Hole', 'Pyramid')))
+        default_dropexits.append(tuple(('Pyramid Entrance', 'Pyramid Exit')))
+        connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
+    else:
+        entrance_pool.remove('Pyramid Hole')
+        entrance_pool.add('Inverted Pyramid Hole')
+        entrance_pool.remove('Pyramid Entrance')
+        entrance_pool.add('Inverted Pyramid Entrance')
+        default_drops.append(tuple(('Inverted Pyramid Hole', 'Pyramid')))
+        default_dropexits.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
+        connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
+        
     Dungeon_Exits = Dungeon_Exits_Base.copy()
     Cave_Exits = Cave_Exits_Base.copy()
     Old_Man_House = Old_Man_House_Base.copy()
@@ -25,22 +48,25 @@ def link_entrances(world, player):
         for exitname, regionname in inverted_mandatory_connections:
             connect_simple(world, exitname, regionname, player)
 
+    connect_simple(world, 'Tavern North', 'Tavern', player)
+    
     connect_custom(world, player)
 
     # if we do not shuffle, set default connections
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        for exitname, regionname in default_connections + default_connector_connections + default_drop_connections + default_item_connections + default_shop_connections:
-            connect_simple(world, exitname, regionname, player)
-        if world.shuffle[player] == 'vanilla':
-            for exitname, regionname in default_dungeon_connections:
-                connect_simple(world, exitname, regionname, player)
+        for entrancename, exitname in default_connections + default_drops + default_item_connections + default_shop_connections:
+            connect_logical(world, entrancename, exitname, player, False)
+        for entrancename, exitname in default_connector_connections + default_dropexits:
+            connect_logical(world, entrancename, exitname, player, True)
         
         if not invFlag:
-            for exitname, regionname in open_default_connections:
-                connect_simple(world, exitname, regionname, player)
+            for entrancename, exitname in open_default_connections:
+                connect_logical(world, entrancename, exitname, player, True)
+            connect_exit(world, 'Chris Houlihan Room Exit', 'Links House', player)
         else:
-            for exitname, regionname in inverted_default_connections:
-                connect_simple(world, exitname, regionname, player)
+            for entrancename, exitname in inverted_default_connections:
+                connect_logical(world, entrancename, exitname, player, True)
+            connect_exit(world, 'Chris Houlihan Room Exit', 'Big Bomb Shop', player)
 
         # inverted entrance mods
         for owid in swapped_connections.keys():
@@ -60,12 +86,17 @@ def link_entrances(world, player):
 
         # dungeon entrance shuffle
         if world.shuffle[player] == 'vanilla':
+            for entrancename, exitname in default_dungeon_connections:
+                connect_logical(world, entrancename, exitname, player, True)
+            for entrancename, exitname in default_skulldrop_connections:
+                connect_logical(world, entrancename, exitname, player, False)
+            
             if not invFlag:
-                for exitname, regionname in open_default_dungeon_connections:
-                    connect_simple(world, exitname, regionname, player)
+                for entrancename, exitname in open_default_dungeon_connections:
+                    connect_logical(world, entrancename, exitname, player, True)
             else:
-                for exitname, regionname in inverted_default_dungeon_connections:
-                    connect_simple(world, exitname, regionname, player)
+                for entrancename, exitname in inverted_default_dungeon_connections:
+                    connect_logical(world, entrancename, exitname, player, True)
         elif world.shuffle[player] == 'dungeonssimple':
             simple_shuffle_dungeons(world, player)
         elif world.shuffle[player] == 'dungeonsfull':
@@ -855,7 +886,7 @@ def link_entrances(world, player):
         world.powder_patch_required[player] = True
 
     # check for ganon location
-    if world.get_entrance('Pyramid Hole' if invFlag == (0x03 in world.owswaps[player][0] and world.owMixed[player]) else 'Inverted Pyramid Hole', player).connected_region.name != 'Pyramid':
+    if world.get_entrance('Pyramid Hole' if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]) else 'Inverted Pyramid Hole', player).connected_region.name != 'Pyramid':
         world.ganon_at_pyramid[player] = False
 
     # check for Ganon's Tower location
@@ -872,6 +903,29 @@ def connect_custom(world, player):
 
 def connect_simple(world, exitname, regionname, player):
     world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
+
+
+def connect_logical(world, entrancename, exitname, player, isTwoWay = False):
+    if entrancename not in entrance_pool:
+        x = 9
+    if exitname not in exit_pool:
+        x = 9
+    assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
+    assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+    try:
+        region = world.get_region(exitname, player)
+        exit = None
+    except RuntimeError:
+        exit = world.get_entrance(exitname, player)
+        region = exit.parent_region
+
+    connect_simple(world, entrancename, region.name, player)
+    if isTwoWay:
+        region = world.get_entrance(entrancename, player).parent_region
+        connect_simple(world, exitname, region.name, player)
+    
+    entrance_pool.remove(entrancename)
+    exit_pool.remove(exitname)
 
 
 def connect_entrance(world, entrancename, exitname, player):
@@ -2071,6 +2125,285 @@ Inverted_Must_Exit_Invalid_Connections = defaultdict(set, {
     'Hyrule Castle Entrance (East)': {'Hyrule Castle Entrance (West)', 'Agahnims Tower'},
 })
 
+Entrance_Pool_Base = {'Links House',
+                    'Desert Palace Entrance (South)',
+                    'Desert Palace Entrance (West)',
+                    'Desert Palace Entrance (East)',
+                    'Desert Palace Entrance (North)',
+                    'Eastern Palace',
+                    'Tower of Hera',
+                    'Hyrule Castle Entrance (South)',
+                    'Hyrule Castle Entrance (West)',
+                    'Hyrule Castle Entrance (East)',
+                    'Agahnims Tower',
+                    'Thieves Town',
+                    'Skull Woods First Section Door',
+                    'Skull Woods Second Section Door (East)',
+                    'Skull Woods Second Section Door (West)',
+                    'Skull Woods Final Section',
+                    'Ice Palace',
+                    'Misery Mire',
+                    'Palace of Darkness',
+                    'Swamp Palace',
+                    'Turtle Rock',
+                    'Dark Death Mountain Ledge (West)',
+                    'Dark Death Mountain Ledge (East)',
+                    'Turtle Rock Isolated Ledge Entrance',
+                    'Hyrule Castle Secret Entrance Stairs',
+                    'Kakariko Well Cave',
+                    'Bat Cave Cave',
+                    'Elder House (East)',
+                    'Elder House (West)',
+                    'North Fairy Cave',
+                    'Lost Woods Hideout Stump',
+                    'Lumberjack Tree Cave',
+                    'Two Brothers House (East)',
+                    'Two Brothers House (West)',
+                    'Sanctuary',
+                    'Old Man Cave (East)',
+                    'Old Man Cave (West)',
+                    'Old Man House (Bottom)',
+                    'Old Man House (Top)',
+                    'Death Mountain Return Cave (West)',
+                    'Death Mountain Return Cave (East)',
+                    'Spectacle Rock Cave (Bottom)',
+                    'Spectacle Rock Cave',
+                    'Spectacle Rock Cave Peak',
+                    'Paradox Cave (Bottom)',
+                    'Paradox Cave (Middle)',
+                    'Paradox Cave (Top)',
+                    'Fairy Ascension Cave (Bottom)',
+                    'Fairy Ascension Cave (Top)',
+                    'Spiral Cave (Bottom)',
+                    'Spiral Cave',
+                    'Bumper Cave (Top)',
+                    'Bumper Cave (Bottom)',
+                    'Superbunny Cave (Top)',
+                    'Superbunny Cave (Bottom)',
+                    'Hookshot Cave',
+                    'Hookshot Cave Back Entrance',
+                    'Ganons Tower',
+                    'Pyramid Entrance',
+                    'Waterfall of Wishing',
+                    'Dam',
+                    'Blinds Hideout',
+                    'Lumberjack House',
+                    'Bonk Fairy (Light)',
+                    'Bonk Fairy (Dark)',
+                    'Lake Hylia Fairy',
+                    'Light Hype Fairy',
+                    'Desert Fairy',
+                    'Dark Lake Hylia Fairy',
+                    'Dark Lake Hylia Ledge Fairy',
+                    'Dark Desert Fairy',
+                    'Dark Death Mountain Fairy',
+                    'Fortune Teller (Light)',
+                    'Lake Hylia Fortune Teller',
+                    'Kings Grave',
+                    'Chicken House',
+                    'Aginahs Cave',
+                    'Sahasrahlas Hut',
+                    'Cave Shop (Lake Hylia)',
+                    'Cave Shop (Dark Death Mountain)',
+                    'Capacity Upgrade',
+                    'Blacksmiths Hut',
+                    'Sick Kids House',
+                    'Lost Woods Gamble',
+                    'Snitch Lady (East)',
+                    'Snitch Lady (West)',
+                    'Bush Covered House',
+                    'Tavern (Front)',
+                    'Light World Bomb Hut',
+                    'Kakariko Shop',
+                    'Cave 45',
+                    'Graveyard Cave',
+                    'Checkerboard Cave',
+                    'Mini Moldorm Cave',
+                    'Long Fairy Cave',
+                    'Good Bee Cave',
+                    '20 Rupee Cave',
+                    '50 Rupee Cave',
+                    'Ice Rod Cave',
+                    'Bonk Rock Cave',
+                    'Library',
+                    'Kakariko Gamble Game',
+                    'Potion Shop',
+                    'Hookshot Fairy',
+                    'Pyramid Fairy',
+                    'East Dark World Hint',
+                    'Palace of Darkness Hint',
+                    'Big Bomb Shop',
+                    'Dark World Shop',
+                    'Dark Lake Hylia Shop',
+                    'Dark World Lumberjack Shop',
+                    'Dark World Potion Shop',
+                    'Dark Lake Hylia Ledge Spike Cave',
+                    'Dark Lake Hylia Ledge Hint',
+                    'Hype Cave',
+                    'Brewery',
+                    'C-Shaped House',
+                    'Chest Game',
+                    'Dark World Hammer Peg Cave',
+                    'Red Shield Shop',
+                    'Dark Sanctuary Hint',
+                    'Fortune Teller (Dark)',
+                    'Archery Game',
+                    'Mire Shed',
+                    'Dark Desert Hint',
+                    'Spike Cave',
+                    'Mimic Cave',
+                    'Kakariko Well Drop',
+                    'Hyrule Castle Secret Entrance Drop',
+                    'Bat Cave Drop',
+                    'North Fairy Cave Drop',
+                    'Lost Woods Hideout Drop',
+                    'Lumberjack Tree Tree',
+                    'Sanctuary Grave',
+                    'Skull Woods Second Section Hole',
+                    'Skull Woods First Section Hole (West)',
+                    'Skull Woods First Section Hole (East)',
+                    'Skull Woods First Section Hole (North)',
+                    'Pyramid Hole'}
+
+Exit_Pool_Base = {'Links House Exit',
+                'Desert Palace Exit (South)',
+                'Desert Palace Exit (West)',
+                'Desert Palace Exit (East)',
+                'Desert Palace Exit (North)',
+                'Eastern Palace Exit',
+                'Tower of Hera Exit',
+                'Hyrule Castle Exit (South)',
+                'Hyrule Castle Exit (West)',
+                'Hyrule Castle Exit (East)',
+                'Agahnims Tower Exit',
+                'Thieves Town Exit',
+                'Skull Woods First Section Exit',
+                'Skull Woods Second Section Exit (East)',
+                'Skull Woods Second Section Exit (West)',
+                'Skull Woods Final Section Exit',
+                'Ice Palace Exit',
+                'Misery Mire Exit',
+                'Palace of Darkness Exit',
+                'Swamp Palace Exit',
+                'Turtle Rock Exit (Front)',
+                'Turtle Rock Ledge Exit (West)',
+                'Turtle Rock Ledge Exit (East)',
+                'Turtle Rock Isolated Ledge Exit',
+                'Hyrule Castle Secret Entrance Exit',
+                'Kakariko Well Exit',
+                'Bat Cave Exit',
+                'Elder House Exit (East)',
+                'Elder House Exit (West)',
+                'North Fairy Cave Exit',
+                'Lost Woods Hideout Exit',
+                'Lumberjack Tree Exit',
+                'Two Brothers House Exit (East)',
+                'Two Brothers House Exit (West)',
+                'Sanctuary Exit',
+                'Old Man Cave Exit (East)',
+                'Old Man Cave Exit (West)',
+                'Old Man House Exit (Bottom)',
+                'Old Man House Exit (Top)',
+                'Death Mountain Return Cave Exit (West)',
+                'Death Mountain Return Cave Exit (East)',
+                'Spectacle Rock Cave Exit',
+                'Spectacle Rock Cave Exit (Top)',
+                'Spectacle Rock Cave Exit (Peak)',
+                'Paradox Cave Exit (Bottom)',
+                'Paradox Cave Exit (Middle)',
+                'Paradox Cave Exit (Top)',
+                'Fairy Ascension Cave Exit (Bottom)',
+                'Fairy Ascension Cave Exit (Top)',
+                'Spiral Cave Exit',
+                'Spiral Cave Exit (Top)',
+                'Bumper Cave Exit (Top)',
+                'Bumper Cave Exit (Bottom)',
+                'Superbunny Cave Exit (Top)',
+                'Superbunny Cave Exit (Bottom)',
+                'Hookshot Cave Front Exit',
+                'Hookshot Cave Back Exit',
+                'Ganons Tower Exit',
+                'Pyramid Exit',
+                'Waterfall of Wishing',
+                'Dam',
+                'Blinds Hideout',
+                'Lumberjack House',
+                'Bonk Fairy (Light)',
+                'Bonk Fairy (Dark)',
+                'Lake Hylia Healer Fairy',
+                'Swamp Healer Fairy',
+                'Desert Healer Fairy',
+                'Dark Lake Hylia Healer Fairy',
+                'Dark Lake Hylia Ledge Healer Fairy',
+                'Dark Desert Healer Fairy',
+                'Dark Death Mountain Healer Fairy',
+                'Fortune Teller (Light)',
+                'Lake Hylia Fortune Teller',
+                'Kings Grave',
+                'Chicken House',
+                'Aginahs Cave',
+                'Sahasrahlas Hut',
+                'Cave Shop (Lake Hylia)',
+                'Cave Shop (Dark Death Mountain)',
+                'Capacity Upgrade',
+                'Blacksmiths Hut',
+                'Sick Kids House',
+                'Lost Woods Gamble',
+                'Snitch Lady (East)',
+                'Snitch Lady (West)',
+                'Bush Covered House',
+                'Tavern (Front)',
+                'Light World Bomb Hut',
+                'Kakariko Shop',
+                'Cave 45',
+                'Graveyard Cave',
+                'Checkerboard Cave',
+                'Mini Moldorm Cave',
+                'Long Fairy Cave',
+                'Good Bee Cave',
+                '20 Rupee Cave',
+                '50 Rupee Cave',
+                'Ice Rod Cave',
+                'Bonk Rock Cave',
+                'Library',
+                'Kakariko Gamble Game',
+                'Potion Shop',
+                'Hookshot Fairy',
+                'Pyramid Fairy',
+                'East Dark World Hint',
+                'Palace of Darkness Hint',
+                'Big Bomb Shop',
+                'Village of Outcasts Shop',
+                'Dark Lake Hylia Shop',
+                'Dark World Lumberjack Shop',
+                'Dark World Potion Shop',
+                'Dark Lake Hylia Ledge Spike Cave',
+                'Dark Lake Hylia Ledge Hint',
+                'Hype Cave',
+                'Brewery',
+                'C-Shaped House',
+                'Chest Game',
+                'Dark World Hammer Peg Cave',
+                'Red Shield Shop',
+                'Dark Sanctuary Hint',
+                'Fortune Teller (Dark)',
+                'Archery Game',
+                'Mire Shed',
+                'Dark Desert Hint',
+                'Spike Cave',
+                'Mimic Cave',
+                'Kakariko Well (top)',
+                'Hyrule Castle Secret Entrance',
+                'Bat Cave (right)',
+                'North Fairy Cave',
+                'Lost Woods Hideout (top)',
+                'Lumberjack Tree (top)',
+                'Sewer Drop',
+                'Skull Back Drop',
+                'Skull Left Drop',
+                'Skull Pinball',
+                'Skull Pot Circle',
+                'Pyramid'}
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
 mandatory_connections = [('Links House S&Q', 'Links House'),
@@ -2101,18 +2434,12 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),
                          ('Hookshot Cave Middle to Back', 'Hookshot Cave (Back)'),
                          ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
-                         ('Ganon Drop', 'Bottom of Pyramid'),
-
-                         # Unshuffled Entrances
-                         ('Tavern North', 'Tavern')
+                         ('Ganon Drop', 'Bottom of Pyramid')
                     ]
 
-open_mandatory_connections = [('Sanctuary S&Q', 'Sanctuary'),
-                                ('Other World S&Q', 'Pyramid Area')]
+open_mandatory_connections = [('Sanctuary S&Q', 'Sanctuary')]
 
-inverted_mandatory_connections = [('Sanctuary S&Q', 'Dark Sanctuary Hint'),
-                                  ('Other World S&Q', 'Hyrule Castle Ledge'),
-                                  ('Dark Sanctuary Hint Exit', 'Dark Chapel Area')]
+inverted_mandatory_connections = [('Sanctuary S&Q', 'Dark Sanctuary Hint')]
 
 # non-shuffled entrance links
 default_connections = [('Lumberjack House', 'Lumberjack House'),
@@ -2150,58 +2477,32 @@ default_connections = [('Lumberjack House', 'Lumberjack House'),
                        ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
                     ]
 
-default_connector_connections = [('Old Man Cave (West)', 'Old Man Cave Ledge'),
-                                 ('Old Man Cave (East)', 'Old Man Cave'),
-                                 ('Old Man Cave Exit (West)', 'Mountain Entry Entrance'),
-                                 ('Old Man Cave Exit (East)', 'West Death Mountain (Bottom)'),
-                                 ('Old Man House (Bottom)', 'Old Man House'),
-                                 ('Old Man House Exit (Bottom)', 'West Death Mountain (Bottom)'),
-                                 ('Old Man House (Top)', 'Old Man House Back'),
-                                 ('Old Man House Exit (Top)', 'West Death Mountain (Bottom)'),
-                                 ('Death Mountain Return Cave (East)', 'Death Mountain Return Cave'),
-                                 ('Death Mountain Return Cave (West)', 'Death Mountain Return Cave'),
-                                 ('Death Mountain Return Cave Exit (West)', 'Mountain Entry Ledge'),
-                                 ('Death Mountain Return Cave Exit (East)', 'West Death Mountain (Bottom)'),
-                                 ('Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Peak)'),
-                                 ('Spectacle Rock Cave (Bottom)', 'Spectacle Rock Cave (Bottom)'),
-                                 ('Spectacle Rock Cave', 'Spectacle Rock Cave (Top)'),
-                                 ('Spectacle Rock Cave Exit', 'West Death Mountain (Bottom)'),
-                                 ('Spectacle Rock Cave Exit (Top)', 'West Death Mountain (Bottom)'),
-                                 ('Spectacle Rock Cave Exit (Peak)', 'West Death Mountain (Bottom)'),
-                                 ('Spiral Cave', 'Spiral Cave (Top)'),
-                                 ('Spiral Cave (Bottom)', 'Spiral Cave (Bottom)'),
-                                 ('Spiral Cave Exit', 'East Death Mountain (Bottom)'),
-                                 ('Spiral Cave Exit (Top)', 'Spiral Cave Ledge'),
-                                 ('Fairy Ascension Cave (Bottom)', 'Fairy Ascension Cave (Bottom)'),
-                                 ('Fairy Ascension Cave (Top)', 'Fairy Ascension Cave (Top)'),
-                                 ('Fairy Ascension Cave Exit (Bottom)', 'Fairy Ascension Plateau'),
-                                 ('Fairy Ascension Cave Exit (Top)', 'Fairy Ascension Ledge'),
-                                 ('Paradox Cave (Bottom)', 'Paradox Cave Front'),
-                                 ('Paradox Cave (Middle)', 'Paradox Cave'),
-                                 ('Paradox Cave (Top)', 'Paradox Cave'),
-                                 ('Paradox Cave Exit (Bottom)', 'East Death Mountain (Bottom)'),
-                                 ('Paradox Cave Exit (Middle)', 'East Death Mountain (Bottom)'),
-                                 ('Paradox Cave Exit (Top)', 'East Death Mountain (Top East)'),
-                                 ('Elder House (East)', 'Elder House'),
-                                 ('Elder House (West)', 'Elder House'),
-                                 ('Elder House Exit (East)', 'Kakariko Area'),
-                                 ('Elder House Exit (West)', 'Kakariko Area'),
-                                 ('Two Brothers House (East)', 'Two Brothers House'),
-                                 ('Two Brothers House (West)', 'Two Brothers House'),
-                                 ('Two Brothers House Exit (East)', 'Kakariko Suburb Area'),
-                                 ('Two Brothers House Exit (West)', 'Maze Race Ledge'),
-                                 ('Bumper Cave (Bottom)', 'Bumper Cave'),
-                                 ('Bumper Cave (Top)', 'Bumper Cave'),
-                                 ('Bumper Cave Exit (Top)', 'Bumper Cave Ledge'),
-                                 ('Bumper Cave Exit (Bottom)', 'Bumper Cave Entrance'),
-                                 ('Superbunny Cave (Top)', 'Superbunny Cave (Top)'),
-                                 ('Superbunny Cave (Bottom)', 'Superbunny Cave (Bottom)'),
-                                 ('Superbunny Cave Exit (Top)', 'East Dark Death Mountain (Top)'),
-                                 ('Superbunny Cave Exit (Bottom)', 'East Dark Death Mountain (Bottom)'),
-                                 ('Hookshot Cave', 'Hookshot Cave (Front)'),
-                                 ('Hookshot Cave Back Entrance', 'Hookshot Cave (Back)'),
-                                 ('Hookshot Cave Front Exit', 'East Dark Death Mountain (Top)'),
-                                 ('Hookshot Cave Back Exit', 'Dark Death Mountain Floating Island')
+default_connector_connections = [('Old Man Cave (West)', 'Old Man Cave Exit (West)'),
+                                 ('Old Man Cave (East)', 'Old Man Cave Exit (East)'),
+                                 ('Old Man House (Bottom)', 'Old Man House Exit (Bottom)'),
+                                 ('Old Man House (Top)', 'Old Man House Exit (Top)'),
+                                 ('Death Mountain Return Cave (East)', 'Death Mountain Return Cave Exit (East)'),
+                                 ('Death Mountain Return Cave (West)', 'Death Mountain Return Cave Exit (West)'),
+                                 ('Spectacle Rock Cave Peak', 'Spectacle Rock Cave Exit (Peak)'),
+                                 ('Spectacle Rock Cave (Bottom)', 'Spectacle Rock Cave Exit'),
+                                 ('Spectacle Rock Cave', 'Spectacle Rock Cave Exit (Top)'),
+                                 ('Spiral Cave', 'Spiral Cave Exit (Top)'),
+                                 ('Spiral Cave (Bottom)', 'Spiral Cave Exit'),
+                                 ('Fairy Ascension Cave (Bottom)', 'Fairy Ascension Cave Exit (Bottom)'),
+                                 ('Fairy Ascension Cave (Top)', 'Fairy Ascension Cave Exit (Top)'),
+                                 ('Paradox Cave (Bottom)', 'Paradox Cave Exit (Bottom)'),
+                                 ('Paradox Cave (Middle)', 'Paradox Cave Exit (Middle)'),
+                                 ('Paradox Cave (Top)', 'Paradox Cave Exit (Top)'),
+                                 ('Elder House (East)', 'Elder House Exit (East)'),
+                                 ('Elder House (West)', 'Elder House Exit (West)'),
+                                 ('Two Brothers House (East)', 'Two Brothers House Exit (East)'),
+                                 ('Two Brothers House (West)', 'Two Brothers House Exit (West)'),
+                                 ('Bumper Cave (Bottom)', 'Bumper Cave Exit (Bottom)'),
+                                 ('Bumper Cave (Top)', 'Bumper Cave Exit (Top)'),
+                                 ('Superbunny Cave (Top)', 'Superbunny Cave Exit (Top)'),
+                                 ('Superbunny Cave (Bottom)', 'Superbunny Cave Exit (Bottom)'),
+                                 ('Hookshot Cave', 'Hookshot Cave Front Exit'),
+                                 ('Hookshot Cave Back Entrance', 'Hookshot Cave Back Exit')
                             ]
 
 default_item_connections = [('Mimic Cave', 'Mimic Cave'),
@@ -2244,32 +2545,24 @@ default_shop_connections = [('Kakariko Shop', 'Kakariko Shop'),
                         ]
 
 default_drop_connections = [('Lost Woods Hideout Drop', 'Lost Woods Hideout (top)'),
-                            ('Lost Woods Hideout Stump', 'Lost Woods Hideout (bottom)'),
-                            ('Lost Woods Hideout Exit', 'Lost Woods East Area'),
                             ('Lumberjack Tree Tree', 'Lumberjack Tree (top)'),
-                            ('Lumberjack Tree Cave', 'Lumberjack Tree (bottom)'),
-                            ('Lumberjack Tree Exit', 'Lumberjack Area'),
-                            ('Sanctuary', 'Sanctuary Portal'),
                             ('Sanctuary Grave', 'Sewer Drop'),
-                            ('Sanctuary Exit', 'Sanctuary Area'),
                             ('North Fairy Cave Drop', 'North Fairy Cave'),
-                            ('North Fairy Cave', 'North Fairy Cave'),
-                            ('North Fairy Cave Exit', 'River Bend Area'),
                             ('Kakariko Well Drop', 'Kakariko Well (top)'),
-                            ('Kakariko Well Cave', 'Kakariko Well (bottom)'),
-                            ('Kakariko Well Exit', 'Kakariko Area'),
                             ('Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance'),
-                            ('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance'),
-                            ('Hyrule Castle Secret Entrance Exit', 'Hyrule Castle Courtyard Northeast'),
                             ('Bat Cave Drop', 'Bat Cave (right)'),
-                            ('Bat Cave Cave', 'Bat Cave (left)'),
-                            ('Bat Cave Exit', 'Blacksmith Area'),
-                            ('Pyramid Hole', 'Pyramid'),
-                            ('Pyramid Entrance', 'Bottom of Pyramid'),
-                            ('Inverted Pyramid Hole', 'Pyramid'),
-                            ('Inverted Pyramid Entrance', 'Bottom of Pyramid'),
-                            ('Pyramid Exit', 'Pyramid Exit Ledge')
+                            #('Pyramid Hole', 'Pyramid') # this is dynamically added because of Inverted/OW Mixed
                         ]
+
+default_dropexit_connections = [('Lost Woods Hideout Stump', 'Lost Woods Hideout Exit'),
+                                ('Lumberjack Tree Cave', 'Lumberjack Tree Exit'),
+                                ('Sanctuary', 'Sanctuary Exit'),
+                                ('North Fairy Cave', 'North Fairy Cave Exit'),
+                                ('Kakariko Well Cave', 'Kakariko Well Exit'),
+                                ('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit'),
+                                ('Bat Cave Cave', 'Bat Cave Exit'),
+                                #('Pyramid Entrance', 'Pyramid Exit') # this is dynamically added because of Inverted/OW Mixed
+                            ]
 
 swapped_connections = {
     0x03: [
@@ -2282,75 +2575,44 @@ swapped_connections = {
             ('Death Mountain Return Cave (West)', 'Bumper Cave Exit (Top)'),
             ('Bumper Cave (Bottom)', 'Old Man Cave Exit (West)'),
             ('Bumper Cave (Top)', 'Dark Death Mountain Healer Fairy')
-        ],
-    0x1b: [
-            ('Inverted Pyramid Entrance', 'Pyramid Exit')
         ]
 }
 
-open_default_connections = [('Links House', 'Links House'),
-                            ('Links House Exit', 'Links House Area'),
+open_default_connections = [('Links House', 'Links House Exit'),
                             ('Big Bomb Shop', 'Big Bomb Shop')
                         ]
 
-inverted_default_connections = [('Links House', 'Big Bomb Shop'),
-                                ('Links House Exit', 'Big Bomb Shop Area'),
-                                ('Big Bomb Shop', 'Links House')
+inverted_default_connections = [('Big Bomb Shop', 'Links House Exit'),
+                                ('Links House', 'Big Bomb Shop')
                             ]
 
 # non shuffled dungeons
-default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert South Portal'),
-                               ('Desert Palace Entrance (West)', 'Desert West Portal'),
-                               ('Desert Palace Entrance (North)', 'Desert Back Portal'),
-                               ('Desert Palace Entrance (East)', 'Desert East Portal'),
-                               ('Desert Palace Exit (South)', 'Desert Palace Stairs'),
-                               ('Desert Palace Exit (West)', 'Desert Ledge'),
-                               ('Desert Palace Exit (East)', 'Desert Palace Mouth'),
-                               ('Desert Palace Exit (North)', 'Desert Palace Entrance (North) Spot'),
+default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Palace Exit (South)'),
+                               ('Desert Palace Entrance (West)', 'Desert Palace Exit (West)'),
+                               ('Desert Palace Entrance (North)', 'Desert Palace Exit (North)'),
+                               ('Desert Palace Entrance (East)', 'Desert Palace Exit (East)'),
+                               
+                               ('Eastern Palace', 'Eastern Palace Exit'),
+                               ('Tower of Hera', 'Tower of Hera Exit'),
 
-                               ('Eastern Palace', 'Eastern Portal'),
-                               ('Eastern Palace Exit', 'Eastern Palace Area'),
-                               ('Tower of Hera', 'Hera Portal'),
-                               ('Tower of Hera Exit', 'West Death Mountain (Top)'),
+                               ('Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)'),
+                               ('Hyrule Castle Entrance (West)', 'Hyrule Castle Exit (West)'),
+                               ('Hyrule Castle Entrance (East)', 'Hyrule Castle Exit (East)'),
 
-                               ('Hyrule Castle Entrance (South)', 'Hyrule Castle South Portal'),
-                               ('Hyrule Castle Entrance (West)', 'Hyrule Castle West Portal'),
-                               ('Hyrule Castle Entrance (East)', 'Hyrule Castle East Portal'),
-                               ('Hyrule Castle Exit (South)', 'Hyrule Castle Courtyard'),
-                               ('Hyrule Castle Exit (West)', 'Hyrule Castle Ledge'),
-                               ('Hyrule Castle Exit (East)', 'Hyrule Castle Ledge'),
+                               ('Thieves Town', 'Thieves Town Exit'),
+                               ('Skull Woods First Section Door', 'Skull Woods First Section Exit'),
+                               ('Skull Woods Second Section Door (East)', 'Skull Woods Second Section Exit (East)'),
+                               ('Skull Woods Second Section Door (West)', 'Skull Woods Second Section Exit (West)'),
+                               ('Skull Woods Final Section', 'Skull Woods Final Section Exit'),
+                               ('Ice Palace', 'Ice Palace Exit'),
+                               ('Misery Mire', 'Misery Mire Exit'),
+                               ('Palace of Darkness', 'Palace of Darkness Exit'),
+                               ('Swamp Palace', 'Swamp Palace Exit'), # requires additional patch for flooding moat if moved
 
-                               ('Thieves Town', 'Thieves Town Portal'),
-                               ('Thieves Town Exit', 'Village of Outcasts Area'),
-                               ('Skull Woods First Section Hole (East)', 'Skull Pinball'),
-                               ('Skull Woods First Section Hole (West)', 'Skull Left Drop'),
-                               ('Skull Woods First Section Hole (North)', 'Skull Pot Circle'),
-                               ('Skull Woods First Section Door', 'Skull 1 Portal'),
-                               ('Skull Woods First Section Exit', 'Skull Woods Forest'),
-                               ('Skull Woods Second Section Hole', 'Skull Back Drop'),
-                               ('Skull Woods Second Section Door (East)', 'Skull 2 East Portal'),
-                               ('Skull Woods Second Section Door (West)', 'Skull 2 West Portal'),
-                               ('Skull Woods Second Section Exit (East)', 'Skull Woods Forest'),
-                               ('Skull Woods Second Section Exit (West)', 'Skull Woods Forest (West)'),
-                               ('Skull Woods Final Section', 'Skull 3 Portal'),
-                               ('Skull Woods Final Section Exit', 'Skull Woods Forest (West)'),
-                               ('Ice Palace', 'Ice Portal'),
-                               ('Ice Palace Exit', 'Ice Palace Area'),
-                               ('Misery Mire', 'Mire Portal'),
-                               ('Misery Mire Exit', 'Misery Mire Area'),
-                               ('Palace of Darkness', 'Palace of Darkness Portal'),
-                               ('Palace of Darkness Exit', 'Palace of Darkness Area'),
-                               ('Swamp Palace', 'Swamp Portal'),  # requires additional patch for flooding moat if moved
-                               ('Swamp Palace Exit', 'Swamp Area'),
-
-                               ('Turtle Rock', 'Turtle Rock Main Portal'),
-                               ('Turtle Rock Exit (Front)', 'Turtle Rock Area'),
-                               ('Turtle Rock Ledge Exit (West)', 'Dark Death Mountain Ledge'),
-                               ('Turtle Rock Ledge Exit (East)', 'Dark Death Mountain Ledge'),
-                               ('Dark Death Mountain Ledge (West)', 'Turtle Rock Lazy Eyes Portal'),
-                               ('Dark Death Mountain Ledge (East)', 'Turtle Rock Chest Portal'),
-                               ('Turtle Rock Isolated Ledge Exit', 'Dark Death Mountain Isolated Ledge'),
-                               ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Eye Bridge Portal')
+                               ('Turtle Rock', 'Turtle Rock Exit (Front)'),
+                               ('Dark Death Mountain Ledge (West)', 'Turtle Rock Ledge Exit (West)'),
+                               ('Dark Death Mountain Ledge (East)', 'Turtle Rock Ledge Exit (East)'),
+                               ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Isolated Ledge Exit')
                             ]
 
 open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Portal'),
@@ -2359,10 +2621,8 @@ open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Portal'),
                                     ('Agahnims Tower Exit', 'Hyrule Castle Ledge')
                                 ]
 
-inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Portal'),
-                                        ('Ganons Tower Exit', 'Hyrule Castle Ledge'),
-                                        ('Agahnims Tower', 'Ganons Tower Portal'),
-                                        ('Agahnims Tower Exit', 'West Dark Death Mountain (Top)')
+inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Exit'),
+                                        ('Agahnims Tower', 'Ganons Tower Exit')
                                     ]
 
 indirect_connections = {
