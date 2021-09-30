@@ -2615,10 +2615,14 @@ default_dungeon_connections = [('Desert Palace Entrance (South)', 'Desert Palace
                                ('Turtle Rock Isolated Ledge Entrance', 'Turtle Rock Isolated Ledge Exit')
                             ]
 
-open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Portal'),
-                                    ('Ganons Tower Exit', 'West Dark Death Mountain (Top)'),
-                                    ('Agahnims Tower', 'Agahnims Tower Portal'),
-                                    ('Agahnims Tower Exit', 'Hyrule Castle Ledge')
+default_skulldrop_connections = [('Skull Woods First Section Hole (East)', 'Skull Pinball'),
+                                 ('Skull Woods First Section Hole (West)', 'Skull Left Drop'),
+                                 ('Skull Woods First Section Hole (North)', 'Skull Pot Circle'),
+                                 ('Skull Woods Second Section Hole', 'Skull Back Drop')
+                                ]
+
+open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Exit'),
+                                    ('Agahnims Tower', 'Agahnims Tower Exit')
                                 ]
 
 inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Exit'),
