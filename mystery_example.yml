@@ -4,7 +4,7 @@
     parallel: 2
     full: 2
   overworld_crossed:
-    none: 1
+    none: 4
     polar: 1
     grouped: 1
     limited: 1
@@ -13,9 +13,8 @@
     on: 1
     off: 1
   overworld_swap:
-    vanilla: 1
-    mixed: 2
-    crossed: 2
+    on: 1
+    off: 1
   flute_shuffle:
     vanilla: 0
     balanced: 1
