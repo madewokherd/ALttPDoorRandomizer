@@ -5,11 +5,12 @@ from collections import defaultdict
 
 entrance_pool = list()
 exit_pool = list()
+ignore_pool = False
 
 def link_entrances(world, player):
     invFlag = world.mode[player] == 'inverted'
-    
-    global entrance_pool, exit_pool
+
+    global entrance_pool, exit_pool, ignore_pool
     entrance_pool = Entrance_Pool_Base.copy()
     exit_pool = Exit_Pool_Base.copy()
     default_drops = default_drop_connections.copy()
@@ -18,16 +19,16 @@ def link_entrances(world, player):
 
     # modifications to lists
     if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]):
-        default_drops.append(tuple(('Pyramid Hole', 'Pyramid')))
-        default_dropexits.append(tuple(('Pyramid Entrance', 'Pyramid Exit')))
+        drop_connections.append(tuple(('Pyramid Hole', 'Pyramid')))
+        dropexit_connections.append(tuple(('Pyramid Entrance', 'Pyramid Exit')))
         connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
     else:
         entrance_pool.remove('Pyramid Hole')
         entrance_pool.add('Inverted Pyramid Hole')
         entrance_pool.remove('Pyramid Entrance')
         entrance_pool.add('Inverted Pyramid Entrance')
-        default_drops.append(tuple(('Inverted Pyramid Hole', 'Pyramid')))
-        default_dropexits.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
+        drop_connections.append(tuple(('Inverted Pyramid Hole', 'Pyramid')))
+        dropexit_connections.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
         connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
         
     Dungeon_Exits = Dungeon_Exits_Base.copy()
@@ -54,18 +55,20 @@ def link_entrances(world, player):
 
     # if we do not shuffle, set default connections
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        for entrancename, exitname in default_connections + default_drops + default_item_connections + default_shop_connections:
+        for entrancename, exitname in default_connections + drop_connections + default_item_connections + default_shop_connections:
             connect_logical(world, entrancename, exitname, player, False)
-        for entrancename, exitname in default_connector_connections + default_dropexits:
+        for entrancename, exitname in default_connector_connections + dropexit_connections:
             connect_logical(world, entrancename, exitname, player, True)
         
         if not invFlag:
             for entrancename, exitname in open_default_connections:
                 connect_logical(world, entrancename, exitname, player, True)
+            ignore_pool = True
             connect_exit(world, 'Chris Houlihan Room Exit', 'Links House', player)
         else:
             for entrancename, exitname in inverted_default_connections:
                 connect_logical(world, entrancename, exitname, player, True)
+            ignore_pool = True
             connect_exit(world, 'Chris Houlihan Room Exit', 'Big Bomb Shop', player)
 
         # inverted entrance mods
@@ -83,6 +86,7 @@ def link_entrances(world, player):
         elif invFlag != (0x0a in world.owswaps[player][0] and world.owMixed[player]) and \
             invFlag == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
             connect_two_way(world, 'Bumper Cave (Top)', 'Death Mountain Return Cave Exit (West)', player)
+        ignore_pool = False
 
         # dungeon entrance shuffle
         if world.shuffle[player] == 'vanilla':
@@ -153,9 +157,6 @@ def link_entrances(world, player):
             old_man_entrances.remove(links_house)
 
         if invFlag:
-            if links_house in old_man_entrances:
-                old_man_entrances.remove(links_house)
-
             # place dark sanc
             sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in bomb_shop_doors]
             sanc_door = random.choice(sanc_doors)
@@ -185,6 +186,7 @@ def link_entrances(world, player):
 
         connect_two_way(world, old_man_entrance if invFlag == (0x0a in world.owswaps[player][0] and world.owMixed[player]) else 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
         connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
+        
         if invFlag and old_man_exit == 'Spike Cave':
             bomb_shop_doors.remove('Spike Cave')
             bomb_shop_doors.extend(old_man_entrances)
@@ -245,10 +247,7 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
             links_house = 'Links House'
         else:
-            if not invFlag:
-                links_house_doors = [i for i in lw_entrances if i not in Isolated_LH_Doors_Open]
-            else:
-                links_house_doors = [i for i in lw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
+            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
@@ -404,10 +403,7 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
             links_house = 'Links House'
         else:
-            if not invFlag:
-                links_house_doors = [i for i in lw_entrances + lw_must_exits if i not in Isolated_LH_Doors_Open]
-            else:
-                links_house_doors = [i for i in dw_entrances if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
+            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
@@ -589,10 +585,7 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
             links_house = 'Links House'
         else:
-            if not invFlag:
-                links_house_doors = [i for i in entrances + must_exits if i not in Isolated_LH_Doors_Open]
-            else:
-                links_house_doors = [i for i in entrances + must_exits if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
+            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             if not invFlag and world.doorShuffle[player] == 'crossed' and world.intensity[player] >= 3:
                 exclusions = DW_Entrances + DW_Dungeon_Entrances + DW_Single_Cave_Doors\
                           + DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + ['Ganons Tower']
@@ -662,6 +655,7 @@ def link_entrances(world, player):
         connect_doors(world, entrances, door_targets, player)
     elif world.shuffle[player] == 'insanity':
         # beware ye who enter here
+        ignore_pool = True
 
         if not invFlag:
             entrances_must_exits = DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + LW_Dungeon_Entrances_Must_Exit + ['Skull Woods Second Section Door (West)']
@@ -781,10 +775,7 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
             links_house = 'Links House'
         else:
-            if not invFlag:
-                links_house_doors = [i for i in doors if i not in Isolated_LH_Doors_Open]
-            else:
-                links_house_doors = [i for i in doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
+            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             if not invFlag and world.doorShuffle[player] == 'crossed' and world.intensity[player] >= 3:
                 exclusions = DW_Entrances + DW_Dungeon_Entrances + DW_Single_Cave_Doors \
                              + DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + ['Ganons Tower']
@@ -906,12 +897,14 @@ def connect_simple(world, exitname, regionname, player):
 
 
 def connect_logical(world, entrancename, exitname, player, isTwoWay = False):
-    if entrancename not in entrance_pool:
-        x = 9
-    if exitname not in exit_pool:
-        x = 9
-    assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
-    assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+    if not ignore_pool:
+        if entrancename not in entrance_pool:
+            x = 9
+        if exitname not in exit_pool:
+            x = 9
+        assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
+        assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+    
     try:
         region = world.get_region(exitname, player)
         exit = None
@@ -924,11 +917,20 @@ def connect_logical(world, entrancename, exitname, player, isTwoWay = False):
         region = world.get_entrance(entrancename, player).parent_region
         connect_simple(world, exitname, region.name, player)
     
-    entrance_pool.remove(entrancename)
-    exit_pool.remove(exitname)
+    if not ignore_pool:
+        entrance_pool.remove(entrancename)
+        exit_pool.remove(exitname)
 
 
 def connect_entrance(world, entrancename, exitname, player):
+    if not ignore_pool:
+        if entrancename not in entrance_pool:
+            x = 9
+        if exitname not in exit_pool:
+            x = 9
+        assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
+        assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+    
     entrance = world.get_entrance(entrancename, player)
     # check if we got an entrance or a region to connect to
     try:
@@ -946,11 +948,23 @@ def connect_entrance(world, entrancename, exitname, player):
     addresses = door_addresses[entrance.name][0]
 
     entrance.connect(region, addresses, target)
+
+    if not ignore_pool:
+        entrance_pool.remove(entrancename)
+        exit_pool.remove(exitname)
     
     if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         world.spoiler.set_entrance(entrance.name, exit.name if exit is not None else region.name, 'entrance', player)
 
 def connect_exit(world, exitname, entrancename, player):
+    if not (ignore_pool or exitname == 'Chris Houlihan Room Exit'):
+        if entrancename not in entrance_pool:
+            x = 9
+        if exitname not in exit_pool:
+            x = 9
+        assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
+        assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+    
     entrance = world.get_entrance(entrancename, player)
     exit = world.get_entrance(exitname, player)
 
@@ -960,11 +974,23 @@ def connect_exit(world, exitname, entrancename, player):
 
     exit.connect(entrance.parent_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
     
+    if not (ignore_pool or exitname == 'Chris Houlihan Room Exit'):
+        entrance_pool.remove(entrancename)
+        exit_pool.remove(exitname)
+    
     if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         world.spoiler.set_entrance(entrance.name, exit.name, 'exit', player)
 
 
 def connect_two_way(world, entrancename, exitname, player):
+    if not ignore_pool:
+        if entrancename not in entrance_pool:
+            x = 9
+        if exitname not in exit_pool:
+            x = 9
+        assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
+        assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+    
     entrance = world.get_entrance(entrancename, player)
     exit = world.get_entrance(exitname, player)
 
@@ -976,6 +1002,10 @@ def connect_two_way(world, entrancename, exitname, player):
 
     entrance.connect(exit.parent_region, door_addresses[entrance.name][0], exit_ids[exit.name][0])
     exit.connect(entrance.parent_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
+    
+    if not ignore_pool:
+        entrance_pool.remove(entrancename)
+        exit_pool.remove(exitname)
     
     if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         world.spoiler.set_entrance(entrance.name, exit.name, 'both', player)
