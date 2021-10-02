@@ -497,10 +497,6 @@ def copy_world(world):
     ret.state.stale = {player: True for player in range(1, world.players + 1)}
 
     ret.owedges = world.owedges
-    for edge in ret.owedges:
-        transition = ret.check_for_owedge(edge.name, edge.player)
-        if transition is not None:
-            transition.dest = edge
     ret.doors = world.doors
     for door in ret.doors:
         entrance = ret.check_for_entrance(door.name, door.player)
