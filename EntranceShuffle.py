@@ -53,6 +53,9 @@ def link_entrances(world, player):
     
     connect_custom(world, player)
 
+    if invFlag == (0x05 in world.owswaps[player][0] and world.owMixed[player]):
+        isolated_entrances.append('Mimic Cave')
+
     # if we do not shuffle, set default connections
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         for entrancename, exitname in default_connections + drop_connections + default_item_connections + default_shop_connections:
@@ -141,10 +144,7 @@ def link_entrances(world, player):
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
             links_house = 'Links House'
         else:
-            if not invFlag:
-                links_house_doors = [i for i in LW_Single_Cave_Doors if i not in Isolated_LH_Doors_Open]
-            else:
-                links_house_doors = [i for i in LW_Single_Cave_Doors if i not in Inverted_Dark_Sanctuary_Doors + Isolated_LH_Doors]
+            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
@@ -1666,16 +1666,15 @@ LW_Single_Cave_Doors = ['Blinds Hideout',
                         'Mimic Cave',
                         'Links House']
 
-Isolated_LH_Doors_Open = ['Mimic Cave',
-                          'Kings Grave',
-                          'Waterfall of Wishing',
-                          'Desert Palace Entrance (South)',
-                          'Desert Palace Entrance (North)',
-                          'Capacity Upgrade',
-                          'Ice Palace',
-                          'Skull Woods Final Section',
-                          'Dark World Hammer Peg Cave',
-                          'Turtle Rock Isolated Ledge Entrance']
+Isolated_LH_Doors = ['Kings Grave',
+                     'Waterfall of Wishing',
+                     'Desert Palace Entrance (South)',
+                     'Desert Palace Entrance (North)',
+                     'Capacity Upgrade',
+                     'Ice Palace',
+                     'Skull Woods Final Section',
+                     'Dark World Hammer Peg Cave',
+                     'Turtle Rock Isolated Ledge Entrance']
 
 DW_Single_Cave_Doors = ['Bonk Fairy (Dark)',
                         'Dark Sanctuary Hint',
@@ -2124,16 +2123,6 @@ Inverted_Dark_Sanctuary_Doors = ['Dark Sanctuary Hint',
                                  'Bumper Cave (Bottom)',
                                  'Bumper Cave (Top)',
                                  'Thieves Town']
-
-Isolated_LH_Doors = ['Kings Grave',
-                     'Waterfall of Wishing',
-                     'Desert Palace Entrance (South)',
-                     'Desert Palace Entrance (North)',
-                     'Capacity Upgrade',
-                     'Ice Palace',
-                     'Skull Woods Final Section',
-                     'Dark World Hammer Peg Cave',
-                     'Turtle Rock Isolated Ledge Entrance']
 
 # Entrances that cannot be used to access a must_exit entrance - symmetrical to allow reverse lookups
 Must_Exit_Invalid_Connections = defaultdict(set, {

@@ -12,7 +12,6 @@ except ImportError:
 
 
 from source.classes.BabelFish import BabelFish
-from EntranceShuffle import door_addresses, indirect_connections
 from Utils import int16_as_bytes
 from Tables import normal_offset_table, spiral_offset_table, multiply_lookup, divisor_lookup
 from RoomData import Room
@@ -598,6 +597,7 @@ class CollectionState(object):
                 self.path[new_region] = (new_region.name, self.path.get(connection, None))
 
                 # Retry connections if the new region can unblock them
+                from EntranceShuffle import indirect_connections
                 if new_region.name in indirect_connections:
                     new_entrance = self.world.get_entrance(indirect_connections[new_region.name], player)
                     if new_entrance in bc and new_entrance.parent_region in rrp:
@@ -2501,6 +2501,7 @@ class Shop(object):
         # [id][roomID-low][roomID-high][doorID][zero][shop_config][shopkeeper_config][sram_index]
         entrances = self.region.entrances
         config = self.item_count
+        from EntranceShuffle import door_addresses
         if len(entrances) == 1 and entrances[0].name in door_addresses:
             door_id = door_addresses[entrances[0].name][0]+1
         else:
