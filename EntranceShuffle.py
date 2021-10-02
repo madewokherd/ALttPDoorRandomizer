@@ -13,8 +13,8 @@ def link_entrances(world, player):
     global entrance_pool, exit_pool, ignore_pool
     entrance_pool = Entrance_Pool_Base.copy()
     exit_pool = Exit_Pool_Base.copy()
-    default_drops = default_drop_connections.copy()
-    default_dropexits = default_dropexit_connections.copy()
+    drop_connections = default_drop_connections.copy()
+    dropexit_connections = default_dropexit_connections.copy()
     isolated_entrances = Isolated_LH_Doors.copy()
 
     # modifications to lists
