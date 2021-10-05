@@ -142,9 +142,9 @@ def link_entrances(world, player):
 
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-            links_house = 'Links House'
+            links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
         else:
-            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
+            links_house_doors = [i for i in (LW_Single_Cave_Doors if not invFlag else DW_Single_Cave_Doors) if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
@@ -245,9 +245,7 @@ def link_entrances(world, player):
 
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-            links_house = 'Links House'
         else:
-            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
@@ -401,9 +399,9 @@ def link_entrances(world, player):
         
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-            links_house = 'Links House'
+            links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
         else:
-            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
+            links_house_doors = [i for i in (lw_entrances + lw_must_exits if not invFlag else dw_entrances) if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
         connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
@@ -583,9 +581,9 @@ def link_entrances(world, player):
         
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-            links_house = 'Links House'
+            links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
         else:
-            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
+            links_house_doors = [i for i in entrances + must_exits if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             if not invFlag and world.doorShuffle[player] == 'crossed' and world.intensity[player] >= 3:
                 exclusions = DW_Entrances + DW_Dungeon_Entrances + DW_Single_Cave_Doors\
                           + DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + ['Ganons Tower']
@@ -773,9 +771,9 @@ def link_entrances(world, player):
 
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-            links_house = 'Links House'
+            links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
         else:
-            links_house_doors = [i for i in LW_Single_Cave_Doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
+            links_house_doors = [i for i in doors if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             if not invFlag and world.doorShuffle[player] == 'crossed' and world.intensity[player] >= 3:
                 exclusions = DW_Entrances + DW_Dungeon_Entrances + DW_Single_Cave_Doors \
                              + DW_Entrances_Must_Exit + DW_Dungeon_Entrances_Must_Exit + ['Ganons Tower']
