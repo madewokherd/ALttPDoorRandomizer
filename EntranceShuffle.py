@@ -72,12 +72,10 @@ def link_entrances(world, player):
             for entrancename, exitname in open_default_connections:
                 connect_logical(world, entrancename, exitname, player, True)
             ignore_pool = True
-            connect_exit(world, 'Chris Houlihan Room Exit', 'Links House', player)
         else:
             for entrancename, exitname in inverted_default_connections:
                 connect_logical(world, entrancename, exitname, player, True)
             ignore_pool = True
-            connect_exit(world, 'Chris Houlihan Room Exit', 'Big Bomb Shop', player)
 
         # inverted entrance mods
         for owid in swapped_connections.keys():
@@ -152,7 +150,6 @@ def link_entrances(world, player):
             links_house_doors = [i for i in (LW_Single_Cave_Doors if not invFlag else DW_Single_Cave_Doors) if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
-        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         
         if links_house in bomb_shop_doors:
             bomb_shop_doors.remove(links_house)
@@ -256,7 +253,6 @@ def link_entrances(world, player):
             links_house_doors = [i for i in (lw_entrances if not invFlag else dw_entrances) if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
-        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if not invFlag:
             if links_house in lw_entrances:
                 lw_entrances.remove(links_house)
@@ -416,7 +412,6 @@ def link_entrances(world, player):
             links_house_doors = [i for i in (lw_entrances + lw_must_exits if not invFlag else dw_entrances) if i not in isolated_entrances + ([] if not invFlag else Inverted_Dark_Sanctuary_Doors)]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
-        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if not invFlag:
             if links_house in lw_entrances:
                 lw_entrances.remove(links_house)
@@ -599,7 +594,6 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(list(links_house_doors))
         connect_two_way(world, links_house, 'Links House Exit', player)
-        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         if links_house in entrances:
             entrances.remove(links_house)
         elif links_house in must_exits:
@@ -782,7 +776,6 @@ def link_entrances(world, player):
                 links_house_doors = [i for i in links_house_doors if i not in exclusions]
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
-        connect_exit(world, 'Chris Houlihan Room Exit', links_house, player) # should always match link's house, except for plandos
         exit_pool.remove(links_house)
         doors.remove(links_house)
 
@@ -867,6 +860,13 @@ def link_entrances(world, player):
         connect_doors(world, doors, door_targets, player)
     else:
         raise NotImplementedError('Shuffling not supported yet')
+    
+    # ensure Houlihan exits where Links House does
+    # TODO: Plando should overrule this
+    for links_house in world.get_entrance('Links House Exit', player).connected_region.exits:
+        if links_house.connected_region.name == 'Links House':
+            break
+    connect_exit(world, 'Chris Houlihan Room Exit', links_house.name, player)
 
     # check for swamp palace fix
     if world.get_entrance('Dam', player).connected_region.name != 'Dam' or world.get_entrance('Swamp Palace', player).connected_region.name != 'Swamp Portal':
