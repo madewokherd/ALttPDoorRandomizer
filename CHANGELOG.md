@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.1.9.4
+- Hotfix for bad 0.1.9.3 version
+
 ### 0.1.9.3
 - Moved flute spot from Northwest Lake Hylia to Southeast Lake Hylia
 - Fixed Links House start in Inverted ER
