@@ -245,6 +245,7 @@ def link_entrances(world, player):
 
         # place links house
         if world.mode[player] == 'standard' or not world.shufflelinks[player]:
+            links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
         else:
             links_house = random.choice(links_house_doors)
         connect_two_way(world, links_house, 'Links House Exit', player)
