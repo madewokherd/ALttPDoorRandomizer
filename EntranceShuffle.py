@@ -163,7 +163,8 @@ def link_entrances(world, player):
             sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in bomb_shop_doors]
             sanc_door = random.choice(sanc_doors)
             bomb_shop_doors.remove(sanc_door)
-            connect_two_way(world, sanc_door, 'Dark Sanctuary Hint', player)
+            connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
             
             lw_dm_entrances = ['Paradox Cave (Bottom)', 'Paradox Cave (Middle)', 'Paradox Cave (Top)', 'Old Man House (Bottom)',
                             'Fairy Ascension Cave (Bottom)', 'Fairy Ascension Cave (Top)', 'Spiral Cave (Bottom)', 'Old Man Cave (East)',
@@ -261,7 +262,8 @@ def link_entrances(world, player):
             sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in dw_entrances]
             sanc_door = random.choice(sanc_doors)
             dw_entrances.remove(sanc_door)
-            connect_two_way(world, sanc_door, 'Dark Sanctuary Hint', player)
+            connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
 
         # in restricted, the only mandatory exits are in dark world (lw in inverted)
         if not invFlag:
@@ -421,7 +423,8 @@ def link_entrances(world, player):
             sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in dw_entrances]
             sanc_door = random.choice(sanc_doors)
             dw_entrances.remove(sanc_door)
-            connect_two_way(world, sanc_door, 'Dark Sanctuary Hint', player)
+            connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
 
         # we randomize which world requirements we fulfill first so we get better dungeon distribution
         # we also places the Old Man House at this time to make sure he can be connected to the desert one way
@@ -599,7 +602,8 @@ def link_entrances(world, player):
             sanc_doors = [door for door in Inverted_Dark_Sanctuary_Doors if door in entrances]
             sanc_door = random.choice(sanc_doors)
             entrances.remove(sanc_door)
-            connect_two_way(world, sanc_door, 'Dark Sanctuary Hint', player)
+            connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
 
         #place must-exit caves 
         connect_mandatory_exits(world, entrances, caves, must_exits, player)
@@ -779,7 +783,8 @@ def link_entrances(world, player):
             sanc_door = random.choice(sanc_doors)
             exit_pool.remove(sanc_door)
             doors.remove(sanc_door)
-            connect_two_way(world, sanc_door, 'Dark Sanctuary Hint', player)
+            connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
 
         # now let's deal with mandatory reachable stuff
         def extract_reachable_exit(cavelist):
