@@ -857,7 +857,7 @@ def link_entrances(world, player):
     # ensure Houlihan exits where Links House does
     # TODO: Plando should overrule this
     for links_house in world.get_entrance('Links House Exit', player).connected_region.exits:
-        if links_house.connected_region.name == 'Links House':
+        if links_house.connected_region and links_house.connected_region.name == 'Links House':
             break
     connect_exit(world, 'Chris Houlihan Room Exit', links_house.name, player)
 
