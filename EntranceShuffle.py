@@ -70,14 +70,13 @@ def link_entrances(world, player):
         
         if not invFlag:
             for entrancename, exitname in open_default_connections:
-            ignore_pool = True
                 connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
         else:
             for entrancename, exitname in inverted_default_connections:
-            ignore_pool = True
                 connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
 
         # inverted entrance mods
+        ignore_pool = True
         for owid in swapped_connections.keys():
             if invFlag != (owid in world.owswaps[player][0] and world.owMixed[player]):
                 for (entrancename, exitname) in swapped_connections[owid]:
