@@ -180,8 +180,6 @@ def link_entrances(world, player):
         random.shuffle(old_man_entrances)
         old_man_exit = old_man_entrances.pop()
         if not invFlag:
-
-        connect_two_way(world, old_man_entrance if invFlag == (0x0a in world.owswaps[player][0] and world.owMixed[player]) else 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
             lw_dm_entrances.extend(old_man_entrances)
             random.shuffle(lw_dm_entrances)
             old_man_entrance = lw_dm_entrances.pop()
