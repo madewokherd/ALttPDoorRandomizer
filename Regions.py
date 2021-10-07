@@ -164,7 +164,7 @@ def create_regions(world, player):
         create_dw_region(player, 'Shield Shop Area', None, ['Shield Shop Fence (Outer) Ledge Drop', 'Forgotton Forest Mirror Spot', 'Shield Shop NW', 'Shield Shop NE']),
         create_dw_region(player, 'Shield Shop Fence', None, ['Shield Shop Fence (Inner) Ledge Drop', 'Red Shield Shop', 'Forgotton Forest Fence Mirror Spot']),
         create_dw_region(player, 'Pyramid Area', ['Pyramid'], ['Pyramid Fairy', 'Pyramid Hole', 'HC Ledge Mirror Spot', 'HC Courtyard Mirror Spot', 'HC Area Mirror Spot', 'HC East Entry Mirror Spot', 'Pyramid ES']),
-        create_dw_region(player, 'Pyramid Exit Ledge', None, ['Pyramid Exit Ledge Drop', 'Pyramid Entrance']),
+        create_dw_region(player, 'Pyramid Exit Ledge', None, ['Pyramid Exit Ledge Drop', 'HC Courtyard Left Mirror Spot', 'Pyramid Entrance']),
         create_dw_region(player, 'Pyramid Pass', None, ['Post Aga Inverted Teleporter', 'HC Area South Mirror Spot', 'Pyramid SW', 'Pyramid SE']),
         create_dw_region(player, 'Broken Bridge Area', None, ['Broken Bridge Hammer Rock (South)', 'Broken Bridge Water Drop', 'Wooden Bridge Mirror Spot', 'Broken Bridge SW']),
         create_dw_region(player, 'Broken Bridge Northeast', None, ['Broken Bridge Hammer Rock (North)', 'Broken Bridge Hookshot Gap', 'Broken Bridge Northeast Water Drop', 'Wooden Bridge Northeast Mirror Spot', 'Broken Bridge NE']),

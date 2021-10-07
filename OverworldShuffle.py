@@ -1071,6 +1071,7 @@ ow_connections = {
             ('HC Ledge Mirror Spot', 'Hyrule Castle Ledge'),
             ('HC Courtyard Mirror Spot', 'Hyrule Castle Courtyard'),
             ('HC Area Mirror Spot', 'Hyrule Castle Area'),
+            ('HC Courtyard Left Mirror Spot', 'Hyrule Castle Courtyard'),
             ('HC Area South Mirror Spot', 'Hyrule Castle Area'),
             ('HC East Entry Mirror Spot', 'Hyrule Castle East Entry'),
             ('Top of Pyramid', 'Pyramid Area'),
