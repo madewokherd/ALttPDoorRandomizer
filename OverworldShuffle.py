@@ -1,6 +1,7 @@
 import RaceRandom as random, logging, copy
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
-from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OpenStd, parallel_links, IsParallel
+from Regions import mark_dark_world_regions, mark_light_world_regions
+from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
 __version__ = '0.1.9.4-u'
 
@@ -146,6 +147,8 @@ def link_overworld(world, player):
             for (exitname, regionname) in ow_connections[owid][1]:
                 connect_simple(world, exitname, regionname, player)
 
+    categorize_world_regions(world, player)
+    
     # crossed shuffle
     logging.getLogger('').debug('Crossing overworld edges')
     if world.owCrossed[player] in ['grouped', 'limited', 'chaos']:
@@ -646,10 +649,19 @@ def create_flute_exits(world, player):
                 and (region.name not in world.owswaps[player][1] or region.name in world.owswaps[player][2])):
             exitname = 'Flute From ' + region.name
             exit = Entrance(region.player, exitname, region)
+            exit.spot_type = 'Flute'
             exit.access_rule = lambda state: state.can_flute(player)
             exit.connect(world.get_region('Flute Sky', player))
             region.exits.append(exit)
     world.initialize_regions()
+
+def categorize_world_regions(world, player):
+    for type in OWExitTypes:
+        for exitname in OWExitTypes[type]:
+            world.get_entrance(exitname, player).spot_type = type
+    
+    mark_light_world_regions(world, player)
+    mark_dark_world_regions(world, player)
 
 def update_world_regions(world, player):
     if world.owMixed[player]:
@@ -1443,6 +1455,7 @@ flute_data = {
     0x32: (['Flute Boy Approach Area',        'Stumpy Approach Area'],              0x32, 0x03a0, 0x0c6c, 0x0500, 0x0cd0, 0x05a8, 0x0cdb, 0x0585, 0x0002, 0x0000, 0x0cd6, 0x05a8),
     0x33: (['C Whirlpool Outer Area',         'Dark C Whirlpool Outer Area'],       0x33, 0x0180, 0x0c20, 0x0600, 0x0c80, 0x0628, 0x0c8f, 0x067d, 0x0000, 0x0000, 0x0c80, 0x0628),
     0x34: (['Statues Area',                   'Hype Cave Area'],                    0x34, 0x088e, 0x0d00, 0x0866, 0x0d60, 0x08d8, 0x0d6f, 0x08e3, 0x0000, 0x000a, 0x0d60, 0x08d8),
+    #0x35: (['Lake Hylia Area',                'Ice Lake Area'],                     0x35, 0x0d00, 0x0da6, 0x0a06, 0x0e08, 0x0a80, 0x0e13, 0x0a8b, 0xfffa, 0xfffa, 0x0d88, 0x0a88),
     0x3e: (['Lake Hylia South Shore',         'Ice Lake Ledge (East)'],             0x35, 0x1860, 0x0f1e, 0x0d00, 0x0f98, 0x0da8, 0x0f8b, 0x0d85, 0x0000, 0x0000, 0x0f90, 0x0da4),
     0x37: (['Ice Cave Area',                  'Shopping Mall Area'],                0x37, 0x0786, 0x0cf6, 0x0e2e, 0x0d58, 0x0ea0, 0x0d63, 0x0eab, 0x000a, 0x0002, 0x0d48, 0x0ed0),
     0x3a: (['Desert Pass Area',               'Swamp Nook Area'],                   0x3a, 0x001a, 0x0e08, 0x04c6, 0x0e70, 0x0540, 0x0e7d, 0x054b, 0x0006, 0x000a, 0x0e70, 0x0540),
