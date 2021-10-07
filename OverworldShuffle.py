@@ -173,8 +173,11 @@ def link_overworld(world, player):
             if world.owCrossed[player] == 'limited':
                 random.shuffle(crossed_candidates)
                 for edge_set in crossed_candidates[:9]:
-                    for edge in edge_set:
-                        crossed_edges.append(edge)
+                    if world.owKeepSimilar[player]:
+                        for edge in edge_set:
+                            crossed_edges.append(edge)
+                    else:
+                        crossed_edges.append(edge_set)
             for edge in copy.deepcopy(crossed_edges):
                 if edge in parallel_links:
                     crossed_edges.append(parallel_links[edge])
