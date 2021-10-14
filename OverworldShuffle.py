@@ -279,7 +279,7 @@ def link_overworld(world, player):
                     region = world.get_region(regionname, player)
                     for exit in region.exits:
                         if exit.connected_region is not None and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld] and exit.connected_region.name not in new_ignored:
-                            if OWTileRegions[exit.connected_region.name] in [base_owid, owid] or OWTileRegions[regionname] == base_owid:
+                            if exit.connected_region.name in OWTileRegions and (OWTileRegions[exit.connected_region.name] in [base_owid, owid] or OWTileRegions[regionname] == base_owid):
                                 new_ignored.add(exit.connected_region.name)
                                 getIgnored(exit.connected_region.name, base_owid, OWTileRegions[exit.connected_region.name])
 

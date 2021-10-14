@@ -1833,8 +1833,8 @@ def find_inaccessible_regions(world, player):
                     queue.append(connect)
     world.inaccessible_regions[player].extend([r.name for r in all_regions.difference(visited_regions) if valid_inaccessible_region(r)])
     if (world.mode[player] == 'inverted') != (0x1b in world.owswaps[player][0] and world.owMixed[player]):
-        ledge = world.get_region('Hyrule Castle Ledge', 1)
-        if any(x for x in ledge.exits if x.connected_region.name == 'Agahnims Tower Portal'):
+        ledge = world.get_region('Hyrule Castle Ledge', player)
+        if any(x for x in ledge.exits if x.connected_region and x.connected_region.name == 'Agahnims Tower Portal'):
             world.inaccessible_regions[player].append('Hyrule Castle Ledge')
     logger = logging.getLogger('')
     logger.debug('Inaccessible Regions:')

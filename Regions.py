@@ -82,7 +82,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Links House Area', None, ['Links House', 'Big Bomb Shop Mirror Spot', 'Links House NE', 'Links House WN', 'Links House WC', 'Links House WS', 'Links House SC', 'Links House ES']),
         create_lw_region(player, 'Stone Bridge Area', None, ['Hammer Bridge North Mirror Spot', 'Hammer Bridge South Mirror Spot', 'Stone Bridge NC', 'Stone Bridge EN', 'Stone Bridge WS', 'Stone Bridge SC']),
         create_lw_region(player, 'Stone Bridge Water', None, ['Dark Hobo Mirror Spot', 'Stone Bridge WC', 'Stone Bridge EC'], Terrain.Water),
-        create_lw_region(player, 'Hobo Bridge', ['Hobo'], ['Hobo EC']),
+        create_lw_region(player, 'Hobo Bridge', ['Hobo'], ['Hobo EC'], Terrain.Water),
         create_lw_region(player, 'Central Cliffs', None, ['Central Bonk Rocks Cliff Ledge Drop', 'Links House Cliff Ledge Drop', 'Stone Bridge Cliff Ledge Drop', 'Lake Hylia Area Cliff Ledge Drop', 'Lake Hylia Island FAWT Ledge Drop', 'Stone Bridge EC Cliff Water Drop', 'Tree Line WC Cliff Water Drop', 'C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Cliff Ledge Drop', 'South Teleporter Cliff Ledge Drop', 'Statues Cliff Ledge Drop']),
         create_lw_region(player, 'Tree Line Area', None, ['Lake Hylia Fairy', 'Dark Tree Line Mirror Spot', 'Tree Line WN', 'Tree Line NW', 'Tree Line SE']),
         create_lw_region(player, 'Tree Line Water', None, ['Tree Line WC', 'Tree Line SC'], Terrain.Water),

@@ -106,14 +106,15 @@ def mirrorless_path_to_castle_courtyard(world, player):
     queue = collections.deque([(start.connected_region, [])])
     while queue:
         (current, path) = queue.popleft()
-        for entrance in current.exits:
-            if entrance.connected_region not in seen:
-                new_path = path + [entrance.access_rule]
-                if entrance.connected_region == target:
-                    return new_path
-                else:
-                    queue.append((entrance.connected_region, new_path))
-                    seen.add(entrance.connected_region)
+        if current:
+            for entrance in current.exits:
+                if entrance.connected_region not in seen:
+                    new_path = path + [entrance.access_rule]
+                    if entrance.connected_region == target:
+                        return new_path
+                    else:
+                        queue.append((entrance.connected_region, new_path))
+                        seen.add(entrance.connected_region)
 
 def set_rule(spot, rule):
     spot.access_rule = rule
@@ -1863,7 +1864,7 @@ def set_big_bomb_rules(world, player):
             add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.has('Flippers', player) or state.can_flute(player)))
         
         #TODO: Fix red bomb rules, artifically adding a bunch of rules to help reduce unbeatable seeds in OW shuffle
-        add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False)
+        set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False)
         #add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_reach('Pyramid Area', 'Region', player))
         #add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.can_lift_heavy_rocks(player) and state.has('Flippers', player) and state.can_flute(player) and state.has('Hammer', player) and state.has('Hookshot', player) and state.has_Pearl(player) and state.has_Mirror(player)))
 
@@ -2061,7 +2062,7 @@ def set_inverted_big_bomb_rules(world, player):
             raise Exception('No logic found for routing from %s to the pyramid.' % bombshop_entrance.name)
         
         if world.owShuffle[player] != 'vanilla' or world.owMixed[player] or world.owCrossed[player] != 'none':
-            add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False) #temp disable progression until routing to Pyramid get be guaranteed
+            set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False) #temp disable progression until routing to Pyramid get be guaranteed
 
 
 def set_bunny_rules(world, player, inverted):
@@ -2200,7 +2201,7 @@ def set_bunny_rules(world, player, inverted):
 
     for ent_name in bunny_impassible_doors:
         bunny_exit = world.get_entrance(ent_name, player)
-        if is_bunny(bunny_exit.parent_region):
+        if bunny_exit.connected_region and is_bunny(bunny_exit.parent_region):
             add_rule(bunny_exit, get_rule_to_add(bunny_exit.parent_region))
 
     doors_to_check = [x for x in world.doors if x.player == player and x not in bunny_impassible_doors]

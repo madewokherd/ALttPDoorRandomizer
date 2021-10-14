@@ -2500,7 +2500,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             write_int16(rom, snes_to_pc(0x02D9B0), 0x0007)
             rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
 
-            rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  #indicates the overworld door being used for the single entrance spawn point
+            rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  # indicates the overworld door being used for the single entrance spawn point
     if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
     if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owMixed[player]):
