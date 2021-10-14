@@ -881,6 +881,7 @@ def link_entrances(world, player):
     if world.get_entrance('Ganons Tower' if not invFlag else 'Agahnims Tower', player).connected_region.name != 'Ganons Tower Portal' if not invFlag else 'GT Lobby':
         world.ganonstower_vanilla[player] = False
 
+
 def connect_custom(world, player):
     if hasattr(world, 'custom_entrances') and world.custom_entrances[player]:
         for exit_name, region_name in world.custom_entrances[player]:
@@ -953,6 +954,7 @@ def connect_entrance(world, entrancename, exitname, player):
     if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         world.spoiler.set_entrance(entrance.name, exit.name if exit is not None else region.name, 'entrance', player)
 
+
 def connect_exit(world, exitname, entrancename, player):
     if not (ignore_pool or exitname == 'Chris Houlihan Room Exit'):
         if entrancename not in entrance_pool:
@@ -1008,62 +1010,6 @@ def connect_two_way(world, entrancename, exitname, player):
         world.spoiler.set_entrance(entrance.name, exit.name, 'both', player)
 
 
-def scramble_holes(world, player):
-    hole_entrances = [('Kakariko Well Cave', 'Kakariko Well Drop'),
-                      ('Bat Cave Cave', 'Bat Cave Drop'),
-                      ('North Fairy Cave', 'North Fairy Cave Drop'),
-                      ('Lost Woods Hideout Stump', 'Lost Woods Hideout Drop'),
-                      ('Lumberjack Tree Cave', 'Lumberjack Tree Tree'),
-                      ('Sanctuary', 'Sanctuary Grave')]
-
-    hole_targets = [('Kakariko Well Exit', 'Kakariko Well (top)'),
-                    ('Bat Cave Exit', 'Bat Cave (right)'),
-                    ('North Fairy Cave Exit', 'North Fairy Cave'),
-                    ('Lost Woods Hideout Exit', 'Lost Woods Hideout (top)'),
-                    ('Lumberjack Tree Exit', 'Lumberjack Tree (top)')]
-
-    if world.mode[player] == 'standard':
-        # cannot move uncle cave
-        connect_two_way(world, 'Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit', player)
-        connect_entrance(world, 'Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance', player)
-    else:
-        hole_entrances.append(('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Drop'))
-        hole_targets.append(('Hyrule Castle Secret Entrance Exit', 'Hyrule Castle Secret Entrance'))
-
-    # do not shuffle sanctuary into pyramid hole unless shuffle is crossed
-    if world.shuffle[player] == 'crossed':
-        hole_targets.append(('Sanctuary Exit', 'Sewer Drop'))
-
-    # determine pyramid hole
-    if not world.shuffle_ganon:
-        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
-            connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
-            connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
-        else:
-            connect_two_way(world, 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
-            connect_entrance(world, 'Inverted Pyramid Hole', 'Pyramid', player)
-    else:
-        hole_targets.append(('Pyramid Exit', 'Pyramid'))
-
-        random.shuffle(hole_targets)
-        exit, target = hole_targets.pop()
-        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
-            connect_two_way(world, 'Pyramid Entrance', exit, player)
-            connect_entrance(world, 'Pyramid Hole', target, player)
-        else:
-            connect_two_way(world, 'Inverted Pyramid Entrance', exit, player)
-            connect_entrance(world, 'Inverted Pyramid Hole', target, player)
-
-    if world.shuffle[player] != 'crossed':
-        hole_targets.append(('Sanctuary Exit', 'Sewer Drop'))
-
-    # shuffle the rest
-    random.shuffle(hole_targets)
-    for entrance, drop in hole_entrances:
-        exit, target = hole_targets.pop()
-        connect_two_way(world, entrance, exit, player)
-        connect_entrance(world, drop, target, player)
-
 def connect_random(world, exitlist, targetlist, player, two_way=False):
     targetlist = list(targetlist)
     random.shuffle(targetlist)
@@ -1076,7 +1022,6 @@ def connect_random(world, exitlist, targetlist, player, two_way=False):
 
 
 def connect_mandatory_exits(world, entrances, caves, must_be_exits, player):
-
     # Keeps track of entrances that cannot be used to access each exit / cave
     if world.mode[player] == 'inverted':
         invalid_connections = Inverted_Must_Exit_Invalid_Connections.copy()
@@ -1201,6 +1146,63 @@ def connect_doors(world, doors, targets, player):
         connect_entrance(world, door, target, player)
     doors[:] = doors[placing:]
     targets[:] = targets[placing:]
+
+
+def scramble_holes(world, player):
+    hole_entrances = [('Kakariko Well Cave', 'Kakariko Well Drop'),
+                      ('Bat Cave Cave', 'Bat Cave Drop'),
+                      ('North Fairy Cave', 'North Fairy Cave Drop'),
+                      ('Lost Woods Hideout Stump', 'Lost Woods Hideout Drop'),
+                      ('Lumberjack Tree Cave', 'Lumberjack Tree Tree'),
+                      ('Sanctuary', 'Sanctuary Grave')]
+
+    hole_targets = [('Kakariko Well Exit', 'Kakariko Well (top)'),
+                    ('Bat Cave Exit', 'Bat Cave (right)'),
+                    ('North Fairy Cave Exit', 'North Fairy Cave'),
+                    ('Lost Woods Hideout Exit', 'Lost Woods Hideout (top)'),
+                    ('Lumberjack Tree Exit', 'Lumberjack Tree (top)')]
+
+    if world.mode[player] == 'standard':
+        # cannot move uncle cave
+        connect_two_way(world, 'Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit', player)
+        connect_entrance(world, 'Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance', player)
+    else:
+        hole_entrances.append(('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Drop'))
+        hole_targets.append(('Hyrule Castle Secret Entrance Exit', 'Hyrule Castle Secret Entrance'))
+
+    # do not shuffle sanctuary into pyramid hole unless shuffle is crossed
+    if world.shuffle[player] == 'crossed':
+        hole_targets.append(('Sanctuary Exit', 'Sewer Drop'))
+
+    # determine pyramid hole
+    if not world.shuffle_ganon:
+        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
+            connect_two_way(world, 'Pyramid Entrance', 'Pyramid Exit', player)
+            connect_entrance(world, 'Pyramid Hole', 'Pyramid', player)
+        else:
+            connect_two_way(world, 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
+            connect_entrance(world, 'Inverted Pyramid Hole', 'Pyramid', player)
+    else:
+        hole_targets.append(('Pyramid Exit', 'Pyramid'))
+
+        random.shuffle(hole_targets)
+        exit, target = hole_targets.pop()
+        if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
+            connect_two_way(world, 'Pyramid Entrance', exit, player)
+            connect_entrance(world, 'Pyramid Hole', target, player)
+        else:
+            connect_two_way(world, 'Inverted Pyramid Entrance', exit, player)
+            connect_entrance(world, 'Inverted Pyramid Hole', target, player)
+
+    if world.shuffle[player] != 'crossed':
+        hole_targets.append(('Sanctuary Exit', 'Sewer Drop'))
+
+    # shuffle the rest
+    random.shuffle(hole_targets)
+    for entrance, drop in hole_entrances:
+        exit, target = hole_targets.pop()
+        connect_two_way(world, entrance, exit, player)
+        connect_entrance(world, drop, target, player)
 
 
 def skull_woods_shuffle(world, player):
@@ -1351,6 +1353,7 @@ def simple_shuffle_dungeons(world, player):
             connect_two_way(world, 'Dark Death Mountain Ledge (West)', 'Turtle Rock Ledge Exit (West)', player)
             connect_two_way(world, 'Dark Death Mountain Ledge (East)', 'Turtle Rock Ledge Exit (East)', player)
 
+
 def full_shuffle_dungeons(world, Dungeon_Exits, player):
     invFlag = world.mode[player] == 'inverted'
 
@@ -1432,6 +1435,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
         connect_mandatory_exits(world, lw_entrances, dungeon_exits, lw_dungeon_entrances_must_exit, player)
     
     connect_caves(world, lw_entrances, dw_entrances, dungeon_exits, player)
+
 
 def unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_Exits):
     def shuffle_lists_in_list(ls):
