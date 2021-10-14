@@ -24,7 +24,8 @@ def set_rules(world, player):
     ow_bunny_rules(world, player)
 
     if world.mode[player] == 'standard':
-        standard_rules(world, player)
+        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+            standard_rules(world, player)
     elif world.mode[player] == 'open' or world.mode[player] == 'inverted':
         open_rules(world, player)
     else:
