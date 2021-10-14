@@ -70,7 +70,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Eastern Palace Area', None, ['Sahasrahlas Hut', 'Eastern Palace', 'Palace of Darkness Mirror Spot', 'Eastern Palace SW', 'Eastern Palace SE']),
         create_lw_region(player, 'Eastern Cliff', None, ['Sand Dunes Ledge Drop', 'Stone Bridge East Ledge Drop', 'Tree Line Ledge Drop', 'Eastern Palace Ledge Drop']),
         create_lw_region(player, 'Blacksmith Area', None, ['Blacksmiths Hut', 'Bat Cave Cave', 'Bat Cave Ledge Peg', 'Hammer Pegs Mirror Spot', 'Hammer Pegs Entry Mirror Spot', 'Blacksmith WS']),
-        create_lw_region(player, 'Bat Cave Ledge', None, ['Bat Cave Drop']),
+        create_lw_region(player, 'Bat Cave Ledge', None, ['Bat Cave Ledge Peg (East)', 'Bat Cave Drop']),
         create_lw_region(player, 'Sand Dunes Area', None, ['Dark Dunes Mirror Spot', 'Sand Dunes NW', 'Sand Dunes WN', 'Sand Dunes SC']),
         create_lw_region(player, 'Maze Race Area', None, ['Dig Game Mirror Spot', 'Maze Race ES']),
         create_lw_region(player, 'Maze Race Ledge', None, ['Two Brothers House (West)', 'Maze Race Game', 'Dig Game Ledge Mirror Spot']),

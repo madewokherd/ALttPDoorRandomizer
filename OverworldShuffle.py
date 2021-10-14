@@ -756,6 +756,7 @@ mandatory_connections = [# Whirlpool Connections
                          ('Wooden Bridge Water Drop', 'Wooden Bridge Water'), #flippers
                          ('Wooden Bridge Northeast Water Drop', 'Wooden Bridge Water'), #flippers
                          ('Bat Cave Ledge Peg', 'Bat Cave Ledge'), #hammer
+                         ('Bat Cave Ledge Peg (East)', 'Blacksmith Area'), #hammer
                          ('Maze Race Game', 'Maze Race Prize'), #pearl
                          ('Maze Race Ledge Drop', 'Maze Race Area'),
                          ('Desert Palace Statue Move', 'Desert Palace Stairs'), #book
