@@ -426,7 +426,7 @@ def reorganize_tile_groups(world, player):
     groups = {}
     for (name, groupType) in OWTileGroups.keys():
         if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
-            if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
+            if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 groups[(name,)] = ([], [], [])
             else:
                 groups[(name, groupType)] = ([], [], [])
@@ -434,7 +434,7 @@ def reorganize_tile_groups(world, player):
     for (name, groupType) in OWTileGroups.keys():
         if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
             (lw_owids, dw_owids) = OWTileGroups[(name, groupType,)]
-            if world.shuffle[player] in ['vanilla', 'simple', 'dungeonssimple']:
+            if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name,)]
                 exist_owids.extend(lw_owids)
                 exist_owids.extend(dw_owids)

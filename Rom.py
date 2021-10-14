@@ -2478,7 +2478,8 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
                 write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
 
     if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owMixed[player]):
-        if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
+                or (world.shuffle[player] == 'simple' and (world.mode[player] == 'inverted' != (0x05 in world.owswaps[player][0] and world.owMixed[player]))):
             rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01])  # mountain cave starts on OW
             
             write_int16(rom, snes_to_pc(0x02D8DE), 0x00F1)  # change mountain cave spawn point to just outside old man cave
