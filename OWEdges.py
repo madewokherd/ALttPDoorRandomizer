@@ -1517,6 +1517,7 @@ OWExitTypes = {
                 'Wooden Bridge Bush (South)',
                 'Wooden Bridge Bush (North)',
                 'Bat Cave Ledge Peg',
+                'Bat Cave Ledge Peg (East)',
                 'Maze Race Game',
                 'Desert Palace Statue Move',
                 'Checkerboard Ledge Approach',
