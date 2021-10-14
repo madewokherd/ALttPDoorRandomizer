@@ -1296,6 +1296,8 @@ class CollectionState(object):
         return self.has('Fire Rod', player) or self.has('Lamp', player)
 
     def can_flute(self, player):
+        if any(map(lambda i: i.name == 'Ocarina', self.world.precollected_items)):
+            return True
         lw = self.world.get_region('Kakariko Area', player)
         return self.has('Ocarina', player) and lw.can_reach(self) and self.is_not_bunny(lw, player)
 
