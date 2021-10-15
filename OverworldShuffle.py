@@ -256,6 +256,8 @@ def link_overworld(world, player):
                         logging.getLogger('').warning("Edge '%s' could not find a valid connection" % back_set[0])
     assert len(connected_edges) == len(default_connections) * 2, connected_edges
 
+    # TODO: Reshuffle some areas if impossible to reach, exception if non-dungeon ER enabled or if area is LW with no portal and flute shuffle is enabled
+
     # flute shuffle
     def connect_flutes(flute_destinations):
         for o in range(0, len(flute_destinations)):
