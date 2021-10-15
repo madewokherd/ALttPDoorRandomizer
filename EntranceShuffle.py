@@ -1026,7 +1026,6 @@ def simple_shuffle_dungeons(world, player):
 
     dp_target = multi_dungeons.pop()
     tr_target = multi_dungeons.pop()
-    assert 1==2
     
     if hc_target == 'Hyrule Castle':
         connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
