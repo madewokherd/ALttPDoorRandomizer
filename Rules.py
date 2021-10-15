@@ -1344,7 +1344,8 @@ def no_glitches_rules(world, player):
     #     add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: False)  # no glitches does not require block override
     forbid_bomb_jump_requirements(world, player)
-    add_conditional_lamps(world, player)
+    if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent underworld rules from applying when trying to search reachability in the overworld
+        add_conditional_lamps(world, player)
 
 
 def fake_flipper_rules(world, player):

@@ -432,7 +432,7 @@ def link_entrances(world, player):
                         'Skull Left Drop', 'Skull Pinball', 'Skull Pot Circle']
 
         if world.mode[player] == 'standard':
-            connect_two_way(world, 'Hyrule Castle Exit (South)', 'Hyrule Castle Entrance (South)', player)
+            connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
             connect_entrance(world, 'Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance', player)
             connect_two_way(world, 'Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit', player)
             caves.append(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'))
@@ -513,6 +513,7 @@ def link_entrances(world, player):
         if links_house.connected_region and links_house.connected_region.name == 'Links House':
             break
     connect_exit(world, 'Chris Houlihan Room Exit', links_house.name, player)
+    ignore_pool = True
 
     # check for swamp palace fix
     if not (world.get_entrance('Dam', player).connected_region.name in ['Dam', 'Swamp Portal'] and world.get_entrance('Swamp Palace', player).connected_region.name == ['Dam', 'Swamp Portal']):
