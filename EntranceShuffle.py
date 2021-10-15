@@ -1437,6 +1437,215 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
     connect_caves(world, lw_entrances, dw_entrances, dungeon_exits, player)
 
 
+def place_links_house(world, sectors, player):
+    invFlag = world.mode[player] == 'inverted'
+    if world.mode[player] == 'standard' or not world.shufflelinks[player]:
+        links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
+    else:
+        def get_link_candidates():
+            # find largest walkable sector
+            sector = None
+            invalid_sectors = list()
+            while (sector is None):
+                sector = max(sectors, key=lambda x: len(x) - (0 if x not in invalid_sectors else 1000))
+                if not ((world.owCrossed[player] == 'polar' and world.owMixed[player]) or world.owCrossed[player] not in ['none', 'polar']) \
+                        and world.get_region(next(iter(next(iter(sector)))), player).type != (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
+                    invalid_sectors.append(sector)
+                    sector = None
+            regions = max(sector, key=lambda x: len(x))
+            
+            # get entrances from list of regions
+            entrances = list()
+            for region_name in [r for r in regions if r ]:
+                if world.shuffle[player] == 'simple' and region_name in OWTileRegions and OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
+                    continue
+                region = world.get_region(region_name, player)
+                if region.type == RegionType.LightWorld if not invFlag else RegionType.DarkWorld:
+                    for exit in region.exits:
+                        if not exit.connected_region and exit.spot_type == 'Entrance':
+                            entrances.append(exit.name)
+            return entrances
+        
+        links_house_doors = [i for i in get_link_candidates() if i in entrance_pool]
+        links_house = random.choice(links_house_doors)
+    connect_two_way(world, links_house, 'Links House Exit', player)
+    return links_house
+
+
+def place_dark_sanc(world, links_house, sectors, player):
+    # get walkable sector in which links house was placed
+    links_region = world.get_entrance(links_house, player).parent_region.name
+    regions = next(s for s in sectors if any(links_region in w for w in s))
+    regions = next(w for w in regions if links_region in w)
+    
+    # eliminate regions surrounding links until less than half of the candidate regions remain
+    explored_regions = list({links_region})
+    was_progress = True
+    while was_progress and len(explored_regions) < len(regions) / 2:
+        was_progress = False
+        new_regions = list()
+        for region_name in explored_regions:
+            region = world.get_region(region_name, player)
+            for exit in region.exits:
+                if exit.connected_region and region.type == exit.connected_region.type and exit.connected_region.name in regions and exit.connected_region.name not in explored_regions + new_regions:
+                    new_regions.append(exit.connected_region.name)
+                    was_progress = True
+        explored_regions.extend(new_regions)
+
+    # get entrances from remaining regions
+    sanc_doors = list()
+    for region_name in [r for r in regions if r not in explored_regions]:
+        if OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
+            continue
+        region = world.get_region(region_name, player)
+        for exit in region.exits:
+            if not exit.connected_region and exit.spot_type == 'Entrance':
+                sanc_doors.append(exit.name)
+    
+    sanc_doors = [i for i in sanc_doors if i in entrance_pool]
+    sanc_door = random.choice(sanc_doors)
+    connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
+    world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance(sanc_door, player).parent_region)
+    return sanc_door
+
+
+def place_blacksmith(world, links_house, player):
+    invFlag = world.mode[player] == 'inverted'
+    
+    assumed_inventory = list()
+    region = world.get_region('Frog Prison', player)
+    if world.logic[player] in ['noglitches', 'minorglitches'] and region.type == (RegionType.DarkWorld if not invFlag else RegionType.LightWorld):
+        assumed_inventory.append('Titans Mitts')
+    
+    links_region = world.get_entrance(links_house, player).parent_region.name
+    blacksmith_doors = list(build_accessible_entrance_list(world, links_region, player, assumed_inventory, False, True, True))
+    
+    if invFlag:
+        dark_sanc = world.get_entrance('Dark Sanctuary Hint Exit', player).connected_region.name
+        blacksmith_doors = list(set(blacksmith_doors + list(build_accessible_entrance_list(world, dark_sanc, player, assumed_inventory, False, True, True))))
+    elif world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
+        sanc_region = world.get_entrance('Sanctuary Exit', player).connected_region.name
+        blacksmith_doors = list(set(blacksmith_doors + list(build_accessible_entrance_list(world, sanc_region, player, assumed_inventory, False, True, True))))
+    
+    random.shuffle(blacksmith_doors)
+    blacksmith_hut = blacksmith_doors.pop()
+    connect_entrance(world, blacksmith_hut, 'Blacksmiths Hut', player)
+    return blacksmith_hut
+
+
+def place_old_man(world, pool, player):
+    # exit has to come from specific set of doors, the entrance is free to move about
+    if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
+        region_name = 'West Death Mountain (Top)'
+    else:
+        region_name = 'West Dark Death Mountain (Top)'
+    old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True))
+    random.shuffle(old_man_entrances)
+    old_man_exit = None
+    while not old_man_exit:
+        old_man_exit = old_man_entrances.pop()
+        if 'West Death Mountain (Bottom)' not in build_accessible_region_list(world, world.get_entrance(old_man_exit, player).parent_region.name, player, True):
+            old_man_exit = None
+    
+    old_man_entrances = [e for e in pool if e in entrance_pool and e not in entrance_exits]
+    random.shuffle(old_man_entrances)
+    old_man_entrance = old_man_entrances.pop()
+    if world.shuffle[player] != 'insanity':
+        connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
+        connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
+    else:
+        # skip assigning connections to West Entrance/Exit
+        connect_exit(world, 'Old Man Cave Exit (East)', old_man_exit, player, False)
+        connect_entrance(world, old_man_entrance, 'Old Man Cave Exit (East)', player, False)
+
+
+def junk_fill_inaccessible(world, player):
+    from DoorShuffle import find_inaccessible_regions
+    find_inaccessible_regions(world, player)
+    
+    # remove regions that have a dungeon entrance
+    accessible_regions = list()
+    for region_name in world.inaccessible_regions[player]:
+        region = world.get_region(region_name, player)
+        for exit in region.exits:
+            if exit.connected_region and exit.connected_region.type == RegionType.Dungeon:
+                accessible_regions.append(region_name)
+                break
+    for region_name in accessible_regions.copy():
+        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, False, False))))
+    world.inaccessible_regions[player] = [r for r in world.inaccessible_regions[player] if r not in accessible_regions]
+    
+    # get inaccessible entrances
+    inaccessible_entrances = list()
+    for region_name in world.inaccessible_regions[player]:
+        region = world.get_region(region_name, player)
+        if region.type in [RegionType.LightWorld, RegionType.DarkWorld]:
+            for exit in region.exits:
+                if not exit.connected_region and exit.name in entrance_pool:
+                    inaccessible_entrances.append(exit.name)
+    #TODO: assign non-item locations to the entrances that exist in the unreachable regions
+
+
+def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player):
+    invFlag = world.mode[player] == 'inverted'
+
+    random.shuffle(lw_entrances)
+    random.shuffle(dw_entrances)
+
+    from DoorShuffle import find_inaccessible_regions
+    find_inaccessible_regions(world, player)
+    
+    # remove regions that have a dungeon entrance
+    accessible_regions = list()
+    for region_name in world.inaccessible_regions[player]:
+        region = world.get_region(region_name, player)
+        for exit in region.exits:
+            if exit.connected_region and exit.connected_region.type == RegionType.Dungeon:
+                accessible_regions.append(region_name)
+                break
+    for region_name in accessible_regions.copy():
+        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, False, False))))
+    world.inaccessible_regions[player] = [r for r in world.inaccessible_regions[player] if r not in accessible_regions]
+    
+    # split inaccessible into 2 lists for each world
+    inaccessible_regions = list(world.inaccessible_regions[player])
+    must_exit_regions = list()
+    otherworld_must_exit_regions = list()
+    for region_name in inaccessible_regions.copy():
+        region = world.get_region(region_name, player)
+        if region.type not in [RegionType.LightWorld, RegionType.DarkWorld] or not any((not exit.connected_region and exit.spot_type == 'Entrance') for exit in region.exits) \
+                or (region_name == 'Pyramid Exit Ledge' and invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
+            inaccessible_regions.remove(region_name)
+        elif region.type == (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
+            must_exit_regions.append(region_name)
+        elif region.type == (RegionType.DarkWorld if not invFlag else RegionType.LightWorld):
+            otherworld_must_exit_regions.append(region_name)
+    
+    def connect_one(region_name, pool):
+        inaccessible_entrances = list()
+        region = world.get_region(region_name, player)
+        for exit in region.exits:
+            if not exit.connected_region and exit.name in entrance_pool:
+                inaccessible_entrances.append(exit.name)
+        random.shuffle(inaccessible_entrances)
+        connect_mandatory_exits(world, pool, caves, [inaccessible_entrances.pop()], player)
+        connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
+    
+    # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
+    if world.shuffle[player] in ['crossed', 'insanity']:
+        combined_must_exit_regions = list(must_exit_regions + otherworld_must_exit_regions)
+        if len(combined_must_exit_regions) > 0:
+            random.shuffle(combined_must_exit_regions)
+            connect_one(combined_must_exit_regions[0], [e for e in lw_entrances if e in entrance_pool])
+    else:
+        if len(otherworld_must_exit_regions) > 0:
+            random.shuffle(otherworld_must_exit_regions)
+            connect_one(otherworld_must_exit_regions[0], [e for e in (dw_entrances if not invFlag else lw_entrances) if e in entrance_pool])
+        elif len(must_exit_regions) > 0:
+            random.shuffle(must_exit_regions)
+            connect_one(must_exit_regions[0], [e for e in (lw_entrances if not invFlag else dw_entrances) if e in entrance_pool])
+
+
 def unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_Exits):
     def shuffle_lists_in_list(ls):
         for i, item in enumerate(ls):
@@ -1475,6 +1684,137 @@ def unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_E
     tuplize_lists_in_list(Cave_Exits)
     tuplize_lists_in_list(Old_Man_House)
     tuplize_lists_in_list(Cave_Three_Exits)
+
+
+def build_sectors(world, player):
+    from Main import copy_world
+    from OWEdges import OWTileRegions
+    
+    # perform accessibility check on duplicate world
+    for player in range(1, world.players + 1):
+        world.key_logic[player] = {}
+    base_world = copy_world(world)
+    world.key_logic = {}
+    
+    # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
+    regions = list(OWTileRegions.copy().keys())
+    sectors = list()
+    while(len(regions) > 0):
+        explored_regions = build_accessible_region_list(base_world, regions[0], player, False, False, False)
+        regions = [r for r in regions if r not in explored_regions]
+        unique_regions = [_ for i in range(len(sectors)) for _ in sectors[i]]
+        if (any(r in unique_regions for r in explored_regions)):
+            for s in range(len(sectors)):
+                if (any(r in sectors[s] for r in explored_regions)):
+                    sectors[s] = set(list(sectors[s]) + list(explored_regions))
+                    break
+        else:
+            sectors.append(explored_regions)
+    
+    # remove water regions if Flippers not in starting inventory
+    if not any(map(lambda i: i.name == 'Flippers', world.precollected_items)):
+        for s in range(len(sectors)):
+            terrains = list()
+            for regionname in sectors[s]:
+                region = world.get_region(regionname, player)
+                if region.terrain == Terrain.Land:
+                    terrains.append(regionname)
+            sectors[s] = terrains
+    
+    # within each group, split into contiguous regions accessible only with starting inventory
+    for s in range(len(sectors)):
+        regions = list(sectors[s]).copy()
+        sectors2 = list()
+        while(len(regions) > 0):
+            explored_regions = build_accessible_region_list(base_world, regions[0], player, False, True, False)
+            regions = [r for r in regions if r not in explored_regions]
+            unique_regions = [_ for i in range(len(sectors2)) for _ in sectors2[i]]
+            if (any(r in unique_regions for r in explored_regions)):
+                for s2 in range(len(sectors2)):
+                    if (any(r in sectors2[s2] for r in explored_regions)):
+                        sectors2[s2] = set(list(sectors2[s2]) + list(explored_regions))
+                        break
+            else:
+                sectors2.append(explored_regions)
+        sectors[s] = sectors2
+
+    return sectors
+
+
+def build_accessible_region_list(world, start_region, player, cross_world=False, region_rules=True, ignore_ledges = False):
+    def explore_region(region_name):
+        explored_regions.add(region_name)
+        region = world.get_region(region_name, player)
+        for exit in region.exits:
+            if exit.connected_region is not None \
+                and ((any(map(lambda i: i.name == 'Ocarina', world.precollected_items)) and exit.spot_type == 'Flute') \
+                    or (exit.connected_region.type == region.type or (cross_world and exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]))) \
+                    and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.spot_type != 'Ledge') \
+                    and exit.connected_region.name not in explored_regions:
+                if exit.spot_type == 'Flute':
+                    fluteregion = exit.connected_region
+                    for flutespot in fluteregion.exits:
+                        if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
+                            explore_region(flutespot.connected_region.name)
+                else:
+                    explore_region(exit.connected_region.name)
+    
+    connect_simple(world, 'Links House S&Q', start_region, player)
+    blank_state = CollectionState(world)
+    explored_regions = set()
+    explore_region(start_region)
+
+    return explored_regions
+    
+
+def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True):
+    from Main import copy_world
+    from Items import ItemFactory
+    
+    for player in range(1, world.players + 1):
+        world.key_logic[player] = {}
+    base_world = copy_world(world)
+    base_world.override_bomb_check = True
+    world.key_logic = {}
+    
+    connect_simple(base_world, 'Links House S&Q', start_region, player)
+    blank_state = CollectionState(base_world)
+    if base_world.mode[player] == 'standard':
+        blank_state.collect(ItemFactory('Zelda Delivered', player), True)
+    for item in assumed_inventory:
+        blank_state.collect(ItemFactory(item, player), True)
+
+    explored_regions = build_accessible_region_list(base_world, start_region, player, cross_world, region_rules, False)
+
+    entrances = set()
+    for region_name in explored_regions:
+        region = base_world.get_region(region_name, player)
+        for exit in region.exits:
+            if exit.name in entrance_pool and (not exit_rules or exit.access_rule(blank_state)):
+                entrances.add(exit.name)
+
+    return entrances
+    
+
+def can_reach(world, entrance_name, region_name, player):
+    from Main import copy_world
+    from Items import ItemFactory
+    from DoorShuffle import find_inaccessible_regions
+    
+    for player in range(1, world.players + 1):
+        world.key_logic[player] = {}
+    base_world = copy_world(world)
+    base_world.override_bomb_check = True
+    world.key_logic = {}
+    
+    entrance = world.get_entrance(entrance_name, player)
+    connect_simple(base_world, 'Links House S&Q', entrance.parent_region.name, player)
+    blank_state = CollectionState(base_world)
+    if base_world.mode[player] == 'standard':
+        blank_state.collect(ItemFactory('Zelda Delivered', player), True)
+
+    find_inaccessible_regions(world, player)
+    return region_name not in world.inaccessible_regions[player]
 
 
 LW_Dungeon_Entrances = ['Desert Palace Entrance (South)',
