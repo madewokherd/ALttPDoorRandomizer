@@ -372,10 +372,6 @@ def link_entrances(world, player):
         for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections):
             connect_logical(world, entrancename, exitname, player, False)
         
-        # place bomb shop
-        bomb_shop = 'Big Bomb Shop' if invFlag == (0x2c in world.owswaps[player][0] and world.owMixed[player]) else 'Links House'
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
-            
         suppress_spoiler = False
         
         # place links house
@@ -404,6 +400,14 @@ def link_entrances(world, player):
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
 
+        # place bomb shop, has limited options
+        bomb_shop_doors = list(entrance_pool)
+        if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
+            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+        random.shuffle(bomb_shop_doors)
+        bomb_shop = bomb_shop_doors.pop()
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+            
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
     elif world.shuffle[player] == 'crossed':
