@@ -14,6 +14,7 @@ def link_entrances(world, player):
     invFlag = world.mode[player] == 'inverted'
 
     global entrance_pool, exit_pool, ignore_pool, suppress_spoiler
+    links_house = False
     entrance_pool = Entrance_Pool_Base.copy()
     exit_pool = Exit_Pool_Base.copy()
     drop_connections = default_drop_connections.copy()
@@ -509,10 +510,12 @@ def link_entrances(world, player):
     
     # ensure Houlihan exits where Links House does
     # TODO: Plando should overrule this
-    for links_house in world.get_entrance('Links House Exit', player).connected_region.exits:
-        if links_house.connected_region and links_house.connected_region.name == 'Links House':
-            break
-    connect_exit(world, 'Chris Houlihan Room Exit', links_house.name, player)
+    if not links_house:
+        for links_house in world.get_entrance('Links House Exit', player).connected_region.exits:
+            if links_house.connected_region and links_house.connected_region.name == 'Links House':
+                links_house = links_house.name
+                break
+    connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)
     ignore_pool = True
 
     # check for swamp palace fix
