@@ -1224,7 +1224,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
     hyrule_castle_exits = list([tuple(e for e in hyrule_castle_exits if e in exit_pool)])
     hyrule_castle_exits.extend([e for e in dungeon_exits if isinstance(e, str)])
     dungeon_exits = [e for e in dungeon_exits if not isinstance(e, str)]
-    if invFlag == (0x13 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.shuffle[player] == 'lite' or invFlag == (0x13 in world.owswaps[player][0] and world.owMixed[player]):
         connect_mandatory_exits(world, lw_entrances, hyrule_castle_exits, lw_must_exit, player, False)
         dungeon_exits.extend([e for e in hyrule_castle_exits if isinstance(e, str)])
         hyrule_castle_exits = [e for e in hyrule_castle_exits if not isinstance(e, str)]
