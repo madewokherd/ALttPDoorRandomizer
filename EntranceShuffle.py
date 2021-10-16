@@ -1356,6 +1356,7 @@ def place_old_man(world, pool, player):
     else:
         region_name = 'West Dark Death Mountain (Top)'
     old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True))
+    old_man_entrances = [e for e in old_man_entrances if e != 'Old Man House (Bottom)']
     if world.shuffle[player] == 'lite':
         old_man_entrances = [e for e in old_man_entrances if e in pool]
     random.shuffle(old_man_entrances)
