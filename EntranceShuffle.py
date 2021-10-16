@@ -620,7 +620,7 @@ def connect_exit(world, exitname, entrancename, player, mark_two_way=True):
     if not (ignore_pool or exitname == 'Chris Houlihan Room Exit'):
         if mark_two_way:
             entrance_pool.remove(entrancename)
-        else:
+        elif world.shuffle[player] == 'insanity':
             entrance_exits.append(entrancename)
         exit_pool.remove(exitname)
     
@@ -649,7 +649,8 @@ def connect_two_way(world, entrancename, exitname, player):
     if not ignore_pool:
         entrance_pool.remove(entrancename)
         exit_pool.remove(exitname)
-        entrance_exits.append(entrancename)
+        if world.shuffle[player] == 'insanity':
+            entrance_exits.append(entrancename)
     
     if not suppress_spoiler:
         world.spoiler.set_entrance(entrance.name, exit.name, 'both', player)
@@ -1343,7 +1344,11 @@ def junk_fill_inaccessible(world, player):
             for exit in region.exits:
                 if not exit.connected_region and exit.name in entrance_pool:
                     inaccessible_entrances.append(exit.name)
-    #TODO: assign non-item locations to the entrances that exist in the unreachable regions
+
+    junk_locations = [e for e in list(zip(*default_connections))[1] if e in exit_pool]
+    random.shuffle(junk_locations)
+    for entrance in inaccessible_entrances:
+        connect_entrance(world, entrance, junk_locations.pop(), player)
 
 
 def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player):
