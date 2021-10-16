@@ -945,7 +945,7 @@ def scramble_holes(world, player):
         hole_targets.append(('Pyramid Exit', 'Pyramid'))
 
     # shuffle sanctuary hole in same world as other HC entrances
-    if world.shuffle[player] != 'crossed':
+    if world.shuffle[player] not in ['lite', 'crossed']:
         drop_owid_map = { #                         owid, is_light_world
             'Lost Woods Hideout Stump':             (0x00, True),
             'Lumberjack Tree Cave':                 (0x02, True),
