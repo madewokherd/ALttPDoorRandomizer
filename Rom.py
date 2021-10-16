@@ -646,8 +646,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # patch overworld edges
     inverted_buffer = [0] * 0x82
+    owMode = 0
     if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] not in ['none', 'polar'] or world.owMixed[player]:
-        owMode = 0
         if world.owShuffle[player] == 'parallel':
             owMode = 1
         elif world.owShuffle[player] == 'full':
@@ -660,10 +660,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             world.fix_fake_world[player] = True
         if world.owMixed[player]:
             owMode |= 0x400
-        
-        write_int16(rom, 0x150002, owMode)
-
-        write_int16(rom, 0x150004, owFlags)
 
         rom.write_byte(0x18004C, 0x01) # patch for allowing Frogsmith to enter multi-entrance caves
         
@@ -692,6 +688,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
                 write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
     
+    write_int16(rom, 0x150002, owMode)
+    write_int16(rom, 0x150004, owFlags)
     
     # patch entrance/exits/holes
     for region in world.regions:
