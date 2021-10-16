@@ -368,6 +368,44 @@ def link_entrances(world, player):
 
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
+    elif world.shuffle[player] == 'lite':
+        for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections):
+            connect_logical(world, entrancename, exitname, player, False)
+        
+        # place bomb shop
+        bomb_shop = 'Big Bomb Shop' if invFlag == (0x2c in world.owswaps[player][0] and world.owMixed[player]) else 'Links House'
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+            
+        suppress_spoiler = False
+        
+        # place links house
+        links_house = place_links_house(world, sectors, player)
+        
+        # shuffle dungeons
+        full_shuffle_dungeons(world, Dungeon_Exits, player)
+
+        # shuffle dropdowns
+        scramble_holes(world, player)
+
+        # place old man, has limited options
+        connector_entrances = [e for e in list(zip(*default_connector_connections))[0] if e in entrance_pool]
+        place_old_man(world, list(connector_entrances), player)
+    
+        caves = list(Cave_Exits + Cave_Three_Exits + Old_Man_House)
+        
+        # place connectors in inaccessible regions
+        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
+        connect_inaccessible_regions(world, connector_entrances, [], caves, player)
+        
+        # shuffle remaining connectors
+        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
+        connect_caves(world, connector_entrances, [], caves, player)
+
+        # place blacksmith, has limited options
+        place_blacksmith(world, links_house, player)
+
+        # place remaining doors
+        connect_doors(world, list(entrance_pool), list(exit_pool), player)
     elif world.shuffle[player] == 'crossed':
         suppress_spoiler = False
         skull_woods_shuffle(world, player)
@@ -1171,6 +1209,13 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
             random.shuffle(ledge)
             lw_must_exit.append(ledge.pop())
             lw_related.extend(ledge)
+    if world.shuffle[player] == 'lite':
+        lw_entrances.extend(dw_entrances)
+        lw_must_exit.extend(dw_must_exit)
+        lw_related.extend(dw_related)
+        dw_entrances = list()
+        dw_must_exit = list()
+        dw_related = list()
     random.shuffle(lw_must_exit)
     random.shuffle(dw_must_exit)
     
@@ -1231,6 +1276,8 @@ def place_links_house(world, sectors, player):
             return entrances
         
         links_house_doors = [i for i in get_link_candidates() if i in entrance_pool]
+        if world.shuffle[player] == 'lite':
+            links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
         links_house = random.choice(links_house_doors)
     connect_two_way(world, links_house, 'Links House Exit', player)
     return links_house
@@ -1304,6 +1351,8 @@ def place_old_man(world, pool, player):
     else:
         region_name = 'West Dark Death Mountain (Top)'
     old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True))
+    if world.shuffle[player] == 'lite':
+        old_man_entrances = [e for e in old_man_entrances if e in pool]
     random.shuffle(old_man_entrances)
     old_man_exit = None
     while not old_man_exit:
@@ -1400,7 +1449,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
     
     # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
-    if world.shuffle[player] in ['crossed', 'insanity']:
+    if world.shuffle[player] in ['lite', 'crossed', 'insanity']:
         combined_must_exit_regions = list(must_exit_regions + otherworld_must_exit_regions)
         if len(combined_must_exit_regions) > 0:
             random.shuffle(combined_must_exit_regions)

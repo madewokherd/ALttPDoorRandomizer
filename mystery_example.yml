@@ -46,6 +46,7 @@
     simple: 2
     restricted: 2
     full: 2
+    lite: 2
     crossed: 3
     insanity: 1
   shufflelinks:
