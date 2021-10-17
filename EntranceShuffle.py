@@ -13,7 +13,10 @@ suppress_spoiler = True
 def link_entrances(world, player):
     invFlag = world.mode[player] == 'inverted'
 
-    global entrance_pool, exit_pool, ignore_pool, suppress_spoiler
+    global entrance_pool, exit_pool, ignore_pool, suppress_spoiler, entrance_exits
+    entrance_exits = list()
+    ignore_pool = False
+    suppress_spoiler = True
     links_house = False
     entrance_pool = Entrance_Pool_Base.copy()
     exit_pool = Exit_Pool_Base.copy()
