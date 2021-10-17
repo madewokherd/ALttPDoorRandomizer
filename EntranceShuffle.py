@@ -374,6 +374,8 @@ def link_entrances(world, player):
     elif world.shuffle[player] == 'lite':
         for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections):
             connect_logical(world, entrancename, exitname, player, False)
+        if invFlag:
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance('Dark Sanctuary Hint', player).parent_region)
         
         suppress_spoiler = False
         
