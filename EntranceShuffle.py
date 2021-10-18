@@ -388,16 +388,16 @@ def link_entrances(world, player):
         # shuffle dropdowns
         scramble_holes(world, player)
 
-        # place old man, has limited options
-        connector_entrances = [e for e in list(zip(*default_connector_connections))[0] if e in entrance_pool]
-        place_old_man(world, list(connector_entrances), player)
-    
         caves = list(Cave_Exits + Cave_Three_Exits + Old_Man_House)
         
         # place connectors in inaccessible regions
-        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
+        connector_entrances = [e for e in list(zip(*default_connector_connections))[0] if e in entrance_pool]
         connect_inaccessible_regions(world, connector_entrances, [], caves, player)
         
+        # place old man, has limited options
+        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
+        place_old_man(world, list(connector_entrances), player)
+    
         # shuffle remaining connectors
         connector_entrances = [e for e in connector_entrances if e in entrance_pool]
         connect_caves(world, connector_entrances, [], caves, player)
