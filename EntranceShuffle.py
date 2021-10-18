@@ -415,6 +415,51 @@ def link_entrances(world, player):
             
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
+    elif world.shuffle[player] == 'liteplus':
+        for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections):
+            connect_logical(world, entrancename, exitname, player, False)
+        if invFlag:
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance('Dark Sanctuary Hint', player).parent_region)
+        
+        suppress_spoiler = False
+        
+        # place links house
+        links_house = place_links_house(world, sectors, player)
+        
+        # shuffle dungeons
+        #full_shuffle_dungeons(world, Dungeon_Exits, player)
+        skull_woods_shuffle(world, player)
+
+        # shuffle dropdowns
+        scramble_holes(world, player)
+
+        caves = list(Cave_Exits + Dungeon_Exits + Cave_Three_Exits + Old_Man_House)
+
+        # place connectors in inaccessible regions
+        connector_entrances = [e for e in list(zip(*default_connector_connections))[0] + list(zip(*default_dungeon_connections))[0] if e in entrance_pool]
+        connect_inaccessible_regions(world, connector_entrances, [], caves, player)
+
+        # place old man, has limited options
+        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
+        place_old_man(world, list(connector_entrances), player)
+        
+        # shuffle remaining connectors
+        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
+        connect_caves(world, connector_entrances, [], caves, player)
+        
+        # place blacksmith, has limited options
+        place_blacksmith(world, links_house, player)
+
+        # place bomb shop, has limited options
+        bomb_shop_doors = list(entrance_pool)
+        if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
+            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+        random.shuffle(bomb_shop_doors)
+        bomb_shop = bomb_shop_doors.pop()
+        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+            
+        # place remaining doors
+        connect_doors(world, list(entrance_pool), list(exit_pool), player)
     elif world.shuffle[player] == 'crossed':
         suppress_spoiler = False
         skull_woods_shuffle(world, player)
@@ -959,7 +1004,7 @@ def scramble_holes(world, player):
         hole_targets.append(('Pyramid Exit', 'Pyramid'))
 
     # shuffle sanctuary hole in same world as other HC entrances
-    if world.shuffle[player] not in ['lite', 'crossed']:
+    if world.shuffle[player] not in ['lite', 'liteplus', 'crossed']:
         drop_owid_map = { #                         owid, is_light_world
             'Lost Woods Hideout Stump':             (0x00, True),
             'Lumberjack Tree Cave':                 (0x02, True),
@@ -1291,7 +1336,7 @@ def place_links_house(world, sectors, player):
             return entrances
         
         links_house_doors = [i for i in get_link_candidates() if i in entrance_pool]
-        if world.shuffle[player] == 'lite':
+        if world.shuffle[player] in ['lite', 'liteplus']:
             links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
         links_house = random.choice(links_house_doors)
     connect_two_way(world, links_house, 'Links House Exit', player)
@@ -1367,7 +1412,7 @@ def place_old_man(world, pool, player):
         region_name = 'West Dark Death Mountain (Top)'
     old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True))
     old_man_entrances = [e for e in old_man_entrances if e != 'Old Man House (Bottom)']
-    if world.shuffle[player] == 'lite':
+    if world.shuffle[player] in ['lite', 'liteplus']:
         old_man_entrances = [e for e in old_man_entrances if e in pool]
     random.shuffle(old_man_entrances)
     old_man_exit = None
@@ -1465,7 +1510,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
     
     # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
-    if world.shuffle[player] in ['lite', 'crossed', 'insanity']:
+    if world.shuffle[player] in ['lite', 'liteplus', 'crossed', 'insanity']:
         combined_must_exit_regions = list(must_exit_regions + otherworld_must_exit_regions)
         if len(combined_must_exit_regions) > 0:
             random.shuffle(combined_must_exit_regions)
