@@ -769,6 +769,11 @@ def connect_mandatory_exits(world, entrances, caves, must_be_exits, player, must
                     raise RuntimeError('Not enough multi-entrance caves left to connect unreachable regions!')
                 if len(entrances) < len(must_be_exits) + 1:
                     raise RuntimeError('Not enough entrances left to connect unreachable regions!')
+                if cave_surplus > len(must_be_exits):
+                    for candidate in caves:
+                        if not isinstance(candidate, str) and (candidate in used_caves or len(candidate) < len(entrances) - required_entrances - 1):
+                            cave = candidate
+                            break
                 if len(must_be_exits) == 0: # if assigning last must exit
                     for candidate in caves:
                         if not isinstance(candidate, str) and (candidate in used_caves or len(candidate) <= len(entrances) - required_entrances - 1):
