@@ -1410,6 +1410,8 @@ def place_blacksmith(world, links_house, player):
     elif world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
         sanc_region = world.get_entrance('Sanctuary Exit', player).connected_region.name
         blacksmith_doors = list(set(blacksmith_doors + list(build_accessible_entrance_list(world, sanc_region, player, assumed_inventory, False, True, True))))
+    if world.shuffle[player] in ['lite', 'liteplus']:
+        blacksmith_doors = [e for e in blacksmith_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
     
     random.shuffle(blacksmith_doors)
     blacksmith_hut = blacksmith_doors.pop()
