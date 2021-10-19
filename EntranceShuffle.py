@@ -1382,7 +1382,7 @@ def place_old_man(world, pool, player):
         region_name = 'West Death Mountain (Top)'
     else:
         region_name = 'West Dark Death Mountain (Top)'
-    old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True))
+    old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True, True))
     old_man_entrances = [e for e in old_man_entrances if e != 'Old Man House (Bottom)']
     if world.shuffle[player] in ['lite', 'liteplus']:
         old_man_entrances = [e for e in old_man_entrances if e in pool]
@@ -1618,7 +1618,7 @@ def build_accessible_region_list(world, start_region, player, cross_world=False,
     return explored_regions
     
 
-def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True):
+def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True, include_one_ways=False):
     from Main import copy_world
     from Items import ItemFactory
     
@@ -1635,8 +1635,17 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     for item in assumed_inventory:
         blank_state.collect(ItemFactory(item, player), True)
 
-    explored_regions = build_accessible_region_list(base_world, start_region, player, cross_world, region_rules, False)
+    explored_regions = list(build_accessible_region_list(base_world, start_region, player, cross_world, region_rules, False))
 
+    if include_one_ways:
+        new_regions = list()
+        for region_name in explored_regions:
+            if region_name in one_way_ledges:
+                for ledge in one_way_ledges[region_name]:
+                    if ledge not in explored_regions + new_regions:
+                        new_regions.append(ledge)
+        explored_regions.extend(new_regions)
+    
     entrances = set()
     for region_name in explored_regions:
         region = base_world.get_region(region_name, player)
@@ -1679,51 +1688,6 @@ def get_distant_entrances(world, start_entrance, sectors, player):
     start_region = world.get_entrance(start_entrance, player).parent_region.name
     regions = next(s for s in sectors if any(start_region in w for w in s))
     regions = next(w for w in regions if start_region in w)
-
-    one_way_ledges = {
-        'West Death Mountain (Bottom)':      {'West Death Mountain (Top)',
-                                              'Spectacle Rock Ledge'},
-        'East Death Mountain (Bottom)':      {'West Death Mountain (Top East)',
-                                              'Spiral Cave Ledge'},
-        'Fairy Ascension Plateau':           {'Fairy Ascension Ledge'},
-        'Mountain Entry Area':               {'Mountain Entry Ledge'},
-        'Sanctuary Area':                    {'Bonk Rock Ledge'},
-        'Graveyard Area':                    {'Graveyard Ledge'},
-        'Potion Shop Water':                 {'Potion Shop Area',
-                                              'Potion Shop Northeast'},
-        'Zora Approach Water':               {'Zora Approach Area'},
-        'Hyrule Castle Area':                {'Hyrule Castle Ledge'},
-        'Wooden Bridge Water':               {'Wooden Bridge Area',
-                                              'Wooden Bridge Northeast'},
-        'Maze Race Area':                    {'Maze Race Ledge',
-                                              'Maze Race Prize'},
-        'Flute Boy Approach Area':           {'Cave 45 Ledge'},
-        'Desert Area':                       {'Desert Ledge'
-                                              'Desert Checkerboard Ledge',
-                                              'Desert Palace Mouth',
-                                              'Bombos Tablet Ledge',
-                                              'Desert Palace Teleporter Ledge'},
-        'Desert Pass Area':                  {'Desert Pass Ledge'},
-        'Lake Hylia Water':                  {'Lake Hylia South Shore',
-                                              'Lake Hylia Island'},
-        'West Dark Death Mountain (Bottom)': {'West Dark Death Mountain (Top)'},
-        'West Dark Death Mountain (Top)':    {'Dark Death Mountain Floating Island'},
-        'East Dark Death Mountain (Bottom)': {'East Dark Death Mountain (Top)'},
-        'Turtle Rock Area':                  {'Turtle Rock Ledge'},
-        'Bumper Cave Area':                  {'Bumper Cave Ledge'},
-        'Qirn Jump Water':                   {'Qirn Jump Area'},
-        'Dark Witch Water':                  {'Dark Witch Area',
-                                              'Dark Witch Northeast'},
-        'Catfish Approach Water':            {'Catfish Approach Area'},
-        'Pyramid Area':                      {'Pyramid Exit Ledge'},
-        'Broken Bridge Water':               {'Broken Bridge West',
-                                              'Broken Bridge Area',
-                                              'Broken Bridge Northeast'},
-        'Misery Mire Area':                  {'Misery Mire Teleporter Ledge'},
-        'Ice Lake Water':                    {'Ice Lake Area',
-                                              'Ice Lake Ledge (West)',
-                                              'Ice Lake Ledge (East)'}
-    }
     
     # eliminate regions surrounding the initial entrance until less than half of the candidate regions remain
     explored_regions = list({start_region})
@@ -2309,6 +2273,53 @@ open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Exit'),
 inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Exit'),
                                         ('Agahnims Tower', 'Ganons Tower Exit')
                                     ]
+
+one_way_ledges = {
+    'West Death Mountain (Bottom)':      {'West Death Mountain (Top)',
+                                          'Spectacle Rock Ledge'},
+    'East Death Mountain (Bottom)':      {'East Death Mountain (Top East)',
+                                          'Spiral Cave Ledge'},
+    'Fairy Ascension Plateau':           {'Fairy Ascension Ledge'},
+    'Mountain Entry Area':               {'Mountain Entry Ledge'},
+    'Sanctuary Area':                    {'Bonk Rock Ledge'},
+    'Graveyard Area':                    {'Graveyard Ledge'},
+    'Potion Shop Water':                 {'Potion Shop Area',
+                                          'Potion Shop Northeast'},
+    'Zora Approach Water':               {'Zora Approach Area'},
+    'Hyrule Castle Area':                {'Hyrule Castle Ledge'},
+    'Wooden Bridge Water':               {'Wooden Bridge Area',
+                                          'Wooden Bridge Northeast'},
+    'Maze Race Area':                    {'Maze Race Ledge',
+                                          'Maze Race Prize'},
+    'Flute Boy Approach Area':           {'Cave 45 Ledge'},
+    'Desert Area':                       {'Desert Ledge',
+                                          'Desert Palace Entrance (North) Spot',
+                                          'Desert Checkerboard Ledge',
+                                          'Desert Palace Mouth',
+                                          'Desert Palace Stairs',
+                                          'Bombos Tablet Ledge',
+                                          'Desert Palace Teleporter Ledge'},
+    'Desert Pass Area':                  {'Desert Pass Ledge'},
+    'Lake Hylia Water':                  {'Lake Hylia South Shore',
+                                          'Lake Hylia Island'},
+    'West Dark Death Mountain (Bottom)': {'West Dark Death Mountain (Top)'},
+    'West Dark Death Mountain (Top)':    {'Dark Death Mountain Floating Island'},
+    'East Dark Death Mountain (Bottom)': {'East Dark Death Mountain (Top)'},
+    'Turtle Rock Area':                  {'Turtle Rock Ledge'},
+    'Bumper Cave Area':                  {'Bumper Cave Ledge'},
+    'Qirn Jump Water':                   {'Qirn Jump Area'},
+    'Dark Witch Water':                  {'Dark Witch Area',
+                                          'Dark Witch Northeast'},
+    'Catfish Approach Water':            {'Catfish Approach Area'},
+    'Pyramid Area':                      {'Pyramid Exit Ledge'},
+    'Broken Bridge Water':               {'Broken Bridge West',
+                                          'Broken Bridge Area',
+                                          'Broken Bridge Northeast'},
+    'Misery Mire Area':                  {'Misery Mire Teleporter Ledge'},
+    'Ice Lake Water':                    {'Ice Lake Area',
+                                          'Ice Lake Ledge (West)',
+                                          'Ice Lake Ledge (East)'}
+}
 
 indirect_connections = {
     'Turtle Rock Ledge': 'Turtle Rock',
