@@ -427,14 +427,16 @@ def shuffle_tiles(world, groups, result_list, player):
 def reorganize_tile_groups(world, player):
     groups = {}
     for (name, groupType) in OWTileGroups.keys():
-        if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
+        if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
+                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lite', 'liteplus', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 groups[(name,)] = ([], [], [])
             else:
                 groups[(name, groupType)] = ([], [], [])
 
     for (name, groupType) in OWTileGroups.keys():
-        if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks']:
+        if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
+                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lite', 'liteplus', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
             (lw_owids, dw_owids) = OWTileGroups[(name, groupType,)]
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name,)]
