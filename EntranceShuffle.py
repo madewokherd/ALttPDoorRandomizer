@@ -1390,7 +1390,7 @@ def place_old_man(world, pool, player):
     old_man_exit = None
     while not old_man_exit:
         old_man_exit = old_man_entrances.pop()
-        if 'West Death Mountain (Bottom)' not in build_accessible_region_list(world, world.get_entrance(old_man_exit, player).parent_region.name, player, True):
+        if 'West Death Mountain (Bottom)' not in build_accessible_region_list(world, world.get_entrance(old_man_exit, player).parent_region.name, player, True, True):
             old_man_exit = None
     
     old_man_entrances = [e for e in pool if e in entrance_pool and e not in entrance_exits + [old_man_exit]]
@@ -1406,8 +1406,15 @@ def place_old_man(world, pool, player):
 
 
 def junk_fill_inaccessible(world, player):
+    from Main import copy_world
     from DoorShuffle import find_inaccessible_regions
     find_inaccessible_regions(world, player)
+
+    for player in range(1, world.players + 1):
+        world.key_logic[player] = {}
+    base_world = copy_world(world)
+    base_world.override_bomb_check = True
+    world.key_logic = {}
     
     # remove regions that have a dungeon entrance
     accessible_regions = list()
@@ -1418,7 +1425,7 @@ def junk_fill_inaccessible(world, player):
                 accessible_regions.append(region_name)
                 break
     for region_name in accessible_regions.copy():
-        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, False, False))))
+        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(base_world, region_name, player, False, True, False, False))))
     world.inaccessible_regions[player] = [r for r in world.inaccessible_regions[player] if r not in accessible_regions]
     
     # get inaccessible entrances
@@ -1454,7 +1461,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
                 accessible_regions.append(region_name)
                 break
     for region_name in accessible_regions.copy():
-        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, False, False))))
+        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, True, False, False))))
     world.inaccessible_regions[player] = [r for r in world.inaccessible_regions[player] if r not in accessible_regions]
     
     # split inaccessible into 2 lists for each world
@@ -1551,7 +1558,7 @@ def build_sectors(world, player):
     regions = list(OWTileRegions.copy().keys())
     sectors = list()
     while(len(regions) > 0):
-        explored_regions = build_accessible_region_list(base_world, regions[0], player, False, False, False)
+        explored_regions = build_accessible_region_list(base_world, regions[0], player, False, False, False, False)
         regions = [r for r in regions if r not in explored_regions]
         unique_regions = [_ for i in range(len(sectors)) for _ in sectors[i]]
         if (any(r in unique_regions for r in explored_regions)):
@@ -1577,7 +1584,7 @@ def build_sectors(world, player):
         regions = list(sectors[s]).copy()
         sectors2 = list()
         while(len(regions) > 0):
-            explored_regions = build_accessible_region_list(base_world, regions[0], player, False, True, False)
+            explored_regions = build_accessible_region_list(base_world, regions[0], player, False, False, True, False)
             regions = [r for r in regions if r not in explored_regions]
             unique_regions = [_ for i in range(len(sectors2)) for _ in sectors2[i]]
             if (any(r in unique_regions for r in explored_regions)):
@@ -1592,26 +1599,38 @@ def build_sectors(world, player):
     return sectors
 
 
-def build_accessible_region_list(world, start_region, player, cross_world=False, region_rules=True, ignore_ledges = False):
+def build_accessible_region_list(world, start_region, player, build_copy_world=False, cross_world=False, region_rules=True, ignore_ledges = False):
+    from Main import copy_world
+    from Items import ItemFactory
+    
     def explore_region(region_name):
         explored_regions.add(region_name)
-        region = world.get_region(region_name, player)
+        region = base_world.get_region(region_name, player)
         for exit in region.exits:
-            if exit.connected_region is not None \
-                and ((any(map(lambda i: i.name == 'Ocarina', world.precollected_items)) and exit.spot_type == 'Flute') \
-                    or (exit.connected_region.type == region.type or (cross_world and exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]))) \
-                    and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.spot_type != 'Ledge') \
-                    and exit.connected_region.name not in explored_regions:
-                if exit.spot_type == 'Flute':
+            if exit.connected_region is not None:
+                if any(map(lambda i: i.name == 'Ocarina', base_world.precollected_items)) and exit.spot_type == 'Flute':
                     fluteregion = exit.connected_region
                     for flutespot in fluteregion.exits:
                         if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
                             explore_region(flutespot.connected_region.name)
-                else:
+                elif exit.connected_region.name not in explored_regions \
+                        and (exit.connected_region.type == region.type or (cross_world and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld])) \
+                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.spot_type != 'Ledge'):
                     explore_region(exit.connected_region.name)
     
-    connect_simple(world, 'Links House S&Q', start_region, player)
-    blank_state = CollectionState(world)
+    if build_copy_world:
+        for player in range(1, world.players + 1):
+            world.key_logic[player] = {}
+        base_world = copy_world(world)
+        base_world.override_bomb_check = True
+        world.key_logic = {}
+    else:
+        base_world = world
+    
+    connect_simple(base_world, 'Links House S&Q', start_region, player)
+    blank_state = CollectionState(base_world)
+    if base_world.mode[player] == 'standard':
+        blank_state.collect(ItemFactory('Zelda Delivered', player), True)
     explored_regions = set()
     explore_region(start_region)
 
@@ -1635,7 +1654,7 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     for item in assumed_inventory:
         blank_state.collect(ItemFactory(item, player), True)
 
-    explored_regions = list(build_accessible_region_list(base_world, start_region, player, cross_world, region_rules, False))
+    explored_regions = list(build_accessible_region_list(base_world, start_region, player, False, cross_world, region_rules, False))
 
     if include_one_ways:
         new_regions = list()
