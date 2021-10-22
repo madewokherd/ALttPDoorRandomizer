@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'c81153d8bb571e41fe472d36274f47b3'
+RANDOMIZERBASEHASH = 'cfafbec1231207dc4a7f1992ea7500c6'
 
 
 class JsonRom(object):
@@ -769,6 +769,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         dr_flags |= DROptions.OriginalPalettes
     if world.experimental[player]:
         dr_flags |= DROptions.DarkWorld_Spawns
+    if world.logic[player] != 'nologic':
+        dr_flags |= DROptions.Fix_EG
 
 
     # fix hc big key problems (map and compass too)
@@ -2501,6 +2503,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  # indicates the overworld door being used for the single entrance spawn point
     if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
+        rom.write_byte(snes_to_pc(0x1BC428), 0x00) # remove secret portal
     if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC387), [0xDD, 0xD1])  # add warps under rocks
         rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF])  # add warps under rocks
@@ -2510,6 +2513,8 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             world.fix_trock_doors[player] = True
     if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
+        rom.write_byte(snes_to_pc(0x1BC43A), 0x00) # remove secret portal
+
     if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owMixed[player]):
         write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
         rom.write_byte(0x15B8C + 0x06, 0x1B)
@@ -2607,13 +2612,17 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             rom.write_byte(0xDBB73 + 0x52, 0x01)
     if (world.mode[player] == 'inverted') != (0x2F in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])  # add warp under rock
+        rom.write_byte(snes_to_pc(0x1BC590), 0x00) # remove secret portal
     if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC81E), [0x94, 0x1D, 0x82])  # add warp under rock
+        rom.write_byte(snes_to_pc(0x1BC5A1), 0x00) # remove secret portal
     if (world.mode[player] == 'inverted') != (0x33 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC3DF), [0xD8, 0xD1])  # add warp under rock
         rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
+        rom.write_byte(snes_to_pc(0x1BC5B1), 0x00) # remove secret portal
     if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
+        rom.write_byte(snes_to_pc(0x1BC5C7), 0x00) # remove secret portal
     
     # apply inverted map changes
     for b in range(0x00, len(inverted_buffer)):
