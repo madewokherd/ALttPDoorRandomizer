@@ -73,6 +73,8 @@ def link_entrances(world, player):
             connect_logical(world, entrancename, exitname, player, False)
         for entrancename, exitname in default_connector_connections + dropexit_connections:
             connect_logical(world, entrancename, exitname, player, True)
+        if invFlag:
+            world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance('Dark Sanctuary Hint', player).parent_region)
         
         if not invFlag:
             for entrancename, exitname in open_default_connections:

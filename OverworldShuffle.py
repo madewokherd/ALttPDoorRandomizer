@@ -674,6 +674,52 @@ def update_world_regions(world, player):
         for name in world.owswaps[player][2]:
             world.get_region(name, player).type = RegionType.LightWorld
 
+def can_reach_smith(world, player):
+    from Items import ItemFactory
+    from BaseClasses import CollectionState
+
+    invFlag = world.mode[player] == 'inverted'
+    
+    def explore_region(region_name, region=None):
+        nonlocal found
+        explored_regions.add(region_name)
+        if not found:
+            if not region:
+                region = world.get_region(region_name, player)
+            for exit in region.exits:
+                if not found and exit.connected_region is not None:
+                    if any(map(lambda i: i.name == 'Ocarina', world.precollected_items)) and exit.spot_type == 'Flute':
+                        fluteregion = exit.connected_region
+                        for flutespot in fluteregion.exits:
+                            if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
+                                explore_region(flutespot.connected_region.name, flutespot.connected_region)
+                    elif exit.connected_region.name not in explored_regions \
+                            and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
+                            and exit.access_rule(blank_state):
+                        explore_region(exit.connected_region.name, exit.connected_region)
+                    elif exit.name == 'Sanctuary S':
+                        sanc_region = exit.connected_region
+                        if len(sanc_region.exits) and sanc_region.exits[0].name == 'Sanctuary Exit':
+                            explore_region(sanc_region.exits[0].connected_region.name, sanc_region.exits[0].connected_region)
+                    elif exit.connected_region.name == 'Blacksmiths Hut' and exit.access_rule(blank_state):
+                        found = True
+    
+    blank_state = CollectionState(world)
+    if world.mode[player] == 'standard':
+        blank_state.collect(ItemFactory('Zelda Delivered', player), True)
+    if world.logic[player] in ['noglitches', 'minorglitches'] and world.get_region('Frog Prison', player).type == (RegionType.DarkWorld if not invFlag else RegionType.LightWorld):
+        blank_state.collect(ItemFactory('Titans Mitts', player), True)
+    
+    found = False
+    explored_regions = set()
+    explore_region('Links House')
+    if not found:
+        if not invFlag:
+            explore_region('Sanctuary')
+        else:
+            explore_region('Dark Sanctuary Hint')
+    return found
+
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
                     #('Links House NE', 'Lost Woods Pass SW')

@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'beae526152a17a203c6a17b227826679'
+RANDOMIZERBASEHASH = 'c6c2a2d5d89a3c84871f58806bbb3acf'
 
 
 class JsonRom(object):
@@ -661,8 +661,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         if world.owMixed[player]:
             owMode |= 0x400
 
-        rom.write_byte(0x18004C, 0x01) # patch for allowing Frogsmith to enter multi-entrance caves
-        
         # patches map data specific for OW Shuffle
         #inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
         inverted_buffer[0x1A] = inverted_buffer[0x1A] | 0x2  # rocks added to prevent OWG hardlock
@@ -2514,7 +2512,6 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
     if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owMixed[player]):
         rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC43A), 0x00) # remove secret portal
-
     if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owMixed[player]):
         write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
         rom.write_byte(0x15B8C + 0x06, 0x1B)
