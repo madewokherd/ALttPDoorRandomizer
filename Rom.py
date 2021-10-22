@@ -688,6 +688,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     
     write_int16(rom, 0x150002, owMode)
     write_int16(rom, 0x150004, owFlags)
+
+    from OverworldShuffle import can_reach_smith
+    if not can_reach_smith(world, player):
+        rom.write_byte(0x18005d, 0x01) # patch for deleting smith on S+Q
     
     # patch entrance/exits/holes
     for region in world.regions:
