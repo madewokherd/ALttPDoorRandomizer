@@ -876,7 +876,7 @@ mandatory_connections = [# Whirlpool Connections
                          ('Grassy Lawn Pegs', 'Village of Outcasts Area'), #hammer
                          ('Shield Shop Fence (Outer) Ledge Drop', 'Shield Shop Fence'),
                          ('Shield Shop Fence (Inner) Ledge Drop', 'Shield Shop Area'),
-                         ('Pyramid Exit Ledge Drop', 'Pyramid Area'), #hammer(inverted)
+                         ('Pyramid Exit Ledge Drop', 'Pyramid Area'),
                          ('Broken Bridge Hammer Rock (South)', 'Broken Bridge Northeast'), #hammer/glove
                          ('Broken Bridge Hammer Rock (North)', 'Broken Bridge Area'), #hammer/glove
                          ('Broken Bridge Hookshot Gap', 'Broken Bridge West'), #hookshot

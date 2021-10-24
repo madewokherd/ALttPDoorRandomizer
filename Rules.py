@@ -1017,7 +1017,6 @@ def ow_rules(world, player):
         add_rule(world.get_entrance('Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Pyramid Entrance', player), lambda state: False)
         
-        set_rule(world.get_entrance('Pyramid Exit Ledge Drop', player), lambda state: state.has('Hammer', player))
         set_rule(world.get_entrance('Pyramid Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Pyramid Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Pyramid Courtyard Mirror Spot', player), lambda state: state.has_Mirror(player))
