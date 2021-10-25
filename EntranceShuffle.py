@@ -23,7 +23,7 @@ def link_entrances(world, player):
     drop_connections = default_drop_connections.copy()
     dropexit_connections = default_dropexit_connections.copy()
 
-    Dungeon_Exits = Dungeon_Exits_Base.copy()
+    Dungeon_Exits = LW_Dungeon_Exits + DW_Mid_Dungeon_Exits + DW_Late_Dungeon_Exits
     Cave_Exits = Cave_Exits_Base.copy()
     Old_Man_House = Old_Man_House_Base.copy()
     Cave_Three_Exits = Cave_Three_Exits_Base.copy()
@@ -381,32 +381,71 @@ def link_entrances(world, player):
         
         suppress_spoiler = False
         
-        # place links house
-        links_house = place_links_house(world, sectors, player)
-        
         # shuffle dungeons
-        full_shuffle_dungeons(world, Dungeon_Exits, player)
+        skull_woods_shuffle(world, player)
 
+        # build dungeon lists
+        lw_dungeons = LW_Dungeon_Exits.copy()
+        dw_dungeons = DW_Late_Dungeon_Exits.copy()
+
+        if world.mode[player] == 'standard':
+            connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
+            lw_dungeons.append(tuple(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)')))
+        else:
+            lw_dungeons.append(tuple(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Hyrule Castle Exit (South)')))
+
+        if not world.shuffle_ganon:
+            connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+        else:
+            dw_dungeons.append('Ganons Tower Exit')
+        
+        unbias_dungeons(lw_dungeons)
+        unbias_dungeons(dw_dungeons)
+        
         # shuffle dropdowns
         scramble_holes(world, player)
 
-        caves = list(Cave_Exits + Cave_Three_Exits + Old_Man_House)
+        # place links house
+        links_house = place_links_house(world, sectors, player)
         
-        # place connectors in inaccessible regions
-        connector_entrances = [e for e in list(zip(*default_connector_connections))[0] if e in entrance_pool]
-        connect_inaccessible_regions(world, connector_entrances, [], caves, player)
-        
-        # place old man, has limited options
-        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
-        place_old_man(world, list(connector_entrances), player)
-    
-        # shuffle remaining connectors
-        connector_entrances = [e for e in connector_entrances if e in entrance_pool]
-        connect_caves(world, connector_entrances, [], caves, player)
-
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
 
+        # determine pools
+        Cave_Base = list(Cave_Exits + Cave_Three_Exits)
+        lw_entrances = list()
+        dw_entrances = list()
+        for e in entrance_pool:
+            region = world.get_entrance(e, player).parent_region
+            if region.type == RegionType.LightWorld:
+                lw_entrances.append(e)
+            else:
+                dw_entrances.append(e)
+        
+        # place connectors in inaccessible regions
+        caves = Cave_Base + lw_dungeons + Cave_Base
+        connector_entrances = [e for e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] if e in lw_entrances]
+        connect_inaccessible_regions(world, connector_entrances, [], caves, player)
+        lw_dungeons = list(set(lw_dungeons) & set(caves)) + Old_Man_House
+
+        caves = list(set(Cave_Base) & set(caves)) + dw_dungeons
+        connector_entrances = [e for e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] if e in dw_entrances]
+        connect_inaccessible_regions(world, [], connector_entrances, caves, player)
+        dw_dungeons = list(set(dw_dungeons) & set(caves))
+        caves = list(set(Cave_Base) & set(caves)) + DW_Mid_Dungeon_Exits
+        
+        # place old man, has limited options
+        lw_entrances = [e for e in lw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
+        dw_entrances = [e for e in dw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
+        place_old_man(world, lw_entrances if not invFlag else dw_entrances, player)
+        
+        # shuffle remaining connectors
+        lw_entrances = [e for e in lw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
+        dw_entrances = [e for e in dw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
+        connect_caves(world, lw_entrances, [], lw_dungeons, player)
+        connect_caves(world, [], dw_entrances, dw_dungeons, player)
+        connect_caves(world, lw_entrances, dw_entrances, caves, player)
+        
         # place bomb shop, has limited options
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
@@ -1016,7 +1055,7 @@ def scramble_holes(world, player):
         hole_targets.append(('Pyramid Exit', 'Pyramid'))
 
     # shuffle sanctuary hole in same world as other HC entrances
-    if world.shuffle[player] not in ['lite', 'liteplus', 'crossed']:
+    if world.shuffle[player] not in ['liteplus', 'crossed']:
         drop_owid_map = { #                         owid, is_light_world
             'Lost Woods Hideout Stump':             (0x00, True),
             'Lumberjack Tree Cave':                 (0x02, True),
@@ -1032,6 +1071,8 @@ def scramble_holes(world, player):
         region = world.get_entrance('Hyrule Castle Exit (South)', player).parent_region
         if len(region.entrances) > 0:
             hc_in_lw = region.entrances[0].parent_region.type == (RegionType.LightWorld if not invFlag else RegionType.DarkWorld)
+        elif world.shuffle[player] == 'lite':
+            hc_in_lw = True
         else:
             # checks if drop candidates exist in LW
             drop_owids = [ 0x00, 0x02, 0x13, 0x15, 0x18, 0x1b, 0x22 ]
@@ -1280,13 +1321,6 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
             random.shuffle(ledge)
             lw_must_exit.append(ledge.pop())
             lw_related.extend(ledge)
-    if world.shuffle[player] == 'lite':
-        lw_entrances.extend(dw_entrances)
-        lw_must_exit.extend(dw_must_exit)
-        lw_related.extend(dw_related)
-        dw_entrances = list()
-        dw_must_exit = list()
-        dw_related = list()
     random.shuffle(lw_must_exit)
     random.shuffle(dw_must_exit)
     
@@ -1295,17 +1329,16 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
     hyrule_castle_exits = list([tuple(e for e in hyrule_castle_exits if e in exit_pool)])
     hyrule_castle_exits.extend([e for e in dungeon_exits if isinstance(e, str)])
     dungeon_exits = [e for e in dungeon_exits if not isinstance(e, str)]
-    if world.shuffle[player] != 'lite':
-        if invFlag == (0x13 in world.owswaps[player][0] and world.owMixed[player]):
-            connect_mandatory_exits(world, lw_entrances, hyrule_castle_exits, lw_must_exit, player, False)
-            dungeon_exits.extend([e for e in hyrule_castle_exits if isinstance(e, str)])
-            hyrule_castle_exits = [e for e in hyrule_castle_exits if not isinstance(e, str)]
-            connect_caves(world, lw_entrances, [], hyrule_castle_exits, player)
-        else:
-            connect_mandatory_exits(world, dw_entrances, hyrule_castle_exits, dw_must_exit, player, False)
-            dungeon_exits.extend([e for e in hyrule_castle_exits if isinstance(e, str)])
-            hyrule_castle_exits = [e for e in hyrule_castle_exits if not isinstance(e, str)]
-            connect_caves(world, [], dw_entrances, hyrule_castle_exits, player)
+    if invFlag == (0x13 in world.owswaps[player][0] and world.owMixed[player]):
+        connect_mandatory_exits(world, lw_entrances, hyrule_castle_exits, lw_must_exit, player, False)
+        dungeon_exits.extend([e for e in hyrule_castle_exits if isinstance(e, str)])
+        hyrule_castle_exits = [e for e in hyrule_castle_exits if not isinstance(e, str)]
+        connect_caves(world, lw_entrances, [], hyrule_castle_exits, player)
+    else:
+        connect_mandatory_exits(world, dw_entrances, hyrule_castle_exits, dw_must_exit, player, False)
+        dungeon_exits.extend([e for e in hyrule_castle_exits if isinstance(e, str)])
+        hyrule_castle_exits = [e for e in hyrule_castle_exits if not isinstance(e, str)]
+        connect_caves(world, [], dw_entrances, hyrule_castle_exits, player)
     
     # connect any remaining must-exit entrances
     dungeon_exits.extend(hyrule_castle_exits)
@@ -1492,7 +1525,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
             connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
     
     # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
-    if world.shuffle[player] in ['lite', 'liteplus', 'crossed', 'insanity']:
+    if world.shuffle[player] in ['liteplus', 'crossed', 'insanity']:
         combined_must_exit_regions = list(must_exit_regions + otherworld_must_exit_regions)
         if len(combined_must_exit_regions) > 0:
             random.shuffle(combined_must_exit_regions)
@@ -1544,6 +1577,30 @@ def unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_E
     tuplize_lists_in_list(Cave_Exits)
     tuplize_lists_in_list(Old_Man_House)
     tuplize_lists_in_list(Cave_Three_Exits)
+
+
+def unbias_dungeons(Dungeon_Exits):
+    def shuffle_lists_in_list(ls):
+        for i, item in enumerate(ls):
+            if isinstance(item, list):
+                ls[i] = random.sample(item, len(item))
+
+    def tuplize_lists_in_list(ls):
+        for i, item in enumerate(ls):
+            if isinstance(item, list):
+                ls[i] = tuple(item)
+
+    shuffle_lists_in_list(Dungeon_Exits)
+
+    # TR fixup
+    for i, item in enumerate(Dungeon_Exits[-1]):
+        if 'Turtle Rock Ledge Exit (East)' == item:
+            if 0 != i:
+                Dungeon_Exits[-1][i] = Dungeon_Exits[-1][0]
+                Dungeon_Exits[-1][0] = 'Turtle Rock Ledge Exit (East)'
+            break
+
+    tuplize_lists_in_list(Dungeon_Exits)
 
 
 def build_sectors(world, player):
@@ -1763,18 +1820,20 @@ def can_reach(world, entrance_name, region_name, player):
     return region_name not in world.inaccessible_regions[player]
 
 
-Dungeon_Exits_Base = [('Desert Palace Exit (South)', 'Desert Palace Exit (West)', 'Desert Palace Exit (East)'),
+LW_Dungeon_Exits = [('Desert Palace Exit (South)', 'Desert Palace Exit (West)', 'Desert Palace Exit (East)'),
     'Desert Palace Exit (North)',
     'Eastern Palace Exit',
     'Tower of Hera Exit',
-    'Thieves Town Exit',
-    'Skull Woods Final Section Exit',
-    'Ice Palace Exit',
+    'Agahnims Tower Exit']
+
+DW_Late_Dungeon_Exits = ['Ice Palace Exit',
     'Misery Mire Exit',
-    'Palace of Darkness Exit',
-    'Swamp Palace Exit',
-    'Agahnims Tower Exit',
     ('Turtle Rock Ledge Exit (East)', 'Turtle Rock Exit (Front)',  'Turtle Rock Ledge Exit (West)', 'Turtle Rock Isolated Ledge Exit')]
+
+DW_Mid_Dungeon_Exits = ['Thieves Town Exit',
+    'Skull Woods Final Section Exit',
+    'Palace of Darkness Exit',
+    'Swamp Palace Exit']
 
 Cave_Exits_Base = [('Elder House Exit (East)', 'Elder House Exit (West)'),
                    ('Two Brothers House Exit (East)', 'Two Brothers House Exit (West)'),
