@@ -120,7 +120,7 @@ class World(object):
             set_player_attr('can_access_trock_front', None)
             set_player_attr('can_access_trock_big_chest', None)
             set_player_attr('can_access_trock_middle', None)
-            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lite', 'liteplus', 'crossed', 'insanity', 'madness_legacy'])
+            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lite', 'lean', 'crossed', 'insanity', 'madness_legacy'])
             set_player_attr('mapshuffle', False)
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', False)
@@ -2966,7 +2966,7 @@ class Pot(object):
 # byte 0: DDOO OEEE (DR, OR, ER)
 dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0}
 or_mode = {"vanilla": 0, "parallel": 1, "full": 1}
-er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "lite": 4, "liteplus": 5, "crossed": 6, "insanity": 7, "dungeonsfull": 8, "dungeonssimple": 9}
+er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "lite": 4, "lean": 5, "crossed": 6, "insanity": 7, "dungeonsfull": 8, "dungeonssimple": 9}
 
 # byte 1: LLLW WSSR (logic, mode, sword, retro)
 logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owglitches": 3, "majorglitches": 4}
