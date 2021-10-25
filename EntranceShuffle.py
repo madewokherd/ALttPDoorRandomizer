@@ -1522,7 +1522,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         if len(inaccessible_entrances):
             random.shuffle(inaccessible_entrances)
             connect_mandatory_exits(world, pool, caves, [inaccessible_entrances.pop()], player)
-            connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
+        connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
     
     # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
     if world.shuffle[player] in ['liteplus', 'crossed', 'insanity']:
