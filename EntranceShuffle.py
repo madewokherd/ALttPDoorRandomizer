@@ -1662,20 +1662,21 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     from Main import copy_world
     from Items import ItemFactory
     
-    def explore_region(region_name):
+    def explore_region(region_name, region=None):
         explored_regions.add(region_name)
-        region = base_world.get_region(region_name, player)
+        if not region:
+            region = base_world.get_region(region_name, player)
         for exit in region.exits:
             if exit.connected_region is not None:
                 if any(map(lambda i: i.name == 'Ocarina', base_world.precollected_items)) and exit.spot_type == 'Flute':
                     fluteregion = exit.connected_region
                     for flutespot in fluteregion.exits:
                         if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
-                            explore_region(flutespot.connected_region.name)
+                            explore_region(flutespot.connected_region.name, flutespot.connected_region)
                 elif exit.connected_region.name not in explored_regions \
                         and (exit.connected_region.type == region.type or (cross_world and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld])) \
                         and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.spot_type != 'Ledge'):
-                    explore_region(exit.connected_region.name)
+                    explore_region(exit.connected_region.name, exit.connected_region)
     
     if build_copy_world:
         for player in range(1, world.players + 1):
