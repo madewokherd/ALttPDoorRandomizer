@@ -5,6 +5,7 @@
 - Added 2 new ER modes (Lite and Lean)
 - Added new mystery options (Logic/Shuffle Ganon)
 - Smith deletion on S+Q only occurs if Blacksmith not reachable from starting locations
+- Spoiler log improvements to prevent spoiling in the beginning 'meta' section
 - Various minor fixes and improvements
 - ~~Merged DR v0.5.1.4 - ROM bug fixes/keylogic improvements~~
 
