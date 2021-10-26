@@ -129,6 +129,42 @@ New flute spots are chosen at random, with restrictions that limit the promixity
 
 New flute spots are chosen at random with minimum bias.
 
+## New Entrance Shuffle Options (--shuffle)
+
+### Lite
+
+This mode is intended to be a beginner-friendly introduction to playing ER. It focuses on reducing low% world traversal in late-game dungeons while reducing the number of entrances needing to be checked.
+
+This mode groups entrances into types and shuffles them freely within those groups.
+- Dungeons and Connectors (Multi-Entrance Caves)
+- Item Locations (Single-Entrance Caves with an item, includes Potion Shop and Red Bomb Shop, includes Shops only if Shopsanity is enabled)
+- Dropdowns and their associated exits (Skull Woods dropdowns are handled the same as in Crossed)
+- Non-item locations (junk locations) all remain vanilla
+
+Lite mode shuffles all connectors same-world, to limit bunny traversal. And to prevent Low% enemy and boss combat, some dungeons are confined to specific worlds.
+
+The following dungeons are guaranteed to be in the Light World:
+- Hyrule Castle
+- Eastern Palace
+- Desert Palace
+- Tower of Hera
+- Agahnim's Tower
+
+The following are guaranteed to be in the Dark World:
+- Ice Palace
+- Misery Mire
+- Turtle Rock
+- Ganon's Tower
+
+### Lean
+
+This mode is intended to be a more refined and more competitive format to Crossed ER. It focuses on reducing the number of entrances needing to be checked, while giving the player unique routing options based on the entrance pools defined below, as opposed to mindlessly checking all the remaining entrances. The Dungeons/Connectors can connect cross-world.
+
+This mode groups entrances into types and shuffles them freely within those groups.
+- Dungeons and Connectors (Multi-Entrance Caves)
+- Item Locations (Single-Entrance Caves with an item, includes Potion Shop and Red Bomb Shop, includes Shops only if Shopsanity is enabled)
+- Dropdowns and their associated exits (Skull Woods dropdowns are handled the same as in Crossed)
+- Non-item locations (junk locations) all remain vanilla
 
 # Command Line Options
 

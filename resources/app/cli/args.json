@@ -146,6 +146,8 @@
       "simple",
       "restricted",
       "full",
+      "lite",
+      "lean",
       "crossed",
       "insanity",
       "dungeonsfull",

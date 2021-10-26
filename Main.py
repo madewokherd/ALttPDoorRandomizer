@@ -30,7 +30,7 @@ from Fill import sell_potions, sell_keys, balance_multiworld_progression, balanc
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
 from Utils import output_path, parse_player_names
 
-__version__ = '0.5.1.2-u'
+__version__ = '0.5.1.4-u'
 
 from source.classes.BabelFish import BabelFish
 
@@ -513,7 +513,9 @@ def copy_world(world):
             connect_portal(portal, ret, player)
     ret.sanc_portal = world.sanc_portal
 
+    from OverworldShuffle import categorize_world_regions
     for player in range(1, world.players + 1):
+        categorize_world_regions(ret, player)
         set_rules(ret, player)
 
     return ret

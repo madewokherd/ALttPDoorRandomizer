@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.2.0.0
+- Massive overhaul of ER algorithm
+- Added 2 new ER modes (Lite and Lean)
+- Added new mystery options (Logic/Shuffle Ganon)
+- Smith deletion on S+Q only occurs if Blacksmith not reachable from starting locations
+- Various minor fixes and improvements
+- ~~Merged DR v0.5.1.4 - ROM bug fixes/keylogic improvements~~
+
 ### 0.1.9.4
 - Hotfix for bad 0.1.9.3 version
 

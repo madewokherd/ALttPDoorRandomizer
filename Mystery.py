@@ -120,7 +120,7 @@ def roll_settings(weights):
     if glitches_required not in ['none', 'no_logic']:
         print("Only NMG and No Logic supported")
         glitches_required = 'none'
-    ret.logic = {'none': 'noglitches', 'no_logic': 'nologic'}[glitches_required]
+    ret.logic = {'none': 'noglitches', 'owg': 'owglitches', 'no_logic': 'nologic'}[glitches_required]
 
     item_placement = get_choice('item_placement')
     # not supported in ER
@@ -166,6 +166,8 @@ def roll_settings(weights):
                 'triforce-hunt': 'triforcehunt'
                 }[goal]
     ret.openpyramid = goal == 'fast_ganon' if ret.shuffle in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
+
+    ret.shuffleganon = get_choice('shuffleganon') == 'on'
 
     ret.crystals_gt = get_choice('tower_open')
 
