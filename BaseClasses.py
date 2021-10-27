@@ -123,7 +123,7 @@ class World(object):
             set_player_attr('can_access_trock_front', None)
             set_player_attr('can_access_trock_big_chest', None)
             set_player_attr('can_access_trock_middle', None)
-            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lite', 'lean', 'crossed', 'insanity', 'madness_legacy'])
+            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lean', 'crossed', 'insanity', 'madness_legacy'])
             set_player_attr('mapshuffle', False)
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', False)

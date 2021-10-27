@@ -477,7 +477,7 @@ def reorganize_tile_groups(world, player):
     groups = {}
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
         if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lite', 'lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
                     groups[(name, whirlpoolGroup)] = ([], [], [])
@@ -491,7 +491,7 @@ def reorganize_tile_groups(world, player):
 
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
         if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lite', 'lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
             (lw_owids, dw_owids) = OWTileGroups[(name, groupType, whirlpoolGroup)]
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
