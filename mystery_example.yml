@@ -15,6 +15,9 @@
   overworld_swap:
     on: 1
     off: 1
+  whirlpool_shuffle:
+    on: 1
+    off: 1
   flute_shuffle:
     vanilla: 0
     balanced: 1
