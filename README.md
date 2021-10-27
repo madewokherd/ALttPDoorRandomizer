@@ -93,6 +93,8 @@ Every transition independently is a candidate to be chosen as a cross-world conn
 
 Note: Only parallel connections (a connection that also exists in the opposite world) are considered for cross-world connections, which means that the same connection in the opposite world will also connect cross-world.
 
+Note: If Whirlpool Shuffle is enabled, those connections can be cross-world but do not count towards the 9 transitions that are crossed.
+
 Motive: Why 9 connections? To imitate the effect of the 9 standard portals that exist.
 
 ### Chaos
@@ -110,6 +112,10 @@ Note: This affects OW Layout Shuffle mostly, but also affects Limited and Chaos 
 OW tiles are randomly chosen to become a part of the opposite world. When on the Overworld, there will be an L or D in the upper left corner, indicating which world you are currently in. Mirroring still works the same, you must be in the DW to mirror to the LW.
 
 Note: Tiles are put into groups that must be shuffled together when certain settings are enabled. For instance, if ER is disabled, then any tiles that have a connector cave that leads to another tile, those tiles must swap together; (an exception to this is the Old Man Rescue cave which has been modified similar to how Inverted modifies it, Old Man Rescue is ALWAYS accessible from the Light World)
+
+## Whirlpool Shuffle (--ow_whirlpool)
+
+When enabled, the whirlpool connections are shuffled. If Crossed OW is enabled, the whirlpools can also be cross-world as well. For Limited Crossed OW, this doesn't count towards the limited number of crossed edge transitions.
 
 ## Flute Shuffle (--ow_fluteshuffle)
 
