@@ -969,7 +969,7 @@ OWTileRegions = bidict({
 })
 
 OWTileGroups = {
-    ("Woods", "Regular"): (
+    ("Woods", "Regular", "None"): (
         [
             0x00, 0x2d, 0x80
         ],
@@ -977,7 +977,7 @@ OWTileGroups = {
             0x40, 0x6d
         ]
     ),
-    ("Lumberjack", "Regular"): (
+    ("Lumberjack", "Regular", "None"): (
         [
             0x02
         ],
@@ -985,7 +985,7 @@ OWTileGroups = {
             0x42
         ]
     ),
-    ("West Mountain", "Regular"): (
+    ("West Mountain", "Regular", "None"): (
         [
             0x03
         ],
@@ -993,7 +993,7 @@ OWTileGroups = {
             0x43
         ]
     ),
-    ("East Mountain", "Regular"): (
+    ("East Mountain", "Regular", "None"): (
         [
             0x05
         ],
@@ -1001,23 +1001,31 @@ OWTileGroups = {
             0x45
         ]
     ),
-    ("East Mountain", "Entrance"): (
+    ("East Mountain", "Entrance", "None"): (
         [
-            0x07, 
+            0x07
         ],
         [
             0x47
         ]
     ),
-    ("Lake", "Regular"): (
+    ("Lake", "Regular", "Zora"): (
         [
-            0x0f, 0x35, 0x81
+            0x0f, 0x81
         ],
         [
-            0x4f, 0x75
+            0x4f
         ]
     ),
-    ("Mountain Entry", "Regular"): (
+    ("Lake", "Regular", "Lake"): (
+        [
+            0x35
+        ],
+        [
+            0x75
+        ]
+    ),
+    ("Mountain Entry", "Regular", "None"): (
         [
             0x0a
         ],
@@ -1025,7 +1033,7 @@ OWTileGroups = {
             0x4a
         ]
     ),
-    ("Woods Pass", "Regular"): (
+    ("Woods Pass", "Regular", "None"): (
         [
             0x10
         ],
@@ -1033,7 +1041,7 @@ OWTileGroups = {
             0x50
         ]
     ),
-    ("Fortune", "Regular"): (
+    ("Fortune", "Regular", "None"): (
         [
             0x11
         ],
@@ -1041,15 +1049,39 @@ OWTileGroups = {
             0x51
         ]
     ),
-    ("Whirlpools", "Regular"): (
+    ("Whirlpools", "Regular", "Pond"): (
         [
-            0x12, 0x15, 0x33, 0x3f
+            0x12
         ],
         [
-            0x52, 0x55, 0x73, 0x7f
+            0x52
         ]
     ),
-    ("Castle", "Entrance"): (
+    ("Whirlpools", "Regular", "Witch"): (
+        [
+            0x15
+        ],
+        [
+            0x55
+        ]
+    ),
+    ("Whirlpools", "Regular", "CWhirlpool"): (
+        [
+            0x33
+        ],
+        [
+            0x73
+        ]
+    ),
+    ("Whirlpools", "Regular", "Southeast"): (
+        [
+            0x3f
+        ],
+        [
+            0x7f
+        ]
+    ),
+    ("Castle", "Entrance", "None"): (
         [
             0x13, 0x14
         ],
@@ -1057,7 +1089,7 @@ OWTileGroups = {
             0x53, 0x54
         ]
     ),
-    ("Castle", "Regular"): (
+    ("Castle", "Regular", "None"): (
         [
             0x1a, 0x1b
         ],
@@ -1065,7 +1097,7 @@ OWTileGroups = {
             0x5a, 0x5b
         ]
     ),
-    ("Witch", "Regular"): (
+    ("Witch", "Regular", "None"): (
         [
             0x16
         ],
@@ -1073,7 +1105,7 @@ OWTileGroups = {
             0x56
         ]
     ),
-    ("Water Approach", "Regular"): (
+    ("Water Approach", "Regular", "None"): (
         [
             0x17
         ],
@@ -1081,7 +1113,7 @@ OWTileGroups = {
             0x57
         ]
     ),
-    ("Village", "Regular"): (
+    ("Village", "Regular", "None"): (
         [
             0x18
         ],
@@ -1089,7 +1121,7 @@ OWTileGroups = {
             0x58
         ]
     ),
-    ("Wooden Bridge", "Regular"): (
+    ("Wooden Bridge", "Regular", "None"): (
         [
             0x1d
         ],
@@ -1097,7 +1129,7 @@ OWTileGroups = {
             0x5d
         ]
     ),
-    ("Eastern", "Regular"): (
+    ("Eastern", "Regular", "None"): (
         [
             0x1e
         ],
@@ -1105,7 +1137,7 @@ OWTileGroups = {
             0x5e
         ]
     ),
-    ("Blacksmith", "Regular"): (
+    ("Blacksmith", "Regular", "None"): (
         [
             0x22
         ],
@@ -1113,7 +1145,7 @@ OWTileGroups = {
             0x62
         ]
     ),
-    ("Dunes", "Regular"): (
+    ("Dunes", "Regular", "None"): (
         [
             0x25
         ],
@@ -1121,7 +1153,7 @@ OWTileGroups = {
             0x65
         ]
     ),
-    ("Game", "Regular"): (
+    ("Game", "Regular", "None"): (
         [
             0x28, 0x29
         ],
@@ -1129,7 +1161,7 @@ OWTileGroups = {
             0x68, 0x69
         ]
     ),
-    ("Grove", "Regular"): (
+    ("Grove", "Regular", "None"): (
         [
             0x2a
         ],
@@ -1137,7 +1169,7 @@ OWTileGroups = {
             0x6a
         ]
     ),
-    ("Central Bonk Rocks", "Regular"): (
+    ("Central Bonk Rocks", "Regular", "None"): (
         [
             0x2b
         ],
@@ -1145,7 +1177,7 @@ OWTileGroups = {
             0x6b
         ]
     ),
-    # ("Links", "Regular"): (
+    # ("Links", "Regular", "None"): (
     #     [
     #         0x2c
     #     ],
@@ -1153,7 +1185,7 @@ OWTileGroups = {
     #         0x6c
     #     ]
     # ),
-    ("Tree Line", "Regular"): (
+    ("Tree Line", "Regular", "None"): (
         [
             0x2e
         ],
@@ -1161,7 +1193,7 @@ OWTileGroups = {
             0x6e
         ]
     ),
-    ("Nook", "Regular"): (
+    ("Nook", "Regular", "None"): (
         [
             0x2f
         ],
@@ -1169,7 +1201,7 @@ OWTileGroups = {
             0x6f
         ]
     ),
-    ("Desert", "Regular"): (
+    ("Desert", "Regular", "None"): (
         [
             0x30, 0x3a
         ],
@@ -1177,7 +1209,7 @@ OWTileGroups = {
             0x70, 0x7a
         ]
     ),
-    ("Grove Approach", "Regular"): (
+    ("Grove Approach", "Regular", "None"): (
         [
             0x32
         ],
@@ -1185,7 +1217,7 @@ OWTileGroups = {
             0x72
         ]
     ),
-    ("Hype", "Regular"): (
+    ("Hype", "Regular", "None"): (
         [
             0x34
         ],
@@ -1193,7 +1225,7 @@ OWTileGroups = {
             0x74
         ]
     ),
-    ("Shopping Mall", "Regular"): (
+    ("Shopping Mall", "Regular", "None"): (
         [
             0x37
         ],
@@ -1201,7 +1233,7 @@ OWTileGroups = {
             0x77
         ]
     ),
-    ("Swamp", "Regular"): (
+    ("Swamp", "Regular", "None"): (
         [
             0x3b
         ],
@@ -1209,7 +1241,7 @@ OWTileGroups = {
             0x7b
         ]
     ),
-    ("South Pass", "Regular"): (
+    ("South Pass", "Regular", "None"): (
         [
             0x3c
         ],

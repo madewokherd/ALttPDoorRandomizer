@@ -221,6 +221,9 @@
     "ow_mixed": [
       "Overworld tiles are randomly chosen to become part of the opposite world."
     ],
+    "ow_whirlpool": [
+      "Whirlpools will be shuffled and paired together."
+    ],
     "ow_fluteshuffle": [
       "This randomizes the flute spot destinations.",
       "Vanilla:        All flute spots remain unchanged.",

@@ -26,6 +26,7 @@ class World(object):
         self.owCrossed = owCrossed.copy()
         self.owKeepSimilar = {}
         self.owMixed = owMixed.copy()
+        self.owWhirlpoolShuffle = {}
         self.owFluteShuffle = {}
         self.shuffle = shuffle.copy()
         self.doorShuffle = doorShuffle.copy()
@@ -76,6 +77,7 @@ class World(object):
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
         self.owswaps = {}
+        self.owwhirlpools = {}
         self.owedges = []
         self._owedge_cache = {}
         self.owflutespots = {}
@@ -105,6 +107,7 @@ class World(object):
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('owswaps', [[],[],[]])
+            set_player_attr('owwhirlpools', [])
             set_player_attr('remote_items', False)
             set_player_attr('required_medallions', ['Ether', 'Quake'])
             set_player_attr('swamp_patch_required', False)
@@ -112,7 +115,7 @@ class World(object):
             set_player_attr('ganon_at_pyramid', True)
             set_player_attr('ganonstower_vanilla', True)
             set_player_attr('sewer_light_cone', self.mode[player] == 'standard')
-            set_player_attr('fix_trock_doors', self.shuffle[player] != 'vanilla' or ((self.mode[player] == 'inverted') != (0x05 in self.owswaps[player][0] and self.owMixed[player])))
+            set_player_attr('fix_trock_doors', self.shuffle[player] != 'vanilla' or ((self.mode[player] == 'inverted') != 0x05 in self.owswaps[player][0]))
             set_player_attr('fix_skullwoods_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'] or self.doorShuffle[player] not in ['vanilla'])
             set_player_attr('fix_palaceofdarkness_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'])
             set_player_attr('fix_trock_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'])
@@ -120,7 +123,7 @@ class World(object):
             set_player_attr('can_access_trock_front', None)
             set_player_attr('can_access_trock_big_chest', None)
             set_player_attr('can_access_trock_middle', None)
-            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lite', 'lean', 'crossed', 'insanity', 'madness_legacy'])
+            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lean', 'crossed', 'insanity', 'madness_legacy'])
             set_player_attr('mapshuffle', False)
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', False)
@@ -2693,6 +2696,7 @@ class Spoiler(object):
                          'ow_crossed': self.world.owCrossed,
                          'ow_keepsimilar': self.world.owKeepSimilar,
                          'ow_mixed': self.world.owMixed,
+                         'ow_whirlpool': self.world.owWhirlpoolShuffle,
                          'ow_fluteshuffle': self.world.owFluteShuffle,
                          'shuffle': self.world.shuffle,
                          'shuffleganon': self.world.shuffle_ganon,
@@ -2784,6 +2788,7 @@ class Spoiler(object):
                     outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_keepsimilar'][player] else 'No'))
                 outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
                 outfile.write('Swapped OW (Mixed):'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_mixed'][player] else 'No'))
+                outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_whirlpool'][player] else 'No'))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shuffleganon'][player] else 'No'))
@@ -2807,6 +2812,7 @@ class Spoiler(object):
             if self.startinventory:
                 outfile.write('Starting Inventory:'.ljust(line_width))
                 outfile.write('\n'.ljust(line_width+1).join(self.startinventory))
+            
             outfile.write('\n\nRequirements:\n\n')
             for dungeon, medallion in self.medallions.items():
                 outfile.write(f'{dungeon}:'.ljust(line_width) + '%s Medallion\n' % medallion)

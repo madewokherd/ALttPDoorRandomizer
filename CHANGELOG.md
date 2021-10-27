@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.2.1.0
+- Implemented Whirlpool Shuffle
+
 ### 0.2.0.0
 - Massive overhaul of ER algorithm
 - Added 2 new ER modes (Lite and Lean)

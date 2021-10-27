@@ -3,7 +3,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.0.0-u'
+__version__ = '0.2.1.0-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -186,6 +186,44 @@ def link_overworld(world, player):
         
         trimmed_groups = performSwap(trimmed_groups, crossed_edges)
         assert len(crossed_edges) == 0, 'Not all edges were crossed successfully: ' + ', '.join(crossed_edges)
+
+    # whirlpool shuffle
+    logging.getLogger('').debug('Shuffling whirlpools')
+
+    if not world.owWhirlpoolShuffle[player]:
+        for (_, from_whirlpool, from_region), (_, to_whirlpool, to_region) in default_whirlpool_connections:
+            connect_simple(world, from_whirlpool, to_region, player)
+            connect_simple(world, to_whirlpool, from_region, player)
+    else:
+        whirlpool_candidates = [[],[]]
+        for (from_owid, from_whirlpool, from_region), (to_owid, to_whirlpool, to_region) in default_whirlpool_connections:
+            if world.owCrossed[player] != 'none':
+                whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
+                whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
+            else:
+                if world.get_region(from_region, player).type == RegionType.LightWorld:
+                    whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
+                else:
+                    whirlpool_candidates[1].append(tuple((from_owid, from_whirlpool, from_region)))
+                
+                if world.get_region(to_region, player).type == RegionType.LightWorld:
+                    whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
+                else:
+                    whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
+
+        # shuffle happens here
+        world.owwhirlpools[player] = [None] * 8
+        whirlpool_map = [ 0x35, 0x0f, 0x15, 0x33, 0x12, 0x3f, 0x55, 0x7f ]
+        for whirlpools in whirlpool_candidates:
+            random.shuffle(whirlpools)
+            while len(whirlpools):
+                from_owid, from_whirlpool, from_region = whirlpools.pop()
+                to_owid, to_whirlpool, to_region = whirlpools.pop()
+                connect_simple(world, from_whirlpool, to_region, player)
+                connect_simple(world, to_whirlpool, from_region, player)
+                world.owwhirlpools[player][next(i for i, v in enumerate(whirlpool_map) if v == to_owid)] = from_owid
+                world.owwhirlpools[player][next(i for i, v in enumerate(whirlpool_map) if v == from_owid)] = to_owid
+                world.spoiler.set_overworld(from_whirlpool, to_whirlpool, 'both', player)
 
     # layout shuffle
     logging.getLogger('').debug('Shuffling overworld layout')
@@ -387,22 +425,33 @@ def connect_two_way(world, edgename1, edgename2, player, connected_edges=None):
 
 def shuffle_tiles(world, groups, result_list, player):
     swapped_edges = list()
+    valid_whirlpool_parity = False
 
-    # tile shuffle happens here
-    removed = list()
-    for group in groups.keys():
-        if random.randint(0, 1):
-            removed.append(group)
-    
-    # save shuffled tiles to list
-    for group in groups.keys():
-        if group not in removed:
-            (owids, lw_regions, dw_regions) = groups[group]
-            (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
-            exist_owids.extend(owids)
-            exist_lw_regions.extend(lw_regions)
-            exist_dw_regions.extend(dw_regions)
-            result_list = [exist_owids, exist_lw_regions, exist_dw_regions]
+    while not valid_whirlpool_parity:
+        # tile shuffle happens here
+        removed = list()
+        for group in groups.keys():
+            # if group[0] in ['Links', 'Central Bonk Rocks', 'Castle']: # TODO: Standard + Inverted
+            if random.randint(0, 1):
+                removed.append(group)
+        
+        # save shuffled tiles to list
+        new_results = [[],[],[]]
+        for group in groups.keys():
+            if group not in removed:
+                (owids, lw_regions, dw_regions) = groups[group]
+                (exist_owids, exist_lw_regions, exist_dw_regions) = new_results
+                exist_owids.extend(owids)
+                exist_lw_regions.extend(lw_regions)
+                exist_dw_regions.extend(dw_regions)
+
+        # check whirlpool parity
+        valid_whirlpool_parity = world.owCrossed[player] != 'none' or len(set(new_results[0]) & set({0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f})) % 2 == 0
+
+    (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
+    exist_owids.extend(new_results[0])
+    exist_lw_regions.extend(new_results[1])
+    exist_dw_regions.extend(new_results[2])
 
     # replace LW edges with DW
     ignore_list = list() #TODO: Remove ignore_list when special OW areas are included in pool
@@ -426,36 +475,62 @@ def shuffle_tiles(world, groups, result_list, player):
 
 def reorganize_tile_groups(world, player):
     groups = {}
-    for (name, groupType) in OWTileGroups.keys():
+    for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
         if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lite', 'lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
-                groups[(name,)] = ([], [], [])
+                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
+                    groups[(name, whirlpoolGroup)] = ([], [], [])
+                else:
+                    groups[(name,)] = ([], [], [])
             else:
-                groups[(name, groupType)] = ([], [], [])
+                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
+                    groups[(name, groupType, whirlpoolGroup)] = ([], [], [])
+                else:
+                    groups[(name, groupType)] = ([], [], [])
 
-    for (name, groupType) in OWTileGroups.keys():
+    for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
         if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lite', 'lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
-            (lw_owids, dw_owids) = OWTileGroups[(name, groupType,)]
+                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+            (lw_owids, dw_owids) = OWTileGroups[(name, groupType, whirlpoolGroup)]
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
-                (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name,)]
-                exist_owids.extend(lw_owids)
-                exist_owids.extend(dw_owids)
-                for owid in lw_owids:
-                    exist_lw_regions.extend(OWTileRegions.inverse[owid])
-                for owid in dw_owids:
-                    exist_dw_regions.extend(OWTileRegions.inverse[owid])
-                groups[(name,)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
+                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, whirlpoolGroup)]
+                    exist_owids.extend(lw_owids)
+                    exist_owids.extend(dw_owids)
+                    for owid in lw_owids:
+                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
+                    for owid in dw_owids:
+                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
+                    groups[(name, whirlpoolGroup)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+                else:
+                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name,)]
+                    exist_owids.extend(lw_owids)
+                    exist_owids.extend(dw_owids)
+                    for owid in lw_owids:
+                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
+                    for owid in dw_owids:
+                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
+                    groups[(name,)] = (exist_owids, exist_lw_regions, exist_dw_regions)
             else:
-                (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, groupType)]
-                exist_owids.extend(lw_owids)
-                exist_owids.extend(dw_owids)
-                for owid in lw_owids:
-                    exist_lw_regions.extend(OWTileRegions.inverse[owid])
-                for owid in dw_owids:
-                    exist_dw_regions.extend(OWTileRegions.inverse[owid])
-                groups[(name, groupType)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
+                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, groupType, whirlpoolGroup)]
+                    exist_owids.extend(lw_owids)
+                    exist_owids.extend(dw_owids)
+                    for owid in lw_owids:
+                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
+                    for owid in dw_owids:
+                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
+                    groups[(name, groupType, whirlpoolGroup)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+                else:
+                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, groupType)]
+                    exist_owids.extend(lw_owids)
+                    exist_owids.extend(dw_owids)
+                    for owid in lw_owids:
+                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
+                    for owid in dw_owids:
+                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
+                    groups[(name, groupType)] = (exist_owids, exist_lw_regions, exist_dw_regions)
     return groups
 
 def remove_reserved(world, groupedlist, connected_edges, player):
@@ -733,17 +808,7 @@ temporary_mandatory_connections = [
                         ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [# Whirlpool Connections
-                         ('C Whirlpool', 'River Bend Water'),
-                         ('River Bend Whirlpool', 'C Whirlpool Water'),
-                         ('Lake Hylia Whirlpool', 'Zora Waterfall Water'),
-                         ('Zora Whirlpool', 'Lake Hylia Water'),
-                         ('Kakariko Pond Whirlpool', 'Octoballoon Water'),
-                         ('Octoballoon Whirlpool', 'Kakariko Pond Area'),
-                         ('Qirn Jump Whirlpool', 'Bomber Corner Water'),
-                         ('Bomber Corner Whirlpool', 'Qirn Jump Water'),
-
-                         # Intra-tile OW Connections
+mandatory_connections = [# Intra-tile OW Connections
                          ('Lost Woods Bush (West)', 'Lost Woods East Area'), #pearl
                          ('Lost Woods Bush (East)', 'Lost Woods West Area'), #pearl
                          ('West Death Mountain Drop', 'West Death Mountain (Bottom)'),
@@ -966,6 +1031,13 @@ mandatory_connections = [# Whirlpool Connections
                          ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), #fake flipper
                          ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water') #fake flipper
                          ]
+
+default_whirlpool_connections = [
+    ((0x33, 'C Whirlpool', 'C Whirlpool Water'),              (0x15, 'River Bend Whirlpool', 'River Bend Water')),
+    ((0x35, 'Lake Hylia Whirlpool', 'Lake Hylia Water'),      (0x0f, 'Zora Whirlpool', 'Zora Waterfall Water')),
+    ((0x12, 'Kakariko Pond Whirlpool', 'Kakariko Pond Area'), (0x3f, 'Octoballoon Whirlpool', 'Octoballoon Water')),
+    ((0x55, 'Qirn Jump Whirlpool', 'Qirn Jump Water'),        (0x7f, 'Bomber Corner Whirlpool', 'Bomber Corner Water'))
+]                         
 
 default_flute_connections = [
     0x0b, 0x16, 0x18, 0x2c, 0x2f, 0x38, 0x3b, 0x3f

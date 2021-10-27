@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'c6c2a2d5d89a3c84871f58806bbb3acf'
+RANDOMIZERBASEHASH = 'e9dea70e0a0b15bfa0ff7ecd63228a0c'
 
 
 class JsonRom(object):
@@ -644,6 +644,11 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_byte(snes_to_pc(0x0AB793 + o), data[11] & 0xff) # Y low byte
         rom.write_byte(snes_to_pc(0x0AB79B + o), data[11] // 0x100) # Y high byte
 
+    # patch whirlpools
+    if world.owWhirlpoolShuffle[player]:
+        owFlags |= 0x01
+        write_int16s(rom, snes_to_pc(0x02EA5C), world.owwhirlpools[player])
+    
     # patch overworld edges
     inverted_buffer = [0] * 0x82
     owMode = 0
