@@ -329,9 +329,6 @@ def link_entrances(world, player):
         else:
             caves.append('Ganons Tower Exit')
 
-        # shuffle holes
-        scramble_holes(world, player)
-
         # place dark sanc
         if invFlag:
             place_dark_sanc(world, sectors, player)
@@ -370,6 +367,9 @@ def link_entrances(world, player):
         lw_entrances = [e for e in lw_entrances if e in entrance_pool]
         dw_entrances = [e for e in dw_entrances if e in entrance_pool]
         connect_caves(world, lw_entrances, dw_entrances, caves, player)
+
+        # shuffle holes
+        scramble_holes(world, player)
 
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
@@ -467,9 +467,6 @@ def link_entrances(world, player):
         # shuffle dungeons
         skull_woods_shuffle(world, player)
 
-        # shuffle dropdowns
-        scramble_holes(world, player)
-
         if world.mode[player] == 'standard':
             connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
             Dungeon_Exits.append(tuple(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)')))
@@ -509,6 +506,9 @@ def link_entrances(world, player):
         bomb_shop = bomb_shop_doors.pop()
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
+        # shuffle dropdowns
+        scramble_holes(world, player)
+
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
     elif world.shuffle[player] == 'crossed':
