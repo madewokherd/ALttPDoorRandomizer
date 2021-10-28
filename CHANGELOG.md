@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.2.1.1
+- Many fixes to ER: infinite loops, preventing cross-world scenarios in non-cross-world modes
+- Spoiler log improvements, outputs in stages so a Spoiler is available if an error occurs
+- Added no_race option for Mystery
+- Fixed output_path in Mystery to use the saved setting if none is specified on CLI
+
 ### 0.2.1.0
 - Implemented Whirlpool Shuffle
 
