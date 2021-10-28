@@ -1361,10 +1361,11 @@ def place_links_house(world, sectors, player):
                 if dark_sanc.connected_region and dark_sanc.connected_region.name == 'Dark Sanctuary Hint':
                     dark_sanc = dark_sanc.name
                     break
+        
         if invFlag and isinstance(dark_sanc, str):
             links_house_doors = [i for i in get_distant_entrances(world, dark_sanc, sectors, player) if i in entrance_pool]
         else:
-            links_house_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] == 'insanity') if i in entrance_pool]
+            links_house_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
         if world.shuffle[player] in ['lite', 'lean']:
             links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
         
@@ -1377,7 +1378,7 @@ def place_dark_sanc(world, sectors, player):
     if not world.shufflelinks[player]:
         sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop', sectors, player) if i in entrance_pool]
     else:
-        sanc_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] == 'insanity') if i in entrance_pool]
+        sanc_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
     if world.shuffle[player] in ['lite', 'lean']:
         sanc_doors = [e for e in sanc_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
     sanc_door = random.choice(sanc_doors)
