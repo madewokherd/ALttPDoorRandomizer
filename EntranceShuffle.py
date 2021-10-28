@@ -257,8 +257,7 @@ def link_entrances(world, player):
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
+        bomb_shop = random.choice(bomb_shop_doors)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # place remaining doors
@@ -301,8 +300,7 @@ def link_entrances(world, player):
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
+        bomb_shop = random.choice(bomb_shop_doors)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
@@ -331,33 +329,33 @@ def link_entrances(world, player):
 
         # place dark sanc
         if invFlag:
-            place_dark_sanc(world, sectors, player)
+            place_dark_sanc(world, sectors, player, list(zip(*drop_connections + dropexit_connections))[0])
         
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, sectors, player, list(zip(*drop_connections + dropexit_connections))[0])
 
         # determine pools
         lw_entrances = list()
         dw_entrances = list()
         for e in entrance_pool:
-            region = world.get_entrance(e, player).parent_region
-            if region.type == RegionType.LightWorld:
-                lw_entrances.append(e)
-            else:
-                dw_entrances.append(e)
+            if e not in list(zip(*drop_connections + dropexit_connections))[0]:
+                region = world.get_entrance(e, player).parent_region
+                if region.type == RegionType.LightWorld:
+                    lw_entrances.append(e)
+                else:
+                    dw_entrances.append(e)
         
         # place connectors in inaccessible regions
-        connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
+        connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player, list(zip(*drop_connections + dropexit_connections))[0])
         
         # place old man, has limited options
-        place_old_man(world, lw_entrances if not invFlag else dw_entrances, player)
+        place_old_man(world, lw_entrances if not invFlag else dw_entrances, player, list(zip(*drop_connections + dropexit_connections))[0])
         
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
+        bomb_shop_doors = [e for e in entrance_pool if e not in list(zip(*drop_connections + dropexit_connections))[0]]
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
+            bomb_shop_doors = [e for e in bomb_shop_doors if e not in ['Pyramid Fairy']]
+        bomb_shop = random.choice(bomb_shop_doors)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
@@ -384,9 +382,6 @@ def link_entrances(world, player):
         # shuffle dungeons
         skull_woods_shuffle(world, player)
 
-        # shuffle dropdowns
-        scramble_holes(world, player)
-
         # build dungeon lists
         lw_dungeons = LW_Dungeon_Exits.copy()
         dw_dungeons = DW_Late_Dungeon_Exits.copy()
@@ -405,6 +400,9 @@ def link_entrances(world, player):
         unbias_dungeons(lw_dungeons)
         unbias_dungeons(dw_dungeons)
         
+        # shuffle dropdowns
+        scramble_holes(world, player)
+
         # place links house
         links_house = place_links_house(world, sectors, player)
         
@@ -451,8 +449,7 @@ def link_entrances(world, player):
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
+        bomb_shop = random.choice(bomb_shop_doors)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # place remaining doors
@@ -506,8 +503,7 @@ def link_entrances(world, player):
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
+        bomb_shop = random.choice(bomb_shop_doors)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # place remaining doors
@@ -552,8 +548,7 @@ def link_entrances(world, player):
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
+        bomb_shop = random.choice(bomb_shop_doors)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
@@ -1352,7 +1347,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
     connect_caves(world, lw_entrances, dw_entrances, dungeon_exits, player)
 
 
-def place_links_house(world, sectors, player):
+def place_links_house(world, sectors, player, ignore_list=[]):
     invFlag = world.mode[player] == 'inverted'
     if world.mode[player] == 'standard' or not world.shufflelinks[player]:
         links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
@@ -1370,13 +1365,15 @@ def place_links_house(world, sectors, player):
         if world.shuffle[player] in ['lite', 'lean']:
             links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
         
+        #TODO: Need to improve Links House placement to choose a better sector or eliminate entrances that are after ledge drops
+        links_house_doors = [e for e in links_house_doors if e not in ignore_list]
         assert len(links_house_doors), 'No valid candidates to place Links House'
         links_house = random.choice(links_house_doors)
     connect_two_way(world, links_house, 'Links House Exit', player)
     return links_house
 
 
-def place_dark_sanc(world, sectors, player):
+def place_dark_sanc(world, sectors, player, ignore_list=[]):
     if not world.shufflelinks[player]:
         sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop', sectors, player) if i in entrance_pool]
     else:
@@ -1384,6 +1381,7 @@ def place_dark_sanc(world, sectors, player):
     if world.shuffle[player] in ['lite', 'lean']:
         sanc_doors = [e for e in sanc_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
     
+    sanc_doors = [e for e in sanc_doors if e not in ignore_list]
     assert len(sanc_doors), 'No valid candidates to place Dark Chapel'
     sanc_door = random.choice(sanc_doors)
     connect_entrance(world, sanc_door, 'Dark Sanctuary Hint', player)
@@ -1417,14 +1415,14 @@ def place_blacksmith(world, links_house, player):
     return blacksmith_hut
 
 
-def place_old_man(world, pool, player):
+def place_old_man(world, pool, player, ignore_list=[]):
     # exit has to come from specific set of doors, the entrance is free to move about
     if (world.mode[player] == 'inverted') == (0x03 in world.owswaps[player][0] and world.owMixed[player]):
         region_name = 'West Death Mountain (Top)'
     else:
         region_name = 'West Dark Death Mountain (Top)'
     old_man_entrances = list(build_accessible_entrance_list(world, region_name, player, [], False, True, True, True))
-    old_man_entrances = [e for e in old_man_entrances if e != 'Old Man House (Bottom)']
+    old_man_entrances = [e for e in old_man_entrances if e != 'Old Man House (Bottom)' and e not in ignore_list]
     if world.shuffle[player] in ['lite', 'lean']:
         old_man_entrances = [e for e in old_man_entrances if e in pool]
     random.shuffle(old_man_entrances)
@@ -1434,7 +1432,7 @@ def place_old_man(world, pool, player):
         if 'West Death Mountain (Bottom)' not in build_accessible_region_list(world, world.get_entrance(old_man_exit, player).parent_region.name, player, True, True):
             old_man_exit = None
     
-    old_man_entrances = [e for e in pool if e in entrance_pool and e not in entrance_exits + [old_man_exit]]
+    old_man_entrances = [e for e in pool if e in entrance_pool and e not in ignore_list and e not in entrance_exits + [old_man_exit]]
     random.shuffle(old_man_entrances)
     old_man_entrance = old_man_entrances.pop()
     if world.shuffle[player] != 'insanity':
@@ -1484,7 +1482,7 @@ def junk_fill_inaccessible(world, player):
         connect_entrance(world, entrance, junk_locations.pop(), player)
 
 
-def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player):
+def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player, ignore_list=[]):
     invFlag = world.mode[player] == 'inverted'
 
     random.shuffle(lw_entrances)
@@ -1512,7 +1510,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
     for region_name in inaccessible_regions.copy():
         region = world.get_region(region_name, player)
         if region.type not in [RegionType.LightWorld, RegionType.DarkWorld] or not any((not exit.connected_region and exit.spot_type == 'Entrance') for exit in region.exits) \
-                or (region_name == 'Pyramid Exit Ledge' and invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
+                or (region_name == 'Pyramid Exit Ledge' and world.shuffle[player] != 'insanity' or invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             inaccessible_regions.remove(region_name)
         elif region.type == (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
             must_exit_regions.append(region_name)
@@ -1523,12 +1521,12 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         inaccessible_entrances = list()
         region = world.get_region(region_name, player)
         for exit in region.exits:
-            if not exit.connected_region and exit.name in entrance_pool and (world.shuffle[player] not in ['lite', 'lean'] or exit.name in pool):
+            if not exit.connected_region and exit.name in [e for e in entrance_pool if e not in ignore_list] and (world.shuffle[player] not in ['lite', 'lean'] or exit.name in pool):
                 inaccessible_entrances.append(exit.name)
         if len(inaccessible_entrances):
             random.shuffle(inaccessible_entrances)
             connect_mandatory_exits(world, pool, caves, [inaccessible_entrances.pop()], player)
-        connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player)
+        connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player, ignore_list)
     
     # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
     if world.shuffle[player] in ['lean', 'crossed', 'insanity']:
