@@ -63,7 +63,8 @@ def main():
     erargs.create_spoiler = args.create_spoiler
     erargs.race = True
     erargs.outputname = seedname
-    erargs.outputpath = args.outputpath
+    if args.outputpath:
+        erargs.outputpath = args.outputpath
     erargs.loglevel = args.loglevel
 
     if args.rom:
