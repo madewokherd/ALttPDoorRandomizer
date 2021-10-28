@@ -1364,9 +1364,10 @@ def place_links_house(world, sectors, player):
         if invFlag and isinstance(dark_sanc, str):
             links_house_doors = [i for i in get_distant_entrances(world, dark_sanc, sectors, player) if i in entrance_pool]
         else:
-            links_house_doors = [i for i in get_starting_entrances(world, sectors, player) if i in entrance_pool]
+            links_house_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] == 'insanity') if i in entrance_pool]
         if world.shuffle[player] in ['lite', 'lean']:
             links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
+        
         links_house = random.choice(links_house_doors)
     connect_two_way(world, links_house, 'Links House Exit', player)
     return links_house
@@ -1376,7 +1377,7 @@ def place_dark_sanc(world, sectors, player):
     if not world.shufflelinks[player]:
         sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop', sectors, player) if i in entrance_pool]
     else:
-        sanc_doors = [i for i in get_starting_entrances(world, sectors, player) if i in entrance_pool]
+        sanc_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] == 'insanity') if i in entrance_pool]
     if world.shuffle[player] in ['lite', 'lean']:
         sanc_doors = [e for e in sanc_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
     sanc_door = random.choice(sanc_doors)
@@ -1735,30 +1736,36 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     return entrances
     
 
-def get_starting_entrances(world, sectors, player):
+def get_starting_entrances(world, sectors, player, force_starting_world=True):
     invFlag = world.mode[player] == 'inverted'
 
     # find largest walkable sector
     sector = None
     invalid_sectors = list()
-    while (sector is None):
-        sector = max(sectors, key=lambda x: len(x) - (0 if x not in invalid_sectors else 1000))
-        if not ((world.owCrossed[player] == 'polar' and world.owMixed[player]) or world.owCrossed[player] not in ['none', 'polar']) \
-                and world.get_region(next(iter(next(iter(sector)))), player).type != (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
-            invalid_sectors.append(sector)
-            sector = None
-    regions = max(sector, key=lambda x: len(x))
-    
-    # get entrances from list of regions
     entrances = list()
-    for region_name in [r for r in regions if r ]:
-        if world.shuffle[player] == 'simple' and region_name in OWTileRegions and OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
-            continue
-        region = world.get_region(region_name, player)
-        if region.type == RegionType.LightWorld if not invFlag else RegionType.DarkWorld:
-            for exit in region.exits:
-                if not exit.connected_region and exit.spot_type == 'Entrance':
-                    entrances.append(exit.name)
+    while not len(entrances):
+        while (sector is None):
+            sector = max(sectors, key=lambda x: len(x) - (0 if x not in invalid_sectors else 1000))
+            if not ((world.owCrossed[player] == 'polar' and world.owMixed[player]) or world.owCrossed[player] not in ['none', 'polar']) \
+                    and world.get_region(next(iter(next(iter(sector)))), player).type != (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
+                invalid_sectors.append(sector)
+                sector = None
+        regions = max(sector, key=lambda x: len(x))
+        
+        # get entrances from list of regions
+        entrances = list()
+        for region_name in regions:
+            if world.shuffle[player] == 'simple' and region_name in OWTileRegions and OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
+                continue
+            region = world.get_region(region_name, player)
+            if not force_starting_world or region.type == (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
+                for exit in region.exits:
+                    if not exit.connected_region and exit.spot_type == 'Entrance':
+                        entrances.append(exit.name)
+        
+        invalid_sectors.append(sector)
+        sector = None
+    
     return entrances
 
 
