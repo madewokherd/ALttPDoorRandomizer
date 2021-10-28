@@ -2600,6 +2600,56 @@ class Spoiler(object):
         else:
             self.doorTypes[(doorNames, player)] = OrderedDict([('player', player), ('doorNames', doorNames), ('type', type)])
 
+    def parse_meta(self):
+        from Main import __version__ as ERVersion
+        from OverworldShuffle import __version__ as ORVersion
+
+        self.startinventory = list(map(str, self.world.precollected_items))
+        self.metadata = {'version': ERVersion,
+                         'versions': {'Door':ERVersion, 'Overworld':ORVersion},
+                         'logic': self.world.logic,
+                         'mode': self.world.mode,
+                         'retro': self.world.retro,
+                         'bombbag': self.world.bombbag,
+                         'weapons': self.world.swords,
+                         'goal': self.world.goal,
+                         'ow_shuffle': self.world.owShuffle,
+                         'ow_crossed': self.world.owCrossed,
+                         'ow_keepsimilar': self.world.owKeepSimilar,
+                         'ow_mixed': self.world.owMixed,
+                         'ow_whirlpool': self.world.owWhirlpoolShuffle,
+                         'ow_fluteshuffle': self.world.owFluteShuffle,
+                         'shuffle': self.world.shuffle,
+                         'shuffleganon': self.world.shuffle_ganon,
+                         'shufflelinks': self.world.shufflelinks,
+                         'door_shuffle': self.world.doorShuffle,
+                         'intensity': self.world.intensity,
+                         'item_pool': self.world.difficulty,
+                         'item_functionality': self.world.difficulty_adjustments,
+                         'gt_crystals': self.world.crystals_needed_for_gt,
+                         'ganon_crystals': self.world.crystals_needed_for_ganon,
+                         'open_pyramid': self.world.open_pyramid,
+                         'accessibility': self.world.accessibility,
+                         'hints': self.world.hints,
+                         'mapshuffle': self.world.mapshuffle,
+                         'compassshuffle': self.world.compassshuffle,
+                         'keyshuffle': self.world.keyshuffle,
+                         'bigkeyshuffle': self.world.bigkeyshuffle,
+                         'boss_shuffle': self.world.boss_shuffle,
+                         'enemy_shuffle': self.world.enemy_shuffle,
+                         'enemy_health': self.world.enemy_health,
+                         'enemy_damage': self.world.enemy_damage,
+                         'potshuffle': self.world.potshuffle,
+                         'players': self.world.players,
+                         'teams': self.world.teams,
+                         'experimental': self.world.experimental,
+                         'keydropshuffle': self.world.keydropshuffle,
+                         'shopsanity': self.world.shopsanity,
+						 'triforcegoal': self.world.treasure_hunt_count,
+						 'triforcepool': self.world.treasure_hunt_total,
+                         'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)}
+                         }
+
     def parse_data(self):
         self.medallions = OrderedDict()
         if self.world.players == 1:
@@ -2609,8 +2659,6 @@ class Spoiler(object):
             for player in range(1, self.world.players + 1):
                 self.medallions[f'Misery Mire ({self.world.get_player_names(player)})'] = self.world.required_medallions[player][0]
                 self.medallions[f'Turtle Rock ({self.world.get_player_names(player)})'] = self.world.required_medallions[player][1]
-
-        self.startinventory = list(map(str, self.world.precollected_items))
 
         self.locations = OrderedDict()
         listed_locations = set()
@@ -2682,54 +2730,8 @@ class Spoiler(object):
                 for portal in self.world.dungeon_portals[player]:
                     self.set_lobby(portal.name, portal.door.name, player)
 
-        from Main import __version__ as ERVersion
-        from OverworldShuffle import __version__ as ORVersion
-        self.metadata = {'version': ERVersion,
-                         'versions': {'Door':ERVersion, 'Overworld':ORVersion},
-                         'logic': self.world.logic,
-                         'mode': self.world.mode,
-                         'retro': self.world.retro,
-                         'bombbag': self.world.bombbag,
-                         'weapons': self.world.swords,
-                         'goal': self.world.goal,
-                         'ow_shuffle': self.world.owShuffle,
-                         'ow_crossed': self.world.owCrossed,
-                         'ow_keepsimilar': self.world.owKeepSimilar,
-                         'ow_mixed': self.world.owMixed,
-                         'ow_whirlpool': self.world.owWhirlpoolShuffle,
-                         'ow_fluteshuffle': self.world.owFluteShuffle,
-                         'shuffle': self.world.shuffle,
-                         'shuffleganon': self.world.shuffle_ganon,
-                         'shufflelinks': self.world.shufflelinks,
-                         'door_shuffle': self.world.doorShuffle,
-                         'intensity': self.world.intensity,
-                         'item_pool': self.world.difficulty,
-                         'item_functionality': self.world.difficulty_adjustments,
-                         'gt_crystals': self.world.crystals_needed_for_gt,
-                         'ganon_crystals': self.world.crystals_needed_for_ganon,
-                         'open_pyramid': self.world.open_pyramid,
-                         'accessibility': self.world.accessibility,
-                         'hints': self.world.hints,
-                         'mapshuffle': self.world.mapshuffle,
-                         'compassshuffle': self.world.compassshuffle,
-                         'keyshuffle': self.world.keyshuffle,
-                         'bigkeyshuffle': self.world.bigkeyshuffle,
-                         'boss_shuffle': self.world.boss_shuffle,
-                         'enemy_shuffle': self.world.enemy_shuffle,
-                         'enemy_health': self.world.enemy_health,
-                         'enemy_damage': self.world.enemy_damage,
-                         'potshuffle': self.world.potshuffle,
-                         'players': self.world.players,
-                         'teams': self.world.teams,
-                         'experimental': self.world.experimental,
-                         'keydropshuffle': self.world.keydropshuffle,
-                         'shopsanity': self.world.shopsanity,
-						 'triforcegoal': self.world.treasure_hunt_count,
-						 'triforcepool': self.world.treasure_hunt_total,
-                         'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)}
-                         }
-
     def to_json(self):
+        self.parse_meta()
         self.parse_data()
         out = OrderedDict()
         out['Overworld'] = list(self.overworlds.values())
@@ -2751,8 +2753,8 @@ class Spoiler(object):
 
         return json.dumps(out)
 
-    def to_file(self, filename):
-        self.parse_data()
+    def meta_to_file(self, filename):
+        self.parse_meta()
         with open(filename, 'w') as outfile:
             line_width = 35
             outfile.write('ALttP Entrance Randomizer  -  Seed: %s\n\n' % (self.world.seed))
@@ -2764,9 +2766,6 @@ class Spoiler(object):
             for player in range(1, self.world.players + 1):
                 if self.world.players > 1:
                     outfile.write('\nPlayer %d: %s\n' % (player, self.world.get_player_names(player)))
-                if len(self.hashes) > 0:
-                    for team in range(self.world.teams):
-                        outfile.write('%s%s\n' % (f"Hash - {self.world.player_names[player][team]} (Team {team+1}): " if self.world.teams > 1 else 'Hash: ', self.hashes[player, team]))
                 outfile.write('Settings Code:'.ljust(line_width) + '%s\n' % self.metadata["code"][player])
                 outfile.write('Logic:'.ljust(line_width) + '%s\n' % self.metadata['logic'][player])
                 outfile.write('Mode:'.ljust(line_width) + '%s\n' % self.metadata['mode'][player])
@@ -2812,14 +2811,28 @@ class Spoiler(object):
             if self.startinventory:
                 outfile.write('Starting Inventory:'.ljust(line_width))
                 outfile.write('\n'.ljust(line_width+1).join(self.startinventory))
-            
+
+    def to_file(self, filename):
+        self.parse_data()
+        with open(filename, 'a') as outfile:
+            line_width = 35
+            if self.world.players > 1:
+                outfile.write('\nHashes:')
+            for player in range(1, self.world.players + 1):
+                if self.world.players > 1:
+                    outfile.write('\nPlayer %d: %s\n' % (player, self.world.get_player_names(player)))
+                if len(self.hashes) > 0:
+                    for team in range(self.world.teams):
+                        outfile.write('%s%s\n' % (f"Hash - {self.world.player_names[player][team]} (Team {team+1}): " if self.world.teams > 1 else 'Hash: ', self.hashes[player, team]))
             outfile.write('\n\nRequirements:\n\n')
             for dungeon, medallion in self.medallions.items():
                 outfile.write(f'{dungeon}:'.ljust(line_width) + '%s Medallion\n' % medallion)
-            if self.world.crystals_gt_orig[player] == 'random':
-                outfile.write('Crystals Required for GT:'.ljust(line_width) + '%s\n' % (str(self.metadata['gt_crystals'][player])))
-            if self.world.crystals_ganon_orig[player] == 'random':
-                outfile.write('Crystals Required for Ganon:'.ljust(line_width) + '%s\n' % (str(self.metadata['ganon_crystals'][player])))
+            for player in range(1, self.world.players + 1):
+                player_name = '' if self.world.players == 1 else str(' (Player ' + str(player) + ')')
+                if self.world.crystals_gt_orig[player] == 'random':
+                    outfile.write(str('Crystals Required for GT' + player_name + ':').ljust(line_width) + '%s\n' % (str(self.metadata['gt_crystals'][player])))
+                if self.world.crystals_ganon_orig[player] == 'random':
+                    outfile.write(str('Crystals Required for Ganon' + player_name + ':').ljust(line_width) + '%s\n' % (str(self.metadata['ganon_crystals'][player])))
             
             if self.overworlds:
                 # overworlds: overworld transitions;
@@ -2868,6 +2881,8 @@ class Spoiler(object):
                     outfile.write(f'\n\nBosses ({self.world.get_player_names(player)}):\n\n')
                     outfile.write('\n'.join([f'{x}: {y}' for x, y in bossmap.items() if y not in ['Agahnim', 'Agahnim 2', 'Ganon']]))
 
+    def playthru_to_file(self, filename):
+        with open(filename, 'a') as outfile:
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names
             outfile.write('\n\nPlaythrough:\n\n')
@@ -2895,7 +2910,6 @@ class Spoiler(object):
                 path_listings.append("{}\n        {}".format(self.world.fish.translate("meta","locations",location), "\n   =>   ".join(path_lines)))
 
             outfile.write('\n'.join(path_listings))
-
 
 flooded_keys = {
     'Trench 1 Switch': 'Swamp Palace - Trench 1 Pot Key',

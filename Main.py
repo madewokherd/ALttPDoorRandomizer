@@ -131,6 +131,15 @@ def main(args, seed=None, fish=None):
             world.player_names[player].append(name)
     logger.info('')
 
+    if world.owShuffle[1] != 'vanilla' or world.owCrossed[1] not in ['none', 'polar'] or world.owMixed[1] or str(world.seed).startswith('M'):
+        outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
+    else:
+        outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
+
+    if args.create_spoiler and not args.jsonout:
+        logger.info(world.fish.translate("cli","cli","patching.spoiler"))
+        world.spoiler.meta_to_file(output_path('%s_Spoiler.txt' % outfilebase))
+
     for player in range(1, world.players + 1):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
 
@@ -266,11 +275,6 @@ def main(args, seed=None, fish=None):
             customize_shops(world, player)
     balance_money_progression(world)
 
-    if world.owShuffle[1] != 'vanilla' or world.owCrossed[1] not in ['none', 'polar'] or world.owMixed[1] or str(world.seed).startswith('M'):
-        outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
-    else:
-        outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
-
     rom_names = []
     jsonout = {}
     enemized = False
@@ -338,6 +342,10 @@ def main(args, seed=None, fish=None):
                 with open(output_path('%s_multidata' % outfilebase), 'wb') as f:
                     f.write(multidata)
 
+    if args.create_spoiler and not args.jsonout:
+        logger.info(world.fish.translate("cli","cli","patching.spoiler"))
+        world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
+
     if not args.skip_playthrough:
         logger.info(world.fish.translate("cli","cli","calc.playthrough"))
         create_playthrough(world)
@@ -350,7 +358,7 @@ def main(args, seed=None, fish=None):
             with open(output_path('%s_Spoiler.json' % outfilebase), 'w') as outfile:
               outfile.write(world.spoiler.to_json())
         else:
-            world.spoiler.to_file(output_path('%s_Spoiler.txt' % outfilebase))
+            world.spoiler.playthru_to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
     YES = world.fish.translate("cli","cli","yes")
     NO = world.fish.translate("cli","cli","no")
