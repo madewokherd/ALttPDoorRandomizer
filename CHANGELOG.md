@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.2.1.2
+- Fixed issue with whirlpools not changing world when in Crossed OW
+
 ### 0.2.1.1
 - Many fixes to ER: infinite loops, preventing cross-world scenarios in non-cross-world modes
 - Spoiler log improvements, outputs in stages so a Spoiler is available if an error occurs

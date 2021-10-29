@@ -3,7 +3,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.1.1-u'
+__version__ = '0.2.1.2-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
