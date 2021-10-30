@@ -658,7 +658,7 @@ def link_entrances(world, player):
     ignore_pool = True
 
     # check for swamp palace fix
-    if not (world.get_entrance('Dam', player).connected_region.name in ['Dam', 'Swamp Portal'] and world.get_entrance('Swamp Palace', player).connected_region.name == ['Dam', 'Swamp Portal']):
+    if not (world.get_entrance('Dam', player).connected_region.name in ['Dam', 'Swamp Portal'] and world.get_entrance('Swamp Palace', player).connected_region.name in ['Dam', 'Swamp Portal']):
         world.swamp_patch_required[player] = True
 
     # check for potion shop location
