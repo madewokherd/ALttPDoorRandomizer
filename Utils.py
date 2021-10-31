@@ -358,15 +358,20 @@ def update_deprecated_args(args):
         # Shuffle Ganon defaults to TRUE
         # Don't do: Yes
         # Do:       No
-        orig_shuffleganon = args.shuffleganon
-        if isinstance(orig_shuffleganon, bool):
-            args.shuffleganon = {}
-            for player in range(1, players + 1):
-                args.shuffleganon[player] = orig_shuffleganon
-        for player in range(1, players + 1):
+        if isinstance(args.shuffleganon, bool):
             if "no_shuffleganon" in argVars:
+                args.shuffleganon = not args.no_shuffleganon in truthy
+        else:
+            for player in range(1, players + 1):
                 args.shuffleganon[player] = not args.no_shuffleganon in truthy
-
+        
+        if isinstance(args.no_shuffleganon, bool):
+            if "shuffleganon" in argVars:
+                args.no_shuffleganon = not args.shuffleganon in truthy
+        else:
+            for player in range(1, players + 1):
+                args.no_shuffleganon[player] = not args.shuffleganon in truthy
+        
         # Playthrough defaults to TRUE
         # Don't do: Yes
         # Do:       No
