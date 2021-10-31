@@ -359,12 +359,12 @@
   },
   "shuffleganon": {
     "action": "store_false",
-    "type": "bool"
+    "type": "bool",
+    "help": "suppress"
   },
   "no_shuffleganon": {
     "action": "store_true",
-    "dest": "shuffleganon",
-    "help": "suppress"
+    "dest": "shuffleganon"
   },
   "shufflelinks": {
     "action": "store_true",

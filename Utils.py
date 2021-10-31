@@ -318,6 +318,10 @@ def update_deprecated_args(args):
     if args:
         argVars = vars(args)
         truthy = [1, True, "True", "true"]
+        if "multi" in argVars:
+            players = int(args.multi)
+        else:
+            players = 1
         # Hints default to FALSE
         # Don't do: Yes
         # Do:       No
@@ -354,12 +358,14 @@ def update_deprecated_args(args):
         # Shuffle Ganon defaults to TRUE
         # Don't do: Yes
         # Do:       No
-        if "no_shuffleganon" in argVars:
-            args.shuffleganon = not args.no_shuffleganon in truthy
-        # Don't do: No
-        # Do:       Yes
-        if "shuffleganon" in argVars:
-            args.no_shuffleganon = not args.shuffleganon in truthy
+        orig_shuffleganon = args.shuffleganon
+        if isinstance(orig_shuffleganon, bool):
+            args.shuffleganon = {}
+            for player in range(1, players + 1):
+                args.shuffleganon[player] = orig_shuffleganon
+        for player in range(1, players + 1):
+            if "no_shuffleganon" in argVars:
+                args.shuffleganon[player] = not args.no_shuffleganon in truthy
 
         # Playthrough defaults to TRUE
         # Don't do: Yes
