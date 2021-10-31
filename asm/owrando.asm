@@ -130,9 +130,11 @@ OWWorldCheck16:
 OWWhirlpoolUpdate:
 {
     jsl $02ea6c ; what we wrote over
-    lda.l OWFlags : and #$01 : beq +
-        ldx $8a : jsr OWWorldUpdate
-    + rtl
+    lda.l OWFlags : and #$01 : bne +
+    lda.l OWMode+1 : and #$02 : beq .return
+        + ldx $8a : jsr OWWorldUpdate
+    .return
+    rtl
 }
 
 OWFluteCancel:
