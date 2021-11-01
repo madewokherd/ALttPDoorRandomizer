@@ -136,10 +136,6 @@ def main(args, seed=None, fish=None):
     else:
         outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
 
-    if args.create_spoiler and not args.jsonout:
-        logger.info(world.fish.translate("cli","cli","patching.spoiler"))
-        world.spoiler.meta_to_file(output_path('%s_Spoiler.txt' % outfilebase))
-
     for player in range(1, world.players + 1):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
 
@@ -151,7 +147,12 @@ def main(args, seed=None, fish=None):
             item = ItemFactory(tok.strip(), player)
             if item:
                 world.push_precollected(item)
+    
+    if args.create_spoiler and not args.jsonout:
+        logger.info(world.fish.translate("cli","cli","patching.spoiler"))
+        world.spoiler.meta_to_file(output_path('%s_Spoiler.txt' % outfilebase))
 
+    for player in range(1, world.players + 1):
         create_regions(world, player)
         create_dungeon_regions(world, player)
         create_owedges(world, player)

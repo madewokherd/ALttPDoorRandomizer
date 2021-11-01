@@ -2810,7 +2810,7 @@ class Spoiler(object):
             
             if self.startinventory:
                 outfile.write('Starting Inventory:'.ljust(line_width))
-                outfile.write('\n'.ljust(line_width+1).join(self.startinventory))
+                outfile.write('\n'.ljust(line_width+1).join(self.startinventory) + '\n')
 
     def to_file(self, filename):
         self.parse_data()
