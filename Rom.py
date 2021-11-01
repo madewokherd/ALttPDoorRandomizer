@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '4f22298a5c72fff1b04b5bb3278ce13d'
+RANDOMIZERBASEHASH = 'a83652bc433c024cff1e277e1afeb627'
 
 
 class JsonRom(object):
@@ -688,8 +688,44 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
-                write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
-                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
+                if edge.name == 'Lost Woods NW':
+                    if edge.dest.name != 'Master Sword Meadow SC':
+                        write_int16(rom, 0x15e53 + 0x96, edge.dest.midpoint)
+                        write_int16(rom, 0x15bdb + 0x96, edge.dest.vramLoc)
+                        rom.write_byte(0x15b8c + 0x4b, edge.dest.owIndex)
+                        if edge.dest.owIndex == 0x81:
+                            write_int16(rom, 0x15c79 + 0x96, 0x320)
+                            write_int16(rom, 0x15d17 + 0x96, 0x21e)
+                            write_int16(rom, 0x15db5 + 0x96, 0x3e8)
+                            write_int16(rom, 0x15ef1 + 0x96, 0x019)
+                            write_int16(rom, 0x15f8f + 0x96, 0x2a1)
+                            rom.write_byte(0x1607c + 0x4b, 0xf2)
+                        else:
+                            o = ((edge.dest.owSlotIndex >> 3 + 1) * 2 - 1) * 0x100 + 0xe8
+                            write_int16(rom, 0x15db5 + 0x96, o)
+                elif edge.name == 'Zora Waterfall NE':
+                    if edge.dest.name != 'Zoras Domain SW':
+                        write_int16(rom, 0x15e53 + 0x9a, edge.dest.midpoint)
+                        write_int16(rom, 0x15bdb + 0x9a, edge.dest.vramLoc)
+                        rom.write_byte(0x15b8c + 0x4d, edge.dest.owIndex)
+                        if edge.dest.owIndex == 0x80:
+                            write_int16(rom, 0x15c79 + 0x9a, 0x120)
+                            write_int16(rom, 0x15d17 + 0x9a, 0x0)
+                            write_int16(rom, 0x15db5 + 0x9a, 0x1e8)
+                            write_int16(rom, 0x15ef1 + 0x9a, 0x19d)
+                            write_int16(rom, 0x15f8f + 0x9a, 0x083)
+                            rom.write_byte(0x1607c + 0x4d, 0x0e)
+                        else:
+                            o = ((edge.dest.owSlotIndex >> 3 + 1) * 2 - 1) * 0x100 + 0xe8
+                            write_int16(rom, 0x15db5 + 0x96, o)
+                elif edge.name == 'Stone Bridge WC':
+                    if edge.dest.name != 'Hobo EC':
+                        write_int16(rom, 0x15db5 + 0x98, edge.dest.midpoint)
+                        write_int16(rom, 0x15bdb + 0x98, edge.dest.vramLoc)
+                        rom.write_byte(0x15b8c + 0x4c, edge.dest.owIndex)
+                else:
+                    write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
+                    write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
     
     write_int16(rom, 0x150002, owMode)
     write_int16(rom, 0x150004, owFlags)
