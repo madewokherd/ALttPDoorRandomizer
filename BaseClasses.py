@@ -939,7 +939,7 @@ class CollectionState(object):
             # try to resolve a name
             if resolution_hint == 'Location':
                 spot = self.world.get_location(spot, player)
-            elif resolution_hint in ['Entrance', 'OWEdge']:
+            elif resolution_hint in ['Entrance', 'OWEdge', 'OWTerrain', 'Ledge', 'Portal', 'Whirlpool', 'Mirror', 'Flute']:
                 spot = self.world.get_entrance(spot, player)
             else:
                 # default to Region
