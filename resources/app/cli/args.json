@@ -358,7 +358,7 @@
     "help": "suppress"
   },
   "shuffleganon": {
-    "action": "store_false",
+    "action": "store_true",
     "type": "bool",
     "help": "suppress"
   },
