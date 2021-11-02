@@ -2802,12 +2802,14 @@ class Spoiler(object):
                 outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['ow_whirlpool'][player] else 'No'))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
-                outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shuffleganon'][player] else 'No'))
-                outfile.write('Shuffle Links:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shufflelinks'][player] else 'No'))
+                if self.metadata['shuffle'][player] != 'vanilla':
+                    outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shuffleganon'][player] else 'No'))
+                    outfile.write('Shuffle Links:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['shufflelinks'][player] else 'No'))
                 outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['open_pyramid'][player] else 'No'))
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
-                outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
-                outfile.write('Experimental:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
+                if self.metadata['door_shuffle'][player] != 'vanilla':
+                    outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
+                    outfile.write('Experimental:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['experimental'][player] else 'No'))
                 outfile.write('Pot Shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['potshuffle'][player] else 'No'))
                 outfile.write('Key Drop Shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['keydropshuffle'][player] else 'No'))
                 outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['mapshuffle'][player] else 'No'))
