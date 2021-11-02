@@ -1,5 +1,14 @@
 # Changelog
 
+### 0.2.1.3
+- New fake flipper handling to allow S+Q rather than insta-kill
+- Fixed whirlpools in Crossed OW
+- Spoiler fixes, incl. missing Starting Inventory in Spoiler
+- Fixed music track change to Sanc music when Standard mode is delivering Zelda
+- Fixed SP flooding issue
+- Fixed issue with Shuffle Ganon in CLI/GUI
+- ~~Merged DR v0.5.1.5 - Mystery subweights~~
+
 ### 0.2.1.2
 - Fixed issue with whirlpools not changing world when in Crossed OW
 
