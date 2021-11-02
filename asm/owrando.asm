@@ -360,6 +360,11 @@ OWNewDestination:
 
     .return
     lda $05 : sta $8a
+    ;bra +
+    ;    nop #8
+    ;    jsl $02EA41
+    ;    nop #8
+    ;+
     rep #$30 : rts
 }
 OWWorldUpdate: ; x = owid of destination screen

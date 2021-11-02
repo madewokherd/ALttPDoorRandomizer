@@ -284,6 +284,8 @@ def link_entrances(world, player):
         dw_entrances = list()
         caves = list(Cave_Exits + Cave_Three_Exits + Old_Man_House)
         for e in entrance_pool:
+            if world.mode[player] == 'standard' and e == 'Bonk Fairy (Light)':
+                continue
             region = world.get_entrance(e, player).parent_region
             if region.type == RegionType.LightWorld:
                 lw_entrances.append(e)
@@ -338,6 +340,8 @@ def link_entrances(world, player):
         lw_entrances = list()
         dw_entrances = list()
         for e in entrance_pool:
+            if world.mode[player] == 'standard' and e == 'Bonk Fairy (Light)':
+                continue
             if e not in list(zip(*drop_connections + dropexit_connections))[0]:
                 region = world.get_entrance(e, player).parent_region
                 if region.type == RegionType.LightWorld:
@@ -539,20 +543,25 @@ def link_entrances(world, player):
         place_blacksmith(world, links_house, player)
         
         # place connectors in inaccessible regions
-        connect_inaccessible_regions(world, list(entrance_pool), [], caves, player)
+        pool = list(entrance_pool)
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in pool:
+            pool.remove('Bonk Fairy (Light)')
+        connect_inaccessible_regions(world, pool, [], caves, player)
         
         # place old man, has limited options
-        place_old_man(world, list(entrance_pool), player)
+        pool = [e for e in pool if e in entrance_pool]
+        place_old_man(world, pool, player)
     
         # place bomb shop, has limited options
         bomb_shop_doors = list(entrance_pool)
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
         bomb_shop = random.choice(bomb_shop_doors)
+        pool.remove(bomb_shop)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
-        connect_caves(world, list(entrance_pool), [], caves, player)
+        connect_caves(world, pool, [], caves, player)
 
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
@@ -616,10 +625,14 @@ def link_entrances(world, player):
         place_blacksmith(world, links_house, player)
 
         # place connectors in inaccessible regions
-        connect_inaccessible_regions(world, list(entrance_pool), [], caves, player)
+        pool = list(entrance_pool)
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in pool:
+            pool.remove('Bonk Fairy (Light)')
+        connect_inaccessible_regions(world, pool, [], caves, player)
         
         # place old man, has limited options
-        place_old_man(world, list(entrance_pool), player)
+        pool = [e for e in pool if e in entrance_pool]
+        place_old_man(world, pool, player)
         caves.append('Old Man Cave Exit (West)')
 
         # place bomb shop, has limited options
@@ -628,10 +641,13 @@ def link_entrances(world, player):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
         random.shuffle(bomb_shop_doors)
         bomb_shop = bomb_shop_doors.pop()
+        pool.remove(bomb_shop)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
         doors = list(entrance_pool)
+        if world.mode[player] == 'standard' and 'Bonk Fairy (Light)' in doors:
+            doors.remove('Bonk Fairy (Light)')
         exit_doors = [e for e in entrance_pool if e not in entrance_exits]
         random.shuffle(doors)
         random.shuffle(exit_doors)
