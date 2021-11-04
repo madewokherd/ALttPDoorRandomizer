@@ -605,9 +605,11 @@ def bomb_rules(world, player):
                       'Hookshot Cave Back to Middle', 'Hookshot Cave Front to Middle', 'Hookshot Cave Middle to Front','Hookshot Cave Middle to Back',
                       'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
     for entrance in bonkable_doors:
-        add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
+        add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player))
+        add_bunny_rule(world.get_entrance(entrance, player), player)
     for entrance in bombable_doors:
-        add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player)) 
+        add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player))
+        add_bunny_rule(world.get_entrance(entrance, player), player)
 
     bonkable_items = ['Sahasrahla\'s Hut - Left', 'Sahasrahla\'s Hut - Middle', 'Sahasrahla\'s Hut - Right']
     bombable_items = ['Blind\'s Hideout - Top', 'Kakariko Well - Top', 'Chicken House', 'Aginah\'s Cave', 'Graveyard Cave',
@@ -615,18 +617,23 @@ def bomb_rules(world, player):
                       'Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left', 'Hype Cave - Bottom']
     for location in bonkable_items:
         add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
+        add_bunny_rule(world.get_location(location, player), player)
     for location in bombable_items:
         add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player)) 
+        add_bunny_rule(world.get_location(location, player), player)
 
     cave_kill_locations = ['Mini Moldorm Cave - Far Left', 'Mini Moldorm Cave - Far Right', 'Mini Moldorm Cave - Left', 'Mini Moldorm Cave - Right', 'Mini Moldorm Cave - Generous Guy', 'Spiral Cave']
     for location in cave_kill_locations:
         add_rule(world.get_location(location, player), lambda state: state.can_kill_most_things(player) or state.can_use_bombs(player))
+        add_bunny_rule(world.get_location(location, player), player)
     add_rule(world.get_entrance('Spiral Cave (top to bottom)', player), lambda state: state.can_kill_most_things(player) or state.can_use_bombs(player))
+    add_bunny_rule(world.get_entrance('Spiral Cave (top to bottom)', player), player)
 
     paradox_switch_chests = ['Paradox Cave Lower - Far Left', 'Paradox Cave Lower - Left', 'Paradox Cave Lower - Right', 'Paradox Cave Lower - Far Right', 'Paradox Cave Lower - Middle']
     for location in paradox_switch_chests:
         add_rule(world.get_location(location, player), lambda state: state.can_hit_crystal_through_barrier(player))
-
+        add_bunny_rule(world.get_location(location, player), player)
+    
     # Dungeon bomb logic
     easy_kill_rooms = [ # Door, bool-bombable
         ('Hyrule Dungeon Armory S', True), # One green guard
@@ -683,7 +690,7 @@ def bomb_rules(world, player):
     if world.doorShuffle[player] == 'vanilla':
         add_rule(world.get_entrance('TR Lazy Eyes SE', player), lambda state: state.can_use_bombs(player)) # ToDo: Add always true for inverted, cross-entrance, and door-variants and so on.
         add_rule(world.get_entrance('Turtle Rock Ledge Exit (West)', player), lambda state: state.can_use_bombs(player)) # Is this the same as above?
-
+        
         dungeon_bonkable = ['Sewers Rat Path WS', 'Sewers Rat Path WN',
                             'PoD Warp Hint SE', 'PoD Jelly Hall NW', 'PoD Jelly Hall NE', 'PoD Mimics 1 SW',
                             'Thieves Ambush E', 'Thieves Rail Ledge W',
