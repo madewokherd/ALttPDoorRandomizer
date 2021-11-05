@@ -223,6 +223,12 @@ def generate_itempool(world, player):
     world.push_item(world.get_location('Floodgate', player), ItemFactory('Open Floodgate', player), False)
     world.get_location('Floodgate', player).event = True
     world.get_location('Floodgate', player).locked = True
+    world.push_item(world.get_location('Big Bomb', player), ItemFactory('Pick Up Big Bomb', player), False)
+    world.get_location('Big Bomb', player).event = True
+    world.get_location('Big Bomb', player).locked = True
+    world.push_item(world.get_location('Pyramid Crack', player), ItemFactory('Detonate Big Bomb', player), False)
+    world.get_location('Pyramid Crack', player).event = True
+    world.get_location('Pyramid Crack', player).locked = True
     world.push_item(world.get_location('Trench 1 Switch', player), ItemFactory('Trench 1 Filled', player), False)
     world.get_location('Trench 1 Switch', player).event = True
     world.get_location('Trench 1 Switch', player).locked = True

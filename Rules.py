@@ -58,14 +58,7 @@ def set_rules(world, player):
     elif world.goal[player] == 'triforcehunt':
         add_rule(world.get_location('Murahdahla', player), lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
 
-    if world.mode[player] != 'inverted':
-        set_big_bomb_rules(world, player)
-        if world.logic[player] == 'owglitches' and world.shuffle[player] not in ('insanity', 'insanity_legacy'):
-            path_to_hc = mirrorless_path_to_location(world, 'West Death Mountain (Bottom)', 'Hyrule Castle Area', player)
-            path_to_courtyard = mirrorless_path_to_castle_courtyard(world, player)
-            add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.world.get_entrance('Dark Death Mountain Offset Mirror', player).can_reach(state) and all(rule(state) for rule in path_to_courtyard) and all(rule(state) for rule in path_to_hc), 'or')
-    else:
-        set_inverted_big_bomb_rules(world, player)
+    set_big_bomb_rules(world, player)
 
     # if swamp and dam have not been moved we require mirror for swamp palace
     if not world.swamp_patch_required[player]:
@@ -194,6 +187,8 @@ def global_rules(world, player):
     set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
     set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Pick Up Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
+    set_rule(world.get_location('Big Bomb', player), lambda state: state.has('Crystal 5', player) and state.has('Crystal 6', player))
+    set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Detonate Big Bomb', player))
     set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
 
     set_rule(world.get_location('Missing Smith', player), lambda state: state.has('Get Frog', player) and state.can_reach('Blacksmiths Hut', 'Region', player)) # Can't S&Q with smith
@@ -1647,6 +1642,8 @@ def find_rules_for_zelda_delivery(world, player):
 def set_big_bomb_rules(world, player):
     # this is a mess
     if len(world.get_region('Big Bomb Shop', player).entrances) > 0:
+        set_rule(world.get_location('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
+        
         bombshop_entrance = world.get_region('Big Bomb Shop', player).entrances[0]
         Normal_LW_entrances = ['Blinds Hideout',
                             'Bonk Fairy (Light)',
@@ -1877,6 +1874,7 @@ def set_big_bomb_rules(world, player):
             add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.has('Flippers', player) or state.can_flute(player)))
         
         #TODO: Fix red bomb rules, artifically adding a bunch of rules to help reduce unbeatable seeds in OW shuffle
+        set_rule(world.get_location('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
         set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: False)
         #add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.can_reach('Pyramid Area', 'Region', player))
         #add_rule(world.get_entrance('Pyramid Fairy', player), lambda state: (state.can_lift_heavy_rocks(player) and state.has('Flippers', player) and state.can_flute(player) and state.has('Hammer', player) and state.has('Hookshot', player) and state.has_Pearl(player) and state.has_Mirror(player)))
@@ -2088,7 +2086,7 @@ def set_bunny_rules(world, player, inverted):
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
                                   'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
                                   'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest', 'Blacksmith',
-                                  'Missing Smith', 'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
+                                  'Missing Smith', 'Pyramid Crack', 'Big Bomb', 'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
                                   'Kakariko Shop - Left', 'Kakariko Shop - Middle', 'Kakariko Shop - Right',
                                   'Lake Hylia Shop - Left', 'Lake Hylia Shop - Middle', 'Lake Hylia Shop - Right',
                                   'Potion Shop - Left', 'Potion Shop - Middle', 'Potion Shop - Right',
