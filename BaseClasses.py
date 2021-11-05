@@ -1581,14 +1581,54 @@ class Entrance(object):
         self.player = player
         self.door = None
         self.hide_path = False
+        self.temp_path = []
 
     def can_reach(self, state):
-        if self.parent_region.can_reach(state) and self.access_rule(state):
-            if not self.hide_path and not self in state.path:
-                state.path[self] = (self.name, state.path.get(self.parent_region, (self.parent_region.name, None)))
-            return True
+        if self.name == 'Pyramid Fairy':
+            world = self.parent_region.world if self.parent_region else None
+            big_bomb_location = world.get_location('Big Bomb', self.player)
+            if big_bomb_location.can_reach(state) and self.can_reach_thru(state, big_bomb_location.parent_region, True, True) and self.access_rule(state):
+                if not self in state.path:
+                    path = state.path.get(big_bomb_location.parent_region, (big_bomb_location.parent_region.name, None))
+                    path = ('Big Bomb Shop Exit', ('Pick Up Big Bomb', path))
+                    while len(self.temp_path):
+                        exit = self.temp_path.pop(0)
+                        path = (exit.name, (exit.parent_region.name, path))
+                    path = ('Detonate Big Bomb', (self.parent_region.name, path))
+                    state.path[self] = (self.name, path)
+                return True
+        else:
+            if self.parent_region.can_reach(state) and self.access_rule(state):
+                if not self.hide_path and not self in state.path:
+                    state.path[self] = (self.name, state.path.get(self.parent_region, (self.parent_region.name, None)))
+                return True
 
         return False
+
+    def can_reach_thru(self, state, start_region, ignore_underworld=False, ignore_ledges=False):
+        def explore_region(region, path = []):
+            nonlocal found
+            if region not in explored_regions or len(explored_regions[region]) > len(path):
+                explored_regions[region] = path
+                for exit in region.exits:
+                    if exit.connected_region and (not ignore_ledges or exit.spot_type != 'Ledge') \
+                            and (not ignore_underworld or exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]) \
+                            and exit.access_rule(state):
+                        if exit.connected_region == self.parent_region:
+                            found = True
+                            explored_regions[self.parent_region] = path + [exit]
+                        else:
+                            explore_region(exit.connected_region, path + [exit])
+
+        found = False
+        explored_regions = {}
+        explore_region(start_region.entrances[0].parent_region)
+        if found:
+            self.temp_path = explored_regions[self.parent_region]
+        
+        #TODO: Implement residual mirror portal placing for the previous leg, to be used for the final destination
+
+        return found
 
     def connect(self, region, addresses=None, target=None, vanilla=None):
         self.connected_region = region
