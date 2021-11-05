@@ -1584,7 +1584,7 @@ class Entrance(object):
         self.temp_path = []
 
     def can_reach(self, state):
-        if self.name == 'Pyramid Fairy':
+        if self.name == 'Pyramid Crack':
             world = self.parent_region.world if self.parent_region else None
             big_bomb_location = world.get_location('Big Bomb', self.player)
             if big_bomb_location.can_reach(state) and self.can_reach_thru(state, big_bomb_location.parent_region, True, True) and self.access_rule(state):

@@ -891,6 +891,7 @@ OWTileRegions = bidict({
     'Shield Shop Fence': 0x5a,
 
     'Pyramid Area': 0x5b,
+    'Pyramid Crack': 0x5b,
     'Pyramid Exit Ledge': 0x5b,
     'Pyramid Pass': 0x5b,
 
@@ -1597,6 +1598,7 @@ OWExitTypes = {
                 'Catfish Approach Rocks (East)',
                 'Village of Outcasts Pegs',
                 'Grassy Lawn Pegs',
+                'Pyramid Crack',
                 'Broken Bridge Hammer Rock (South)',
                 'Broken Bridge Hammer Rock (North)',
                 'Broken Bridge Hookshot Gap',

@@ -942,6 +942,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Shield Shop Fence (Outer) Ledge Drop', 'Shield Shop Fence'),
                          ('Shield Shop Fence (Inner) Ledge Drop', 'Shield Shop Area'),
                          ('Pyramid Exit Ledge Drop', 'Pyramid Area'),
+                         ('Pyramid Crack', 'Pyramid Crack'),
                          ('Broken Bridge Hammer Rock (South)', 'Broken Bridge Northeast'), #hammer/glove
                          ('Broken Bridge Hammer Rock (North)', 'Broken Bridge Area'), #hammer/glove
                          ('Broken Bridge Hookshot Gap', 'Broken Bridge West'), #hookshot
