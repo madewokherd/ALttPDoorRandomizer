@@ -902,6 +902,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Desert Pass Ledge Drop', 'Desert Pass Area'),
                          ('Desert Pass Rocks (North)', 'Desert Pass Southeast'), #glove
                          ('Desert Pass Rocks (South)', 'Desert Pass Area'), #glove
+                         ('Middle Aged Man', 'Middle Aged Man'),
                          ('Octoballoon Water Drop', 'Octoballoon Water'), #flippers
                          ('Octoballoon Waterfall Water Drop', 'Octoballoon Water'), #flippers
                          ('Octoballoon Pier', 'Octoballoon Area'),

@@ -58,9 +58,6 @@ def set_rules(world, player):
     elif world.goal[player] == 'triforcehunt':
         add_rule(world.get_location('Murahdahla', player), lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
 
-    # big bomb rules
-    if len(world.get_region('Big Bomb Shop', player).entrances) > 0:
-        set_rule(world.get_location('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
 
     # if swamp and dam have not been moved we require mirror for swamp palace
     if not world.swamp_patch_required[player]:
@@ -187,8 +184,10 @@ def global_rules(world, player):
     
     set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
     set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
-    set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Pick Up Purple Chest', player))  # Can S&Q with chest
+    set_rule(world.get_entrance('Middle Aged Man', player), lambda state: state.has('Pick Up Purple Chest', player))  # Can S&Q with chest
+    set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Deliver Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Big Bomb', player), lambda state: state.has('Crystal 5', player) and state.has('Crystal 6', player))
+    set_rule(world.get_entrance('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
     set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Detonate Big Bomb', player))
     set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
 

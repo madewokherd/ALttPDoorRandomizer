@@ -214,6 +214,9 @@ def generate_itempool(world, player):
     world.push_item(world.get_location('Dark Blacksmith Ruins', player), ItemFactory('Pick Up Purple Chest', player), False)
     world.get_location('Dark Blacksmith Ruins', player).event = True
     world.get_location('Dark Blacksmith Ruins', player).locked = True
+    world.push_item(world.get_location('Middle Aged Man', player), ItemFactory('Deliver Purple Chest', player), False)
+    world.get_location('Middle Aged Man', player).event = True
+    world.get_location('Middle Aged Man', player).locked = True
     world.push_item(world.get_location('Frog', player), ItemFactory('Get Frog', player), False)
     world.get_location('Frog', player).event = True
     world.get_location('Frog', player).locked = True

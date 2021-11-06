@@ -1584,18 +1584,28 @@ class Entrance(object):
         self.temp_path = []
 
     def can_reach(self, state):
-        if self.name == 'Pyramid Crack':
-            world = self.parent_region.world if self.parent_region else None
-            big_bomb_location = world.get_location('Big Bomb', self.player)
-            if big_bomb_location.can_reach(state) and self.can_reach_thru(state, big_bomb_location.parent_region, True, True) and self.access_rule(state):
-                if not self in state.path:
-                    path = state.path.get(big_bomb_location.parent_region, (big_bomb_location.parent_region.name, None))
-                    path = ('Big Bomb Shop Exit', ('Pick Up Big Bomb', path))
-                    while len(self.temp_path):
-                        exit = self.temp_path.pop(0)
-                        path = (exit.name, (exit.parent_region.name, path))
-                    path = ('Detonate Big Bomb', (self.parent_region.name, path))
-                    state.path[self] = (self.name, path)
+                                # Destination        Pickup                   OW Only  No Ledges  Can S&Q
+        multi_step_locations = { 'Pyramid Crack':   ('Big Bomb',              True,    True,      False),
+                                 'Missing Smith':   ('Frog',                  True,    False,     True),
+                                 'Middle Aged Man': ('Dark Blacksmith Ruins', True,    False,     True) }
+
+        if self.name in multi_step_locations:
+            if self not in state.path:
+                world = self.parent_region.world if self.parent_region else None
+                step_location = world.get_location(multi_step_locations[self.name][0], self.player)
+                if step_location.can_reach(state) and self.can_reach_thru(state, step_location.parent_region, multi_step_locations[self.name][1], multi_step_locations[self.name][2], multi_step_locations[self.name][3]) and self.access_rule(state):
+                    if not self in state.path:
+                        path = state.path.get(step_location.parent_region, (step_location.parent_region.name, None))
+                        item_name = step_location.item.name if step_location.item else 'Pick Up Item'
+                        path = (f'{step_location.parent_region.name} Exit', (item_name, path))
+                        while len(self.temp_path):
+                            exit = self.temp_path.pop(0)
+                            path = (exit.name, (exit.parent_region.name, path))
+                        item_name = self.connected_region.locations[0].item.name if self.connected_region.locations[0].item else 'Deliver Item'
+                        path = (item_name, (self.parent_region.name, path))
+                        state.path[self] = (self.name, path)
+                    return True
+            else:
                 return True
         else:
             if self.parent_region.can_reach(state) and self.access_rule(state):

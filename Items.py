@@ -176,6 +176,7 @@ item_table = {'Bow': (True, False, None, 0x0B, 200, 'You have\nchosen the\narche
               'Get Frog': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Return Smith': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Pick Up Purple Chest': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
+              'Deliver Purple Chest': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Open Floodgate': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Pick Up Big Bomb': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Detonate Big Bomb': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),

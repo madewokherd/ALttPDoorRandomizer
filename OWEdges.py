@@ -820,6 +820,7 @@ OWTileRegions = bidict({
     'Ice Cave Area': 0x37,
 
     'Desert Pass Area': 0x3a,
+    'Middle Aged Man': 0x3a,
     'Desert Pass Southeast': 0x3a,
     'Desert Pass Ledge': 0x3a,
 
@@ -1575,6 +1576,7 @@ OWExitTypes = {
                 'Desert Pass Rocks (North)',
                 'Desert Pass Rocks (South)',
                 'Desert Pass Ladder (North)',
+                'Middle Aged Man',
                 'Octoballoon Pier',
                 'Skull Woods Bush Rock (East)',
                 'Skull Woods Bush Rock (West)',
