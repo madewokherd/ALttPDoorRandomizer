@@ -58,7 +58,6 @@ def set_rules(world, player):
     elif world.goal[player] == 'triforcehunt':
         add_rule(world.get_location('Murahdahla', player), lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
 
-
     # if swamp and dam have not been moved we require mirror for swamp palace
     if not world.swamp_patch_required[player]:
         add_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has_Mirror(player))
@@ -1638,10 +1637,6 @@ def find_rules_for_zelda_delivery(world, player):
                     visited.add(connect)
                     queue.append((connect, rule_list, next_path))
     raise Exception('No path to Sanctuary found')
-
-
-        
-        
 
 
 def set_bunny_rules(world, player, inverted):
