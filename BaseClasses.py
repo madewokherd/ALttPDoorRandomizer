@@ -1581,14 +1581,70 @@ class Entrance(object):
         self.player = player
         self.door = None
         self.hide_path = False
+        self.temp_path = []
 
     def can_reach(self, state):
-        if self.parent_region.can_reach(state) and self.access_rule(state):
-            if not self.hide_path and not self in state.path:
-                state.path[self] = (self.name, state.path.get(self.parent_region, (self.parent_region.name, None)))
-            return True
+                                # Destination        Pickup                   OW Only  No Ledges  Can S&Q
+        multi_step_locations = { 'Pyramid Crack':   ('Big Bomb',              True,    True,      False),
+                                 'Missing Smith':   ('Frog',                  True,    False,     True),
+                                 'Middle Aged Man': ('Dark Blacksmith Ruins', True,    False,     True) }
+
+        if self.name in multi_step_locations:
+            if self not in state.path:
+                world = self.parent_region.world if self.parent_region else None
+                step_location = world.get_location(multi_step_locations[self.name][0], self.player)
+                if step_location.can_reach(state) and self.can_reach_thru(state, step_location.parent_region, multi_step_locations[self.name][1], multi_step_locations[self.name][2], multi_step_locations[self.name][3]) and self.access_rule(state):
+                    if not self in state.path:
+                        path = state.path.get(step_location.parent_region, (step_location.parent_region.name, None))
+                        item_name = step_location.item.name if step_location.item else 'Pick Up Item'
+                        path = (f'{step_location.parent_region.name} Exit', (item_name, path))
+                        while len(self.temp_path):
+                            exit = self.temp_path.pop(0)
+                            path = (exit.name, (exit.parent_region.name, path))
+                        item_name = self.connected_region.locations[0].item.name if self.connected_region.locations[0].item else 'Deliver Item'
+                        path = (item_name, (self.parent_region.name, path))
+                        state.path[self] = (self.name, path)
+                    return True
+            else:
+                return True
+        else:
+            if self.parent_region.can_reach(state) and self.access_rule(state):
+                if not self.hide_path and not self in state.path:
+                    state.path[self] = (self.name, state.path.get(self.parent_region, (self.parent_region.name, None)))
+                return True
 
         return False
+
+    def can_reach_thru(self, state, start_region, ignore_underworld=False, ignore_ledges=False, allow_save_quit=False):
+        def explore_region(region, path = []):
+            nonlocal found
+            if region not in explored_regions or len(explored_regions[region]) > len(path):
+                explored_regions[region] = path
+                for exit in region.exits:
+                    if exit.connected_region and (not ignore_ledges or exit.spot_type != 'Ledge') \
+                            and exit.connected_region.name not in ['Dig Game Area'] \
+                            and exit.access_rule(state):
+                        if exit.connected_region == self.parent_region:
+                            found = True
+                            explored_regions[self.parent_region] = path + [exit]
+                        elif not ignore_underworld or region.type == exit.connected_region.type or exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]:
+                            explore_region(exit.connected_region, path + [exit])
+
+        found = False
+        explored_regions = {}
+        explore_region(start_region.entrances[0].parent_region)
+        if found:
+            self.temp_path = explored_regions[self.parent_region]
+        elif allow_save_quit:
+            world = self.parent_region.world if self.parent_region else None
+            exit = world.get_entrance('Links House S&Q', self.player)
+            explore_region(exit.connected_region, [exit])
+            if found:
+                self.temp_path = explored_regions[self.parent_region]
+        
+        #TODO: Implement residual mirror portal placing for the previous leg, to be used for the final destination
+
+        return found
 
     def connect(self, region, addresses=None, target=None, vanilla=None):
         self.connected_region = region
@@ -2851,7 +2907,7 @@ class Spoiler(object):
             
             outfile.write('\n\nBottle Refills:\n\n')
             for fairy, bottle in self.bottles.items():
-                outfile.write(f'\n{fairy}: {bottle}')
+                outfile.write(f'{fairy}: {bottle}\n')
 
             if self.overworlds:
                 # overworlds: overworld transitions;

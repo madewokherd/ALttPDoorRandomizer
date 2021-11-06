@@ -557,10 +557,10 @@ def link_entrances(world, player):
         if world.logic[player] in ['noglitches', 'minorglitches'] or (invFlag != (0x1b in world.owswaps[player][0] and world.owMixed[player])):
             bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
         bomb_shop = random.choice(bomb_shop_doors)
-        pool.remove(bomb_shop)
         connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
+        pool = [e for e in pool if e in entrance_pool]
         connect_caves(world, pool, [], caves, player)
 
         # place remaining doors
@@ -2184,6 +2184,7 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Fairy Ascension Cave Climb', 'Fairy Ascension Cave (Top)'),
                          ('Fairy Ascension Cave Pots', 'Fairy Ascension Cave (Bottom)'),
                          ('Fairy Ascension Cave Drop', 'Fairy Ascension Cave (Drop)'),
+                         ('Missing Smith', 'Missing Smith'),
                          ('Superbunny Cave Climb', 'Superbunny Cave (Top)'),
                          ('Hookshot Cave Front to Middle', 'Hookshot Cave (Middle)'),
                          ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),

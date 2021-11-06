@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.2.0
+- Delivering Big Red Bomb is now in logic
+- Smith/Purple Chest have proper dynamic pathing to fix logical issues
+- Fixed issue with bomb walls in OW not requiring moon pearl in DW
+
 ### 0.2.1.3
 - New fake flipper handling to allow S+Q rather than insta-kill
 - Fixed whirlpools in Crossed OW
