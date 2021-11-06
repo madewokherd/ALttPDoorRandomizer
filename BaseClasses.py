@@ -1618,7 +1618,7 @@ class Entrance(object):
     def can_reach_thru(self, state, start_region, ignore_underworld=False, ignore_ledges=False, allow_save_quit=False):
         def explore_region(region, path = []):
             nonlocal found
-            if region not in explored_regions or len(explored_regions[region]) > len(path):
+            if region not in explored_regions:
                 explored_regions[region] = path
                 for exit in region.exits:
                     if exit.connected_region and (not ignore_ledges or exit.spot_type != 'Ledge') \
@@ -1628,19 +1628,27 @@ class Entrance(object):
                             found = True
                             explored_regions[self.parent_region] = path + [exit]
                         elif not ignore_underworld or region.type == exit.connected_region.type or exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]:
-                            explore_region(exit.connected_region, path + [exit])
+                            exits_to_traverse.append(tuple((exit, path)))
 
-        found = False
-        explored_regions = {}
-        explore_region(start_region.entrances[0].parent_region)
-        if found:
-            self.temp_path = explored_regions[self.parent_region]
-        elif allow_save_quit:
-            world = self.parent_region.world if self.parent_region else None
-            exit = world.get_entrance('Links House S&Q', self.player)
-            explore_region(exit.connected_region, [exit])
+        def traverse_paths(region, start_path=[]):
+            explore_region(region, start_path)
+            while not found and len(exits_to_traverse):
+                exit, path = exits_to_traverse.pop(0)
+                explore_region(exit.connected_region, path + [exit])
             if found:
                 self.temp_path = explored_regions[self.parent_region]
+        
+        found = False
+        explored_regions = {}
+        exits_to_traverse = list()
+        traverse_paths(start_region.entrances[0].parent_region)
+
+        if not found and allow_save_quit:
+            explored_regions = {}
+            exits_to_traverse = list()
+            world = self.parent_region.world if self.parent_region else None
+            exit = world.get_entrance('Links House S&Q', self.player)
+            traverse_paths(exit.connected_region, [exit])
         
         #TODO: Implement residual mirror portal placing for the previous leg, to be used for the final destination
 
