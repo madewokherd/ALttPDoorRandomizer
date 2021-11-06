@@ -1478,6 +1478,7 @@ OWExitTypes = {
             'Dark Bonk Rocks Cliff Ledge Drop',
             'Bomb Shop Cliff Ledge Drop',
             'Hammer Bridge South Cliff Ledge Drop',
+            'Ice Lake Northeast Pier Hop',
             'Ice Lake Moat Bomb Jump',
             'Ice Lake Area Cliff Ledge Drop',
             'Ice Palace Island FAWT Ledge Drop',
