@@ -111,7 +111,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Lake Hylia Island', ['Lake Hylia Island'], ['Lake Hylia Island Water Drop']),
         create_lw_region(player, 'Lake Hylia Water', None, ['Lake Hylia Central Island Pier', 'Lake Hylia Island Pier', 'Lake Hylia West Pier', 'Lake Hylia East Pier', 'Lake Hylia NC', 'Lake Hylia EC', 'Lake Hylia Whirlpool'], Terrain.Water),
         create_lw_region(player, 'Ice Cave Area', None, ['Ice Rod Cave', 'Good Bee Cave', '20 Rupee Cave', 'Shopping Mall Mirror Spot', 'Ice Cave SE', 'Ice Cave SW']),
-        create_lw_region(player, 'Desert Pass Area', None, ['Desert Pass Ladder (South)', 'Middle Aged Man', 'Desert Fairy', '50 Rupee Cave', 'Swamp Nook Mirror Spot', 'Desert Pass WS', 'Desert Pass EC', 'Desert Pass Rocks (North)']),
+        create_lw_region(player, 'Desert Pass Area', ['Middle Aged Man'], ['Desert Pass Ladder (South)', 'Middle Aged Man', 'Desert Fairy', '50 Rupee Cave', 'Swamp Nook Mirror Spot', 'Desert Pass WS', 'Desert Pass EC', 'Desert Pass Rocks (North)']),
         create_lw_region(player, 'Middle Aged Man', ['Purple Chest'], None),
         create_lw_region(player, 'Desert Pass Southeast', None, ['Desert Pass Rocks (South)', 'Swamp Nook Southeast Mirror Spot', 'Desert Pass ES']),
         create_lw_region(player, 'Desert Pass Ledge', None, ['Desert Pass Ladder (North)', 'Desert Pass Ledge Drop', 'Swamp Nook Pegs Mirror Spot', 'Desert Pass WC']),
