@@ -2907,7 +2907,7 @@ class Spoiler(object):
             
             outfile.write('\n\nBottle Refills:\n\n')
             for fairy, bottle in self.bottles.items():
-                outfile.write(f'\n{fairy}: {bottle}')
+                outfile.write(f'{fairy}: {bottle}\n')
 
             if self.overworlds:
                 # overworlds: overworld transitions;
