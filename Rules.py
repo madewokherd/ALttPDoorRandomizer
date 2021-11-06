@@ -1354,7 +1354,7 @@ def no_glitches_rules(world, player):
 
 
 def fake_flipper_rules(world, player):
-    set_rule(world.get_entrance('Waterfall of Wishing Cave Entry', player), lambda state: state.has('Flippers', player) or (state.has_Pearl(player) and state.can_reach('Lake Hylia Water', player)))
+    set_rule(world.get_entrance('Waterfall of Wishing Cave Entry', player), lambda state: True) # warning, assumes FF possible on other end of whirlpool or local ancilla splash delete
     set_rule(world.get_entrance('River Bend Water Drop', player), lambda state: True)
     set_rule(world.get_entrance('River Bend East Water Drop', player), lambda state: True)
     set_rule(world.get_entrance('Potion Shop Water Drop', player), lambda state: True)
