@@ -1615,19 +1615,19 @@ class Entrance(object):
 
         return False
 
-    def can_reach_thru(self, state, start_region, ignore_underworld=False, ignore_ledges=False):
+    def can_reach_thru(self, state, start_region, ignore_underworld=False, ignore_ledges=False, allow_save_quit=False):
         def explore_region(region, path = []):
             nonlocal found
             if region not in explored_regions or len(explored_regions[region]) > len(path):
                 explored_regions[region] = path
                 for exit in region.exits:
                     if exit.connected_region and (not ignore_ledges or exit.spot_type != 'Ledge') \
-                            and (not ignore_underworld or exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]) \
+                            and exit.connected_region.name not in ['Dig Game Area'] \
                             and exit.access_rule(state):
                         if exit.connected_region == self.parent_region:
                             found = True
                             explored_regions[self.parent_region] = path + [exit]
-                        else:
+                        elif not ignore_underworld or region.type == exit.connected_region.type or exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]:
                             explore_region(exit.connected_region, path + [exit])
 
         found = False
@@ -1635,6 +1635,12 @@ class Entrance(object):
         explore_region(start_region.entrances[0].parent_region)
         if found:
             self.temp_path = explored_regions[self.parent_region]
+        elif allow_save_quit:
+            world = self.parent_region.world if self.parent_region else None
+            exit = world.get_entrance('Links House S&Q', self.player)
+            explore_region(exit.connected_region, [exit])
+            if found:
+                self.temp_path = explored_regions[self.parent_region]
         
         #TODO: Implement residual mirror portal placing for the previous leg, to be used for the final destination
 

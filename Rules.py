@@ -191,7 +191,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Detonate Big Bomb', player))
     set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
 
-    set_rule(world.get_location('Missing Smith', player), lambda state: state.has('Get Frog', player) and state.can_reach('Blacksmiths Hut', 'Region', player)) # Can't S&Q with smith
+    set_rule(world.get_location('Missing Smith', player), lambda state: state.has('Get Frog', player))
     set_rule(world.get_location('Blacksmith', player), lambda state: state.has('Return Smith', player))
     set_rule(world.get_location('Magic Bat', player), lambda state: state.has('Magic Powder', player))
     set_rule(world.get_location('Sick Kid', player), lambda state: state.has_bottle(player))
