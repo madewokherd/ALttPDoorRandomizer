@@ -723,9 +723,7 @@ def reorganize_groups(world, groups, player):
 
 def create_flute_exits(world, player):
     for region in (r for r in world.regions if r.player == player and r.terrain == Terrain.Land and r.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']):
-        if (not world.owMixed[player] and region.type == RegionType.LightWorld) \
-            or (world.owMixed[player] and region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
-                and (region.name not in world.owswaps[player][1] or region.name in world.owswaps[player][2])):
+        if region.type == (RegionType.LightWorld if world.mode != 'inverted' else RegionType.DarkWorld):
             exitname = 'Flute From ' + region.name
             exit = Entrance(region.player, exitname, region)
             exit.spot_type = 'Flute'
