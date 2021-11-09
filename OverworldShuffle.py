@@ -204,15 +204,15 @@ def link_overworld(world, player):
                 connect_simple(world, to_whirlpool, from_region, player)
             else:
                 if (world.owCrossed[player] == 'none' and (world.get_region(from_region, player).type == RegionType.LightWorld)) \
-                        or (world.owCrossed[player] == 'grouped' and ((from_owid < 0x40) == (from_owid not in ow_crossed_tiles[0]))) \
-                        or world.owCrossed[player] not in ['none', 'grouped']:
+                        or world.owCrossed[player] not in ['none', 'grouped'] \
+                        or (world.owCrossed[player] == 'grouped' and ((from_owid < 0x40) == (from_owid not in ow_crossed_tiles[0]))):
                     whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((from_owid, from_whirlpool, from_region)))
                 
                 if (world.owCrossed[player] == 'none' and (world.get_region(to_region, player).type == RegionType.LightWorld)) \
-                        or (world.owCrossed[player] == 'grouped' and ((to_owid < 0x40) == (to_owid not in ow_crossed_tiles[0]))) \
-                        or world.owCrossed[player] not in ['none', 'grouped']:
+                        or world.owCrossed[player] not in ['none', 'grouped'] \
+                        or (world.owCrossed[player] == 'grouped' and ((to_owid < 0x40) == (to_owid not in ow_crossed_tiles[0]))):
                     whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
