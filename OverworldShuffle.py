@@ -153,7 +153,8 @@ def link_overworld(world, player):
     logging.getLogger('').debug('Crossing overworld edges')
     if world.owCrossed[player] in ['grouped', 'limited', 'chaos']:
         if world.owCrossed[player] == 'grouped':
-            crossed_edges = shuffle_tiles(world, tile_groups, [[],[],[]], player)
+            ow_crossed_tiles = [[],[],[]]
+            crossed_edges = shuffle_tiles(world, tile_groups, ow_crossed_tiles, player)
         elif world.owCrossed[player] in ['limited', 'chaos']:
             crossed_edges = list()
             crossed_candidates = list()
@@ -202,12 +203,16 @@ def link_overworld(world, player):
                 connect_simple(world, from_whirlpool, to_region, player)
                 connect_simple(world, to_whirlpool, from_region, player)
             else:
-                if world.owCrossed[player] != 'none' or world.get_region(from_region, player).type == RegionType.LightWorld:
+                if (world.owCrossed[player] == 'none' and (world.get_region(from_region, player).type == RegionType.LightWorld)) \
+                        or (world.owCrossed[player] == 'grouped' and ((from_owid < 0x40) == (from_owid not in ow_crossed_tiles[0]))) \
+                        or world.owCrossed[player] not in ['none', 'grouped']:
                     whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((from_owid, from_whirlpool, from_region)))
                 
-                if world.owCrossed[player] != 'none' or world.get_region(to_region, player).type == RegionType.LightWorld:
+                if (world.owCrossed[player] == 'none' and (world.get_region(to_region, player).type == RegionType.LightWorld)) \
+                        or (world.owCrossed[player] == 'grouped' and ((to_owid < 0x40) == (to_owid not in ow_crossed_tiles[0]))) \
+                        or world.owCrossed[player] not in ['none', 'grouped']:
                     whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
@@ -447,7 +452,7 @@ def shuffle_tiles(world, groups, result_list, player):
                 exist_dw_regions.extend(dw_regions)
 
         # check whirlpool parity
-        valid_whirlpool_parity = world.owCrossed[player] != 'none' or len(set(new_results[0]) & set({0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f})) % 2 == 0
+        valid_whirlpool_parity = world.owCrossed[player] not in ['none', 'grouped'] or len(set(new_results[0]) & set({0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f})) % 2 == 0
 
     (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
     exist_owids.extend(new_results[0])
