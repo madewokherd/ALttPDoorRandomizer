@@ -197,16 +197,17 @@ def link_overworld(world, player):
     else:
         whirlpool_candidates = [[],[]]
         for (from_owid, from_whirlpool, from_region), (to_owid, to_whirlpool, to_region) in default_whirlpool_connections:
-            if world.owCrossed[player] != 'none':
-                whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
-                whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
+            if world.owCrossed[player] == 'polar' and world.owMixed[player] and from_owid == 0x55:
+                # connect the 2 DW whirlpools in Polar Mixed
+                connect_simple(world, from_whirlpool, to_region, player)
+                connect_simple(world, to_whirlpool, from_region, player)
             else:
-                if world.get_region(from_region, player).type == RegionType.LightWorld:
+                if world.owCrossed[player] != 'none' or world.get_region(from_region, player).type == RegionType.LightWorld:
                     whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((from_owid, from_whirlpool, from_region)))
                 
-                if world.get_region(to_region, player).type == RegionType.LightWorld:
+                if world.owCrossed[player] != 'none' or world.get_region(to_region, player).type == RegionType.LightWorld:
                     whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
