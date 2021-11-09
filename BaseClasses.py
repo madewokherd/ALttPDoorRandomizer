@@ -1618,7 +1618,7 @@ class Entrance(object):
     def can_reach_thru(self, state, start_region, ignore_underworld=False, ignore_ledges=False, allow_save_quit=False):
         def explore_region(region, path = []):
             nonlocal found
-            if region not in explored_regions or len(explored_regions[region]) > len(path):
+            if region not in explored_regions:
                 explored_regions[region] = path
                 for exit in region.exits:
                     if exit.connected_region and (not ignore_ledges or exit.spot_type != 'Ledge') \
@@ -1628,19 +1628,27 @@ class Entrance(object):
                             found = True
                             explored_regions[self.parent_region] = path + [exit]
                         elif not ignore_underworld or region.type == exit.connected_region.type or exit.connected_region.type not in [RegionType.Cave, RegionType.Dungeon]:
-                            explore_region(exit.connected_region, path + [exit])
+                            exits_to_traverse.append(tuple((exit, path)))
 
-        found = False
-        explored_regions = {}
-        explore_region(start_region.entrances[0].parent_region)
-        if found:
-            self.temp_path = explored_regions[self.parent_region]
-        elif allow_save_quit:
-            world = self.parent_region.world if self.parent_region else None
-            exit = world.get_entrance('Links House S&Q', self.player)
-            explore_region(exit.connected_region, [exit])
+        def traverse_paths(region, start_path=[]):
+            explore_region(region, start_path)
+            while not found and len(exits_to_traverse):
+                exit, path = exits_to_traverse.pop(0)
+                explore_region(exit.connected_region, path + [exit])
             if found:
                 self.temp_path = explored_regions[self.parent_region]
+        
+        found = False
+        explored_regions = {}
+        exits_to_traverse = list()
+        traverse_paths(start_region.entrances[0].parent_region)
+
+        if not found and allow_save_quit:
+            explored_regions = {}
+            exits_to_traverse = list()
+            world = self.parent_region.world if self.parent_region else None
+            exit = world.get_entrance('Links House S&Q', self.player)
+            traverse_paths(exit.connected_region, [exit])
         
         #TODO: Implement residual mirror portal placing for the previous leg, to be used for the final destination
 
@@ -2910,8 +2918,33 @@ class Spoiler(object):
                 outfile.write(f'{fairy}: {bottle}\n')
 
             if self.overworlds:
-                # overworlds: overworld transitions;
                 outfile.write('\n\nOverworld:\n\n')
+                # overworld tile swaps
+                swap_output = False
+                for player in range(1, self.world.players + 1):
+                    if self.world.owMixed[player]:
+                        from OverworldShuffle import tile_swap_spoiler_table
+                        if not swap_output:
+                            swap_output = True
+                            outfile.write('OW Tile Swaps:\n')
+                        outfile.write(('' if self.world.players == 1 else str('(Player ' + str(player) + ')')).ljust(11)) # player name
+                        s = list(map(lambda x: ' ' if x not in self.world.owswaps[player][0] else 'S', [i for i in range(0x40)]))
+                        outfile.write((tile_swap_spoiler_table + '\n\n') % (                                  s[0x02],                                s[0x07], \
+                                                                                                 s[0x00],                s[0x03],        s[0x05], \
+                            s[0x00],        s[0x02],s[0x03],        s[0x05],        s[0x07],                 s[0x0a],                                s[0x0f], \
+                                            s[0x0a],                                s[0x0f],
+                            s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17], s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17],
+                            s[0x18],        s[0x1a],s[0x1b],        s[0x1d],s[0x1e], \
+                                            s[0x22],                s[0x25],                                 s[0x1a],                s[0x1d], \
+                            s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],     s[0x18],                s[0x1b],                s[0x1e], \
+                            s[0x30],        s[0x32],s[0x33],s[0x34],s[0x35],        s[0x37],                 s[0x22],                s[0x25], \
+                                            s[0x3a],s[0x3b],s[0x3c],                s[0x3f], \
+                                                                                             s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f], \
+                                                                                                             s[0x32],s[0x33],s[0x34],                s[0x37], \
+                                                                                                 s[0x30],                                s[0x35],
+                                                                                                            s[0x3a],s[0x3b],s[0x3c],                 s[0x3f]))
+
+                # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
             
             if self.entrances:

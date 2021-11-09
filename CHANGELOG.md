@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.2.2.1
+- Allow normal Link speed with Old Man following if not in his cave or WDM
+- Fixed issue with Flute exits not getting placed on the correct tiles
+- Hints in Lite/Lean ER no longer refer to entrances that are guaranteed vanilla
+- Added Links House entrance to hint candidate list in ER when it is shuffled
+- Added Tile Swaps ASCII map to Spoiler Log when Tile Swap is enabled
+- Fixed issue with Whirlpool Shuffle not abiding by Polar rules
+
 ### 0.2.2.0
 - Delivering Big Red Bomb is now in logic
 - Smith/Purple Chest have proper dynamic pathing to fix logical issues

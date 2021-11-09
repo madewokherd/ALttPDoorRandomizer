@@ -3,7 +3,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.2.0-u'
+__version__ = '0.2.2.1-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -197,16 +197,17 @@ def link_overworld(world, player):
     else:
         whirlpool_candidates = [[],[]]
         for (from_owid, from_whirlpool, from_region), (to_owid, to_whirlpool, to_region) in default_whirlpool_connections:
-            if world.owCrossed[player] != 'none':
-                whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
-                whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
+            if world.owCrossed[player] == 'polar' and world.owMixed[player] and from_owid == 0x55:
+                # connect the 2 DW whirlpools in Polar Mixed
+                connect_simple(world, from_whirlpool, to_region, player)
+                connect_simple(world, to_whirlpool, from_region, player)
             else:
-                if world.get_region(from_region, player).type == RegionType.LightWorld:
+                if world.owCrossed[player] != 'none' or world.get_region(from_region, player).type == RegionType.LightWorld:
                     whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((from_owid, from_whirlpool, from_region)))
                 
-                if world.get_region(to_region, player).type == RegionType.LightWorld:
+                if world.owCrossed[player] != 'none' or world.get_region(to_region, player).type == RegionType.LightWorld:
                     whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
@@ -723,9 +724,7 @@ def reorganize_groups(world, groups, player):
 
 def create_flute_exits(world, player):
     for region in (r for r in world.regions if r.player == player and r.terrain == Terrain.Land and r.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']):
-        if (not world.owMixed[player] and region.type == RegionType.LightWorld) \
-            or (world.owMixed[player] and region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
-                and (region.name not in world.owswaps[player][1] or region.name in world.owswaps[player][2])):
+        if region.type == (RegionType.LightWorld if world.mode != 'inverted' else RegionType.DarkWorld):
             exitname = 'Flute From ' + region.name
             exit = Entrance(region.player, exitname, region)
             exit.spot_type = 'Flute'
@@ -1589,3 +1588,23 @@ flute_data = {
     0x3c: (['South Pass Area',                'Dark South Pass Area'],              0x3c, 0x0584, 0x0ed0, 0x081e, 0x0f38, 0x0898, 0x0f45, 0x08a3, 0xfffe, 0x0002, 0x0f38, 0x0898),
     0x3f: (['Octoballoon Area',               'Bomber Corner Area'],                0x3f, 0x0810, 0x0f05, 0x0e75, 0x0f67, 0x0ef3, 0x0f72, 0x0efa, 0xfffb, 0x000b, 0x0f80, 0x0ef0)
 }
+
+tile_swap_spoiler_table = \
+"""            0 1 2 3 4 5 6 7
+                      +---+-+---+---+-+
+      01234567   A(00)|   |%s|   |   |%s|
+     +--------+       | %s +-+ %s | %s +-+
+A(00)|%s %s%s %s %s|  B(08)|   |%s|   |   |%s|
+B(08)|  %s    %s|       +-+-+-+-+-+-+-+-+
+C(10)|%s%s%s%s%s%s%s%s|  C(10)|%s|%s|%s|%s|%s|%s|%s|%s|
+D(18)|%s %s%s %s%s |       +-+-+-+-+-+-+-+-+
+E(20)|  %s  %s  |  D(18)|   |%s|   |%s|   |
+F(28)|%s%s%s%s%s%s%s%s|       | %s +-+ %s +-+ %s |
+G(30)|%s %s%s%s%s %s|  E(20)|   |%s|   |%s|   |
+H(38)|  %s%s%s  %s|       +-+-+-+-+-+-+-+-+
+     +--------+  F(28)|%s|%s|%s|%s|%s|%s|%s|%s|
+                      +-+-+-+-+-+-+-+-+
+                 G(30)|   |%s|%s|%s|   |%s|
+                      | %s +-+-+-+ %s +-+
+                 H(38)|   |%s|%s|%s|   |%s|
+                      +---+-+-+-+---+-+"""

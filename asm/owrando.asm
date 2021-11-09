@@ -37,6 +37,10 @@ db #$b0 ; BCS to replace BEQ
 org $06907f ; < 3107f - sprite_prep.asm:2170 (LDA $7EF3CA)
 lda $8a : and.b #$40
 
+; override Link speed with Old Man following
+org $09a32e ; < bank_09.asm:7457 (LDA.b #$0C : STA.b $5E)
+jsl OWOldManSpeed
+
 ; Dark Bonk Rocks Rain Sequence Guards (allowing Tile Swap on Dark Bonk Rocks)
 ;org $09c957 ; <- 4c957
 ;dw #$cb5f ; matches value on Central Bonk Rocks screen
@@ -161,6 +165,22 @@ OWSmithAccept:
     cmp #$08 : beq +
         clc : rtl
     + sec : rtl
+}
+OWOldManSpeed:
+{
+    lda $1b : beq .outdoors
+        lda $a0 : and #$fe : cmp #$f0 : beq .vanilla ; if in cave where you find Old Man
+        bra .normalspeed
+    .outdoors
+        lda $8a : cmp #$03 : beq .vanilla ; if on WDM screen
+
+    .normalspeed
+    lda $5e : cmp #$0c : rtl
+        stz $5e : rtl
+
+    .vanilla
+    lda #$0c : sta $5e ; what we wrote over
+    rtl
 }
 
 org $aa9000
