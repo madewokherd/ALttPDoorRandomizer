@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.2.2
+- Fixed Whirlpool Shuffle with Grouped Crossed OW
+- Made filename not spoil OWR in Mystery
+- Fixed Triforce Hunt goal
+
 ### 0.2.2.1
 - Allow normal Link speed with Old Man following if not in his cave or WDM
 - Fixed issue with Flute exits not getting placed on the correct tiles
