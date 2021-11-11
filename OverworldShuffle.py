@@ -3,7 +3,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.2.1-u'
+__version__ = '0.2.2.2-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -153,7 +153,8 @@ def link_overworld(world, player):
     logging.getLogger('').debug('Crossing overworld edges')
     if world.owCrossed[player] in ['grouped', 'limited', 'chaos']:
         if world.owCrossed[player] == 'grouped':
-            crossed_edges = shuffle_tiles(world, tile_groups, [[],[],[]], player)
+            ow_crossed_tiles = [[],[],[]]
+            crossed_edges = shuffle_tiles(world, tile_groups, ow_crossed_tiles, player)
         elif world.owCrossed[player] in ['limited', 'chaos']:
             crossed_edges = list()
             crossed_candidates = list()
@@ -196,24 +197,31 @@ def link_overworld(world, player):
             connect_simple(world, to_whirlpool, from_region, player)
     else:
         whirlpool_candidates = [[],[]]
+        world.owwhirlpools[player] = [None] * 8
         for (from_owid, from_whirlpool, from_region), (to_owid, to_whirlpool, to_region) in default_whirlpool_connections:
             if world.owCrossed[player] == 'polar' and world.owMixed[player] and from_owid == 0x55:
                 # connect the 2 DW whirlpools in Polar Mixed
                 connect_simple(world, from_whirlpool, to_region, player)
                 connect_simple(world, to_whirlpool, from_region, player)
+                world.owwhirlpools[player][7] = from_owid
+                world.owwhirlpools[player][6] = to_owid
+                world.spoiler.set_overworld(from_whirlpool, to_whirlpool, 'both', player)
             else:
-                if world.owCrossed[player] != 'none' or world.get_region(from_region, player).type == RegionType.LightWorld:
+                if ((world.owCrossed[player] == 'none' or (world.owCrossed[player] == 'polar' and not world.owMixed[player])) and (world.get_region(from_region, player).type == RegionType.LightWorld)) \
+                        or world.owCrossed[player] not in ['none', 'polar', 'grouped'] \
+                        or (world.owCrossed[player] == 'grouped' and ((from_owid < 0x40) == (from_owid not in ow_crossed_tiles[0]))):
                     whirlpool_candidates[0].append(tuple((from_owid, from_whirlpool, from_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((from_owid, from_whirlpool, from_region)))
                 
-                if world.owCrossed[player] != 'none' or world.get_region(to_region, player).type == RegionType.LightWorld:
+                if ((world.owCrossed[player] == 'none' or (world.owCrossed[player] == 'polar' and not world.owMixed[player])) and (world.get_region(to_region, player).type == RegionType.LightWorld)) \
+                        or world.owCrossed[player] not in ['none', 'polar', 'grouped'] \
+                        or (world.owCrossed[player] == 'grouped' and ((to_owid < 0x40) == (to_owid not in ow_crossed_tiles[0]))):
                     whirlpool_candidates[0].append(tuple((to_owid, to_whirlpool, to_region)))
                 else:
                     whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
 
         # shuffle happens here
-        world.owwhirlpools[player] = [None] * 8
         whirlpool_map = [ 0x35, 0x0f, 0x15, 0x33, 0x12, 0x3f, 0x55, 0x7f ]
         for whirlpools in whirlpool_candidates:
             random.shuffle(whirlpools)
@@ -447,7 +455,7 @@ def shuffle_tiles(world, groups, result_list, player):
                 exist_dw_regions.extend(dw_regions)
 
         # check whirlpool parity
-        valid_whirlpool_parity = world.owCrossed[player] != 'none' or len(set(new_results[0]) & set({0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f})) % 2 == 0
+        valid_whirlpool_parity = world.owCrossed[player] not in ['none', 'grouped'] or len(set(new_results[0]) & set({0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f})) % 2 == 0
 
     (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
     exist_owids.extend(new_results[0])

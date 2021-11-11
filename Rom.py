@@ -2186,8 +2186,15 @@ def write_strings(rom, world, player, team):
             entrances_to_hint.update(OtherEntrances)
         elif world.shopsanity[player]:
             entrances_to_hint.update(ShopEntrances)
-        if world.shufflelinks[player] and world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
+        if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            if world.mode[player] == 'inverted' != (0x2c in world.owswaps[player][0] and world.owMixed[player]):
+                entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
+                if world.shufflelinks[player]:
+                    entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
+            else:
+                entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
+                if world.shufflelinks[player]:
+                    entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
         entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
@@ -2760,8 +2767,7 @@ ItemEntrances = {'Blinds Hideout': 'Blind\'s old house',
                  'Spike Cave': 'The ledge cave on west dark DM',
                  'Hype Cave': 'The cave south of the old bomb shop',
                  'Brewery': 'The Village of Outcasts building with no door',
-                 'Chest Game': 'The westmost building in the Village of Outcasts',
-                 'Big Bomb Shop': 'The old bomb shop'
+                 'Chest Game': 'The westmost building in the Village of Outcasts'
                  }
 
 ShopEntrances = {'Cave Shop (Lake Hylia)': 'The cave NW Lake Hylia',
