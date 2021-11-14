@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.2.3
+- Fixed GT entrance not being opened when Inverted and WDM is Tile Swapped
+- The Goal sign is moved to the area where the hole will be (always in opposite world as starting)
+
 ### 0.2.2.2
 - Fixed Whirlpool Shuffle with Grouped Crossed OW
 - Made filename not spoil OWR in Mystery
