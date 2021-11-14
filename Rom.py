@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9df10796c8a8fe07d81fc0012700934a'
+RANDOMIZERBASEHASH = '9dfff0f3d093eb9adce053e9773f523e'
 
 
 class JsonRom(object):
@@ -668,20 +668,20 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
         # patches map data specific for OW Shuffle
         #inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
-        inverted_buffer[0x1A] = inverted_buffer[0x1A] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x1B] = inverted_buffer[0x1B] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x22] = inverted_buffer[0x22] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x3F] = inverted_buffer[0x3F] | 0x2  # added C to terrain
+        inverted_buffer[0x1A] |= 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x1B] |= 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x22] |= 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x3F] |= 0x2  # added C to terrain
         #inverted_buffer[0x43] = inverted_buffer[0x43] | 0x2  # convenient portal on WDDM
-        inverted_buffer[0x5A] = inverted_buffer[0x5A] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x5B] = inverted_buffer[0x5B] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x62] = inverted_buffer[0x62] | 0x2  # rocks added to prevent OWG hardlock
-        inverted_buffer[0x7F] = inverted_buffer[0x7F] | 0x2  # added C to terrain
+        inverted_buffer[0x5A] |= 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x5B] |= 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x62] |= 0x2  # rocks added to prevent OWG hardlock
+        inverted_buffer[0x7F] |= 0x2  # added C to terrain
 
         if world.owMixed[player]:
             for b in world.owswaps[player][0]:
                 # load inverted maps
-                inverted_buffer[b] = (inverted_buffer[b] & 0xFE) | ((inverted_buffer[b] + 1) % 2)
+                inverted_buffer[b] ^= 0x1
 
                 # set world flag
                 rom.write_byte(0x153A00 + b, 0x00 if b >= 0x40 else 0x40)
@@ -2458,7 +2458,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
     if world.mode[player] == 'inverted':
         # load inverted maps
         for b in range(0x00, len(inverted_buffer)):
-            inverted_buffer[b] = (inverted_buffer[b] & 0xFE) | ((inverted_buffer[b] + 1) % 2)
+            inverted_buffer[b] ^= 0x1
     
         rom.write_byte(snes_to_pc(0x0283E0), 0xF0)  # residual portals
         rom.write_byte(snes_to_pc(0x02B34D), 0xF0)
