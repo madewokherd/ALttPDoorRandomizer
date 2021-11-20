@@ -391,6 +391,21 @@ OWWorldUpdate: ; x = owid of destination screen
 {
     lda.l OWTileWorldAssoc,x : cmp.l $7ef3ca : beq .return
         sta.l $7ef3ca ; change world
+
+        ; activate mirror portal sprite
+        phx : cmp #0 : beq + : lda #1
+        + cmp.l InvertedMode : bne +
+            lda #$09 : pha : bra .setPortalSpriteState
+        + lda #$07 : pha ; some state that allows the portal to persist without it getting overwritten
+        
+        .setPortalSpriteState
+        ldx #$0f
+        - lda $0e20,x : cmp #$6C : bne +
+            pla : sta $0dd0,x : plx : bra .playSfx
+        + dex : bpl -
+        pla : plx
+
+        .playSfx
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
 
         ; toggle bunny mode
