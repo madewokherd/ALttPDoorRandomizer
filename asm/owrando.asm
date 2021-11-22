@@ -14,6 +14,9 @@ jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 ;org $02e238 ;LDX #$9E : - DEX : DEX : CMP $DAEE,X : BNE -
 ;jsl OWSpecialTransition : nop #5
 
+org $05af75
+jsl OWPreserveMirrorSprite : nop #2 ; LDA $7EF3CA : BNE $05AFDF
+
 ; whirlpool shuffle cross world change
 org $02b3bd
 jsl OWWhirlpoolUpdate ;JSL $02EA6C
@@ -138,6 +141,19 @@ OWWhirlpoolUpdate:
     lda.l OWMode+1 : and #$02 : beq .return
         + ldx $8a : jsr OWWorldUpdate
     .return
+    rtl
+}
+
+OWPreserveMirrorSprite:
+{
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
+        rtl ; if OW Crossed, skip world check and continue
+    .vanilla
+    lda $7ef3ca : bne .deleteMirror
+        rtl
+
+    .deleteMirror
+    pla : lda #$de : pha ; in vanilla, if in dark world, jump to $05afdf
     rtl
 }
 
@@ -391,25 +407,10 @@ OWWorldUpdate: ; x = owid of destination screen
 {
     lda.l OWTileWorldAssoc,x : cmp.l $7ef3ca : beq .return
         sta.l $7ef3ca ; change world
-
-        ; activate mirror portal sprite
-        phx : cmp #0 : beq + : lda #1
-        + cmp.l InvertedMode : bne +
-            lda #$09 : pha : bra .setPortalSpriteState
-        + lda #$07 : pha ; some state that allows the portal to persist without it getting overwritten
-        
-        .setPortalSpriteState
-        ldx #$0f
-        - lda $0e20,x : cmp #$6C : bne +
-            pla : sta $0dd0,x : plx : bra .playSfx
-        + dex : bpl -
-        pla : plx
-
-        .playSfx
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
 
         ; toggle bunny mode
-        + lda $7ef357 : bne .nobunny
+        lda $7ef357 : bne .nobunny
         lda.l InvertedMode : bne .inverted
             lda $7ef3ca : and.b #$40 : bra +
             .inverted lda $7ef3ca : and.b #$40 : eor #$40
