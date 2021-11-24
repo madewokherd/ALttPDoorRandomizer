@@ -137,6 +137,24 @@ def link_overworld(world, player):
         assert len(swapped_edges) == 0, 'Not all edges were swapped successfully: ' + ', '.join(swapped_edges )
         
         update_world_regions(world, player)
+
+        # update spoiler
+        s = list(map(lambda x: ' ' if x not in world.owswaps[player][0] else 'S', [i for i in range(0x40)]))
+        text_output = tile_swap_spoiler_table.replace('s', '%s') % (             s[0x02],                                s[0x07],
+                                                                                    s[0x00],                s[0x03],        s[0x05],
+            s[0x00],        s[0x02],s[0x03],        s[0x05],        s[0x07],                 s[0x0a],                                s[0x0f],
+                            s[0x0a],                                s[0x0f],
+            s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17], s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17],
+            s[0x18],        s[0x1a],s[0x1b],        s[0x1d],s[0x1e],
+                            s[0x22],                s[0x25],                                 s[0x1a],                s[0x1d],
+            s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],     s[0x18],                s[0x1b],                s[0x1e],
+            s[0x30],        s[0x32],s[0x33],s[0x34],s[0x35],        s[0x37],                 s[0x22],                s[0x25],
+                            s[0x3a],s[0x3b],s[0x3c],                s[0x3f],
+                                                                                s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],
+                                                                                                s[0x32],s[0x33],s[0x34],                s[0x37],
+                                                                                    s[0x30],                                s[0x35],
+                                                                                            s[0x3a],s[0x3b],s[0x3c],                 s[0x3f])
+        world.spoiler.set_map('swaps', text_output, world.owswaps[player][0], player)
     
     # apply tile logical connections
     for owid in ow_connections.keys():
@@ -1598,21 +1616,21 @@ flute_data = {
 }
 
 tile_swap_spoiler_table = \
-"""            0 1 2 3 4 5 6 7
+"""                       0 1 2 3 4 5 6 7
                       +---+-+---+---+-+
-      01234567   A(00)|   |%s|   |   |%s|
-     +--------+       | %s +-+ %s | %s +-+
-A(00)|%s %s%s %s %s|  B(08)|   |%s|   |   |%s|
-B(08)|  %s    %s|       +-+-+-+-+-+-+-+-+
-C(10)|%s%s%s%s%s%s%s%s|  C(10)|%s|%s|%s|%s|%s|%s|%s|%s|
-D(18)|%s %s%s %s%s |       +-+-+-+-+-+-+-+-+
-E(20)|  %s  %s  |  D(18)|   |%s|   |%s|   |
-F(28)|%s%s%s%s%s%s%s%s|       | %s +-+ %s +-+ %s |
-G(30)|%s %s%s%s%s %s|  E(20)|   |%s|   |%s|   |
-H(38)|  %s%s%s  %s|       +-+-+-+-+-+-+-+-+
-     +--------+  F(28)|%s|%s|%s|%s|%s|%s|%s|%s|
+      01234567   A(00)|   |s|   |   |s|
+     +--------+       | s +-+ s | s +-+
+A(00)|s ss s s|  B(08)|   |s|   |   |s|
+B(08)|  s    s|       +-+-+-+-+-+-+-+-+
+C(10)|ssssssss|  C(10)|s|s|s|s|s|s|s|s|
+D(18)|s ss ss |       +-+-+-+-+-+-+-+-+
+E(20)|  s  s  |  D(18)|   |s|   |s|   |
+F(28)|ssssssss|       | s +-+ s +-+ s |
+G(30)|s ssss s|  E(20)|   |s|   |s|   |
+H(38)|  sss  s|       +-+-+-+-+-+-+-+-+
+     +--------+  F(28)|s|s|s|s|s|s|s|s|
                       +-+-+-+-+-+-+-+-+
-                 G(30)|   |%s|%s|%s|   |%s|
-                      | %s +-+-+-+ %s +-+
-                 H(38)|   |%s|%s|%s|   |%s|
+                 G(30)|   |s|s|s|   |s|
+                      | s +-+-+-+ s +-+
+                 H(38)|   |s|s|s|   |s|
                       +---+-+-+-+---+-+"""
