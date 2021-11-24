@@ -149,7 +149,10 @@ OWPreserveMirrorSprite:
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
         rtl ; if OW Crossed, skip world check and continue
     .vanilla
-    lda $7ef3ca : bne .deleteMirror
+    lda InvertedMode : beq +
+        lda $7ef3ca : beq .deleteMirror
+        rtl
+    + lda $7ef3ca : bne .deleteMirror
         rtl
 
     .deleteMirror
