@@ -1,6 +1,6 @@
 # Changelog
 
-### 0.2.3.0
+### 0.2.3.0/1
 - Fixed issue in Crossed OW where mirror portal sprites would disappear when changing worlds
 - Added Big Red Bomb logic to support using residual mirror portals for later re-entry
 - Suppressed irrelevant paths in spoiler playthru
