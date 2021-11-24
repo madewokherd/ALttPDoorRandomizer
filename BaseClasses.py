@@ -3104,7 +3104,7 @@ class Spoiler(object):
             displayed_regions = []
             for location, path in sorted(self.paths.items()):
                 if self.world.players == 1:
-                    region = self.world.get_location(location, 1).parent_region
+                    region = self.world.get_location(location.split(' @', 1)[0], 1).parent_region
                     if region.name in displayed_regions:
                         continue
                     displayed_regions.append(region.name)
