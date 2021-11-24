@@ -3101,7 +3101,13 @@ class Spoiler(object):
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             outfile.write('\n\nPaths:\n\n')
             path_listings = []
+            displayed_regions = []
             for location, path in sorted(self.paths.items()):
+                if self.world.players == 1:
+                    region = self.world.get_location(location, 1).parent_region
+                    if region.name in displayed_regions:
+                        continue
+                    displayed_regions.append(region.name)
                 if location not in self.suppress_spoiler_locations:
                     path_lines = []
                     for region, exit in path:
