@@ -3030,7 +3030,7 @@ class Spoiler(object):
             if self.overworlds:
                 outfile.write('\n\nOverworld:\n\n')
                 # overworld tile swaps
-                if self.maps['swaps']:
+                if 'swaps' in self.maps:
                     outfile.write('OW Tile Swaps:\n')
                     for player in self.maps['swaps']:
                         if self.world.players > 1:
