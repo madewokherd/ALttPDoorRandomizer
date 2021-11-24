@@ -2734,6 +2734,8 @@ class Spoiler(object):
         self.shops = []
         self.bosses = OrderedDict()
 
+        self.suppress_spoiler_locations = ['Big Bomb', 'Dark Blacksmith Ruins', 'Frog', 'Middle Aged Man']
+
     def set_overworld(self, entrance, exit, direction, player):
         if self.world.players == 1:
             self.overworlds[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
@@ -2921,7 +2923,7 @@ class Spoiler(object):
         if self.shops:
             out['Shops'] = self.shops
         out['playthrough'] = self.playthrough
-        out['paths'] = self.paths
+        out['paths'] = {l:p for (l, p) in self.paths if l not in self.suppress_spoiler_locations}
         out['Bosses'] = self.bosses
         out['meta'] = self.metadata
 
@@ -3107,13 +3109,14 @@ class Spoiler(object):
             outfile.write('\n\nPaths:\n\n')
             path_listings = []
             for location, path in sorted(self.paths.items()):
-                path_lines = []
-                for region, exit in path:
-                    if exit is not None:
-                        path_lines.append("{} -> {}".format(self.world.fish.translate("meta","rooms",region), self.world.fish.translate("meta","entrances",exit)))
-                    else:
-                        path_lines.append(self.world.fish.translate("meta","rooms",region))
-                path_listings.append("{}\n        {}".format(self.world.fish.translate("meta","locations",location), "\n   =>   ".join(path_lines)))
+                if location not in self.suppress_spoiler_locations:
+                    path_lines = []
+                    for region, exit in path:
+                        if exit is not None:
+                            path_lines.append("{} -> {}".format(self.world.fish.translate("meta","rooms",region), self.world.fish.translate("meta","entrances",exit)))
+                        else:
+                            path_lines.append(self.world.fish.translate("meta","rooms",region))
+                    path_listings.append("{}\n        {}".format(self.world.fish.translate("meta","locations",location), "\n   =>   ".join(path_lines)))
 
             outfile.write('\n'.join(path_listings))
 
