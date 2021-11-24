@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.2.3.0
+- Fixed issue in Crossed OW where mirror portal sprites would disappear when changing worlds
+- Added Big Red Bomb logic to support using residual mirror portals for later re-entry
+- Suppressed irrelevant paths in spoiler playthru
+- Suppressed identical paths in spoiler playthru if multiple locations within the same region contain progression
+
 ### 0.2.2.3
 - Fixed GT entrance not being opened when Inverted and WDM is Tile Swapped
 - The Goal sign is moved to the area where the hole will be (always in opposite world as starting)
