@@ -140,8 +140,8 @@ def link_overworld(world, player):
 
         # update spoiler
         s = list(map(lambda x: ' ' if x not in world.owswaps[player][0] else 'S', [i for i in range(0x40)]))
-        text_output = tile_swap_spoiler_table.replace('s', '%s') % (             s[0x02],                                s[0x07],
-                                                                                    s[0x00],                s[0x03],        s[0x05],
+        text_output = tile_swap_spoiler_table.replace('s', '%s') % (                         s[0x02],                                s[0x07],
+                                                                                 s[0x00],                s[0x03],        s[0x05],
             s[0x00],        s[0x02],s[0x03],        s[0x05],        s[0x07],                 s[0x0a],                                s[0x0f],
                             s[0x0a],                                s[0x0f],
             s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17], s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17],
@@ -150,10 +150,10 @@ def link_overworld(world, player):
             s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],     s[0x18],                s[0x1b],                s[0x1e],
             s[0x30],        s[0x32],s[0x33],s[0x34],s[0x35],        s[0x37],                 s[0x22],                s[0x25],
                             s[0x3a],s[0x3b],s[0x3c],                s[0x3f],
-                                                                                s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],
-                                                                                                s[0x32],s[0x33],s[0x34],                s[0x37],
-                                                                                    s[0x30],                                s[0x35],
-                                                                                            s[0x3a],s[0x3b],s[0x3c],                 s[0x3f])
+                                                                             s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],
+                                                                                             s[0x32],s[0x33],s[0x34],                s[0x37],
+                                                                                 s[0x30],                                s[0x35],
+                                                                                             s[0x3a],s[0x3b],s[0x3c],                s[0x3f])
         world.spoiler.set_map('swaps', text_output, world.owswaps[player][0], player)
     
     # apply tile logical connections
