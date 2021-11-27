@@ -1,7 +1,8 @@
 import logging
 from collections import defaultdict
 import RaceRandom as random
-from BaseClasses import CollectionState, RegionType, Terrain
+from BaseClasses import CollectionState, RegionType
+from OverworldShuffle import build_accessible_region_list
 from OWEdges import OWTileRegions
 
 entrance_pool = list()
@@ -28,6 +29,7 @@ def link_entrances(world, player):
     Old_Man_House = Old_Man_House_Base.copy()
     Cave_Three_Exits = Cave_Three_Exits_Base.copy()
 
+    from OverworldShuffle import build_sectors
     sectors = build_sectors(world, player)
 
     # modifications to lists
@@ -1633,100 +1635,6 @@ def unbias_dungeons(Dungeon_Exits):
 
     tuplize_lists_in_list(Dungeon_Exits)
 
-
-def build_sectors(world, player):
-    from Main import copy_world
-    from OWEdges import OWTileRegions
-    
-    # perform accessibility check on duplicate world
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
-    base_world = copy_world(world)
-    world.key_logic = {}
-    
-    # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
-    regions = list(OWTileRegions.copy().keys())
-    sectors = list()
-    while(len(regions) > 0):
-        explored_regions = build_accessible_region_list(base_world, regions[0], player, False, False, False, False)
-        regions = [r for r in regions if r not in explored_regions]
-        unique_regions = [_ for i in range(len(sectors)) for _ in sectors[i]]
-        if (any(r in unique_regions for r in explored_regions)):
-            for s in range(len(sectors)):
-                if (any(r in sectors[s] for r in explored_regions)):
-                    sectors[s] = set(list(sectors[s]) + list(explored_regions))
-                    break
-        else:
-            sectors.append(explored_regions)
-    
-    # remove water regions if Flippers not in starting inventory
-    if not any(map(lambda i: i.name == 'Flippers', world.precollected_items)):
-        for s in range(len(sectors)):
-            terrains = list()
-            for regionname in sectors[s]:
-                region = world.get_region(regionname, player)
-                if region.terrain == Terrain.Land:
-                    terrains.append(regionname)
-            sectors[s] = terrains
-    
-    # within each group, split into contiguous regions accessible only with starting inventory
-    for s in range(len(sectors)):
-        regions = list(sectors[s]).copy()
-        sectors2 = list()
-        while(len(regions) > 0):
-            explored_regions = build_accessible_region_list(base_world, regions[0], player, False, False, True, False)
-            regions = [r for r in regions if r not in explored_regions]
-            unique_regions = [_ for i in range(len(sectors2)) for _ in sectors2[i]]
-            if (any(r in unique_regions for r in explored_regions)):
-                for s2 in range(len(sectors2)):
-                    if (any(r in sectors2[s2] for r in explored_regions)):
-                        sectors2[s2] = set(list(sectors2[s2]) + list(explored_regions))
-                        break
-            else:
-                sectors2.append(explored_regions)
-        sectors[s] = sectors2
-
-    return sectors
-
-
-def build_accessible_region_list(world, start_region, player, build_copy_world=False, cross_world=False, region_rules=True, ignore_ledges = False):
-    from Main import copy_world
-    from Items import ItemFactory
-    
-    def explore_region(region_name, region=None):
-        explored_regions.add(region_name)
-        if not region:
-            region = base_world.get_region(region_name, player)
-        for exit in region.exits:
-            if exit.connected_region is not None:
-                if any(map(lambda i: i.name == 'Ocarina', base_world.precollected_items)) and exit.spot_type == 'Flute':
-                    fluteregion = exit.connected_region
-                    for flutespot in fluteregion.exits:
-                        if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
-                            explore_region(flutespot.connected_region.name, flutespot.connected_region)
-                elif exit.connected_region.name not in explored_regions \
-                        and (exit.connected_region.type == region.type or (cross_world and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld])) \
-                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.spot_type != 'Ledge'):
-                    explore_region(exit.connected_region.name, exit.connected_region)
-    
-    if build_copy_world:
-        for player in range(1, world.players + 1):
-            world.key_logic[player] = {}
-        base_world = copy_world(world)
-        base_world.override_bomb_check = True
-        world.key_logic = {}
-    else:
-        base_world = world
-    
-    connect_simple(base_world, 'Links House S&Q', start_region, player)
-    blank_state = CollectionState(base_world)
-    if base_world.mode[player] == 'standard':
-        blank_state.collect(ItemFactory('Zelda Delivered', player), True)
-    explored_regions = set()
-    explore_region(start_region)
-
-    return explored_regions
-    
 
 def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True, include_one_ways=False):
     from Main import copy_world
