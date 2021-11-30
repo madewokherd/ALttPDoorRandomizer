@@ -954,6 +954,10 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Zora Waterfall Water Drop', 'Zora Waterfall Water'), #flippers
                          ('Zora Waterfall Water Entry', 'Zora Waterfall Water'), #flippers
                          ('Waterfall of Wishing Cave Entry', 'Waterfall of Wishing Cave'), #flippers
+                         ('Lost Woods Pass Hammer (North)', 'Lost Woods Pass Portal Area'), #hammer
+                         ('Lost Woods Pass Hammer (South)', 'Lost Woods Pass East Top Area'), #hammer
+                         ('Lost Woods Pass Rock (North)', 'Lost Woods Pass East Bottom Area'), #mitts
+                         ('Lost Woods Pass Rock (South)', 'Lost Woods Pass Portal Area'), #mitts
                          ('Bonk Rock Ledge Drop', 'Sanctuary Area'),
                          ('Graveyard Ledge Drop', 'Graveyard Area'),
                          ('Kings Grave Outer Rocks', 'Kings Grave Area'), #mitts
@@ -1041,8 +1045,10 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Bumper Cave Entrance Drop', 'Bumper Cave Area'),
                          ('Skull Woods Pass Bush Row (West)', 'Skull Woods Pass East Top Area'), #pearl
                          ('Skull Woods Pass Bush Row (East)', 'Skull Woods Pass West Area'), #pearl
-                         ('Skull Woods Pass Rock (Top)', 'Skull Woods Pass East Bottom Area'), #mitts
-                         ('Skull Woods Pass Rock (Bottom)', 'Skull Woods Pass East Top Area'), #mitts
+                         ('Skull Woods Pass Bush (North)', 'Skull Woods Pass Portal Area'), #pearl
+                         ('Skull Woods Pass Bush (South)', 'Skull Woods Pass East Top Area'), #pearl
+                         ('Skull Woods Pass Rock (North)', 'Skull Woods Pass East Bottom Area'), #mitts
+                         ('Skull Woods Pass Rock (South)', 'Skull Woods Pass Portal Area'), #mitts
                          ('Dark Graveyard Bush (South)', 'Dark Graveyard North'), #pearl
                          ('Dark Graveyard Bush (North)', 'Dark Graveyard Area'), #pearl
                          ('Qirn Jump Water Drop', 'Qirn Jump Water'), #flippers
@@ -1252,15 +1258,15 @@ ow_connections = {
     0x10: ([
             ('Lost Woods Pass West Mirror Spot', 'Lost Woods Pass West Area'),
             ('Lost Woods Pass East Top Mirror Spot', 'Lost Woods Pass East Top Area'),
+            ('Lost Woods Pass Portal Mirror Spot', 'Lost Woods Pass Portal Area'),
             ('Lost Woods Pass East Bottom Mirror Spot', 'Lost Woods Pass East Bottom Area'),
-            ('Kakariko Teleporter (Hammer)', 'Skull Woods Pass East Top Area'),
-            ('Kakariko Teleporter (Rock)', 'Skull Woods Pass East Top Area')
+            ('Kakariko Teleporter', 'Skull Woods Pass Portal Area')
         ], [
             ('Skull Woods Pass West Mirror Spot', 'Skull Woods Pass West Area'),
             ('Skull Woods Pass East Top Mirror Spot', 'Skull Woods Pass East Top Area'),
+            ('Skull Woods Pass Portal Mirror Spot', 'Skull Woods Pass Portal Area'),
             ('Skull Woods Pass East Bottom Mirror Spot', 'Skull Woods Pass East Bottom Area'),
-            ('West Dark World Teleporter (Hammer)', 'Lost Woods Pass East Top Area'),
-            ('West Dark World Teleporter (Rock)', 'Lost Woods Pass East Bottom Area')
+            ('West Dark World Teleporter', 'Lost Woods Pass Portal Area')
         ]),
     0x11: ([
             ('Kakariko Fortune Mirror Spot', 'Kakariko Fortune Area')
