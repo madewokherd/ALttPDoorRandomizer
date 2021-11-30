@@ -280,48 +280,58 @@ def link_overworld(world, player):
         trimmed_groups = remove_reserved(world, trimmed_groups, connected_edges, player)
         groups = reorganize_groups(world, trimmed_groups, player)
         
-        if world.mode[player] == 'standard':
-            random.shuffle(groups[2:]) # keep first 2 groups (Standard) first
-        else:
-            random.shuffle(groups)
+        tries = 10
+        valid_layout = False
+        connected_edge_cache = connected_edges.copy()
+        while not valid_layout and tries > 0:
+            connected_edges = connected_edge_cache.copy()
 
-        for (forward_edge_sets, back_edge_sets) in groups:
-            assert len(forward_edge_sets) == len(back_edge_sets)
-            random.shuffle(forward_edge_sets)
-            random.shuffle(back_edge_sets)
-            if len(forward_edge_sets) > 0:
-                f = 0
-                b = 0
-                while f < len(forward_edge_sets) and b < len(back_edge_sets):
-                    forward_set = forward_edge_sets[f]
-                    back_set = back_edge_sets[b]
-                    while forward_set[0] in connected_edges:
+            if world.mode[player] == 'standard':
+                random.shuffle(groups[2:]) # keep first 2 groups (Standard) first
+            else:
+                random.shuffle(groups)
+
+            for (forward_edge_sets, back_edge_sets) in groups:
+                assert len(forward_edge_sets) == len(back_edge_sets)
+                random.shuffle(forward_edge_sets)
+                random.shuffle(back_edge_sets)
+                if len(forward_edge_sets) > 0:
+                    f = 0
+                    b = 0
+                    while f < len(forward_edge_sets) and b < len(back_edge_sets):
+                        forward_set = forward_edge_sets[f]
+                        back_set = back_edge_sets[b]
+                        while forward_set[0] in connected_edges:
+                            f += 1
+                            if f < len(forward_edge_sets):
+                                forward_set = forward_edge_sets[f]
+                            else:
+                                forward_set = None
+                                break
                         f += 1
-                        if f < len(forward_edge_sets):
-                            forward_set = forward_edge_sets[f]
-                        else:
-                            forward_set = None
-                            break
-                    f += 1
-                    while back_set[0] in connected_edges:
+                        while back_set[0] in connected_edges:
+                            b += 1
+                            if b < len(back_edge_sets):
+                                back_set = back_edge_sets[b]
+                            else:
+                                back_set = None
+                                break
                         b += 1
-                        if b < len(back_edge_sets):
-                            back_set = back_edge_sets[b]
-                        else:
-                            back_set = None
-                            break
-                    b += 1
-                    if forward_set is not None and back_set is not None:
-                        assert len(forward_set) == len(back_set)
-                        for (forward_edge, back_edge) in zip(forward_set, back_set):
-                            connect_two_way(world, forward_edge, back_edge, player, connected_edges)
-                    elif forward_set is not None:
-                        logging.getLogger('').warning("Edge '%s' could not find a valid connection" % forward_set[0])
-                    elif back_set is not None:
-                        logging.getLogger('').warning("Edge '%s' could not find a valid connection" % back_set[0])
-    assert len(connected_edges) == len(default_connections) * 2, connected_edges
+                        if forward_set is not None and back_set is not None:
+                            assert len(forward_set) == len(back_set)
+                            for (forward_edge, back_edge) in zip(forward_set, back_set):
+                                connect_two_way(world, forward_edge, back_edge, player, connected_edges)
+                        elif forward_set is not None:
+                            logging.getLogger('').warning("Edge '%s' could not find a valid connection" % forward_set[0])
+                        elif back_set is not None:
+                            logging.getLogger('').warning("Edge '%s' could not find a valid connection" % back_set[0])
+            assert len(connected_edges) == len(default_connections) * 2, connected_edges
+            
+            world.owsectors[player] = build_sectors(world, player)
+            valid_layout = validate_layout(world, player)
 
-    # TODO: Reshuffle some areas if impossible to reach, exception if non-dungeon ER enabled or if area is LW with no portal and flute shuffle is enabled
+            tries -= 1
+        assert valid_layout, 'Could not find a valid OW layout'
 
     # flute shuffle
     def connect_flutes(flute_destinations):
@@ -913,6 +923,20 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     explore_region(start_region)
 
     return explored_regions
+
+def validate_layout(world, player):
+    sectors = [[r for l in s for r in l] for s in world.owsectors[player]]
+    for sector in sectors:
+        entrances_present = False
+        for region_name in sector:
+            region = world.get_region(region_name, player)
+            if any(x.spot_type == 'Entrance' for x in region.exits):
+                entrances_present = True
+                break
+        if not entrances_present and not all(r in isolated_regions for r in sector):
+            return False
+
+    return True
     
 test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
@@ -1669,6 +1693,11 @@ default_connections = [#('Lost Woods NW', 'Master Sword Meadow SC'),
                         ('West Dark Death Mountain ES', 'East Dark Death Mountain WS'),
                         ('East Dark Death Mountain EN', 'Turtle Rock WN')
                         ]
+
+isolated_regions = [
+    'Death Mountain Floating Island',
+    'Mimic Cave Ledge'
+]
 
 flute_data = {
     #Slot    LW Region                         DW Region                            OWID   VRAM    BG Y    BG X   Link Y  Link X   Cam Y   Cam X   Unk1    Unk2   IconY   IconX    AltY    AltX
