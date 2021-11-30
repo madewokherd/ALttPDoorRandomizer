@@ -30,7 +30,8 @@ def link_entrances(world, player):
     Cave_Three_Exits = Cave_Three_Exits_Base.copy()
 
     from OverworldShuffle import build_sectors
-    sectors = build_sectors(world, player)
+    if not world.owsectors[player]:
+        world.owsectors[player] = build_sectors(world, player)
 
     # modifications to lists
     if invFlag == (0x1b in world.owswaps[player][0] and world.owMixed[player]):
@@ -243,10 +244,10 @@ def link_entrances(world, player):
 
         if invFlag:
             # place dark sanc
-            place_dark_sanc(world, sectors, player)
+            place_dark_sanc(world, player)
         
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, player)
         
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
@@ -273,10 +274,10 @@ def link_entrances(world, player):
 
         # place dark sanc
         if invFlag:
-            place_dark_sanc(world, sectors, player)
+            place_dark_sanc(world, player)
         
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, player)
         
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
@@ -333,10 +334,10 @@ def link_entrances(world, player):
 
         # place dark sanc
         if invFlag:
-            place_dark_sanc(world, sectors, player, list(zip(*drop_connections + dropexit_connections))[0])
+            place_dark_sanc(world, player, list(zip(*drop_connections + dropexit_connections))[0])
         
         # place links house
-        links_house = place_links_house(world, sectors, player, list(zip(*drop_connections + dropexit_connections))[0])
+        links_house = place_links_house(world, player, list(zip(*drop_connections + dropexit_connections))[0])
 
         # determine pools
         lw_entrances = list()
@@ -410,7 +411,7 @@ def link_entrances(world, player):
         scramble_holes(world, player)
 
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, player)
         
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
@@ -496,7 +497,7 @@ def link_entrances(world, player):
         scramble_holes(world, player)
 
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, player)
         
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
@@ -544,10 +545,10 @@ def link_entrances(world, player):
 
         # place dark sanc
         if invFlag:
-            place_dark_sanc(world, sectors, player)
+            place_dark_sanc(world, player)
         
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, player)
         
         # place blacksmith, has limited options
         place_blacksmith(world, links_house, player)
@@ -618,10 +619,10 @@ def link_entrances(world, player):
 
         # place dark sanc
         if invFlag:
-            place_dark_sanc(world, sectors, player)
+            place_dark_sanc(world, player)
 
         # place links house
-        links_house = place_links_house(world, sectors, player)
+        links_house = place_links_house(world, player)
 
         # place blacksmith, place sanc exit first for additional blacksmith candidates
         doors = list(entrance_pool)
@@ -1373,7 +1374,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
     connect_caves(world, lw_entrances, dw_entrances, dungeon_exits, player)
 
 
-def place_links_house(world, sectors, player, ignore_list=[]):
+def place_links_house(world, player, ignore_list=[]):
     invFlag = world.mode[player] == 'inverted'
     if world.mode[player] == 'standard' or not world.shufflelinks[player]:
         links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
@@ -1385,9 +1386,9 @@ def place_links_house(world, sectors, player, ignore_list=[]):
                     break
         
         if invFlag and isinstance(dark_sanc, str):
-            links_house_doors = [i for i in get_distant_entrances(world, dark_sanc, sectors, player) if i in entrance_pool]
+            links_house_doors = [i for i in get_distant_entrances(world, dark_sanc, player) if i in entrance_pool]
         else:
-            links_house_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
+            links_house_doors = [i for i in get_starting_entrances(world, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
         if world.shuffle[player] in ['lite', 'lean']:
             links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
         
@@ -1399,11 +1400,11 @@ def place_links_house(world, sectors, player, ignore_list=[]):
     return links_house
 
 
-def place_dark_sanc(world, sectors, player, ignore_list=[]):
+def place_dark_sanc(world, player, ignore_list=[]):
     if not world.shufflelinks[player]:
-        sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop', sectors, player) if i in entrance_pool]
+        sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop', player) if i in entrance_pool]
     else:
-        sanc_doors = [i for i in get_starting_entrances(world, sectors, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
+        sanc_doors = [i for i in get_starting_entrances(world, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
     if world.shuffle[player] in ['lite', 'lean']:
         sanc_doors = [e for e in sanc_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
     
@@ -1674,7 +1675,7 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     return entrances
     
 
-def get_starting_entrances(world, sectors, player, force_starting_world=True):
+def get_starting_entrances(world, player, force_starting_world=True):
     invFlag = world.mode[player] == 'inverted'
 
     # find largest walkable sector
@@ -1683,7 +1684,7 @@ def get_starting_entrances(world, sectors, player, force_starting_world=True):
     entrances = list()
     while not len(entrances):
         while (sector is None):
-            sector = max(sectors, key=lambda x: len(x) - (0 if x not in invalid_sectors else 1000))
+            sector = max(world.owsectors[player], key=lambda x: len(x) - (0 if x not in invalid_sectors else 1000))
             if not ((world.owCrossed[player] == 'polar' and world.owMixed[player]) or world.owCrossed[player] not in ['none', 'polar']) \
                     and world.get_region(next(iter(next(iter(sector)))), player).type != (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
                 invalid_sectors.append(sector)
@@ -1707,10 +1708,10 @@ def get_starting_entrances(world, sectors, player, force_starting_world=True):
     return entrances
 
 
-def get_distant_entrances(world, start_entrance, sectors, player):
+def get_distant_entrances(world, start_entrance, player):
     # get walkable sector in which initial entrance was placed
     start_region = world.get_entrance(start_entrance, player).parent_region.name
-    regions = next(s for s in sectors if any(start_region in w for w in s))
+    regions = next(s for s in world.owsectors[player] if any(start_region in w for w in s))
     regions = next(w for w in regions if start_region in w)
     
     # eliminate regions surrounding the initial entrance until less than half of the candidate regions remain

@@ -76,11 +76,12 @@ class World(object):
         self.dynamic_locations = []
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
-        self.owswaps = {}
-        self.owwhirlpools = {}
         self.owedges = []
         self._owedge_cache = {}
+        self.owswaps = {}
+        self.owwhirlpools = {}
         self.owflutespots = {}
+        self.owsectors = {}
         self.doors = []
         self._door_cache = {}
         self.paired_doors = {}
@@ -108,6 +109,7 @@ class World(object):
             set_player_attr('player_names', [])
             set_player_attr('owswaps', [[],[],[]])
             set_player_attr('owwhirlpools', [])
+            set_player_attr('owsectors', None)
             set_player_attr('remote_items', False)
             set_player_attr('required_medallions', ['Ether', 'Quake'])
             set_player_attr('bottle_refills', ['Bottle (Green Potion)', 'Bottle (Green Potion)'])
