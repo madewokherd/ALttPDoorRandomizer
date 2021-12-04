@@ -888,7 +888,6 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     from Main import copy_world
     from BaseClasses import CollectionState
     from Items import ItemFactory
-    from Utils import stack_size3a
     
     def explore_region(region_name, region=None):
         explored_regions.add(region_name)
