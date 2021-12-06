@@ -326,6 +326,8 @@ def create_owedges(world, player):
     world.initialize_owedges(edges)
 
 def create_owedge(player, name, owIndex, direction, terrain, edge_id, owSlotIndex=0xff):
+    if name not in OWExitTypes['OWEdge']:
+        OWExitTypes['OWEdge'].append(name)
     return OWEdge(player, name, owIndex, direction, terrain, edge_id, owSlotIndex)
 
 
@@ -1392,6 +1394,7 @@ parallel_links = bidict({'Lost Woods SW': 'Skull Woods SW',
                         })
 
 OWExitTypes = {
+    'OWEdge': [],
     'Ledge': ['West Death Mountain Drop',
             'Spectacle Rock Drop',
             'East Death Mountain Spiral Ledge Drop',
