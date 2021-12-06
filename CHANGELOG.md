@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.3.3
+- Added OW Layout validation that reduces the cases where some screens are unreachable
+- Fixed issue with mirror portals showing up in DW in Crossed OW
+- Corrected Lost/Skull Woods Pass regions to be more accurate
+
 ### 0.2.3.0/1/2
 - Fixed issue in Crossed OW where mirror portal sprites would disappear when changing worlds
 - Added Big Red Bomb logic to support using residual mirror portals for later re-entry
