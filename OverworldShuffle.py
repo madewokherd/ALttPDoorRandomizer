@@ -265,6 +265,8 @@ def link_overworld(world, player):
                 assert len(forward_set) == len(back_set)
                 for (forward_edge, back_edge) in zip(forward_set, back_set):
                     connect_two_way(world, forward_edge, back_edge, player, connected_edges)
+
+        world.owsectors[player] = build_sectors(world, player)
     else:
         if world.owKeepSimilar[player] and world.owShuffle[player] in ['vanilla', 'parallel']:
             for exitname, destname in parallelsimilar_connections:
@@ -334,6 +336,7 @@ def link_overworld(world, player):
         assert valid_layout, 'Could not find a valid OW layout'
 
     # flute shuffle
+    logging.getLogger('').debug('Shuffling flute spots')
     def connect_flutes(flute_destinations):
         for o in range(0, len(flute_destinations)):
             owslot = flute_destinations[o]
@@ -376,23 +379,37 @@ def link_overworld(world, player):
             flute_pool.remove(owid)
             new_spots.append(owid)
             return True
+        
+        # determine sectors (isolated groups of regions) to place flute spots
+        flute_regions = {(f[0][0] if f[1] not in world.owswaps[player][0] else f[0][1]) : o for o, f in flute_data.items()}
+        flute_sectors = [(len([r for l in s for r in l]), [r for l in s for r in l if r in flute_regions]) for s in world.owsectors[player]]
+        flute_sectors = [s for s in flute_sectors if len(s[1]) > 0]
+        region_total = sum([c for c,_ in flute_sectors])
+        sector_total = len(flute_sectors)
 
-        # guarantee desert/mire access
-        addSpot(0x38)
+        # reserve a number of flute spots for each sector
+        flute_spots = 8
+        for sector in flute_sectors:
+            sector_total -= 1
+            spots_to_place = min(flute_spots - sector_total, max(1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
+            target_spots = len(new_spots) + spots_to_place
+            
+            if 'Desert Palace Teleporter Ledge' in sector[1] or 'Misery Mire Teleporter Ledge' in sector[1]:
+                addSpot(0x38) # guarantee desert/mire access
 
-        # guarantee mountain access
-        if world.owShuffle[player] == 'vanilla':
-            mountainIds = [0x0b, 0x0e, 0x07]
-            addSpot(mountainIds[random.randint(0, 2)])
+            random.shuffle(sector[1])
+            f = 0
+            while len(new_spots) < target_spots:
+                if f >= len(sector[1]):
+                    f = 0
+                if sector[1][f] not in new_spots:
+                    addSpot(flute_regions[sector[1][f]])
+                f += 1
 
-        random.shuffle(flute_pool)
-        f = 0
-        while len(new_spots) < 8:
-            if f >= len(flute_pool):
-                f = 0
-            if flute_pool[f] not in new_spots:
-                addSpot(flute_pool[f])
-            f += 1
+            region_total -= sector[0]
+            flute_spots -= spots_to_place
+        
+        # connect new flute spots
         new_spots.sort()
         world.owflutespots[player] = new_spots
         connect_flutes(new_spots)
