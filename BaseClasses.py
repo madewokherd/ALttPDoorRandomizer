@@ -2749,9 +2749,9 @@ class Spoiler(object):
         if type not in self.maps:
             self.maps[type] = {}
         if self.world.players == 1:
-            self.maps[type][player] = OrderedDict([('text', text), ('data', data)])
+            self.maps[(type, player)] = OrderedDict([('type', type), ('text', text), ('data', data)])
         else:
-            self.maps[type][player] = OrderedDict([('player', player), ('text', text), ('data', data)])
+            self.maps[(type, player)] = OrderedDict([('player', player), ('type', type), ('text', text), ('data', data)])
 
     def set_entrance(self, entrance, exit, direction, player):
         if self.world.players == 1:
