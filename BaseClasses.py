@@ -2746,8 +2746,6 @@ class Spoiler(object):
             self.overworlds[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
 
     def set_map(self, type, text, data, player):
-        if type not in self.maps:
-            self.maps[type] = {}
         if self.world.players == 1:
             self.maps[(type, player)] = OrderedDict([('type', type), ('text', text), ('data', data)])
         else:
@@ -3032,12 +3030,15 @@ class Spoiler(object):
             if self.overworlds:
                 outfile.write('\n\nOverworld:\n\n')
                 # overworld tile swaps
-                if 'swaps' in self.maps:
-                    outfile.write('OW Tile Swaps:\n')
-                    for player in self.maps['swaps']:
+                for player in range(1, self.world.players + 1):
+                    if ('swaps', player) in self.maps:
+                        outfile.write('OW Tile Swaps:\n')
+                        break
+                for player in range(1, self.world.players + 1):
+                    if ('swaps', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps['swaps'][player]['text'] + '\n\n')
+                        outfile.write(self.maps[('swaps', player)]['text'] + '\n\n')
 
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
