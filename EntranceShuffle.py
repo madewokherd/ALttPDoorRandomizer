@@ -40,9 +40,9 @@ def link_entrances(world, player):
         connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
     else:
         entrance_pool.remove('Pyramid Hole')
-        entrance_pool.add('Inverted Pyramid Hole')
+        entrance_pool.append('Inverted Pyramid Hole')
         entrance_pool.remove('Pyramid Entrance')
-        entrance_pool.add('Inverted Pyramid Entrance')
+        entrance_pool.append('Inverted Pyramid Entrance')
         drop_connections.append(tuple(('Inverted Pyramid Hole', 'Pyramid')))
         dropexit_connections.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
         connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
