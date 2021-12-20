@@ -1658,7 +1658,8 @@ class Entrance(object):
                 from OWEdges import OWTileRegions
                 from OverworldShuffle import ow_connections
                 owid = OWTileRegions[follower_region.name]
-                (mirror_map, other_world) = ow_connections[owid % 0x40]
+                (mirror_map_orig, other_world) = ow_connections[owid % 0x40]
+                mirror_map = list(mirror_map_orig).copy()
                 mirror_map.extend(other_world)
                 mirror_exit = None
                 while len(mirror_map):
@@ -1710,7 +1711,8 @@ class Entrance(object):
                     from OWEdges import OWTileRegions
                     from OverworldShuffle import ow_connections
                     owid = OWTileRegions[dest_region.name]
-                    (mirror_map, other_world) = ow_connections[owid % 0x40]
+                    (mirror_map_orig, other_world) = ow_connections.copy()[owid % 0x40]
+                    mirror_map = list(mirror_map_orig).copy()
                     mirror_map.extend(other_world)
                     mirror_map = [(x, d) for (x, d) in mirror_map if x in [e.name for e in dest_region.exits]]
                     # loop thru potential places to leave a mirror portal

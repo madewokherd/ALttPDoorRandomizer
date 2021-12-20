@@ -1,5 +1,5 @@
 import logging
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import RaceRandom as random
 from BaseClasses import CollectionState, RegionType
 from OverworldShuffle import build_accessible_region_list
@@ -432,21 +432,21 @@ def link_entrances(world, player):
         connector_entrances = [e for e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] if e in (dw_entrances if not invFlag else lw_entrances)]
         connect_inaccessible_regions(world, [], connector_entrances, caves, player)
         if invFlag:
-            lw_dungeons = list(set(lw_dungeons) & set(caves))
+            lw_dungeons = list(OrderedDict.fromkeys(lw_dungeons + caves))
         else:
-            dw_dungeons = list(set(dw_dungeons) & set(caves))
+            dw_dungeons = list(OrderedDict.fromkeys(dw_dungeons + caves))
         
-        caves = list(set(Cave_Base) & set(caves)) + (lw_dungeons if not invFlag else dw_dungeons)
+        caves = list(OrderedDict.fromkeys(Cave_Base + caves)) + (lw_dungeons if not invFlag else dw_dungeons)
         connector_entrances = [e for e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] if e in (lw_entrances if not invFlag else dw_entrances)]
         connect_inaccessible_regions(world, connector_entrances, [], caves, player)
         if not invFlag:
-            lw_dungeons = list(set(lw_dungeons) & set(caves))
+            lw_dungeons = list(OrderedDict.fromkeys(lw_dungeons + caves))
         else:
-            dw_dungeons = list(set(dw_dungeons) & set(caves))
+            dw_dungeons = list(OrderedDict.fromkeys(dw_dungeons + caves))
         
         lw_dungeons = lw_dungeons + (Old_Man_House if not invFlag else [])
         dw_dungeons = dw_dungeons + ([] if not invFlag else Old_Man_House)
-        caves = list(set(Cave_Base) & set(caves)) + DW_Mid_Dungeon_Exits
+        caves = list(OrderedDict.fromkeys(Cave_Base + caves)) + DW_Mid_Dungeon_Exits
         
         # place old man, has limited options
         lw_entrances = [e for e in lw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
@@ -1429,10 +1429,10 @@ def place_blacksmith(world, links_house, player):
     
     if invFlag:
         dark_sanc = world.get_entrance('Dark Sanctuary Hint Exit', player).connected_region.name
-        blacksmith_doors = list(set(blacksmith_doors + list(build_accessible_entrance_list(world, dark_sanc, player, assumed_inventory, False, True, True))))
+        blacksmith_doors = list(OrderedDict.fromkeys(blacksmith_doors + list(build_accessible_entrance_list(world, dark_sanc, player, assumed_inventory, False, True, True))))
     elif world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
         sanc_region = world.get_entrance('Sanctuary Exit', player).connected_region.name
-        blacksmith_doors = list(set(blacksmith_doors + list(build_accessible_entrance_list(world, sanc_region, player, assumed_inventory, False, True, True))))
+        blacksmith_doors = list(OrderedDict.fromkeys(blacksmith_doors + list(build_accessible_entrance_list(world, sanc_region, player, assumed_inventory, False, True, True))))
     if world.shuffle[player] in ['lite', 'lean']:
         blacksmith_doors = [e for e in blacksmith_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
     
@@ -1491,7 +1491,7 @@ def junk_fill_inaccessible(world, player):
                 accessible_regions.append(region_name)
                 break
     for region_name in accessible_regions.copy():
-        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(base_world, region_name, player, False, True, False, False))))
+        accessible_regions = list(OrderedDict.fromkeys(accessible_regions + list(build_accessible_region_list(base_world, region_name, player, False, True, False, False))))
     world.inaccessible_regions[player] = [r for r in world.inaccessible_regions[player] if r not in accessible_regions]
     
     # get inaccessible entrances
@@ -1527,7 +1527,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
                 accessible_regions.append(region_name)
                 break
     for region_name in accessible_regions.copy():
-        accessible_regions = list(set(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, True, False, False))))
+        accessible_regions = list(OrderedDict.fromkeys(accessible_regions + list(build_accessible_region_list(world, region_name, player, True, True, False, False))))
     world.inaccessible_regions[player] = [r for r in world.inaccessible_regions[player] if r not in accessible_regions]
     
     # split inaccessible into 2 lists for each world
@@ -1665,12 +1665,12 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
                         new_regions.append(ledge)
         explored_regions.extend(new_regions)
     
-    entrances = set()
+    entrances = list()
     for region_name in explored_regions:
         region = base_world.get_region(region_name, player)
         for exit in region.exits:
             if exit.name in entrance_pool and (not exit_rules or exit.access_rule(blank_state)):
-                entrances.add(exit.name)
+                entrances.append(exit.name)
 
     return entrances
     
@@ -1798,7 +1798,7 @@ Cave_Three_Exits_Base = [('Spectacle Rock Cave Exit (Peak)', 'Spectacle Rock Cav
 Old_Man_House_Base = [('Old Man House Exit (Bottom)', 'Old Man House Exit (Top)')]
 
 
-Entrance_Pool_Base = {'Links House',
+Entrance_Pool_Base = ['Links House',
                     'Desert Palace Entrance (South)',
                     'Desert Palace Entrance (West)',
                     'Desert Palace Entrance (East)',
@@ -1936,9 +1936,9 @@ Entrance_Pool_Base = {'Links House',
                     'Skull Woods First Section Hole (West)',
                     'Skull Woods First Section Hole (East)',
                     'Skull Woods First Section Hole (North)',
-                    'Pyramid Hole'}
+                    'Pyramid Hole']
 
-Exit_Pool_Base = {'Links House Exit',
+Exit_Pool_Base = ['Links House Exit',
                 'Desert Palace Exit (South)',
                 'Desert Palace Exit (West)',
                 'Desert Palace Exit (East)',
@@ -2076,7 +2076,7 @@ Exit_Pool_Base = {'Links House Exit',
                 'Skull Left Drop',
                 'Skull Pinball',
                 'Skull Pot Circle',
-                'Pyramid'}
+                'Pyramid']
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
 mandatory_connections = [('Links House S&Q', 'Links House'),
