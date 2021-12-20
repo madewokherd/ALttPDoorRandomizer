@@ -119,6 +119,7 @@
   "ow_crossed": {
     "choices": [
       "none",
+      "allowed",
       "polar",
       "grouped",
       "limited",
