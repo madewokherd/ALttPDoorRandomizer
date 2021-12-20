@@ -307,9 +307,10 @@ def global_rules(world, player):
     set_rule(world.get_location('Thieves\' Town - Big Chest', player), lambda state: state.has('Hammer', player))
     for entrance in ['Thieves Basement Block Path', 'Thieves Blocked Entry Path', 'Thieves Conveyor Block Path', 'Thieves Conveyor Bridge Block Path']:
         set_rule(world.get_entrance(entrance, player), lambda state: state.can_lift_rocks(player))
-    for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
-        forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
-    forbid_item(world.get_location('Thieves\' Town - Blind\'s Cell', player), 'Big Key (Thieves Town)', player)
+
+    # I think these rules are unnecessary now - testing needed
+    # for location in ['Thieves\' Town - Blind\'s Cell', 'Thieves\' Town - Boss']:
+    #     forbid_item(world.get_location(location, player), 'Big Key (Thieves Town)', player)
     for location in ['Suspicious Maiden', 'Thieves\' Town - Blind\'s Cell']:
         set_rule(world.get_location(location, player), lambda state: state.has('Big Key (Thieves Town)', player))
     set_rule(world.get_location('Revealing Light', player), lambda state: state.has('Shining Light', player) and state.has('Maiden Rescued', player))
@@ -717,7 +718,7 @@ def default_rules(world, player):
 
     # Underworld Logic
     set_rule(world.get_entrance('Old Man Cave Exit (West)', player), lambda state: False)  # drop cannot be climbed up
-    set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has('Magic Mirror', player))  # can erase block
+    set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has_Mirror(player))  # can erase block, overwritten in noglitches
     set_rule(world.get_entrance('Bumper Cave Exit (Top)', player), lambda state: state.has('Cape', player))
     set_rule(world.get_entrance('Bumper Cave Exit (Bottom)', player), lambda state: state.has('Cape', player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('Superbunny Cave Exit (Bottom)', player), lambda state: False)  # Cannot get to bottom exit from top. Just exists for shuffling

@@ -1658,7 +1658,8 @@ class Entrance(object):
                 from OWEdges import OWTileRegions
                 from OverworldShuffle import ow_connections
                 owid = OWTileRegions[follower_region.name]
-                (mirror_map, other_world) = ow_connections[owid % 0x40]
+                (mirror_map_orig, other_world) = ow_connections[owid % 0x40]
+                mirror_map = list(mirror_map_orig).copy()
                 mirror_map.extend(other_world)
                 mirror_exit = None
                 while len(mirror_map):
@@ -1710,7 +1711,8 @@ class Entrance(object):
                     from OWEdges import OWTileRegions
                     from OverworldShuffle import ow_connections
                     owid = OWTileRegions[dest_region.name]
-                    (mirror_map, other_world) = ow_connections[owid % 0x40]
+                    (mirror_map_orig, other_world) = ow_connections.copy()[owid % 0x40]
+                    mirror_map = list(mirror_map_orig).copy()
                     mirror_map.extend(other_world)
                     mirror_map = [(x, d) for (x, d) in mirror_map if x in [e.name for e in dest_region.exits]]
                     # loop thru potential places to leave a mirror portal
@@ -2746,12 +2748,10 @@ class Spoiler(object):
             self.overworlds[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
 
     def set_map(self, type, text, data, player):
-        if type not in self.maps:
-            self.maps[type] = {}
         if self.world.players == 1:
-            self.maps[type][player] = OrderedDict([('text', text), ('data', data)])
+            self.maps[(type, player)] = OrderedDict([('type', type), ('text', text), ('data', data)])
         else:
-            self.maps[type][player] = OrderedDict([('player', player), ('text', text), ('data', data)])
+            self.maps[(type, player)] = OrderedDict([('player', player), ('type', type), ('text', text), ('data', data)])
 
     def set_entrance(self, entrance, exit, direction, player):
         if self.world.players == 1:
@@ -3032,12 +3032,15 @@ class Spoiler(object):
             if self.overworlds:
                 outfile.write('\n\nOverworld:\n\n')
                 # overworld tile swaps
-                if 'swaps' in self.maps:
-                    outfile.write('OW Tile Swaps:\n')
-                    for player in self.maps['swaps']:
+                for player in range(1, self.world.players + 1):
+                    if ('swaps', player) in self.maps:
+                        outfile.write('OW Tile Swaps:\n')
+                        break
+                for player in range(1, self.world.players + 1):
+                    if ('swaps', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps['swaps'][player]['text'] + '\n\n')
+                        outfile.write(self.maps[('swaps', player)]['text'] + '\n\n')
 
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
