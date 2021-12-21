@@ -908,6 +908,9 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     from Items import ItemFactory
     
     def explore_region(region_name, region=None):
+        if stack_size3a() > 500:
+            raise GenerationException(f'Infinite loop detected for "{start_region}" located at \'build_accessible_region_list\'')
+
         explored_regions.append(region_name)
         if not region:
             region = base_world.get_region(region_name, player)
