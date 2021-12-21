@@ -853,8 +853,8 @@ def build_sectors(world, player):
     from OWEdges import OWTileRegions
     
     # perform accessibility check on duplicate world
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     world.key_logic = {}
     
@@ -925,8 +925,8 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
                     explore_region(exit.connected_region.name, exit.connected_region)
     
     if build_copy_world:
-        for player in range(1, world.players + 1):
-            world.key_logic[player] = {}
+        for p in range(1, world.players + 1):
+            world.key_logic[p] = {}
         base_world = copy_world(world)
         base_world.override_bomb_check = True
         world.key_logic = {}

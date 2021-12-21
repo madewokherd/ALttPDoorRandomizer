@@ -1476,8 +1476,8 @@ def junk_fill_inaccessible(world, player):
     from DoorShuffle import find_inaccessible_regions
     find_inaccessible_regions(world, player)
 
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     base_world.override_bomb_check = True
     world.key_logic = {}
@@ -1641,8 +1641,8 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     from Main import copy_world
     from Items import ItemFactory
     
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     base_world.override_bomb_check = True
     world.key_logic = {}
@@ -1751,8 +1751,8 @@ def can_reach(world, entrance_name, region_name, player):
     from Items import ItemFactory
     from DoorShuffle import find_inaccessible_regions
     
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     base_world.override_bomb_check = True
     world.key_logic = {}
