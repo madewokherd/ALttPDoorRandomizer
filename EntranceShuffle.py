@@ -40,9 +40,9 @@ def link_entrances(world, player):
         connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
     else:
         entrance_pool.remove('Pyramid Hole')
-        entrance_pool.add('Inverted Pyramid Hole')
+        entrance_pool.append('Inverted Pyramid Hole')
         entrance_pool.remove('Pyramid Entrance')
-        entrance_pool.add('Inverted Pyramid Entrance')
+        entrance_pool.append('Inverted Pyramid Entrance')
         drop_connections.append(tuple(('Inverted Pyramid Hole', 'Pyramid')))
         dropexit_connections.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
         connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
@@ -1476,8 +1476,8 @@ def junk_fill_inaccessible(world, player):
     from DoorShuffle import find_inaccessible_regions
     find_inaccessible_regions(world, player)
 
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     base_world.override_bomb_check = True
     world.key_logic = {}
@@ -1641,8 +1641,8 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     from Main import copy_world
     from Items import ItemFactory
     
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     base_world.override_bomb_check = True
     world.key_logic = {}
@@ -1751,8 +1751,8 @@ def can_reach(world, entrance_name, region_name, player):
     from Items import ItemFactory
     from DoorShuffle import find_inaccessible_regions
     
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     base_world.override_bomb_check = True
     world.key_logic = {}

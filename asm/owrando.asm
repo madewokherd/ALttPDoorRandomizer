@@ -160,6 +160,12 @@ OWPreserveMirrorSprite:
     pla : lda #$de : pha ; in vanilla, if in dark world, jump to $05afdf
     rtl
 }
+OWMirrorSpriteMove:
+{
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
+        lda $1acf : eor #$80 : sta $1acf
+    + lda #$2c : jml.l $07A985 ; what we wrote over
+}
 
 OWFluteCancel:
 {

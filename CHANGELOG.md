@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.3.5
+- Fixed issue with multiworld generation
+- Added infinite loop detection
+- Move mirror portal off screen during mirror bonk in Crossed OW
+
 ### 0.2.3.4
 - Fixed major issue with subsequent seeds using same seed/settings resulting different
 - Flute Shuffle now awards separated regions a prorated number of flute spots based on size

@@ -4,7 +4,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.3.4-u'
+__version__ = '0.2.3.5-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -853,8 +853,8 @@ def build_sectors(world, player):
     from OWEdges import OWTileRegions
     
     # perform accessibility check on duplicate world
-    for player in range(1, world.players + 1):
-        world.key_logic[player] = {}
+    for p in range(1, world.players + 1):
+        world.key_logic[p] = {}
     base_world = copy_world(world)
     world.key_logic = {}
     
@@ -906,8 +906,12 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     from Main import copy_world
     from BaseClasses import CollectionState
     from Items import ItemFactory
+    from Utils import stack_size3a
     
     def explore_region(region_name, region=None):
+        if stack_size3a() > 500:
+            raise GenerationException(f'Infinite loop detected for "{start_region}" located at \'build_accessible_region_list\'')
+
         explored_regions.append(region_name)
         if not region:
             region = base_world.get_region(region_name, player)
@@ -925,8 +929,8 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
                     explore_region(exit.connected_region.name, exit.connected_region)
     
     if build_copy_world:
-        for player in range(1, world.players + 1):
-            world.key_logic[player] = {}
+        for p in range(1, world.players + 1):
+            world.key_logic[p] = {}
         base_world = copy_world(world)
         base_world.override_bomb_check = True
         world.key_logic = {}
