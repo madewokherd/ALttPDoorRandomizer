@@ -1,5 +1,6 @@
 import RaceRandom as random, logging, copy
 from collections import OrderedDict
+from DungeonGenerator import GenerationException
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
@@ -907,7 +908,6 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     from BaseClasses import CollectionState
     from Items import ItemFactory
     from Utils import stack_size3a
-    from DungeonGenerator import GenerationException
     
     def explore_region(region_name, region=None):
         if stack_size3a() > 500:
