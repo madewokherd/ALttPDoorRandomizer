@@ -907,6 +907,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     from BaseClasses import CollectionState
     from Items import ItemFactory
     from Utils import stack_size3a
+    from DungeonGenerator import GenerationException
     
     def explore_region(region_name, region=None):
         if stack_size3a() > 500:
