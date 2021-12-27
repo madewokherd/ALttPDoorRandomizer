@@ -298,6 +298,9 @@ class World(object):
                     self._owedge_cache[(edgename, player)] = edge
                     return edge
             return None
+    
+    def if_tile_swapped(self, owid, player):
+        return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
