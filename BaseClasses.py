@@ -299,7 +299,7 @@ class World(object):
                     return edge
             return None
     
-    def if_tile_swapped(self, owid, player):
+    def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
     def check_for_door(self, doorname, player):
