@@ -2968,7 +2968,7 @@ class Spoiler(object):
                 outfile.write('Retro:'.ljust(line_width) + '%s\n' % ('Yes' if self.metadata['retro'][player] else 'No'))
                 outfile.write('Swords:'.ljust(line_width) + '%s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:'.ljust(line_width) + '%s\n' % self.metadata['goal'][player])
-                if self.metadata['goal'][player] == 'triforcehunt':
+                if self.metadata['goal'][player] in ['triforcehunt', 'trinity']:
                     outfile.write('Triforce Pieces Required:'.ljust(line_width) + '%s\n' % self.metadata['triforcegoal'][player])
                     outfile.write('Triforce Pieces Total:'.ljust(line_width) + '%s\n' % self.metadata['triforcepool'][player])
                 outfile.write('Crystals Required for GT:'.ljust(line_width) + '%s\n' % str(self.world.crystals_gt_orig[player]))
@@ -3215,7 +3215,7 @@ world_mode = {"open": 0, "standard": 1, "inverted": 2}
 sword_mode = {"random": 0,  "assured": 1, "swordless": 2, "vanilla": 3}
 
 # byte 2: GGGD DFFH (goal, diff, item_func, hints)
-goal_mode = {"ganon": 0, "pedestal": 1, "dungeons": 2, "triforcehunt": 3, "crystals": 4}
+goal_mode = {"ganon": 0, "pedestal": 1, "dungeons": 2, "triforcehunt": 3, "crystals": 4, "trinity": 5}
 diff_mode = {"normal": 0, "hard": 1, "expert": 2}
 func_mode = {"normal": 0, "hard": 1, "expert": 2}
 
