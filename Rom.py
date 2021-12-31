@@ -2375,7 +2375,9 @@ def write_strings(rom, world, player, team):
         tt['sign_ganon'] = 'You need to get to the pedestal... Ganon is invincible!'
     else:
         if world.goal[player] in ['trinity']:
-            tt['sign_ganon'] = 'Three ways Ganon can die! Get to it!'
+            trinity_crystal_text = ('%d crystal to beat Ganon.' if world.crystals_needed_for_ganon[player] == 1 else '%d crystals to beat Ganon.') % world.crystals_needed_for_ganon[player]
+            tt['sign_ganon'] = 'Three ways to victory! %s Get to it!' % trinity_crystal_text
+            trinity_crystal_text = 'Three ways to victory! %s Get to it!' % trinity_crystal_text
             tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
         tt['ganon_fall_in'] = Ganon1_texts[random.randint(0, len(Ganon1_texts) - 1)]
         tt['ganon_fall_in_alt'] = 'You cannot defeat me until you finish your goal!'
