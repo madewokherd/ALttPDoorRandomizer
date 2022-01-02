@@ -598,14 +598,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
             # patch music
             music_addresses = dungeon_music_addresses[location.name]
-            if world.mapshuffle[player] or world.goal[player] == 'trinity':
+            if world.mapshuffle[player]:
                 music = random.choice([0x11, 0x16])
             else:
                 music = 0x11 if 'Pendant' in location.item.name else 0x16
             for music_address in music_addresses:
                 rom.write_byte(music_address, music)
 
-    if world.mapshuffle[player] or world.goal[player] == 'trinity':
+    if world.mapshuffle[player]:
         rom.write_byte(0x155C9, random.choice([0x11, 0x16]))  # Randomize GT music too with map shuffle
 
     if world.pot_contents[player]:
@@ -1482,7 +1482,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                                      | (0x02 if world.compassshuffle[player] else 0x00)
                                      | (0x04 if world.mapshuffle[player] else 0x00)
                                      | (0x08 if world.bigkeyshuffle[player] else 0x00)))  # free roaming item text boxes
-    rom.write_byte(0x18003B, 0x01 if world.mapshuffle[player] or world.goal[player] == 'trinity' else 0x00)  # maps showing crystals on overworld
+    rom.write_byte(0x18003B, 0x01 if world.mapshuffle[player] else 0x00)  # maps showing crystals on overworld
 
     # compasses showing dungeon count
     if world.clock_mode != 'none' or world.dungeon_counters[player] == 'off':
@@ -1530,8 +1530,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             return reveal_bytes.get(location.parent_region.dungeon.name, 0x0000)
         return 0x0000
 
-    write_int16(rom, 0x18017A, get_reveal_bytes('Green Pendant') if world.mapshuffle[player] or world.goal[player] == 'trinity' else 0x0000) # Sahasrahla reveal
-    write_int16(rom, 0x18017C, get_reveal_bytes('Crystal 5')|get_reveal_bytes('Crystal 6') if world.mapshuffle[player] or world.goal[player] == 'trinity' else 0x0000) # Bomb Shop Reveal
+    write_int16(rom, 0x18017A, get_reveal_bytes('Green Pendant') if world.mapshuffle[player] else 0x0000) # Sahasrahla reveal
+    write_int16(rom, 0x18017C, get_reveal_bytes('Crystal 5')|get_reveal_bytes('Crystal 6') if world.mapshuffle[player] else 0x0000) # Bomb Shop Reveal
 
     rom.write_byte(0x180172, 0x01 if world.retro[player] else 0x00)  # universal keys
     rom.write_byte(0x180175, 0x01 if world.retro[player] else 0x00)  # rupee bow
