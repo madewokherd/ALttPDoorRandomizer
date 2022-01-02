@@ -262,7 +262,7 @@ def generate_itempool(world, player):
         world.get_location('Zelda Drop Off', player).locked = True
 
     # set up item pool
-    if world.custom:
+    if world.custom and player in world.customitemarray:
         (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_total, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.bombbag[player], world.customitemarray)
         world.rupoor_cost = min(world.customitemarray[player]["rupoorcost"], 9999)
     else:
