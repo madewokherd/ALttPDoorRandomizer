@@ -2836,10 +2836,11 @@ class Spoiler(object):
                          }
         if self.world.custom:
             for p in range(1, self.world.players + 1):
-                if self.world.customitemarray[p]["triforcepiecesgoal"] > 0:
-                    self.metadata['triforcegoal'][p] = max(min(self.world.customitemarray[p]["triforcepiecesgoal"], 99), 1)
-                if self.world.customitemarray[p]["triforcepieces"] > 0:
-                    self.metadata['triforcepool'][p] = max(min(self.world.customitemarray[p]["triforcepieces"], 168), self.metadata['triforcegoal'][p])
+                if p in self.world.customitemarray:
+                    if self.world.customitemarray[p]["triforcepiecesgoal"] > 0:
+                        self.metadata['triforcegoal'][p] = max(min(self.world.customitemarray[p]["triforcepiecesgoal"], 99), 1)
+                    if self.world.customitemarray[p]["triforcepieces"] > 0:
+                        self.metadata['triforcepool'][p] = max(min(self.world.customitemarray[p]["triforcepieces"], 168), self.metadata['triforcegoal'][p])
 
     def parse_data(self):
         self.medallions = OrderedDict()
