@@ -343,7 +343,7 @@ def generate_itempool(world, player):
         if world.treasure_hunt_total[player] == 0:
             world.treasure_hunt_total[player] = 30
         world.treasure_hunt_icon[player] = 'Triforce Piece'
-        if world.custom:
+        if world.custom and player in world.customitemarray:
             world.treasure_hunt_count[player] = treasure_hunt_count
             world.treasure_hunt_total[player] = treasure_hunt_total
 
