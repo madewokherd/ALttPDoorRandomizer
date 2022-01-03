@@ -1003,7 +1003,7 @@ def set_default_triforce(goal, custom_goal, custom_total):
         triforce_goal, triforce_total = 20, 30
     if custom_goal > 0:
         triforce_goal = max(min(custom_goal, 128), 1)
-    if custom_total > 0:
+    if custom_total > 0 or custom_goal > 0:
         triforce_total = max(min(custom_total, 128), triforce_goal) #128 max to ensure other progression can fit.
     return (triforce_goal, triforce_total)
 
