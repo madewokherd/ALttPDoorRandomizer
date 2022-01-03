@@ -2834,13 +2834,12 @@ class Spoiler(object):
 						 'triforcepool': self.world.treasure_hunt_total,
                          'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)}
                          }
-        if self.world.custom:
-            for p in range(1, self.world.players + 1):
-                if p in self.world.customitemarray:
-                    if self.world.customitemarray[p]["triforcepiecesgoal"] > 0:
-                        self.metadata['triforcegoal'][p] = max(min(self.world.customitemarray[p]["triforcepiecesgoal"], 99), 1)
-                    if self.world.customitemarray[p]["triforcepieces"] > 0:
-                        self.metadata['triforcepool'][p] = max(min(self.world.customitemarray[p]["triforcepieces"], 168), self.metadata['triforcegoal'][p])
+        for p in range(1, self.world.players + 1):
+            from ItemList import set_default_triforce
+            if self.world.custom and p in self.world.customitemarray:
+                self.metadata['triforcegoal'][p], self.metadata['triforcepool'][p] = set_default_triforce(self.metadata['goal'][p], self.world.customitemarray[p]["triforcepiecesgoal"], self.world.customitemarray[p]["triforcepieces"])
+            else:
+                self.metadata['triforcegoal'][p], self.metadata['triforcepool'][p] = set_default_triforce(self.metadata['goal'][p], 0, 0)
 
     def parse_data(self):
         self.medallions = OrderedDict()
