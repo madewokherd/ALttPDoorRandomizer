@@ -999,8 +999,10 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
 
 def set_default_triforce(goal, custom_goal, custom_total):
     triforce_goal, triforce_total = 0, 0
-    if goal in ['triforcehunt', 'trinity']:
+    if goal == 'triforcehunt':
         triforce_goal, triforce_total = 20, 30
+    elif goal == 'trinity':
+        triforce_goal, triforce_total = 8, 10
     if custom_goal > 0:
         triforce_goal = max(min(custom_goal, 128), 1)
     if custom_total > 0 or custom_goal > 0:
