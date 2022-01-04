@@ -358,7 +358,7 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
         if not gftower_trash or not world.ganonstower_vanilla[player] or world.doorShuffle[player] == 'crossed' or world.logic[player] in ['owglitches', 'nologic']:
             continue
 
-        gftower_trash_count = (random.randint(15, 50) if world.goal[player] == 'triforcehunt' else random.randint(0, 15))
+        gftower_trash_count = (random.randint(15, 50) if world.goal[player] in ['triforcehunt', 'trinity'] else random.randint(0, 15))
 
         gtower_locations = [location for location in fill_locations if 'Ganons Tower' in location.name and location.player == player]
         random.shuffle(gtower_locations)
@@ -701,7 +701,7 @@ def balance_money_progression(world):
         sphere_locations = get_sphere_locations(state, unchecked_locations)
         checked_locations = []
         for player in range(1, world.players+1):
-            kiki_payable = state.prog_items[('Moon Pearl', player)] > 0 or (world.mode[player] == 'inverted') != (0x1e in world.owswaps[player][0] and world.owMixed[player])
+            kiki_payable = state.prog_items[('Moon Pearl', player)] > 0 or world.is_tile_swapped(0x1e, player)
             if kiki_payable and world.get_region('Palace of Darkness Area', player) in state.reachable_regions[player]:
                 if not kiki_paid[player]:
                     kiki_check[player] = True

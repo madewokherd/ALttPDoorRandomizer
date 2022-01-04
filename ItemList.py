@@ -178,7 +178,7 @@ def get_custom_array_key(item):
 
 
 def generate_itempool(world, player):
-    if (world.difficulty[player] not in ['normal', 'hard', 'expert'] or world.goal[player] not in ['ganon', 'pedestal', 'dungeons', 'triforcehunt', 'crystals']
+    if (world.difficulty[player] not in ['normal', 'hard', 'expert'] or world.goal[player] not in ['ganon', 'pedestal', 'dungeons', 'triforcehunt', 'trinity', 'crystals']
             or world.mode[player] not in ['open', 'standard', 'inverted'] or world.timer not in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown'] or world.progressive not in ['on', 'off', 'random']):
         raise NotImplementedError('Not supported yet')
 
@@ -190,7 +190,7 @@ def generate_itempool(world, player):
     else:
         world.push_item(world.get_location('Ganon', player), ItemFactory('Triforce', player), False)
 
-    if world.goal[player] in ['triforcehunt']:
+    if world.goal[player] in ['triforcehunt', 'trinity']:
         region = world.get_region('Hyrule Castle Courtyard',player)
 
         loc = Location(player, "Murahdahla", parent=region)
@@ -262,8 +262,8 @@ def generate_itempool(world, player):
         world.get_location('Zelda Drop Off', player).locked = True
 
     # set up item pool
-    if world.custom:
-        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.bombbag[player], world.customitemarray)
+    if world.custom and player in world.customitemarray:
+        (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_total, treasure_hunt_icon, lamps_needed_for_dark_rooms) = make_custom_item_pool(world.progressive, world.shuffle[player], world.difficulty[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.bombbag[player], world.customitemarray[player])
         world.rupoor_cost = min(world.customitemarray[player]["rupoorcost"], 9999)
     else:
         (pool, placed_items, precollected_items, clock_mode, lamps_needed_for_dark_rooms) = get_pool_core(world.progressive, world.shuffle[player], world.difficulty[player], world.treasure_hunt_total[player], world.timer, world.goal[player], world.mode[player], world.swords[player], world.retro[player], world.bombbag[player], world.doorShuffle[player], world.logic[player])
@@ -337,14 +337,9 @@ def generate_itempool(world, player):
     if clock_mode is not None:
         world.clock_mode = clock_mode
 
-    if world.goal[player] == 'triforcehunt':
-        if world.treasure_hunt_count[player] == 0:
-            world.treasure_hunt_count[player] = 20
-        if world.treasure_hunt_total[player] == 0:
-            world.treasure_hunt_total[player] = 30
+    if world.goal[player] in ['triforcehunt', 'trinity']:
+        world.treasure_hunt_count[player], world.treasure_hunt_total[player] = set_default_triforce(world.goal[player], world.treasure_hunt_count[player], world.treasure_hunt_total[player])
         world.treasure_hunt_icon[player] = 'Triforce Piece'
-        if world.custom:
-            world.treasure_hunt_count[player] = treasure_hunt_count
 
     world.itempool.extend([item for item in get_dungeon_item_pool(world) if item.player == player
                            and ((item.smallkey and world.keyshuffle[player])
@@ -355,9 +350,9 @@ def generate_itempool(world, player):
     # logic has some branches where having 4 hearts is one possible requirement (of several alternatives)
     # rather than making all hearts/heart pieces progression items (which slows down generation considerably)
     # We mark one random heart container as an advancement item (or 4 heart pieces in expert mode)
-    if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and world.customitemarray[player]["heartcontainer"] == 0):
+    if world.difficulty[player] in ['normal', 'hard'] and not (world.custom and player in world.customitemarray and world.customitemarray[player]["heartcontainer"] == 0):
         next(item for item in items if item.name == 'Boss Heart Container').advancement = True
-    elif world.difficulty[player] in ['expert'] and not (world.custom and world.customitemarray[player]["heartpiece"] < 4):
+    elif world.difficulty[player] in ['expert'] and not (world.custom and player in world.customitemarray and world.customitemarray[player]["heartpiece"] < 4):
         adv_heart_pieces = (item for item in items if item.name == 'Piece of Heart')
         for i in range(4):
             next(adv_heart_pieces).advancement = True
@@ -414,7 +409,7 @@ def set_up_take_anys(world, player):
     if world.mode[player] == 'inverted':
         if 'Dark Sanctuary Hint' in take_any_locations:
             take_any_locations.remove('Dark Sanctuary Hint')
-    if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x29, player):
         if 'Archery Game' in take_any_locations:
             take_any_locations.remove('Archery Game')
 
@@ -759,7 +754,7 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     placed_items = {}
     precollected_items = []
     clock_mode = None
-    if goal == 'triforcehunt':
+    if goal in ['triforcehunt', 'trinity']:
         if treasure_hunt_total == 0:
             treasure_hunt_total = 30
     triforcepool = ['Triforce Piece'] * int(treasure_hunt_total)
@@ -841,7 +836,7 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
         place_item('Link\'s Uncle', swords_to_use.pop())
         place_item('Blacksmith', swords_to_use.pop())
         place_item('Pyramid Fairy - Left', swords_to_use.pop())
-        if goal != 'pedestal':
+        if goal not in ['pedestal', 'trinity']:
             place_item('Master Sword Pedestal', swords_to_use.pop())
         else:
             place_item('Master Sword Pedestal', 'Triforce')
@@ -866,7 +861,7 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
         pool.extend(diff.timedohko)
         extraitems -= len(diff.timedohko)
         clock_mode = 'countdown-ohko'
-    if goal == 'triforcehunt':
+    if goal in ['triforcehunt', 'trinity']:
         pool.extend(triforcepool)
         extraitems -= len(triforcepool)
 
@@ -877,7 +872,7 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
             pool.extend(extra)
             extraitems -= len(extra)
 
-    if goal == 'pedestal' and swords != 'vanilla':
+    if goal in ['pedestal', 'trinity'] and swords != 'vanilla':
         place_item('Master Sword Pedestal', 'Triforce')
     if retro:
         pool = [item.replace('Single Arrow','Rupees (5)') for item in pool]
@@ -901,13 +896,12 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     return (pool, placed_items, precollected_items, clock_mode, lamps_needed_for_dark_rooms)
 
 def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, swords, retro, bombbag, customitemarray):
-    if isinstance(customitemarray,dict) and 1 in customitemarray:
-        customitemarray = customitemarray[1]
     pool = []
     placed_items = {}
     precollected_items = []
     clock_mode = None
     treasure_hunt_count = None
+    treasure_hunt_total = None
     treasure_hunt_icon = None
 
     def place_item(loc, item):
@@ -916,14 +910,18 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
 
     # Correct for insanely oversized item counts and take initial steps to handle undersized pools.
     # Bow to Silver Arrows Upgrade, including Generic Keys & Rupoors
-    for x in [*range(0, 66 + 1), 68, 69]:
+    for x in [*range(0, 69)]:
         key = CONST.CUSTOMITEMS[x]
         if customitemarray[key] > total_items_to_place:
             customitemarray[key] = total_items_to_place
-
+    
     # Triforce
     if customitemarray["triforce"] > total_items_to_place:
         customitemarray["triforce"] = total_items_to_place
+
+    # Triforce Pieces
+    if goal in ['triforcehunt', 'trinity']:
+        customitemarray["triforcepiecesgoal"], customitemarray["triforcepieces"] = set_default_triforce(goal, customitemarray["triforcepiecesgoal"], customitemarray["triforcepieces"])
 
     itemtotal = 0
     # Bow to Silver Arrows Upgrade, including Generic Keys & Rupoors
@@ -955,13 +953,7 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
         pool.append(thisbottle)
 
     if customitemarray["triforcepieces"] > 0 or customitemarray["triforcepiecesgoal"] > 0:
-        treasure_hunt_count = max(min(customitemarray["triforcepiecesgoal"], 99), 1) #To display, count must be between 1 and 99.
         treasure_hunt_icon = 'Triforce Piece'
-        # Ensure game is always possible to complete here, force sufficient pieces if the player is unwilling.
-        if (customitemarray["triforcepieces"] < treasure_hunt_count) and (goal == 'triforcehunt') and (customitemarray["triforce"] == 0):
-            extrapieces = treasure_hunt_count - customitemarray["triforcepieces"]
-            pool.extend(['Triforce Piece'] * extrapieces)
-            itemtotal = itemtotal + extrapieces
 
     if timer in ['display', 'timed', 'timed-countdown']:
         clock_mode = 'countdown' if timer == 'timed-countdown' else 'stopwatch'
@@ -970,7 +962,7 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
     elif timer == 'ohko':
         clock_mode = 'ohko'
 
-    if goal == 'pedestal':
+    if goal in ['pedestal', 'trinity']:
         place_item('Master Sword Pedestal', 'Triforce')
         itemtotal = itemtotal + 1
 
@@ -1003,12 +995,24 @@ def make_custom_item_pool(progressive, shuffle, difficulty, timer, goal, mode, s
 #        print("Placing " + str(nothings) + " Nothings")
         pool.extend(['Nothing'] * nothings)
 
-    return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_icon, lamps_needed_for_dark_rooms)
+    return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_total, treasure_hunt_icon, lamps_needed_for_dark_rooms)
+
+def set_default_triforce(goal, custom_goal, custom_total):
+    triforce_goal, triforce_total = 0, 0
+    if goal == 'triforcehunt':
+        triforce_goal, triforce_total = 20, 30
+    elif goal == 'trinity':
+        triforce_goal, triforce_total = 8, 10
+    if custom_goal > 0:
+        triforce_goal = max(min(custom_goal, 128), 1)
+    if custom_total > 0 or custom_goal > 0:
+        triforce_total = max(min(custom_total, 128), triforce_goal) #128 max to ensure other progression can fit.
+    return (triforce_goal, triforce_total)
 
 # A quick test to ensure all combinations generate the correct amount of items.
 def test():
     for difficulty in ['normal', 'hard', 'expert']:
-        for goal in ['ganon', 'triforcehunt', 'pedestal']:
+        for goal in ['ganon', 'triforcehunt', 'pedestal', 'trinity']:
             for timer in ['none', 'display', 'timed', 'timed-ohko', 'ohko', 'timed-countdown']:
                 for mode in ['open', 'standard', 'inverted', 'retro']:
                     for swords in ['random', 'assured', 'swordless', 'vanilla']:
@@ -1022,7 +1026,7 @@ def test():
                                                 count = len(out[0]) + len(out[1])
 
                                                 correct_count = total_items_to_place
-                                                if goal == 'pedestal' and swords != 'vanilla':
+                                                if goal in ['pedestal', 'trinity'] and swords != 'vanilla':
                                                     # pedestal goals generate one extra item
                                                     correct_count += 1
                                                 if retro:

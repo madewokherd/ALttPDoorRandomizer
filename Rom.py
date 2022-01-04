@@ -624,7 +624,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         offset = 0
         data = flute_data[owslot]
 
-        if (world.mode[player] == 'inverted') != (data[1] in world.owswaps[player][0] and world.owMixed[player]):
+        if world.is_tile_swapped(data[1], player):
             offset = 0x40
         
         write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), data[1] + offset) # owid
@@ -755,7 +755,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     dr_flags = DROptions.Eternal_Mini_Bosses if world.doorShuffle[player] == 'vanilla' else DROptions.Town_Portal
     if world.doorShuffle[player] == 'crossed':
         dr_flags |= DROptions.Map_Info
-    if world.experimental[player] and world.goal[player] != 'triforcehunt':
+    if world.experimental[player] and world.goal[player] not in ['triforcehunt', 'trinity']:
         dr_flags |= DROptions.Debug
     if world.doorShuffle[player] == 'crossed' and world.logic[player] != 'nologic'\
        and world.mixed_travel[player] == 'prevent':
@@ -1235,7 +1235,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # set up goals for treasure hunt
     rom.write_bytes(0x180165, [0x0E, 0x28] if world.treasure_hunt_icon[player] == 'Triforce Piece' else [0x0D, 0x28])
-    if world.goal[player] == 'triforcehunt':
+    if world.goal[player] in ['triforcehunt', 'trinity']:
         rom.write_byte(0x180167, int(world.treasure_hunt_count[player]) % 256)
     rom.write_byte(0x180194, 1)  # Must turn in triforced pieces (instant win not enabled)
 
@@ -1261,7 +1261,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x50563, [0x3F, 0x14]) # disable below ganon chest
     rom.write_byte(0x50599, 0x00) # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest
-    rom.write_byte(0x18008B, 0x01 if world.open_pyramid[player] else 0x00) # pre-open Pyramid Hole
+    rom.write_byte(0x18008B, 0x01 if world.open_pyramid[player] or world.goal[player] == 'trinity' else 0x00) # pre-open Pyramid Hole
     rom.write_byte(0x18008C, 0x01 if world.crystals_needed_for_gt[player] == 0 else 0x00) # GT pre-opened if crystal requirement is 0
     rom.write_byte(0xF5D73, 0xF0) # bees are catchable
     rom.write_byte(0xF5F10, 0xF0) # bees are catchable
@@ -1446,7 +1446,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_byte(0x18003E, 0x01)  # make ganon invincible
     elif world.goal[player] in ['dungeons']:
         rom.write_byte(0x18003E, 0x02)  # make ganon invincible until all dungeons are beat
-    elif world.goal[player] in ['crystals']:
+    elif world.goal[player] in ['crystals', 'trinity']:
         rom.write_byte(0x18003E, 0x04)  # make ganon invincible until all crystals
     else:
         rom.write_byte(0x18003E, 0x03)  # make ganon invincible until all crystals and aga 2 are collected
@@ -2186,7 +2186,7 @@ def write_strings(rom, world, player, team):
         elif world.shopsanity[player]:
             entrances_to_hint.update(ShopEntrances)
         if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            if world.mode[player] == 'inverted' != (0x2c in world.owswaps[player][0] and world.owMixed[player]):
+            if world.is_tile_swapped(0x2c, player):
                 entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
                 if world.shufflelinks[player]:
                     entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
@@ -2198,7 +2198,7 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
             if world.shuffle_ganon:
-                if world.mode[player] == 'inverted' != (0x1b in world.owswaps[player][0] and world.owMixed[player]):
+                if world.is_tile_swapped(0x1b, player):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
                     entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
@@ -2374,6 +2374,10 @@ def write_strings(rom, world, player, team):
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'
         tt['sign_ganon'] = 'You need to get to the pedestal... Ganon is invincible!'
     else:
+        if world.goal[player] in ['trinity']:
+            trinity_crystal_text = ('%d crystal to beat Ganon.' if world.crystals_needed_for_ganon[player] == 1 else '%d crystals to beat Ganon.') % world.crystals_needed_for_ganon[player]
+            tt['sign_ganon'] = 'Three ways to victory! %s Get to it!' % trinity_crystal_text
+            tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
         tt['ganon_fall_in'] = Ganon1_texts[random.randint(0, len(Ganon1_texts) - 1)]
         tt['ganon_fall_in_alt'] = 'You cannot defeat me until you finish your goal!'
         tt['ganon_phase_3_alt'] = 'Got wax in\nyour ears?\nI can not die!'
@@ -2495,9 +2499,9 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
                 write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
                 write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
 
-    if (world.mode[player] == 'inverted') != (0x03 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x03, player):
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
-                or (world.shuffle[player] == 'simple' and (world.mode[player] == 'inverted' != (0x05 in world.owswaps[player][0] and world.owMixed[player]))):
+                or (world.shuffle[player] == 'simple' and world.is_tile_swapped(0x05, player)):
             rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01])  # mountain cave starts on OW
             
             write_int16(rom, snes_to_pc(0x02D8DE), 0x00F1)  # change mountain cave spawn point to just outside old man cave
@@ -2519,20 +2523,20 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
 
             rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  # indicates the overworld door being used for the single entrance spawn point
-    if (world.mode[player] == 'inverted') != (0x05 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x05, player):
         rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC428), 0x00) # remove secret portal
-    if (world.mode[player] == 'inverted') != (0x07 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x07, player):
         rom.write_bytes(snes_to_pc(0x1BC387), [0xDD, 0xD1])  # add warps under rocks
         rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF])  # add warps under rocks
         rom.write_byte(0x180089, 0x01)  # open TR after exit
         rom.write_bytes(0x0086E, [0x5C, 0x00, 0xA0, 0xA1]) # TR tail
         if world.shuffle[player] in ['vanilla']:
             world.fix_trock_doors[player] = True
-    if (world.mode[player] == 'inverted') != (0x10 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x10, player):
         rom.write_bytes(snes_to_pc(0x1BC67A), [0x2E, 0x0B, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC43A), 0x00) # remove secret portal
-    if (world.mode[player] == 'inverted') != (0x1B in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x1b, player):
         write_int16(rom, 0x15AEE + 2 * 0x06, 0x0020)  # post aga hyrule castle spawn
         rom.write_byte(0x15B8C + 0x06, 0x1B)
         write_int16(rom, 0x15BDB + 2 * 0x06, 0x00AE)
@@ -2637,24 +2641,24 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
             rom.write_byte(0x1607C + 0x37, 0x0A)
             write_int16(rom, 0x160CB + 2 * 0x37, 0x0000)
             write_int16(rom, 0x16169 + 2 * 0x37, 0x811C)
-    if (world.mode[player] == 'inverted') != (0x29 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x29, player):
         rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])  # frog pickup on contact
-    if (world.mode[player] == 'inverted') != (0x2C in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x2c, player):
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
             rom.write_byte(0x15B8C, 0x6C)  # exit links at bomb shop area
             rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
             rom.write_byte(0xDBB73 + 0x52, 0x01)
-    if (world.mode[player] == 'inverted') != (0x2F in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x2f, player):
         rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC590), 0x00) # remove secret portal
-    if (world.mode[player] == 'inverted') != (0x30 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x30, player):
         rom.write_bytes(snes_to_pc(0x1BC81E), [0x94, 0x1D, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC5A1), 0x00) # remove secret portal
-    if (world.mode[player] == 'inverted') != (0x33 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x33, player):
         rom.write_bytes(snes_to_pc(0x1BC3DF), [0xD8, 0xD1])  # add warp under rock
         rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC5B1), 0x00) # remove secret portal
-    if (world.mode[player] == 'inverted') != (0x35 in world.owswaps[player][0] and world.owMixed[player]):
+    if world.is_tile_swapped(0x35, player):
         rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC5C7), 0x00) # remove secret portal
     
