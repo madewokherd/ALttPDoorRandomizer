@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.2.4.0
+- Added Guaranteed OWR Reachability
+- Fixed incorrect parity calc for Whirlpool Shuffle
+- Fixed error with generating seeds with GUI
+- CLI fixes for triforce piece arguments
+
 ### 0.2.3.6
 - Added Trinity goal (8/10 default TF pieces)
 - Many improvements to TFH pool allocation
