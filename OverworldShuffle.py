@@ -502,7 +502,7 @@ def shuffle_tiles(world, groups, result_list, player):
                 exist_dw_regions.extend(dw_regions)
 
         # check whirlpool parity
-        valid_whirlpool_parity = world.owCrossed[player] not in ['none', 'grouped'] or len(OrderedDict.fromkeys(new_results[0] + [0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f])) % 2 == 0
+        valid_whirlpool_parity = world.owCrossed[player] not in ['none', 'grouped'] or len([o for o in new_results[0] if o in [0x0f, 0x12, 0x15, 0x33, 0x35, 0x3f, 0x55, 0x7f]]) % 2 == 0
 
     (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
     exist_owids.extend(new_results[0])
