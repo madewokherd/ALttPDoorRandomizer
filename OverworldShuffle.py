@@ -1033,6 +1033,10 @@ def validate_layout(world, player):
             start_region = 'Bomb Shop Area'
         explore_region(start_region)
 
+    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean'] and world.mode == 'inverted':
+        start_region = 'Dark Chapel Area'
+        explore_region(start_region)
+
     if not world.is_tile_swapped(0x30, player):
         start_region = 'Desert Palace Teleporter Ledge'
     else:
