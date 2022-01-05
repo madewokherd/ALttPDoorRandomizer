@@ -1030,7 +1030,7 @@ def validate_layout(world, player):
         if not world.is_tile_swapped(0x2c, player):
             start_region = 'Links House Area'
         else:
-            start_region = 'Bomb Shop Area'
+            start_region = 'Big Bomb Shop Area'
         explore_region(start_region)
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean'] and world.mode == 'inverted':
