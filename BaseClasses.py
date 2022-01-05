@@ -2839,7 +2839,9 @@ class Spoiler(object):
             if self.world.custom and p in self.world.customitemarray:
                 self.metadata['triforcegoal'][p], self.metadata['triforcepool'][p] = set_default_triforce(self.metadata['goal'][p], self.world.customitemarray[p]["triforcepiecesgoal"], self.world.customitemarray[p]["triforcepieces"])
             else:
-                self.metadata['triforcegoal'][p], self.metadata['triforcepool'][p] = set_default_triforce(self.metadata['goal'][p], self.world.treasure_hunt_count, self.world.treasure_hunt_total)
+                custom_goal = self.world.treasure_hunt_count[p] if isinstance(self.world.treasure_hunt_count, dict) else self.world.treasure_hunt_count
+                custom_total = self.world.treasure_hunt_total[p] if isinstance(self.world.treasure_hunt_total, dict) else self.world.treasure_hunt_total
+                self.metadata['triforcegoal'][p], self.metadata['triforcepool'][p] = set_default_triforce(self.metadata['goal'][p], custom_goal, custom_total)
 
     def parse_data(self):
         self.medallions = OrderedDict()
