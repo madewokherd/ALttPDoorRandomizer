@@ -1125,8 +1125,8 @@ def create_shops(world, player):
             if (0x35 not in world.owswaps[player][0] and region_name == 'Dark Lake Hylia Shop') \
                     or (0x35 in world.owswaps[player][0] and region_name == 'Cave Shop (Lake Hylia)'):
                 locked = True
-                custom = True
                 inventory = [('Blue Potion', 160), ('Blue Shield', 50), ('Bombs (10)', 50)]
+                custom = True
         region = world.get_region(region_name, player)
         shop = Shop(region, room_id, type, shopkeeper, custom, locked, sram)
         region.shop = shop
