@@ -2533,6 +2533,8 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         rom.write_bytes(snes_to_pc(0x1BD1DD), [0xA4, 0x06, 0x82, 0x9E, 0x06, 0x82, 0xFF, 0xFF])  # add warps under rocks
         rom.write_byte(0x180089, 0x01)  # open TR after exit
         rom.write_bytes(0x0086E, [0x5C, 0x00, 0xA0, 0xA1]) # TR tail
+        rom.write_bytes(snes_to_pc(0x04E7A3), [0x20, 0x06]) # Top peg moved down, for peg puzzle
+        rom.write_byte(snes_to_pc(0x04E7E4), 0x10) # Remove TR portal overlay
         if world.shuffle[player] in ['vanilla']:
             world.fix_trock_doors[player] = True
     if world.is_tile_swapped(0x10, player):
