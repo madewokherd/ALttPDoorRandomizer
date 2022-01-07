@@ -47,11 +47,6 @@ def link_entrances(world, player):
         dropexit_connections.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
         connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
         
-    if not world.is_tile_swapped(0x03, player):
-        connect_simple(world, 'Old Man S&Q', 'Old Man House', player)
-    else:
-        connect_simple(world, 'Old Man S&Q', 'West Dark Death Mountain (Bottom)', player)
-        
     unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_Exits)
     Cave_Exits.extend(Cave_Exits_Directional)
 
@@ -2078,6 +2073,7 @@ Exit_Pool_Base = ['Links House Exit',
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
 mandatory_connections = [('Links House S&Q', 'Links House'),
+                         ('Old Man S&Q', 'Old Man House'),
 
                          # UW Connections
                          ('Lost Woods Hideout (top to bottom)', 'Lost Woods Hideout (bottom)'),
