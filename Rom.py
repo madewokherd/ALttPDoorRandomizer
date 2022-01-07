@@ -2501,30 +2501,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
                 write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
                 write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
 
-    if world.is_tile_swapped(0x03, player):
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
-                or (world.shuffle[player] == 'simple' and world.is_tile_swapped(0x05, player)):
-            rom.write_bytes(snes_to_pc(0x308350), [0x00, 0x00, 0x01])  # mountain cave starts on OW
             
-            write_int16(rom, snes_to_pc(0x02D8DE), 0x00F1)  # change mountain cave spawn point to just outside old man cave
-            rom.write_bytes(snes_to_pc(0x02D910), [0x1F, 0x1E, 0x1F, 0x1F, 0x03, 0x02, 0x03, 0x03])
-            write_int16(rom, snes_to_pc(0x02D924), 0x0300)
-            write_int16(rom, snes_to_pc(0x02D932), 0x1F10)
-            write_int16(rom, snes_to_pc(0x02D940), 0x1FC0)
-            write_int16(rom, snes_to_pc(0x02D94E), 0x0378)
-            write_int16(rom, snes_to_pc(0x02D95C), 0x0187)
-            write_int16(rom, snes_to_pc(0x02D96A), 0x017F)
-            rom.write_byte(snes_to_pc(0x02D972), 0x06)
-            rom.write_byte(snes_to_pc(0x02D979), 0x00)
-            rom.write_byte(snes_to_pc(0x02D980), 0xFF)
-            rom.write_byte(snes_to_pc(0x02D987), 0x00)
-            rom.write_byte(snes_to_pc(0x02D98E), 0x22)
-            rom.write_byte(snes_to_pc(0x02D995), 0x12)
-            write_int16(rom, snes_to_pc(0x02D9A2), 0x0000)
-            write_int16(rom, snes_to_pc(0x02D9B0), 0x0007)
-            rom.write_byte(snes_to_pc(0x02D9B8), 0x12)
-
-            rom.write_bytes(0x180247, [0x00, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00])  # indicates the overworld door being used for the single entrance spawn point
     if world.is_tile_swapped(0x05, player):
         rom.write_bytes(snes_to_pc(0x1BC655), [0x4A, 0x1D, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC428), 0x00) # remove secret portal
