@@ -1049,7 +1049,7 @@ def validate_layout(world, player):
         start_region = 'Hyrule Castle Ledge'
     explore_region(start_region)
 
-    unreachable_regions = {}
+    unreachable_regions = OrderedDict()
     unreachable_count = -1
     while unreachable_count != len(unreachable_regions):
         # find unreachable regions
