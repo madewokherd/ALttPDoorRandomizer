@@ -869,7 +869,7 @@ def build_sectors(world, player):
         if (any(r in unique_regions for r in explored_regions)):
             for s in range(len(sectors)):
                 if (any(r in sectors[s] for r in explored_regions)):
-                    sectors[s] = list(list(sectors[s]) + list(explored_regions))
+                    sectors[s] = list(dict.fromkeys(list(sectors[s]) + list(explored_regions)))
                     break
         else:
             sectors.append(explored_regions)
@@ -895,7 +895,7 @@ def build_sectors(world, player):
             if (any(r in unique_regions for r in explored_regions)):
                 for s2 in range(len(sectors2)):
                     if (any(r in sectors2[s2] for r in explored_regions)):
-                        sectors2[s2] = list(sectors2[s2] + explored_regions)
+                        sectors2[s2] = list(dict.fromkeys(sectors2[s2] + explored_regions))
                         break
             else:
                 sectors2.append(explored_regions)
