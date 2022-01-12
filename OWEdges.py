@@ -991,7 +991,7 @@ OWTileGroups = {
             0x42
         ]
     ),
-    ("West Mountain", "Regular", "None"): (
+    ("Mountain Entry", "Entrance", "None"): (
         [
             0x03
         ],

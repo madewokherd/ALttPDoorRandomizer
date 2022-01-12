@@ -81,20 +81,6 @@ def link_entrances(world, player):
             for entrancename, exitname in inverted_default_connections:
                 connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
 
-        # inverted entrance mods
-        ignore_pool = True
-        for owid in swapped_connections.keys():
-            if world.is_tile_swapped(owid, player):
-                for (entrancename, exitname) in swapped_connections[owid]:
-                    try:
-                        connect_two_way(world, entrancename, exitname, player)
-                    except RuntimeError:
-                        connect_entrance(world, entrancename, exitname, player)
-        
-        if world.is_tile_swapped(0x03, player) and not world.is_tile_swapped(0x0a, player):
-            connect_entrance(world, 'Death Mountain Return Cave (West)', 'Dark Death Mountain Healer Fairy', player)
-        elif world.is_tile_swapped(0x0a, player) and not world.is_tile_swapped(0x03, player):
-            connect_two_way(world, 'Bumper Cave (Top)', 'Death Mountain Return Cave Exit (West)', player)
         ignore_pool = False
 
         # dungeon entrance shuffle
@@ -124,7 +110,8 @@ def link_entrances(world, player):
         scramble_holes(world, player)
 
         # list modification
-        lw_wdm_entrances = ['Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)',
+        lw_wdm_entrances = ['Old Man Cave (West)', 'Death Mountain Return Cave (West)',
+                            'Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)',
                             'Death Mountain Return Cave (East)', 'Spectacle Rock Cave',
                             'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)']
         lw_edm_entrances = ['Paradox Cave (Bottom)', 'Paradox Cave (Middle)', 'Paradox Cave (Top)', 'Spiral Cave',
@@ -134,13 +121,9 @@ def link_entrances(world, player):
         caves = list(Cave_Exits)
         three_exit_caves = list(Cave_Three_Exits)
 
-        Two_Door_Caves_Directional = list()
+        Two_Door_Caves_Directional = [('Bumper Cave (Bottom)', 'Bumper Cave (Top)')]
         Two_Door_Caves = [('Elder House (East)', 'Elder House (West)'),
                           ('Superbunny Cave (Bottom)', 'Superbunny Cave (Top)')]
-        if not world.is_tile_swapped(0x0a, player):
-            Two_Door_Caves_Directional.append(tuple({'Bumper Cave (Bottom)', 'Bumper Cave (Top)'}))
-        else:
-            Two_Door_Caves_Directional.append(tuple({'Old Man Cave (West)', 'Death Mountain Return Cave (West)'}))
         if not world.is_tile_swapped(0x05, player):
             Two_Door_Caves_Directional.append(tuple({'Hookshot Cave', 'Hookshot Cave Back Entrance'}))
         else:
@@ -174,43 +157,25 @@ def link_entrances(world, player):
         caves.extend(list(Old_Man_House))
         caves.extend(list(three_exit_caves))
 
-        if (not world.is_tile_swapped(0x18, player)) or (not world.is_tile_swapped(0x03, player)): # ability to activate flute in LW
-            candidates = [e for e in lw_wdm_entrances if e != 'Old Man House (Bottom)']
+        candidates = [e for e in lw_wdm_entrances if e != 'Old Man House (Bottom)']
+        random.shuffle(candidates)
+        old_man_exit = candidates.pop()
+        lw_wdm_entrances.remove(old_man_exit)
+        connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
+
+        if 0x03 in world.owswaps[player][0] == 0x05 in world.owswaps[player][0]: # if WDM and EDM are in same world
+            candidates = lw_wdm_entrances + lw_edm_entrances
             random.shuffle(candidates)
-            old_man_exit = candidates.pop()
-            lw_wdm_entrances.remove(old_man_exit)
-            connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
-
-            if not world.is_tile_swapped(0x0a, player):
-                lw_wdm_entrances.extend(['Old Man Cave (West)', 'Death Mountain Return Cave (West)'])
-            else:
-                lw_wdm_entrances.extend(['Bumper Cave (Bottom)', 'Bumper Cave (Top)'])
-            
-            if 0x03 in world.owswaps[player][0] == 0x05 in world.owswaps[player][0]: # if WDM and EDM are in same world
-                candidates = lw_wdm_entrances + lw_edm_entrances
-                random.shuffle(candidates)
-                old_man_entrance = candidates.pop()
+            old_man_entrance = candidates.pop()
+            if old_man_entrance in lw_wdm_entrances:
                 lw_wdm_entrances.remove(old_man_entrance)
-                if old_man_entrance in lw_wdm_entrances:
-                    lw_wdm_entrances.remove(old_man_entrance)
-                elif old_man_entrance in lw_edm_entrances:
-                    lw_edm_entrances.remove(old_man_entrance)
-            else:
-                random.shuffle(lw_wdm_entrances)
-                old_man_entrance = lw_wdm_entrances.pop()
-            connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
+            elif old_man_entrance in lw_edm_entrances:
+                lw_edm_entrances.remove(old_man_entrance)
         else:
-            # force connection to DM
-            random.shuffle(ddm_entrances)
-            old_man_exit = ddm_entrances.pop()
-            connect_two_way(world, old_man_exit, 'Old Man Cave Exit (East)', player)
-            
-            # place old man, bumper cave bottom to DDM entrances not in east bottom
-            if not world.is_tile_swapped(0x0a, player):
-                connect_two_way(world, 'Old Man Cave (West)', 'Old Man Cave Exit (West)', player)
-            else:
-                connect_two_way(world, 'Bumper Cave (Bottom)', 'Old Man Cave Exit (West)', player)
-
+            random.shuffle(lw_wdm_entrances)
+            old_man_entrance = lw_wdm_entrances.pop()
+        connect_two_way(world, old_man_entrance, 'Old Man Cave Exit (West)', player)
+        
         # connect remaining LW DM entrances
         if 0x03 in world.owswaps[player][0] == 0x05 in world.owswaps[player][0]: # if WDM and EDM are in same world
             connect_caves(world, lw_wdm_entrances + lw_edm_entrances, [], caves, player)
@@ -2230,20 +2195,6 @@ default_dropexit_connections = [('Lost Woods Hideout Stump', 'Lost Woods Hideout
                                 ('Bat Cave Cave', 'Bat Cave Exit'),
                                 #('Pyramid Entrance', 'Pyramid Exit') # this is dynamically added because of Inverted/OW Mixed
                             ]
-
-swapped_connections = {
-    0x03: [
-            ('Old Man Cave (East)', 'Death Mountain Return Cave Exit (West)'),
-            #('Death Mountain Return Cave (East)', 'Death Mountain Return Cave Exit (East)'),
-            ('Dark Death Mountain Fairy', 'Old Man Cave Exit (East)')
-        ],
-    0x0a: [
-            ('Old Man Cave (West)', 'Bumper Cave Exit (Bottom)'),
-            ('Death Mountain Return Cave (West)', 'Bumper Cave Exit (Top)'),
-            ('Bumper Cave (Bottom)', 'Old Man Cave Exit (West)'),
-            ('Bumper Cave (Top)', 'Dark Death Mountain Healer Fairy')
-        ]
-}
 
 open_default_connections = [('Links House', 'Links House Exit'),
                             ('Big Bomb Shop', 'Big Bomb Shop')
