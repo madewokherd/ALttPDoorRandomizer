@@ -800,7 +800,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if should_be_bunny(sanc_region, world.mode[player]):
         rom.write_bytes(0x13fff2, [0x12, 0x00])
 
-    lh_name = 'Links House'
+    if not world.is_tile_swapped(0x2c, player):
+        lh_name = 'Links House'
+    else:
+        lh_name = 'Big Bomb Shop'
     links_house = world.get_region(lh_name, player)
     if should_be_bunny(links_house, world.mode[player]):
         rom.write_bytes(0x13fff0, [0x04, 0x01])
@@ -2625,10 +2628,24 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
     if world.is_tile_swapped(0x29, player):
         rom.write_bytes(snes_to_pc(0x06B2AB), [0xF0, 0xE1, 0x05])  # frog pickup on contact
     if world.is_tile_swapped(0x2c, player):
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            rom.write_byte(0x15B8C, 0x6C)  # exit links at bomb shop area
-            rom.write_byte(0xDBB73 + 0x00, 0x53)  # switch bomb shop and links house
-            rom.write_byte(0xDBB73 + 0x52, 0x01)
+        rom.write_bytes(snes_to_pc(0x03F484), [0xFD, 0x4B, 0x68]) # place bed in bomb shop
+        
+        # spawn in bomb shop
+        patch_shuffled_bomb_shop(world, rom, player)
+        rom.write_byte(snes_to_pc(0x02D8D2), 0x1C)
+        rom.write_bytes(snes_to_pc(0x02D8E0), [0x23, 0x22, 0x23, 0x23, 0x18, 0x18, 0x18, 0x19])
+        rom.write_byte(snes_to_pc(0x02D919), 0x18)
+        rom.write_byte(snes_to_pc(0x02D927), 0x23)
+        write_int16(rom, snes_to_pc(0x02D934), 0x2398)
+        rom.write_byte(snes_to_pc(0x02D943), 0x18)
+        write_int16(rom, snes_to_pc(0x02D950), 0x0087)
+        write_int16(rom, snes_to_pc(0x02D95E), 0x0081)
+        rom.write_byte(snes_to_pc(0x02D9A4), 0x53)
+
+        # disable custom exit on links house exit
+        rom.write_byte(snes_to_pc(0x02E225), 0x1C)
+        rom.write_byte(snes_to_pc(0x02DAEE), 0x1C)
+        rom.write_byte(snes_to_pc(0x02DB8C), 0x6C)
     if world.is_tile_swapped(0x2f, player):
         rom.write_bytes(snes_to_pc(0x1BC80D), [0xB2, 0x0B, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC590), 0x00) # remove secret portal
@@ -2659,6 +2676,21 @@ def patch_shuffled_dark_sanc(world, rom, player):
     rom.write_byte(0x180252, ow_area)
     write_int16s(rom, 0x180253, [vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x])
     rom.write_bytes(0x180262, [unknown_1, unknown_2, 0x00])
+
+
+def patch_shuffled_bomb_shop(world, rom, player):
+    bomb_shop = world.get_region('Big Bomb Shop', player)
+    bomb_shop_entrance = str([i for i in bomb_shop.entrances if i.parent_region.name != 'Menu'][0].name)
+    room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[bomb_shop_entrance][1]
+    door_index = door_addresses[str(bomb_shop_entrance)][0]
+
+    rom.write_byte(0x180240, 0x02)
+    rom.write_byte(0x180247, door_index + 1)
+    write_int16(rom, 0x180264, room_id)
+    rom.write_byte(0x180266, ow_area)
+    write_int16s(rom, 0x180267, [vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x])
+    rom.write_bytes(0x180275, [unknown_1, unknown_2, 0x00])
+    write_int16(rom, snes_to_pc(0x02D996), door_1)
 
 
 def update_compasses(rom, world, player):

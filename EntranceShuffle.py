@@ -54,33 +54,33 @@ def link_entrances(world, player):
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
 
-    if not invFlag:
-        for exitname, regionname in open_mandatory_connections:
-            connect_simple(world, exitname, regionname, player)
+    if not world.is_tile_swapped(0x2c, player):
+        connect_simple(world, 'Links House S&Q', 'Links House', player)
     else:
-        for exitname, regionname in inverted_mandatory_connections:
-            connect_simple(world, exitname, regionname, player)
+        connect_simple(world, 'Links House S&Q', 'Big Bomb Shop', player)
+    
+    if not invFlag:
+        connect_simple(world, 'Sanctuary S&Q', 'Sanctuary', player)
+    else:
+        connect_simple(world, 'Sanctuary S&Q', 'Dark Sanctuary Hint', player)
 
     connect_simple(world, 'Tavern North', 'Tavern', player)
     
+    suppress_spoiler = False
     connect_custom(world, player)
+    suppress_spoiler = True
 
     # if we do not shuffle, set default connections
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
         for entrancename, exitname in default_connections + drop_connections + default_item_connections + default_shop_connections:
-            connect_logical(world, entrancename, exitname, player, False)
+            connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
         for entrancename, exitname in default_connector_connections + dropexit_connections:
             connect_logical(world, entrancename, exitname, player, True)
         if invFlag:
             world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance('Dark Sanctuary Hint', player).parent_region)
+        if world.is_tile_swapped(0x2c, player):
+            world.get_entrance('Big Bomb Shop Exit', player).connect(world.get_entrance('Big Bomb Shop', player).parent_region)
         
-        if not invFlag:
-            for entrancename, exitname in open_default_connections:
-                connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
-        else:
-            for entrancename, exitname in inverted_default_connections:
-                connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
-
         ignore_pool = False
 
         # dungeon entrance shuffle
@@ -215,11 +215,12 @@ def link_entrances(world, player):
         junk_fill_inaccessible(world, player)
     
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        bomb_shop = random.choice(bomb_shop_doors)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = list(entrance_pool)
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            bomb_shop = random.choice(bomb_shop_doors)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
@@ -260,11 +261,12 @@ def link_entrances(world, player):
         place_old_man(world, lw_entrances if not invFlag else dw_entrances, player)
         
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        bomb_shop = random.choice(bomb_shop_doors)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = list(entrance_pool)
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            bomb_shop = random.choice(bomb_shop_doors)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
         lw_entrances = [e for e in lw_entrances if e in entrance_pool]
@@ -317,11 +319,12 @@ def link_entrances(world, player):
         place_old_man(world, lw_entrances if not invFlag else dw_entrances, player, list(zip(*drop_connections + dropexit_connections))[0])
         
         # place bomb shop, has limited options
-        bomb_shop_doors = [e for e in entrance_pool if e not in list(zip(*drop_connections + dropexit_connections))[0]]
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in bomb_shop_doors if e not in ['Pyramid Fairy']]
-        bomb_shop = random.choice(bomb_shop_doors)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = [e for e in entrance_pool if e not in list(zip(*drop_connections + dropexit_connections))[0]]
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in bomb_shop_doors if e not in ['Pyramid Fairy']]
+            bomb_shop = random.choice(bomb_shop_doors)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
         lw_entrances = [e for e in lw_entrances if e in entrance_pool]
@@ -419,11 +422,12 @@ def link_entrances(world, player):
         connect_caves(world, lw_entrances, dw_entrances, caves, player)
         
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        bomb_shop = random.choice(bomb_shop_doors)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = list(entrance_pool)
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            bomb_shop = random.choice(bomb_shop_doors)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
@@ -473,11 +477,12 @@ def link_entrances(world, player):
         connect_caves(world, connector_entrances, [], caves, player)
         
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        bomb_shop = random.choice(bomb_shop_doors)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = list(entrance_pool)
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            bomb_shop = random.choice(bomb_shop_doors)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
@@ -522,11 +527,12 @@ def link_entrances(world, player):
         place_old_man(world, pool, player)
     
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        bomb_shop = random.choice(bomb_shop_doors)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = list(entrance_pool)
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            bomb_shop = random.choice(bomb_shop_doors)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
         pool = [e for e in pool if e in entrance_pool]
@@ -605,13 +611,14 @@ def link_entrances(world, player):
         caves.append('Old Man Cave Exit (West)')
 
         # place bomb shop, has limited options
-        bomb_shop_doors = list(entrance_pool)
-        if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
-            bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
-        random.shuffle(bomb_shop_doors)
-        bomb_shop = bomb_shop_doors.pop()
-        pool.remove(bomb_shop)
-        connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
+        if not world.is_tile_swapped(0x2c, player):
+            bomb_shop_doors = list(entrance_pool)
+            if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
+                bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            random.shuffle(bomb_shop_doors)
+            bomb_shop = bomb_shop_doors.pop()
+            pool.remove(bomb_shop)
+            connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
         # shuffle connectors
         doors = list(entrance_pool)
@@ -635,8 +642,8 @@ def link_entrances(world, player):
     # ensure Houlihan exits where Links House does
     # TODO: Plando should overrule this
     if not links_house:
-        for links_house in world.get_entrance('Links House Exit', player).connected_region.exits:
-            if links_house.connected_region and links_house.connected_region.name == 'Links House':
+        for links_house in world.get_entrance('Links House Exit' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop Exit', player).connected_region.exits:
+            if links_house.connected_region and links_house.connected_region.name == ('Links House' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop'):
                 links_house = links_house.name
                 break
     connect_exit(world, 'Chris Houlihan Room Exit', links_house, player)
@@ -1335,7 +1342,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
 def place_links_house(world, player, ignore_list=[]):
     invFlag = world.mode[player] == 'inverted'
     if world.mode[player] == 'standard' or not world.shufflelinks[player]:
-        links_house = 'Links House' if not invFlag else 'Big Bomb Shop'
+        links_house = 'Links House' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop'
     else:
         if invFlag:
             for dark_sanc in world.get_entrance('Dark Sanctuary Hint Exit', player).connected_region.exits:
@@ -1354,7 +1361,11 @@ def place_links_house(world, player, ignore_list=[]):
         links_house_doors = [e for e in links_house_doors if e not in ignore_list]
         assert len(links_house_doors), 'No valid candidates to place Links House'
         links_house = random.choice(links_house_doors)
-    connect_two_way(world, links_house, 'Links House Exit', player)
+    if not world.is_tile_swapped(0x2c, player):
+        connect_two_way(world, links_house, 'Links House Exit', player)
+    else:
+        connect_entrance(world, links_house, 'Big Bomb Shop', player)
+        world.get_entrance('Big Bomb Shop Exit', player).connect(world.get_entrance(links_house, player).parent_region)
     return links_house
 
 
@@ -2037,8 +2048,7 @@ Exit_Pool_Base = ['Links House Exit',
                 'Pyramid']
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [('Links House S&Q', 'Links House'),
-                         ('Old Man S&Q', 'Old Man House'),
+mandatory_connections = [('Old Man S&Q', 'Old Man House'),
 
                          # UW Connections
                          ('Lost Woods Hideout (top to bottom)', 'Lost Woods Hideout (bottom)'),
@@ -2068,10 +2078,6 @@ mandatory_connections = [('Links House S&Q', 'Links House'),
                          ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
                          ('Ganon Drop', 'Bottom of Pyramid')
                     ]
-
-open_mandatory_connections = [('Sanctuary S&Q', 'Sanctuary')]
-
-inverted_mandatory_connections = [('Sanctuary S&Q', 'Dark Sanctuary Hint')]
 
 # non-shuffled entrance links
 default_connections = [('Lumberjack House', 'Lumberjack House'),
@@ -2137,7 +2143,8 @@ default_connector_connections = [('Old Man Cave (West)', 'Old Man Cave Exit (Wes
                                  ('Hookshot Cave Back Entrance', 'Hookshot Cave Back Exit')
                             ]
 
-default_item_connections = [('Mimic Cave', 'Mimic Cave'),
+default_item_connections = [('Links House', 'Links House Exit'),
+                            ('Mimic Cave', 'Mimic Cave'),
                             ('Waterfall of Wishing', 'Waterfall of Wishing'),
                             ('Bonk Rock Cave', 'Bonk Rock Cave'),
                             ('Graveyard Cave', 'Graveyard Cave'),
@@ -2161,6 +2168,7 @@ default_item_connections = [('Mimic Cave', 'Mimic Cave'),
                             ('Brewery', 'Brewery'),
                             ('Pyramid Fairy', 'Pyramid Fairy'),
                             ('Dark World Hammer Peg Cave', 'Dark World Hammer Peg Cave'),
+                            ('Big Bomb Shop', 'Big Bomb Shop'),
                             ('Mire Shed', 'Mire Shed'),
                             ('Hype Cave', 'Hype Cave')
                         ]
@@ -2194,14 +2202,6 @@ default_dropexit_connections = [('Lost Woods Hideout Stump', 'Lost Woods Hideout
                                 ('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit'),
                                 ('Bat Cave Cave', 'Bat Cave Exit'),
                                 #('Pyramid Entrance', 'Pyramid Exit') # this is dynamically added because of Inverted/OW Mixed
-                            ]
-
-open_default_connections = [('Links House', 'Links House Exit'),
-                            ('Big Bomb Shop', 'Big Bomb Shop')
-                        ]
-
-inverted_default_connections = [('Big Bomb Shop', 'Links House Exit'),
-                                ('Links House', 'Big Bomb Shop')
                             ]
 
 # non shuffled dungeons

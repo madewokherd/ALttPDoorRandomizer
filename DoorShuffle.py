@@ -1815,10 +1815,7 @@ def remove_pair_type_if_present(door, world, player):
 
 def find_inaccessible_regions(world, player):
     world.inaccessible_regions[player] = []
-    if world.mode[player] != 'inverted':
-        start_regions = ['Links House', 'Sanctuary']
-    else:
-        start_regions = ['Links House', 'Dark Sanctuary Hint']
+    start_regions = ['Links House' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
     regs = convert_regions(start_regions, world, player)
     all_regions = [r for r in world.regions if r.player == player and r.type is not RegionType.Dungeon]
     visited_regions = set()

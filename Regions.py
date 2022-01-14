@@ -326,7 +326,7 @@ def create_regions(world, player):
         create_cave_region(player, 'Dark World Hammer Peg Cave', 'a cave with an item', ['Peg Cave']),
         create_cave_region(player, 'Archery Game', 'a game of skill'),
         create_cave_region(player, 'Bonk Fairy (Dark)', 'a fairy fountain'),
-        create_cave_region(player, 'Big Bomb Shop', 'the bomb shop', ['Big Bomb']),
+        create_cave_region(player, 'Big Bomb Shop', 'the bomb shop', ['Big Bomb'], ['Big Bomb Shop Exit']),
         create_cave_region(player, 'Dark Lake Hylia Healer Fairy', 'a fairy fountain'),
         create_cave_region(player, 'East Dark World Hint', 'a storyteller'),
         create_cave_region(player, 'Hype Cave', 'a bounty of five items', ['Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left',

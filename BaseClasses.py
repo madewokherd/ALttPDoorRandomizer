@@ -1661,7 +1661,7 @@ class Entrance(object):
             # this is checked first as this often the shortest path
             follower_region = start_region
             if follower_region.type not in [RegionType.LightWorld, RegionType.DarkWorld]:
-                follower_region = start_region.entrances[0].parent_region
+                follower_region = [i for i in start_region.entrances if i.parent_region.name != 'Menu'][0].parent_region
             if (follower_region.world.mode[self.player] != 'inverted') == (follower_region.type == RegionType.LightWorld):
                 from OWEdges import OWTileRegions
                 from OverworldShuffle import ow_connections
