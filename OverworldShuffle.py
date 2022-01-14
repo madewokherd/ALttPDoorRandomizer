@@ -841,7 +841,11 @@ def can_reach_smith(world, player):
     
     found = False
     explored_regions = list()
-    explore_region('Links House')
+    if not world.is_tile_swapped(0x2c, player):
+        start_region = 'Links House'
+    else:
+        start_region = 'Big Bomb Shop'
+    explore_region(start_region)
     if not found:
         if not invFlag:
             explore_region('Sanctuary')
