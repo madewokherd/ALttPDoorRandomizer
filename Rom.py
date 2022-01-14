@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '7f50c5e64c151af842e5887c69ac9cfc'
+RANDOMIZERBASEHASH = '57e05a3a24204d6083d293dbd04da991'
 
 
 class JsonRom(object):
@@ -1275,6 +1275,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180174, 0x01 if world.fix_fake_world[player] else 0x00)
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
 
+    # starting overworld flags
+    assert len(world.initial_overworld_flags[player]) == 0x80 and all([i < 0x100 for i in world.initial_overworld_flags[player]])
+    rom.write_bytes(0x183280, world.initial_overworld_flags[player])
+
     # Starting equipment
     if world.pseudoboots[player]:
         rom.write_byte(0x18008E, 0x01)
@@ -1431,11 +1435,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_byte(0x180043, equip[0x359])
 
     assert equip[:0x340] == [0] * 0x340
-    rom.write_bytes(0x183000, equip[0x340:])
+    rom.write_bytes(0x183340, equip[0x340:])
     rom.write_bytes(0x271A6, equip[0x340:0x340+60])
     
-    rom.write_bytes(0x183080, world.initial_overworld_flags[player]) # starting overworld flags
-
     rom.write_byte(0x18004A, 0x00 if world.mode[player] != 'inverted' else 0x01)  # Inverted mode
     rom.write_byte(0x18005D, 0x00) # Hammer always breaks barrier
     rom.write_byte(0x03A943, 0xD0 if world.mode[player] != 'inverted' else 0xF0) # Mirror: Normal  (D0=Dark to Light, F0=light to dark, 42 = both)
