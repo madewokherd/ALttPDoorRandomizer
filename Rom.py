@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'e57c15f7a80a8e65d0c50c9eec99f072'
+RANDOMIZERBASEHASH = '7f50c5e64c151af842e5887c69ac9cfc'
 
 
 class JsonRom(object):
@@ -1433,6 +1433,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     assert equip[:0x340] == [0] * 0x340
     rom.write_bytes(0x183000, equip[0x340:])
     rom.write_bytes(0x271A6, equip[0x340:0x340+60])
+    
+    rom.write_bytes(0x183080, world.initial_overworld_flags[player]) # starting overworld flags
 
     rom.write_byte(0x18004A, 0x00 if world.mode[player] != 'inverted' else 0x01)  # Inverted mode
     rom.write_byte(0x18005D, 0x00) # Hammer always breaks barrier
@@ -2669,6 +2671,7 @@ def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[dark_sanc_entrance][1]
     door_index = door_addresses[str(dark_sanc_entrance)][0]
+    world.initial_overworld_flags[player][ow_area] |= door_addresses[dark_sanc_entrance][2]
 
     rom.write_byte(0x180241, 0x01)
     rom.write_byte(0x180248, door_index + 1)
@@ -2683,6 +2686,7 @@ def patch_shuffled_bomb_shop(world, rom, player):
     bomb_shop_entrance = str([i for i in bomb_shop.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[bomb_shop_entrance][1]
     door_index = door_addresses[str(bomb_shop_entrance)][0]
+    world.initial_overworld_flags[player][ow_area] |= door_addresses[bomb_shop_entrance][2]
 
     rom.write_byte(0x180240, 0x02)
     rom.write_byte(0x180247, door_index + 1)
