@@ -1385,8 +1385,6 @@ ow_connections = {
         ], [
             ('Spectacle Rock Leave', 'West Death Mountain (Top)'),
             ('Spectacle Rock Approach', 'Spectacle Rock Ledge'),
-            ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'),
-            ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'),
             ('West Dark Death Mountain (Top) Mirror Spot', 'West Dark Death Mountain (Top)'),
             ('Bubble Boy Mirror Spot', 'West Dark Death Mountain (Bottom)'),
             ('West Dark Death Mountain (Bottom) Mirror Spot', 'West Dark Death Mountain (Bottom)'),
