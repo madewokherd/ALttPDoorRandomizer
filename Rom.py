@@ -629,21 +629,33 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             offset = 0x40
         
         write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), data[1] + offset) # owid
-        write_int16(rom, snes_to_pc(0x02E86B + (o * 2)), data[2]) #vram
-        write_int16(rom, snes_to_pc(0x02E88D + (o * 2)), data[3]) # BG scroll Y
-        write_int16(rom, snes_to_pc(0x02E8AF + (o * 2)), data[4]) # BG scroll X
         write_int16(rom, snes_to_pc(0x02E8D1 + (o * 2)), data[13] if offset > 0 and len(data) > 13 else data[5]) # link Y
         write_int16(rom, snes_to_pc(0x02E8F3 + (o * 2)), data[14] if offset > 0 and len(data) > 13 else data[6]) # link X
-        write_int16(rom, snes_to_pc(0x02E915 + (o * 2)), data[7]) # cam Y
-        write_int16(rom, snes_to_pc(0x02E937 + (o * 2)), data[8]) # cam X
-        write_int16(rom, snes_to_pc(0x02E959 + (o * 2)), data[9]) # unknown 1
-        write_int16(rom, snes_to_pc(0x02E97B + (o * 2)), data[10]) # unknown 2
-
-        # flute menu blips
-        rom.write_byte(snes_to_pc(0x0AB783 + o), data[12] & 0xff) # X low byte
-        rom.write_byte(snes_to_pc(0x0AB78B + o), data[12] // 0x100) # X high byte
-        rom.write_byte(snes_to_pc(0x0AB793 + o), data[11] & 0xff) # Y low byte
-        rom.write_byte(snes_to_pc(0x0AB79B + o), data[11] // 0x100) # Y high byte
+        
+        if offset == 0 or len(data) <= 15:
+            write_int16(rom, snes_to_pc(0x02E86B + (o * 2)), data[2]) # vram
+            write_int16(rom, snes_to_pc(0x02E88D + (o * 2)), data[3]) # BG scroll Y
+            write_int16(rom, snes_to_pc(0x02E8AF + (o * 2)), data[4]) # BG scroll X
+            write_int16(rom, snes_to_pc(0x02E915 + (o * 2)), data[7]) # cam Y
+            write_int16(rom, snes_to_pc(0x02E937 + (o * 2)), data[8]) # cam X
+            write_int16(rom, snes_to_pc(0x02E959 + (o * 2)), data[9]) # unknown 1
+            write_int16(rom, snes_to_pc(0x02E97B + (o * 2)), data[10]) # unknown 2
+            rom.write_byte(snes_to_pc(0x0AB783 + o), data[12] & 0xff) # flute menu blip - X low byte
+            rom.write_byte(snes_to_pc(0x0AB78B + o), data[12] // 0x100) # flute menu blip - X high byte
+            rom.write_byte(snes_to_pc(0x0AB793 + o), data[11] & 0xff) # flute menu blip - Y low byte
+            rom.write_byte(snes_to_pc(0x0AB79B + o), data[11] // 0x100) # flute menu blip - Y high byte
+        else: # use alternate flute data
+            write_int16(rom, snes_to_pc(0x02E86B + (o * 2)), data[15]) # vram
+            write_int16(rom, snes_to_pc(0x02E88D + (o * 2)), data[16]) # BG scroll Y
+            write_int16(rom, snes_to_pc(0x02E8AF + (o * 2)), data[17]) # BG scroll X
+            write_int16(rom, snes_to_pc(0x02E915 + (o * 2)), data[18]) # cam Y
+            write_int16(rom, snes_to_pc(0x02E937 + (o * 2)), data[19]) # cam X
+            write_int16(rom, snes_to_pc(0x02E959 + (o * 2)), data[20]) # unknown 1
+            write_int16(rom, snes_to_pc(0x02E97B + (o * 2)), data[21]) # unknown 2
+            rom.write_byte(snes_to_pc(0x0AB783 + o), data[23] & 0xff) # flute menu blip - X low byte
+            rom.write_byte(snes_to_pc(0x0AB78B + o), data[23] // 0x100) # flute menu blip - X high byte
+            rom.write_byte(snes_to_pc(0x0AB793 + o), data[22] & 0xff) # flute menu blip - Y low byte
+            rom.write_byte(snes_to_pc(0x0AB79B + o), data[22] // 0x100) # flute menu blip - Y high byte
 
     # patch whirlpools
     if world.owWhirlpoolShuffle[player]:
