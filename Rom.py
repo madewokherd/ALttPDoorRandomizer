@@ -2278,13 +2278,18 @@ def write_strings(rom, world, player, team):
         
         # Lastly we write hints to show where certain interesting items are. It is done the way it is to re-use the silver code and also to give one hint per each type of item regardless of how many exist. This supports many settings well.
         items_to_hint = RelevantItems.copy()
+        flute_item = 'Ocarina'
+        if world.is_tile_swapped(0x18, player):
+            items_to_hint.remove(flute_item)
+            flute_item = 'Ocarina (Activated)'
+            items_to_hint.append(flute_item)
         if world.owShuffle[player] != 'vanilla' or world.owMixed[player]:
             # Adding a guaranteed hint for the Flute in overworld shuffle.
-            this_location = world.find_items_not_key_only('Ocarina', player)
+            this_location = world.find_items_not_key_only(flute_item, player)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
                 tt[hint_locations.pop(0)] = this_hint
-            items_to_hint.remove('Ocarina')
+            items_to_hint.remove(flute_item)
         if world.keyshuffle[player]:
             items_to_hint.extend(SmallKeys)
         if world.bigkeyshuffle[player]:

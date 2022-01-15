@@ -749,7 +749,7 @@ rupee_chart = {'Rupee (1)': 1, 'Rupees (5)': 5, 'Rupees (20)': 20, 'Rupees (50)'
                'Rupees (100)': 100, 'Rupees (300)': 300}
 
 
-def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, bombbag, door_shuffle, logic, flute_start):
+def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, bombbag, door_shuffle, logic, flute_activated):
     pool = []
     placed_items = {}
     precollected_items = []
@@ -760,6 +760,10 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     triforcepool = ['Triforce Piece'] * int(treasure_hunt_total)
 
     pool.extend(alwaysitems)
+
+    if flute_activated:
+        pool.remove('Ocarina')
+        pool.append('Ocarina (Activated)')
 
     def place_item(loc, item):
         assert loc not in placed_items
@@ -773,9 +777,6 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
         precollected_items.append('Pegasus Boots')
         pool.remove('Pegasus Boots')
         pool.extend(['Rupees (20)'])
-    
-    if flute_start:
-        precollected_items.append('Ocarina')
     
     if want_progressives():
         pool.extend(progressivegloves)
