@@ -1184,14 +1184,14 @@ OWTileGroups = {
             0x6b
         ]
     ),
-    # ("Links", "Regular", "None"): (
-    #     [
-    #         0x2c
-    #     ],
-    #     [
-    #         0x6c
-    #     ]
-    # ),
+    ("Links", "Regular", "None"): (
+        [
+            0x2c
+        ],
+        [
+            0x6c
+        ]
+    ),
     ("Tree Line", "Regular", "None"): (
         [
             0x2e
