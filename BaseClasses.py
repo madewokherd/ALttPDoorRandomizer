@@ -304,6 +304,9 @@ class World(object):
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
+    def is_bombshop_start(self, player):
+        return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
+
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname

@@ -841,7 +841,7 @@ def can_reach_smith(world, player):
     
     found = False
     explored_regions = list()
-    if not world.is_tile_swapped(0x2c, player):
+    if not world.is_bombshop_start(player):
         start_region = 'Links House'
     else:
         start_region = 'Big Bomb Shop'
@@ -1031,7 +1031,7 @@ def validate_layout(world, player):
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:
-        if not world.is_tile_swapped(0x2c, player):
+        if not world.is_bombshop_start(player):
             start_region = 'Links House Area'
         else:
             start_region = 'Big Bomb Shop Area'

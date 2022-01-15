@@ -1815,7 +1815,7 @@ def remove_pair_type_if_present(door, world, player):
 
 def find_inaccessible_regions(world, player):
     world.inaccessible_regions[player] = []
-    start_regions = ['Links House' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
+    start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
     regs = convert_regions(start_regions, world, player)
     all_regions = [r for r in world.regions if r.player == player and r.type is not RegionType.Dungeon]
     visited_regions = set()
@@ -1851,7 +1851,7 @@ def find_accessible_entrances(world, player, builder):
     if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle':
         start_regions = ['Hyrule Castle Courtyard']
     else:
-        start_regions = ['Links House' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
+        start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
     if world.is_tile_swapped(0x1b, player):
         start_regions.append('Hyrule Castle Ledge')
     regs = convert_regions(start_regions, world, player)
@@ -1886,7 +1886,7 @@ def find_accessible_entrances(world, player, builder):
 
 
 def valid_inaccessible_region(world, r, player):
-    return r.type is not RegionType.Cave or (len(r.exits) > 0 and r.name not in ['Links House' if not world.is_tile_swapped(0x2c, player) else 'Big Bomb Shop', 'Chris Houlihan Room'])
+    return r.type is not RegionType.Cave or (len(r.exits) > 0 and r.name not in ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop', 'Chris Houlihan Room'])
 
 
 def add_inaccessible_doors(world, player):
