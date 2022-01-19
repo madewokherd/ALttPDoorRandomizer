@@ -61,6 +61,7 @@ class World(object):
         self.lock_aga_door_in_escape = False
         self.save_and_quit_from_boss = True
         self.accessibility = accessibility.copy()
+        self.initial_overworld_flags = {}
         self.fix_skullwoods_exit = {}
         self.fix_palaceofdarkness_exit = {}
         self.fix_trock_exit = {}
@@ -118,6 +119,7 @@ class World(object):
             set_player_attr('ganon_at_pyramid', True)
             set_player_attr('ganonstower_vanilla', True)
             set_player_attr('sewer_light_cone', self.mode[player] == 'standard')
+            set_player_attr('initial_overworld_flags', [0] * 0x80)
             set_player_attr('fix_trock_doors', self.shuffle[player] != 'vanilla' or ((self.mode[player] == 'inverted') != 0x05 in self.owswaps[player][0]))
             set_player_attr('fix_skullwoods_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'] or self.doorShuffle[player] not in ['vanilla'])
             set_player_attr('fix_palaceofdarkness_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'])
@@ -301,6 +303,9 @@ class World(object):
     
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
+
+    def is_bombshop_start(self, player):
+        return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
 
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
@@ -1310,10 +1315,10 @@ class CollectionState(object):
         return self.has('Fire Rod', player) or self.has('Lamp', player)
 
     def can_flute(self, player):
-        if any(map(lambda i: i.name == 'Ocarina', self.world.precollected_items)):
+        if any(map(lambda i: i.name in ['Ocarina', 'Ocarina (Activated)'], self.world.precollected_items)):
             return True
         lw = self.world.get_region('Kakariko Area', player)
-        return self.has('Ocarina', player) and lw.can_reach(self) and self.is_not_bunny(lw, player)
+        return self.has('Ocarina Activated', player) or (self.has('Ocarina', player) and lw.can_reach(self) and self.is_not_bunny(lw, player))
 
     def can_melt_things(self, player):
         return self.has('Fire Rod', player) or (self.has('Bombos', player) and self.has_sword(player))
@@ -1661,7 +1666,7 @@ class Entrance(object):
             # this is checked first as this often the shortest path
             follower_region = start_region
             if follower_region.type not in [RegionType.LightWorld, RegionType.DarkWorld]:
-                follower_region = start_region.entrances[0].parent_region
+                follower_region = [i for i in start_region.entrances if i.parent_region.name != 'Menu'][0].parent_region
             if (follower_region.world.mode[self.player] != 'inverted') == (follower_region.type == RegionType.LightWorld):
                 from OWEdges import OWTileRegions
                 from OverworldShuffle import ow_connections

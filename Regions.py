@@ -17,8 +17,9 @@ def create_regions(world, player):
         create_lw_region(player, 'West Death Mountain (Bottom)', None, ['Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)', 'Death Mountain Return Cave (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'West Dark Death Mountain (Bottom) Mirror Spot', 'West Death Mountain Teleporter', 'West Death Mountain ES']),
         create_lw_region(player, 'East Death Mountain (Top West)', None, ['DM Hammer Bridge (West)', 'East Dark Death Mountain (Top West) Mirror Spot', 'East Death Mountain WN']),
         create_lw_region(player, 'East Death Mountain (Top East)', None, ['DM Hammer Bridge (East)', 'Floating Island Bridge (East)', 'East Death Mountain Spiral Ledge Drop', 'East Death Mountain Fairy Ledge Drop', 'East Death Mountain Mimic Ledge Drop', 'Paradox Cave (Top)', 'East Dark Death Mountain (Top East) Mirror Spot', 'East Death Mountain EN']),
-        create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Ledge Drop', 'Spiral Cave', 'TR Ledge (West) Mirror Spot']),
-        create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Ledge Drop', 'Mimic Cave', 'TR Ledge (East) Mirror Spot']),
+        create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Ledge Drop', 'Spiral Mimic Bridge (West)', 'Spiral Cave', 'TR Ledge (West) Mirror Spot']),
+        create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Ledge Drop', 'Spiral Mimic Bridge (East)', 'Mimic Cave', 'TR Ledge (East) Mirror Spot']),
+        create_lw_region(player, 'Spiral Mimic Ledge Extend', None, ['Spiral Ledge Approach', 'Mimic Ledge Approach', 'Spiral Mimic Ledge Drop']),
         create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Ledge Drop', 'Fairy Ascension Cave (Top)', 'TR Isolated Mirror Spot']),
         create_lw_region(player, 'Fairy Ascension Plateau', None, ['Fairy Ascension Rocks (North)', 'Fairy Ascension Plateau Ledge Drop', 'Fairy Ascension Cave (Bottom)', 'East Dark Death Mountain (Bottom Plateau) Mirror Spot']),
         create_lw_region(player, 'East Death Mountain (Bottom Left)', None, ['DM Broken Bridge (West)', 'East Dark Death Mountain (Bottom Left) Mirror Spot', 'East Death Mountain WS']),
@@ -111,6 +112,7 @@ def create_regions(world, player):
         create_lw_region(player, 'Lake Hylia Central Island', None, ['Lake Hylia Central Water Drop', 'Capacity Upgrade', 'Ice Palace Mirror Spot', 'Lake Hylia Teleporter']),
         create_lw_region(player, 'Lake Hylia Island', ['Lake Hylia Island'], ['Lake Hylia Island Water Drop']),
         create_lw_region(player, 'Lake Hylia Water', None, ['Lake Hylia Central Island Pier', 'Lake Hylia Island Pier', 'Lake Hylia West Pier', 'Lake Hylia East Pier', 'Lake Hylia NC', 'Lake Hylia EC', 'Lake Hylia Whirlpool'], Terrain.Water),
+        create_lw_region(player, 'Lake Hylia Water D', None, ['Lake Hylia Water D Entry', 'Ice Lake Moat Mirror Spot'], Terrain.Water),
         create_lw_region(player, 'Ice Cave Area', None, ['Ice Rod Cave', 'Good Bee Cave', '20 Rupee Cave', 'Shopping Mall Mirror Spot', 'Ice Cave SE', 'Ice Cave SW']),
         create_lw_region(player, 'Desert Pass Area', ['Middle Aged Man'], ['Desert Pass Ladder (South)', 'Middle Aged Man', 'Desert Fairy', '50 Rupee Cave', 'Swamp Nook Mirror Spot', 'Desert Pass WS', 'Desert Pass EC', 'Desert Pass Rocks (North)']),
         create_lw_region(player, 'Middle Aged Man', ['Purple Chest'], None),
@@ -129,9 +131,9 @@ def create_regions(world, player):
         create_dw_region(player, 'Skull Woods Forgotten Path (Southwest)', None, ['Skull Woods Forgotten Bush (West)', 'Lost Woods Southwest Mirror Spot', 'Skull Woods SW']),
         create_dw_region(player, 'Skull Woods Forgotten Path (Northeast)', None, ['Skull Woods Forgotten Bush (East)', 'Lost Woods East (Forgotten) Mirror Spot', 'Lost Woods West (Forgotten) Mirror Spot', 'Skull Woods EN']),
         create_dw_region(player, 'Dark Lumberjack Area', None, ['Dark World Lumberjack Shop', 'Lumberjack Mirror Spot', 'Dark Lumberjack WN', 'Dark Lumberjack SW']),
-        create_dw_region(player, 'West Dark Death Mountain (Top)', None, ['Dark Death Mountain Drop (West)', 'GT Entry Approach', 'Dark Death Mountain Ladder (North)', 'West Death Mountain (Top) Mirror Spot', 'West Dark Death Mountain EN']),
+        create_dw_region(player, 'West Dark Death Mountain (Top)', None, ['Dark Death Mountain Drop (West)', 'GT Entry Approach', 'West Death Mountain (Top) Mirror Spot', 'West Dark Death Mountain EN']),
         create_dw_region(player, 'GT Approach', None, ['GT Entry Leave', 'Ganons Tower']),
-        create_dw_region(player, 'West Dark Death Mountain (Bottom)', None, ['Dark Death Mountain Ladder (South)', 'Spike Cave', 'Dark Death Mountain Fairy', 'Dark Death Mountain Teleporter (West)', 'Spectacle Rock Mirror Spot', 'West Dark Death Mountain ES']),
+        create_dw_region(player, 'West Dark Death Mountain (Bottom)', None, ['Spike Cave', 'Dark Death Mountain Fairy', 'Dark Death Mountain Teleporter (West)', 'Spectacle Rock Mirror Spot', 'West Dark Death Mountain ES']),
         create_dw_region(player, 'East Dark Death Mountain (Top)', None, ['Dark Death Mountain Drop (East)', 'Superbunny Cave (Top)', 'Hookshot Cave', 'East Death Mountain (Top West) Mirror Spot', 'East Death Mountain (Top East) Mirror Spot', 'East Dark Death Mountain WN', 'East Dark Death Mountain EN']),
         create_dw_region(player, 'East Dark Death Mountain (Bottom)', None, ['Superbunny Cave (Bottom)', 'Cave Shop (Dark Death Mountain)', 'Dark Death Mountain Teleporter (East)', 'Fairy Ascension Mirror Spot']),
         create_dw_region(player, 'East Dark Death Mountain (Bottom Left)', None, ['Death Mountain Bridge Mirror Spot', 'East Dark Death Mountain WS']),
@@ -211,8 +213,8 @@ def create_regions(world, player):
         create_dw_region(player, 'Ice Lake Ledge (West)', None, ['Ice Lake Southwest Water Drop', 'South Shore Mirror Spot', 'Ice Lake WS']),
         create_dw_region(player, 'Ice Lake Ledge (East)', None, ['Ice Lake Southeast Water Drop', 'South Shore East Mirror Spot', 'Ice Lake ES']),
         create_dw_region(player, 'Ice Lake Water', None, ['Ice Lake Northeast Pier', 'Ice Lake Moat Bomb Jump', 'Lake Hylia Island Mirror Spot', 'Ice Lake NC', 'Ice Lake EC'], Terrain.Water),
-        create_dw_region(player, 'Ice Lake Moat', None, ['Ice Lake Moat Water Entry', 'Ice Lake Northeast Pier Hop', 'Ice Palace Approach', 'Lake Hylia Water Mirror Spot']),
-        create_dw_region(player, 'Ice Palace Area', None, ['Ice Palace Leave', 'Ice Palace', 'Ice Palace Teleporter', 'Lake Hylia Central Island Mirror Spot']),
+        create_dw_region(player, 'Ice Lake Moat', None, ['Ice Lake Moat Water Entry', 'Ice Lake Northeast Pier Hop', 'Lake Hylia Water Mirror Spot']),
+        create_dw_region(player, 'Ice Palace Area', None, ['Ice Palace', 'Ice Palace Teleporter', 'Lake Hylia Central Island Mirror Spot']),
         create_dw_region(player, 'Shopping Mall Area', None, ['Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Spike Cave', 'Ice Cave Mirror Spot', 'Shopping Mall SW', 'Shopping Mall SE']),
         create_dw_region(player, 'Swamp Nook Area', None, ['Desert Pass Ledge Mirror Spot', 'Desert Pass Mirror Spot', 'Swamp Nook EC', 'Swamp Nook ES']),
         create_dw_region(player, 'Swamp Area', None, ['Swamp Palace', 'Dam Mirror Spot', 'Swamp WC', 'Swamp WS', 'Swamp NC', 'Swamp EC']),
@@ -326,7 +328,7 @@ def create_regions(world, player):
         create_cave_region(player, 'Dark World Hammer Peg Cave', 'a cave with an item', ['Peg Cave']),
         create_cave_region(player, 'Archery Game', 'a game of skill'),
         create_cave_region(player, 'Bonk Fairy (Dark)', 'a fairy fountain'),
-        create_cave_region(player, 'Big Bomb Shop', 'the bomb shop', ['Big Bomb']),
+        create_cave_region(player, 'Big Bomb Shop', 'the bomb shop', ['Big Bomb'], ['Big Bomb Shop Exit']),
         create_cave_region(player, 'Dark Lake Hylia Healer Fairy', 'a fairy fountain'),
         create_cave_region(player, 'East Dark World Hint', 'a storyteller'),
         create_cave_region(player, 'Hype Cave', 'a bounty of five items', ['Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left',
@@ -1125,8 +1127,8 @@ def create_shops(world, player):
             if (0x35 not in world.owswaps[player][0] and region_name == 'Dark Lake Hylia Shop') \
                     or (0x35 in world.owswaps[player][0] and region_name == 'Cave Shop (Lake Hylia)'):
                 locked = True
-                custom = True
                 inventory = [('Blue Potion', 160), ('Blue Shield', 50), ('Bombs (10)', 50)]
+                custom = True
         region = world.get_region(region_name, player)
         shop = Shop(region, room_id, type, shopkeeper, custom, locked, sram)
         region.shop = shop

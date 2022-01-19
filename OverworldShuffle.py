@@ -5,7 +5,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.4.0-u'
+__version__ = '0.2.5.0-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -817,7 +817,7 @@ def can_reach_smith(world, player):
                 region = world.get_region(region_name, player)
             for exit in region.exits:
                 if not found and exit.connected_region is not None:
-                    if any(map(lambda i: i.name == 'Ocarina', world.precollected_items)) and exit.spot_type == 'Flute':
+                    if any(map(lambda i: i.name in ['Ocarina', 'Ocarina (Activated)'], world.precollected_items)) and exit.spot_type == 'Flute':
                         fluteregion = exit.connected_region
                         for flutespot in fluteregion.exits:
                             if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
@@ -841,7 +841,11 @@ def can_reach_smith(world, player):
     
     found = False
     explored_regions = list()
-    explore_region('Links House')
+    if not world.is_bombshop_start(player):
+        start_region = 'Links House'
+    else:
+        start_region = 'Big Bomb Shop'
+    explore_region(start_region)
     if not found:
         if not invFlag:
             explore_region('Sanctuary')
@@ -869,7 +873,7 @@ def build_sectors(world, player):
         if (any(r in unique_regions for r in explored_regions)):
             for s in range(len(sectors)):
                 if (any(r in sectors[s] for r in explored_regions)):
-                    sectors[s] = list(list(sectors[s]) + list(explored_regions))
+                    sectors[s] = list(dict.fromkeys(list(sectors[s]) + list(explored_regions)))
                     break
         else:
             sectors.append(explored_regions)
@@ -895,7 +899,7 @@ def build_sectors(world, player):
             if (any(r in unique_regions for r in explored_regions)):
                 for s2 in range(len(sectors2)):
                     if (any(r in sectors2[s2] for r in explored_regions)):
-                        sectors2[s2] = list(sectors2[s2] + explored_regions)
+                        sectors2[s2] = list(dict.fromkeys(sectors2[s2] + explored_regions))
                         break
             else:
                 sectors2.append(explored_regions)
@@ -918,7 +922,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
             region = base_world.get_region(region_name, player)
         for exit in region.exits:
             if exit.connected_region is not None:
-                if any(map(lambda i: i.name == 'Ocarina', base_world.precollected_items)) and exit.spot_type == 'Flute':
+                if any(map(lambda i: i.name in ['Ocarina', 'Ocarina (Activated)'], base_world.precollected_items)) and exit.spot_type == 'Flute':
                     fluteregion = exit.connected_region
                     for flutespot in fluteregion.exits:
                         if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
@@ -1027,7 +1031,7 @@ def validate_layout(world, player):
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:
-        if not world.is_tile_swapped(0x2c, player):
+        if not world.is_bombshop_start(player):
             start_region = 'Links House Area'
         else:
             start_region = 'Big Bomb Shop Area'
@@ -1049,7 +1053,7 @@ def validate_layout(world, player):
         start_region = 'Hyrule Castle Ledge'
     explore_region(start_region)
 
-    unreachable_regions = {}
+    unreachable_regions = OrderedDict()
     unreachable_count = -1
     while unreachable_count != len(unreachable_regions):
         # find unreachable regions
@@ -1204,6 +1208,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'),
                          ('Lake Hylia West Pier', 'Lake Hylia Area'),
                          ('Lake Hylia East Pier', 'Lake Hylia Northeast Bank'),
+                         ('Lake Hylia Water D Entry', 'Lake Hylia Water'), #flippers
                          ('Desert Pass Ledge Drop', 'Desert Pass Area'),
                          ('Desert Pass Rocks (North)', 'Desert Pass Southeast'), #glove
                          ('Desert Pass Rocks (South)', 'Desert Pass Area'), #glove
@@ -1381,8 +1386,6 @@ ow_connections = {
         ], [
             ('Spectacle Rock Leave', 'West Death Mountain (Top)'),
             ('Spectacle Rock Approach', 'Spectacle Rock Ledge'),
-            ('Dark Death Mountain Ladder (North)', 'West Dark Death Mountain (Bottom)'),
-            ('Dark Death Mountain Ladder (South)', 'West Dark Death Mountain (Top)'),
             ('West Dark Death Mountain (Top) Mirror Spot', 'West Dark Death Mountain (Top)'),
             ('Bubble Boy Mirror Spot', 'West Dark Death Mountain (Bottom)'),
             ('West Dark Death Mountain (Bottom) Mirror Spot', 'West Dark Death Mountain (Bottom)'),
@@ -1403,6 +1406,11 @@ ow_connections = {
             ('Floating Island Bridge (East)', 'Death Mountain Floating Island'),
             ('East Death Mountain Mimic Ledge Drop', 'Mimic Cave Ledge'),
             ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'),
+            ('Spiral Mimic Bridge (West)', 'Spiral Mimic Ledge Extend'),
+            ('Spiral Mimic Bridge (East)', 'Spiral Mimic Ledge Extend'),
+            ('Spiral Ledge Approach', 'Spiral Cave Ledge'),
+            ('Mimic Ledge Approach', 'Mimic Cave Ledge'),
+            ('Spiral Mimic Ledge Drop', 'Fairy Ascension Ledge'),
             ('East Dark Death Mountain (Top West) Mirror Spot', 'East Dark Death Mountain (Top)'),
             ('East Dark Death Mountain (Top East) Mirror Spot', 'East Dark Death Mountain (Top)'),
             ('TR Ledge (West) Mirror Spot', 'Dark Death Mountain Ledge'),
@@ -1662,14 +1670,13 @@ ow_connections = {
             ('Lake Hylia Teleporter', 'Ice Palace Area')
         ], [
             ('Lake Hylia Island Pier', 'Lake Hylia Island'),
-            ('Ice Palace Approach', 'Ice Palace Area'),
-            ('Ice Palace Leave', 'Ice Lake Moat'),
             ('Ice Lake Mirror Spot', 'Ice Lake Area'),
             ('Ice Lake Southwest Mirror Spot', 'Ice Lake Ledge (West)'),
             ('Ice Lake Southeast Mirror Spot', 'Ice Lake Ledge (East)'),
             ('Ice Lake Northeast Mirror Spot', 'Ice Lake Northeast Bank'),
             ('Ice Palace Mirror Spot', 'Ice Palace Area'),
-            ('Ice Palace Teleporter', 'Lake Hylia Central Island')
+            ('Ice Lake Moat Mirror Spot', 'Ice Lake Moat'),
+            ('Ice Palace Teleporter', 'Lake Hylia Water D')
         ]),
     0x37: ([
             ('Ice Cave Mirror Spot', 'Ice Cave Area')
@@ -1868,10 +1875,10 @@ isolated_regions = [
 ]
 
 flute_data = {
-    #Slot    LW Region                         DW Region                            OWID   VRAM    BG Y    BG X   Link Y  Link X   Cam Y   Cam X   Unk1    Unk2   IconY   IconX    AltY    AltX
+    #Slot    LW Region                         DW Region                            OWID   VRAM    BG Y    BG X   Link Y  Link X   Cam Y   Cam X   Unk1    Unk2   IconY   IconX    AltY    AltX  AltVRAM  AltBGY  AltBGX  AltCamY AltCamX AltUnk1 AltUnk2 AltIconY AltIconX
     0x09: (['Lost Woods East Area',           'Skull Woods Forest'],                0x00, 0x1042, 0x022e, 0x0202, 0x0290, 0x0288, 0x029b, 0x028f, 0xfff2, 0x000e, 0x0290, 0x0288, 0x0290, 0x0290),
     0x02: (['Lumberjack Area',                'Dark Lumberjack Area'],              0x02, 0x059c, 0x00d6, 0x04e6, 0x0138, 0x0558, 0x0143, 0x0563, 0xfffa, 0xfffa, 0x0138, 0x0550),
-    0x0b: (['West Death Mountain (Bottom)',   'West Dark Death Mountain (Bottom)'], 0x03, 0x1600, 0x02ca, 0x060e, 0x0328, 0x0678, 0x0337, 0x0683, 0xfff6, 0xfff2, 0x035b, 0x0680),
+    0x0b: (['West Death Mountain (Bottom)',   'West Dark Death Mountain (Top)'],    0x03, 0x1600, 0x02ca, 0x060e, 0x0328, 0x0678, 0x0337, 0x0683, 0xfff6, 0xfff2, 0x035b, 0x0680, 0x0118, 0x0860, 0x05c0, 0x00b8, 0x07ec, 0x0127, 0x086b, 0xfff8, 0x0004, 0x0148, 0x0850),
     0x0e: (['East Death Mountain (Bottom)',   'East Dark Death Mountain (Bottom)'], 0x05, 0x1860, 0x031e, 0x0d00, 0x0388, 0x0da8, 0x038d, 0x0d7d, 0x0000, 0x0000, 0x0388, 0x0da8),
     0x07: (['Death Mountain TR Pegs',         'Turtle Rock Area'],                  0x07, 0x0804, 0x0102, 0x0e1a, 0x0160, 0x0e90, 0x016f, 0x0e97, 0xfffe, 0x0006, 0x0160, 0x0f20),
     0x0a: (['Mountain Entry Area',            'Bumper Cave Area'],                  0x0a, 0x0180, 0x0220, 0x0406, 0x0280, 0x0488, 0x028f, 0x0493, 0x0000, 0xfffa, 0x0280, 0x0488),
