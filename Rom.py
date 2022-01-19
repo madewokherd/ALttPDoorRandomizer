@@ -1264,6 +1264,13 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         gametype |= 0x01  # enemizer
     rom.write_byte(0x180211, gametype)  # Game type
 
+    warningflags = 0x00 # none
+    if world.logic[player] in ['owglitches', 'nologic']:
+        warningflags |= 0x20
+    if world.logic[player] in ['minorglitches', 'owglitches', 'nologic']:
+        warningflags |= 0x40
+    rom.write_byte(0x180212, warningflags)  # Warning flags
+
     # assorted fixes
     rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
     rom.write_byte(0x180169, 0x01 if world.lock_aga_door_in_escape else 0x00)  # Lock or unlock aga tower door during escape sequence.
