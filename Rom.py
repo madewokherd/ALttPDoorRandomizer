@@ -818,7 +818,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         lh_name = 'Big Bomb Shop'
     links_house = world.get_region(lh_name, player)
     if should_be_bunny(links_house, world.mode[player]):
-        rom.write_bytes(0x13fff0, [0x04, 0x01])
+        rom.write_bytes(0x13fff0, [0x04 if lh_name == 'Links House' else 0x1C, 0x01])
 
     old_man_house = world.get_region('Old Man House', player)
     if should_be_bunny(old_man_house, world.mode[player]):
