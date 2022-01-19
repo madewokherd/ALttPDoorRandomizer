@@ -1208,6 +1208,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Lake Hylia Central Island Pier', 'Lake Hylia Central Island'),
                          ('Lake Hylia West Pier', 'Lake Hylia Area'),
                          ('Lake Hylia East Pier', 'Lake Hylia Northeast Bank'),
+                         ('Lake Hylia Water D Entry', 'Lake Hylia Water'), #flippers
                          ('Desert Pass Ledge Drop', 'Desert Pass Area'),
                          ('Desert Pass Rocks (North)', 'Desert Pass Southeast'), #glove
                          ('Desert Pass Rocks (South)', 'Desert Pass Area'), #glove
@@ -1669,14 +1670,13 @@ ow_connections = {
             ('Lake Hylia Teleporter', 'Ice Palace Area')
         ], [
             ('Lake Hylia Island Pier', 'Lake Hylia Island'),
-            ('Ice Palace Approach', 'Ice Palace Area'),
-            ('Ice Palace Leave', 'Ice Lake Moat'),
             ('Ice Lake Mirror Spot', 'Ice Lake Area'),
             ('Ice Lake Southwest Mirror Spot', 'Ice Lake Ledge (West)'),
             ('Ice Lake Southeast Mirror Spot', 'Ice Lake Ledge (East)'),
             ('Ice Lake Northeast Mirror Spot', 'Ice Lake Northeast Bank'),
             ('Ice Palace Mirror Spot', 'Ice Palace Area'),
-            ('Ice Palace Teleporter', 'Lake Hylia Central Island')
+            ('Ice Lake Moat Mirror Spot', 'Ice Lake Moat'),
+            ('Ice Palace Teleporter', 'Lake Hylia Water D')
         ]),
     0x37: ([
             ('Ice Cave Mirror Spot', 'Ice Cave Area')

@@ -820,6 +820,7 @@ OWTileRegions = bidict({
     'Lake Hylia Central Island': 0x35,
     'Lake Hylia Island': 0x35,
     'Lake Hylia Water': 0x35,
+    'Lake Hylia Water D': 0x35,
 
     'Ice Cave Area': 0x37,
 
@@ -1584,6 +1585,7 @@ OWExitTypes = {
                 'Lake Hylia West Pier',
                 'Lake Hylia Northeast Water Drop',
                 'Lake Hylia East Pier',
+                'Lake Hylia Water D Entry',
                 'Desert Pass Ladder (South)',
                 'Desert Pass Rocks (North)',
                 'Desert Pass Rocks (South)',
@@ -1639,8 +1641,6 @@ OWExitTypes = {
                 'Ice Lake Northeast Pier',
                 'Ice Lake Northeast Pier Hop',
                 'Ice Lake Moat Water Entry',
-                'Ice Palace Approach',
-                'Ice Palace Leave',
                 'Bomber Corner Water Drop',
                 'Bomber Corner Pier'
             ],
@@ -1760,6 +1760,7 @@ OWExitTypes = {
                 'Ice Lake Southeast Mirror Spot',
                 'Ice Lake Northeast Mirror Spot',
                 'Ice Palace Mirror Spot',
+                'Ice Lake Moat Mirror Spot',
                 'Shopping Mall Mirror Spot',
                 'Swamp Nook Mirror Spot',
                 'Swamp Nook Southeast Mirror Spot',

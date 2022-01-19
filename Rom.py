@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'ea4215dbf86da55ffa1255fa5e687b62'
+RANDOMIZERBASEHASH = 'b300438a7242825e33300f9d155814ef'
 
 
 class JsonRom(object):
@@ -2682,7 +2682,8 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         rom.write_bytes(snes_to_pc(0x1BD1D8), [0xA8, 0x02, 0x82, 0xFF, 0xFF])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC5B1), 0x00) # remove secret portal
     if world.is_tile_swapped(0x35, player):
-        rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
+        #rom.write_bytes(snes_to_pc(0x1BC85A), [0x50, 0x0F, 0x82])  # add warp under rock
+        rom.write_bytes(snes_to_pc(0x1BC85A), [0x52, 0x13, 0x82])  # add warp under rock
         rom.write_byte(snes_to_pc(0x1BC5C7), 0x00) # remove secret portal
     
     # apply inverted map changes
