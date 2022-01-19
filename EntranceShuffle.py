@@ -2296,24 +2296,24 @@ one_way_ledges = {
 
 indirect_connections = {
     'Turtle Rock Ledge': 'Turtle Rock',
-    'Big Bomb Shop': 'Pyramid Fairy',
+    #'Big Bomb Shop': 'Pyramid Fairy',
     #'East Dark World': 'Pyramid Fairy',
     'Pyramid Area': 'Pyramid Fairy', # HC Ledge/Courtyard
     #'Dark Desert': 'Pyramid Fairy',
-    'Misery Mire Area': 'Pyramid Fairy', # Desert/Checkerboard Ledge
+    #'Misery Mire Area': 'Pyramid Fairy', # Desert/Checkerboard Ledge
     #'West Dark World': 'Pyramid Fairy',
-    'Dark Chapel Area': 'Pyramid Fairy', # Bonk Rocks
-    'Dark Graveyard North': 'Pyramid Fairy', # Graveyard Ledge/Kings Tomb
+    #'Dark Chapel Area': 'Pyramid Fairy', # Bonk Rocks
+    #'Dark Graveyard North': 'Pyramid Fairy', # Graveyard Ledge/Kings Tomb
     #'South Dark World': 'Pyramid Fairy',
-    'Dig Game Ledge': 'Pyramid Fairy', # Brother House Left
-    'Stumpy Approach Area': 'Pyramid Fairy', # Cave 45
+    #'Dig Game Ledge': 'Pyramid Fairy', # Brother House Left
+    #'Stumpy Approach Area': 'Pyramid Fairy', # Cave 45
     # Inverted Cases
     #'Light World': 'Pyramid Fairy',
-    'Lost Woods West Area': 'Pyramid Fairy', # Skull Woods Back
-    'East Death Mountain (Top East)': 'Pyramid Fairy', # Floating Island
-    'Blacksmith Area': 'Pyramid Fairy', # Hammerpegs
-    'Forgotten Forest Area': 'Pyramid Fairy', # Shield Shop
-    'Desert Area': 'Pyramid Fairy', # Mire Area
+    #'Lost Woods West Area': 'Pyramid Fairy', # Skull Woods Back
+    #'East Death Mountain (Top East)': 'Pyramid Fairy', # Floating Island
+    #'Blacksmith Area': 'Pyramid Fairy', # Hammerpegs
+    #'Forgotten Forest Area': 'Pyramid Fairy', # Shield Shop
+    #'Desert Area': 'Pyramid Fairy', # Mire Area
     'Old Man Cave': 'Old Man S&Q'
 }
 # format:
