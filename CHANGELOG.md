@@ -1,5 +1,8 @@
 # Changelog
 
+### 0.2.5.1
+- Fixed missing rule for Inverted VoO Portal access
+
 ### 0.2.5.0
 - Many updates to Inverted OW Terrain:
     - Links House start now spawns in Big Bomb Shop
