@@ -1862,6 +1862,7 @@ default_connections = [#('Lost Woods NW', 'Master Sword Meadow SC'),
 isolated_regions = [
     'Death Mountain Floating Island',
     'Mimic Cave Ledge',
+    'Spiral Mimic Ledge Extend',
     'Mountain Entry Ledge',
     'Maze Race Prize',
     'Maze Race Ledge',
