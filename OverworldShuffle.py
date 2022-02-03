@@ -67,8 +67,12 @@ def link_overworld(world, player):
                     # move both sets
                     if parallel == IsParallel.Yes and not (all(edge in orig_swaps for edge in map(getParallel, forward_set)) and all(edge in orig_swaps for edge in map(getParallel, back_set))):
                         raise Exception('Cannot move a parallel edge without the other')
-                    new_groups[(OpenStd.Open, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][0].append(forward_set)
-                    new_groups[(OpenStd.Open, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][1].append(back_set)
+                    new_mode = OpenStd.Open
+                    if tuple((OpenStd.Open, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)) not in new_groups.keys():
+                        # when Links House tile is swapped, the DW edges need to get put into existing Standard group
+                        new_mode = OpenStd.Standard
+                    new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][0].append(forward_set)
+                    new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][1].append(back_set)
                     for edge in forward_set:
                         swaps.remove(edge)
                     for edge in back_set:
