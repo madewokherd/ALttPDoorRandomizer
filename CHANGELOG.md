@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.2.5.3
+- Changed AT/GT Swap to favor vanilla, only swapping if GT entrance is the only choice in starting world
+- Fixed issue with Links House not swapping in OW Mixed
+- Added Flute Spots to spoiler log
+- Fixed issue with Light Hype Fairy excluded from bombable door list
+
 ### 0.2.5.1
 - Fixed missing rule for Inverted VoO Portal access
 
