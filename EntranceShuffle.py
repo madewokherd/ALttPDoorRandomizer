@@ -90,11 +90,11 @@ def link_entrances(world, player):
             for entrancename, exitname in default_skulldrop_connections:
                 connect_logical(world, entrancename, exitname, player, False)
             
-            if not invFlag:
-                for entrancename, exitname in open_default_dungeon_connections:
+            if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) and (0x03 not in world.owswaps[player][0]) == invFlag:
+                for entrancename, exitname in inverted_default_dungeon_connections:
                     connect_logical(world, entrancename, exitname, player, True)
             else:
-                for entrancename, exitname in inverted_default_dungeon_connections:
+                for entrancename, exitname in open_default_dungeon_connections:
                     connect_logical(world, entrancename, exitname, player, True)
         elif world.shuffle[player] == 'dungeonssimple':
             suppress_spoiler = False

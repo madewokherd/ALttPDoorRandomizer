@@ -2520,13 +2520,16 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         write_int16(rom, snes_to_pc(0x02D998), 0x0000)
         write_int16(rom, snes_to_pc(0x02D9A6), 0x005A)
         rom.write_byte(snes_to_pc(0x02D9B3), 0x12)
-
-        if world.shuffle[player] == 'vanilla':
-            rom.write_byte(0xDBB73 + 0x23, 0x37)  # switch AT and GT
-            rom.write_byte(0xDBB73 + 0x36, 0x24)
-            if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
-                write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
-                write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
+    
+    # switch AT and GT
+    if world.shuffle[player] == 'vanilla' and \
+            (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) and \
+            (0x03 not in world.owswaps[player][0]) == world.mode[player] == 'inverted':
+        rom.write_byte(0xDBB73 + 0x23, 0x37)
+        rom.write_byte(0xDBB73 + 0x36, 0x24)
+        if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:
+            write_int16(rom, 0x15AEE + 2*0x38, 0x00E0)
+            write_int16(rom, 0x15AEE + 2*0x25, 0x000C)
 
             
     if world.is_tile_swapped(0x05, player):
