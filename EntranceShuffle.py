@@ -288,7 +288,7 @@ def link_entrances(world, player):
             caves.append(tuple(random.sample(['Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'], 3)))
         
         if not world.shuffle_ganon:
-            connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+            connect_two_way(world, 'Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', 'Ganons Tower Exit', player)
         else:
             caves.append('Ganons Tower Exit')
 
@@ -361,7 +361,7 @@ def link_entrances(world, player):
             lw_dungeons.append(tuple(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Hyrule Castle Exit (South)')))
 
         if not world.shuffle_ganon:
-            connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+            connect_two_way(world, 'Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', 'Ganons Tower Exit', player)
         else:
             dw_dungeons.append('Ganons Tower Exit')
         
@@ -449,7 +449,7 @@ def link_entrances(world, player):
             Dungeon_Exits.append(tuple(('Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Hyrule Castle Exit (South)')))
 
         if not world.shuffle_ganon:
-            connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+            connect_two_way(world, 'Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', 'Ganons Tower Exit', player)
         else:
             Dungeon_Exits.append('Ganons Tower Exit')
         
@@ -499,7 +499,7 @@ def link_entrances(world, player):
             caves.append(tuple(random.sample(['Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'], 3)))
         
         if not world.shuffle_ganon:
-            connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+            connect_two_way(world, 'Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', 'Ganons Tower Exit', player)
         else:
             caves.append('Ganons Tower Exit')
 
@@ -567,7 +567,7 @@ def link_entrances(world, player):
             caves.append(('Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)'))
 
         if not world.shuffle_ganon:
-            connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+            connect_two_way(world, 'Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', 'Ganons Tower Exit', player)
             connect_two_way(world, 'Pyramid Entrance' if not world.is_tile_swapped(0x1b, player) else 'Inverted Pyramid Entrance', 'Pyramid Exit', player)
             connect_entrance(world, 'Pyramid Hole' if not world.is_tile_swapped(0x1b, player) else 'Inverted Pyramid Hole', 'Pyramid', player)
         else:
@@ -662,7 +662,7 @@ def link_entrances(world, player):
         world.ganon_at_pyramid[player] = False
 
     # check for Ganon's Tower location
-    if world.get_entrance('Ganons Tower' if not invFlag else 'Agahnims Tower', player).connected_region.name != 'Ganons Tower Portal' if not invFlag else 'GT Lobby':
+    if world.get_entrance('Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', player).connected_region.name != 'Ganons Tower Portal' if not invFlag else 'GT Lobby':
         world.ganonstower_vanilla[player] = False
 
 
@@ -1235,7 +1235,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
         connect_two_way(world, 'Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', player)
     
     if not world.shuffle_ganon:
-        connect_two_way(world, 'Ganons Tower' if not invFlag else 'Agahnims Tower', 'Ganons Tower Exit', player)
+        connect_two_way(world, 'Ganons Tower' if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (not invFlag)) else 'Agahnims Tower', 'Ganons Tower Exit', player)
     else:
         dungeon_exits.append('Ganons Tower Exit')
 
