@@ -1275,7 +1275,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # assorted fixes
     rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
     rom.write_byte(0x180169, 0x01 if world.lock_aga_door_in_escape else 0x00)  # Lock or unlock aga tower door during escape sequence.
-    if world.mode[player] == 'inverted':
+    if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted'):
         rom.write_byte(0x180169, 0x02)  # lock aga/ganon tower door with crystals in inverted
     rom.write_byte(0x180171, 0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01) # Bob is enabled
