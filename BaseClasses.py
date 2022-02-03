@@ -304,6 +304,9 @@ class World(object):
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
+    def is_atgt_swapped(self, player):
+        return (0x03 in self.owswaps[player][0]) == (0x1b in self.owswaps[player][0]) == (self.mode[player] != 'inverted')
+
     def is_bombshop_start(self, player):
         return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
 
@@ -3053,6 +3056,18 @@ class Spoiler(object):
 
             if self.overworlds:
                 outfile.write('\n\nOverworld:\n\n')
+
+                # flute shuffle
+                for player in range(1, self.world.players + 1):
+                    if ('flute', player) in self.maps:
+                        outfile.write('Flute Spots:\n')
+                        break
+                for player in range(1, self.world.players + 1):
+                    if ('flute', player) in self.maps:
+                        if self.world.players > 1:
+                            outfile.write(str('(Player ' + str(player) + ')\n')) # player name
+                        outfile.write(self.maps[('flute', player)]['text'] + '\n\n')
+                
                 # overworld tile swaps
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
