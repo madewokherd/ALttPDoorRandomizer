@@ -877,8 +877,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         rom.write_byte(0x138006, 1)
 
     # swap in non-ER Lobby Shuffle Inverted - but only then
-    if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted') and \
-            world.intensity[player] >= 3 and world.doorShuffle[player] != 'vanilla' and world.shuffle[player] == 'vanilla':
+    if world.is_atgt_swapped[player] and world.intensity[player] >= 3 and world.doorShuffle[player] != 'vanilla' and world.shuffle[player] == 'vanilla':
         aga_portal = world.get_portal('Agahnims Tower', player)
         gt_portal = world.get_portal('Ganons Tower', player)
         aga_portal.exit_offset, gt_portal.exit_offset = gt_portal.exit_offset, aga_portal.exit_offset
@@ -1275,7 +1274,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # assorted fixes
     rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
     rom.write_byte(0x180169, 0x01 if world.lock_aga_door_in_escape else 0x00)  # Lock or unlock aga tower door during escape sequence.
-    if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted'):
+    if world.is_atgt_swapped[player]:
         rom.write_byte(0x180169, 0x02)  # lock aga/ganon tower door with crystals in inverted
     rom.write_byte(0x180171, 0x01 if world.ganon_at_pyramid[player] else 0x00)  # Enable respawning on pyramid after ganon death
     rom.write_byte(0x180173, 0x01) # Bob is enabled
@@ -1287,7 +1286,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest
     rom.write_byte(0x18008B, 0x01 if world.open_pyramid[player] or world.goal[player] == 'trinity' else 0x00) # pre-open Pyramid Hole
     rom.write_byte(0x18008C, 0x01 if world.crystals_needed_for_gt[player] == 0 else 0x00) # GT pre-opened if crystal requirement is 0
-    rom.write_byte(0x18008F, 0x01 if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted') else 0x00) # AT/GT swapped
+    rom.write_byte(0x18008F, 0x01 if world.is_atgt_swapped[player] else 0x00) # AT/GT swapped
     rom.write_byte(0xF5D73, 0xF0) # bees are catchable
     rom.write_byte(0xF5F10, 0xF0) # bees are catchable
     rom.write_byte(0x180086, 0x00 if world.aga_randomness else 0x01)  # set blue ball and ganon warp randomness
@@ -2170,7 +2169,7 @@ def write_strings(rom, world, player, team):
         entrances_to_hint = {}
         entrances_to_hint.update(InconvenientDungeonEntrances)
         if world.shuffle_ganon:
-            if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted'):
+            if world.is_atgt_swapped[player]:
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
             else:
                 entrances_to_hint.update({'Ganons Tower': 'Ganon\'s Tower'})
@@ -2203,7 +2202,7 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] not in ['simple', 'restricted', 'restricted_legacy']:
             entrances_to_hint.update(ConnectorEntrances)
             entrances_to_hint.update(DungeonEntrances)
-            if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted'):
+            if world.is_atgt_swapped[player]:
                 entrances_to_hint.update({'Ganons Tower': 'The dark mountain tower'})
             else:
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
@@ -2524,8 +2523,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         rom.write_byte(snes_to_pc(0x02D9B3), 0x12)
     
     # switch AT and GT
-    if world.shuffle[player] == 'vanilla' and \
-            (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted'):
+    if world.shuffle[player] == 'vanilla' and world.is_atgt_swapped[player]:
         rom.write_byte(0xDBB73 + 0x23, 0x37)
         rom.write_byte(0xDBB73 + 0x36, 0x24)
         if world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:

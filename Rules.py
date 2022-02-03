@@ -854,7 +854,7 @@ def default_rules(world, player):
 
 
 def ow_rules(world, player):
-    if (0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted'):
+    if world.is_atgt_swapped[player]:
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
     else:
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
@@ -1524,7 +1524,7 @@ def swordless_rules(world, player):
     set_rule(world.get_location('Ganon', player), lambda state: state.has('Hammer', player) and state.has_fire_source(player) and state.has('Silver Arrows', player) and state.can_shoot_arrows(player) and state.has_crystals(world.crystals_needed_for_ganon[player], player))
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has('Hammer', player))  # need to damage ganon to get tiles to drop
     
-    if not ((0x03 in world.owswaps[player][0]) == (0x1b in world.owswaps[player][0]) == (world.mode[player] != 'inverted')):
+    if not world.is_atgt_swapped[player]:
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
 
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_misery_mire_medallion(player))   # sword not required to use medallion for opening in swordless (!)
