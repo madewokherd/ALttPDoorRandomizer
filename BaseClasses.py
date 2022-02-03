@@ -3053,6 +3053,18 @@ class Spoiler(object):
 
             if self.overworlds:
                 outfile.write('\n\nOverworld:\n\n')
+
+                # flute shuffle
+                for player in range(1, self.world.players + 1):
+                    if ('flute', player) in self.maps:
+                        outfile.write('Flute Spots:\n')
+                        break
+                for player in range(1, self.world.players + 1):
+                    if ('flute', player) in self.maps:
+                        if self.world.players > 1:
+                            outfile.write(str('(Player ' + str(player) + ')\n')) # player name
+                        outfile.write(self.maps[('flute', player)]['text'] + '\n\n')
+                
                 # overworld tile swaps
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
