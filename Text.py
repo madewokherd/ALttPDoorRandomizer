@@ -627,7 +627,7 @@ class MultiByteCoreTextMapper(object):
     }
 
     @classmethod
-    def convert(cls, text, pause=True, wrap=14):
+    def convert(cls, text, pause=True, wrap=19):
         #text = text.upper()
         lines = text.split('\n')
         outbuf = bytearray()
@@ -736,7 +736,7 @@ class CompressedTextMapper(object):
     }
 
     @classmethod
-    def convert(cls, text, pause=True, max_bytes_expanded=0x800, wrap=14):
+    def convert(cls, text, pause=True, max_bytes_expanded=0x800, wrap=19):
         inbuf = MultiByteCoreTextMapper.convert(text, pause, wrap)
 
         # Links name will need 8 bytes in the target buffer
