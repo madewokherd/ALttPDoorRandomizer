@@ -1083,8 +1083,7 @@ def validate_layout(world, player):
         flat_sectors = [[r for l in s for r in l] for s in world.owsectors[player]]
         for sector in flat_sectors:
             for region_name in sector:
-                if region_name not in explored_regions and region_name not in isolated_regions \
-                        and not (region_name == 'Pyramid Exit Ledge' and world.shuffle[player] == 'insanity'):
+                if region_name not in explored_regions and region_name not in isolated_regions:
                     region = base_world.get_region(region_name, player)
                     unreachable_regions[region_name] = region
         
@@ -1895,7 +1894,8 @@ isolated_regions = [
     'Dark Death Mountain Floating Island',
     'Dark Death Mountain Ledge',
     'Dark Death Mountain Isolated Ledge',
-    'Bumper Cave Ledge'
+    'Bumper Cave Ledge',
+    'Pyramid Exit Ledge'
 ]
 
 flute_data = {
