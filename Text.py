@@ -655,7 +655,7 @@ class MultiByteCoreTextMapper(object):
             pending_space = False
             while words:
                 word = words.pop(0)
-                # sanity check: if the word we have is more than 14 characters, we take as much as we can still fit and push the rest back for later
+                # sanity check: if the word we have is more than 19 characters, we take as much as we can still fit and push the rest back for later
                 if cls.wordlen(word) > wrap:
                     (word_first, word_rest) = cls.splitword(word, linespace)
                     words.insert(0, word_rest)
