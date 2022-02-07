@@ -1110,7 +1110,7 @@ def validate_layout(world, player):
                     if entrance.name not in drop_entrances \
                             and ((entrance.name in dungeon_entrances and world.shuffle[player] not in ['dungeonssimple', 'simple', 'restricted']) \
                                 or (entrance.name in connector_entrances and world.shuffle[player] not in ['dungeonssimple', 'dungeonsfull', 'simple']) \
-                                or (entrance.name in item_entrances + ([] if world.shopsanity[player] else shop_entrances) and world.shuffle[player] not in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])):
+                                or (entrance.name in item_entrances + (tuple() if world.shopsanity[player] else shop_entrances) and world.shuffle[player] not in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])):
                         unreachable_regions.pop(region_name)
                         explore_region(region_name)
                         break
