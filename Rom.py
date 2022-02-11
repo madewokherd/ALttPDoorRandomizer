@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9ff49ef63fdddeb32de09646bd459bf8'
+RANDOMIZERBASEHASH = 'b46e08bfb572876dd51dc3108e7b9292'
 
 
 class JsonRom(object):
@@ -1674,7 +1674,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     from Main import __version__
     seedstring = f'{world.seed:09}' if isinstance(world.seed, int) else world.seed
     # todo: change to DR when Enemizer is okay with DR
-    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{seedstring}\0', 'utf8')[:21]
+    rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{seedstring}O\0', 'utf8')[:21]
     rom.name.extend([0] * (21 - len(rom.name)))
     rom.write_bytes(0x7FC0, rom.name)
 
@@ -2304,6 +2304,7 @@ def write_strings(rom, world, player, team):
             this_location = world.find_items_not_key_only(flute_item, player)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
+                this_hint = this_hint.capitalize()
                 tt[hint_locations.pop(0)] = this_hint
             items_to_hint.remove(flute_item)
         if world.keyshuffle[player]:
@@ -2320,6 +2321,7 @@ def write_strings(rom, world, player, team):
             random.shuffle(this_location)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
+                this_hint = this_hint.capitalize()
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
 
@@ -2439,8 +2441,8 @@ def write_strings(rom, world, player, team):
 
     # inverted spawn menu changes
     if world.mode[player] == 'inverted':
-        tt['menu_start_2'] = "{MENU}\n{SPEED0}\n≥@'s house\n Dark Chapel\n{CHOICE3}"
-        tt['menu_start_3'] = "{MENU}\n{SPEED0}\n≥@'s house\n Dark Chapel\n Mountain Cave\n{CHOICE2}"
+        tt['menu_start_2'] = "{MENU}\n{SPEED0}\n≥@'s House\n Dark Chapel\n{CHOICE3}"
+        tt['menu_start_3'] = "{MENU}\n{SPEED0}\n≥@'s House\n Dark Chapel\n Mountain Cave\n{CHOICE2}"
         tt['intro_main'] = CompressedTextMapper.convert(
                             "{INTRO}\n Episode  III\n{PAUSE3}\n A Link to\n   the Past\n"
                             + "{PAUSE3}\nInverted\n  Randomizer\n{PAUSE3}\nAfter mostly disregarding what happened in the first two games.\n"

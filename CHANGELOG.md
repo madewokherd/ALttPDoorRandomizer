@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.2.6.0
+- New text engine font!
+- Fixed invisible Witch item bug
+- Added 'O' to ROM Header for autotrackers
+- Fixed generation error with Shopsanity + OWR Layout
+- Fixed OWR validation error with Insanity ER + OWR Layout
+- Fixed issue with TR Peg Puzzle not spawning a valid portal
+
 ### 0.2.5.3
 - Changed AT/GT Swap to favor vanilla, only swapping if GT entrance is the only choice in starting world
 - Fixed issue with Links House not swapping in OW Mixed

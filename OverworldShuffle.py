@@ -5,7 +5,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.5.3-u'
+__version__ = '0.2.6.0-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -1110,7 +1110,7 @@ def validate_layout(world, player):
                     if entrance.name not in drop_entrances \
                             and ((entrance.name in dungeon_entrances and world.shuffle[player] not in ['dungeonssimple', 'simple', 'restricted']) \
                                 or (entrance.name in connector_entrances and world.shuffle[player] not in ['dungeonssimple', 'dungeonsfull', 'simple']) \
-                                or (entrance.name in item_entrances + ([] if world.shopsanity[player] else shop_entrances) and world.shuffle[player] not in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])):
+                                or (entrance.name in item_entrances + (tuple() if world.shopsanity[player] else shop_entrances) and world.shuffle[player] not in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])):
                         unreachable_regions.pop(region_name)
                         explore_region(region_name)
                         break
@@ -1894,7 +1894,8 @@ isolated_regions = [
     'Dark Death Mountain Floating Island',
     'Dark Death Mountain Ledge',
     'Dark Death Mountain Isolated Ledge',
-    'Bumper Cave Ledge'
+    'Bumper Cave Ledge',
+    'Pyramid Exit Ledge'
 ]
 
 flute_data = {
