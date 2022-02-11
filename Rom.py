@@ -2304,6 +2304,7 @@ def write_strings(rom, world, player, team):
             this_location = world.find_items_not_key_only(flute_item, player)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
+                this_hint = this_hint.capitalize()
                 tt[hint_locations.pop(0)] = this_hint
             items_to_hint.remove(flute_item)
         if world.keyshuffle[player]:
@@ -2320,6 +2321,7 @@ def write_strings(rom, world, player, team):
             random.shuffle(this_location)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
+                this_hint = this_hint.capitalize()
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
 
