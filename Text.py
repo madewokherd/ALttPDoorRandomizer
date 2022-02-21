@@ -339,6 +339,7 @@ junk_texts = [
 
 KingsReturn_texts = [
     'Who is this even',
+    'When did he get here',
     'The Harem'
 ] * 2 + [
     "the return of the king",
@@ -381,7 +382,7 @@ LostWoods_texts = [
 ] * 2 + [
     "the forest thief",
     "dancing pickles",
-    "flying vultures",
+    "flying crows",
 ]
 WishingWell_texts = [
     "venus. queen of faeries",
@@ -393,7 +394,7 @@ WishingWell_texts = [
     "Venus Love Chain",
     "Venus Crescent Beam",
 ]
-DesertPalace_texts = ['vultures rule the desert', 'literacy moves']
+DesertPalace_texts = ['vultures rule the desert', 'literacy that moves']
 MountainTower_texts = ['the bully makes a friend', 'up up and away']
 LinksHouse_texts = ['your uncle recovers', 'Home Sweet Home', 'Only one bed']
 Lumberjacks_texts = [
@@ -1752,9 +1753,9 @@ class TextTable(object):
         text['telepathic_tile_ice_entrance'] = CompressedTextMapper.convert("{NOBORDER}\nYou can use Fire Rod or Bombos to pass.")
         text['telepathic_tile_ice_stalfos_knights_room'] = CompressedTextMapper.convert("{NOBORDER}\nKnock 'em down and then bomb them dead.")
         text['telepathic_tile_tower_of_hera_entrance'] = CompressedTextMapper.convert("{NOBORDER}\nThis is a bad place, with a guy who will make you fall…\n\n\na lot.")
-        text['caught_a_bee'] = CompressedTextMapper.convert("Caught a Bee\n  ≥ keep\n    release\n{CHOICE}")
-        text['caught_a_fairy'] = CompressedTextMapper.convert("Caught Fairy!\n  ≥ keep\n    release\n{CHOICE}")
         text['houlihan_room'] = CompressedTextMapper.convert("Randomizer tournament winners\n{HARP}\n  ~~~2021~~~\ndaaanty\n\n  ~~~2019~~~\nJet082")
+        text['caught_a_bee'] = CompressedTextMapper.convert("Caught a Bee\n  ≥ Keep\n    Release\n{CHOICE}")
+        text['caught_a_fairy'] = CompressedTextMapper.convert("Caught Fairy!\n  ≥ Keep\n    Release\n{CHOICE}")
         text['no_empty_bottles'] = CompressedTextMapper.convert("Whoa, bucko!\nNo empty bottles.")
         text['game_race_boy_time'] = CompressedTextMapper.convert("Your time was\nᚎᚍ min ᚌᚋ sec.")
         text['game_race_girl'] = CompressedTextMapper.convert("You have 15 seconds,\nGo… Go… Go…")
