@@ -166,6 +166,13 @@ OWMirrorSpriteMove:
         lda $1acf : eor #$80 : sta $1acf
     + lda #$2c : jml.l $07A985 ; what we wrote over
 }
+OWMirrorSpriteRestore:
+{
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
+        lda $1acf : and #$0f : sta $1acf
+    + rep #$30 : lda.w $04AC ; what we wrote over
+    rtl
+}
 
 OWFluteCancel:
 {
