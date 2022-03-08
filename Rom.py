@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'b46e08bfb572876dd51dc3108e7b9292'
+RANDOMIZERBASEHASH = '497aac112b42e50ea66ce793340cdb18'
 
 
 class JsonRom(object):
@@ -2304,7 +2304,7 @@ def write_strings(rom, world, player, team):
             this_location = world.find_items_not_key_only(flute_item, player)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
-                this_hint = this_hint.capitalize()
+                this_hint = this_hint[0].upper() + this_hint[1:]
                 tt[hint_locations.pop(0)] = this_hint
             items_to_hint.remove(flute_item)
         if world.keyshuffle[player]:
@@ -2321,7 +2321,7 @@ def write_strings(rom, world, player, team):
             random.shuffle(this_location)
             if this_location:
                 this_hint = this_location[0].item.hint_text + ' can be found ' + hint_text(this_location[0]) + '.'
-                this_hint = this_hint.capitalize()
+                this_hint = this_hint[0].upper() + this_hint[1:]
                 tt[hint_locations.pop(0)] = this_hint
                 hint_count -= 1
 
