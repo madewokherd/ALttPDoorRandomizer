@@ -170,9 +170,17 @@ OWMirrorSpriteMove:
 }
 OWMirrorSpriteRestore:
 {
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
-        lda $1acf : and #$0f : sta $1acf
-    + rep #$30 : lda.w $04AC ; what we wrote over
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .return
+        lda InvertedMode : beq +
+            lda $7ef3ca : beq .return
+            bra .restorePortal
+        + lda $7ef3ca : bne .return
+        
+    .restorePortal
+    lda $1acf : and #$0f : sta $1acf
+    
+    .return
+    rep #$30 : lda.w $04AC ; what we wrote over
     rtl
 }
 OWLightWorldOrCrossed:
