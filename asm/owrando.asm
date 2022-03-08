@@ -48,10 +48,12 @@ jsl OWOldManSpeed
 ;org $09c957 ; <- 4c957
 ;dw #$cb5f ; matches value on Central Bonk Rocks screen
 
+; override world check when spawning mirror portal sprite in Crossed OWR
+org $0283dc
+jsl.l OWLightWorldOrCrossed
+
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm:4068 ()
-jsl.l OWWorldCheck
-org $0283dc  ; < ? - Bank02.asm:816 ()
 jsl.l OWWorldCheck
 org $02aa36  ; < ? - Bank02.asm:6559 ()
 jsl.l OWWorldCheck
@@ -172,6 +174,12 @@ OWMirrorSpriteRestore:
         lda $1acf : and #$0f : sta $1acf
     + rep #$30 : lda.w $04AC ; what we wrote over
     rtl
+}
+OWLightWorldOrCrossed:
+{
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
+        lda #$00 : rtl
+    + jsl OWWorldCheck : rtl
 }
 
 OWFluteCancel:
