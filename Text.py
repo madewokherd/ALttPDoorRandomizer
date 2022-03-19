@@ -103,7 +103,7 @@ Triforce_texts = [
     "\n     WINNER!!",
     "\n    I'm  sorry\n\n    but your\n  princess is in\n  another castle",
     "\n     Success!",
-    "      Whelp…\n        that  just\n         happened",
+    "    Whelp…\n      that  just\n       happened",
     "     Oh  hey…\n        it's you",
     "\n    Wheeeeee!!",
     "     Time for\n      another one?",
