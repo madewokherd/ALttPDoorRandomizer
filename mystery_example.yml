@@ -59,6 +59,10 @@
   shuffleganon:
     on: 1
     off: 1
+  overworld_map: # control how the overworld map operates when entrance shuffle is on
+    default: 1
+    compass: 10
+    map: 5
   world_state:
     standard: 1
     open: 1
@@ -79,6 +83,16 @@
   triforce_pool_min: 20
   triforce_pool_max: 40
   triforce_min_difference: 10
+  algorithm:
+    major_only: 1
+    dungeon_only: 1
+    vanilla_fill: 1
+    balanced: 10
+    district: 1
+  restrict_boss_items:
+    none: 1
+    mapcompass: 1
+    dungeon: 1
   dungeon_items:
     standard: 10
     mc: 3

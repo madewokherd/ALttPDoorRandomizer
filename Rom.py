@@ -16,8 +16,8 @@ except ImportError:
     raise Exception('Could not load BPS module')
 
 from BaseClasses import CollectionState, ShopType, Region, Location, OWEdge, Door, DoorType, RegionType, PotItem
-from DoorShuffle import compass_data, DROptions, boss_indicator
-from Dungeons import dungeon_music_addresses
+from DoorShuffle import compass_data, DROptions, boss_indicator, dungeon_portals
+from Dungeons import dungeon_music_addresses, dungeon_table
 from Regions import location_table, shop_to_location_table, retro_shops
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
@@ -26,14 +26,14 @@ from Text import Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
 from Items import ItemFactory
-from EntranceShuffle import door_addresses, exit_ids
+from EntranceShuffle import door_addresses, exit_ids, ow_prize_table
 from OverworldShuffle import default_flute_connections, flute_data
 
 from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '6497ab1cbede637dbaea53b9be8247e3'
+RANDOMIZERBASEHASH = 'aa5868d654074a921fa11e491732cb2a'
 
 
 class JsonRom(object):
@@ -1513,14 +1513,48 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18003B, 0x01 if world.mapshuffle[player] else 0x00)  # maps showing crystals on overworld
 
     # compasses showing dungeon count
+    compass_mode = 0x00
     if world.clock_mode != 'none' or world.dungeon_counters[player] == 'off':
-        rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.dungeon_counters[player] == 'on':
-        rom.write_byte(0x18003C, 0x02)  # always on
-    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dungeon_counters[player] == 'pickup':
-        rom.write_byte(0x18003C, 0x01)  # show on pickup
-    else:
+        compass_mode = 0x00  # Currently must be off if timer is on, because they use same HUD location
         rom.write_byte(0x18003C, 0x00)
+    elif world.dungeon_counters[player] == 'on':
+        compass_mode = 0x02  # always on
+    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dungeon_counters[player] == 'pickup':
+        compass_mode = 0x01  # show on pickup
+    if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
+        compass_mode |= 0x80  # turn on locating dungeons
+        x_map_position_generic = [0x3c0, 0xbc0, 0x7c0, 0x1c0, 0x5c0, 0xdc0, 0x7c0, 0xbc0, 0x9c0, 0x3c0]
+        for idx, x_map in enumerate(x_map_position_generic):
+            rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
+            rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
+        if world.compassshuffle[player] and world.overworld_map[player] == 'compass':
+            compass_mode |= 0x40  # compasses are wild
+        for dungeon, portal_list in dungeon_portals.items():
+            ow_map_index = dungeon_table[dungeon].map_index
+            if len(portal_list) == 1:
+                portal_idx = 0
+            else:
+                if world.doorShuffle[player] == 'crossed':
+                    # the random choice excludes sanctuary
+                    portal_idx = next((i for i, elem in enumerate(portal_list)
+                                       if world.get_portal(elem, player).chosen), random.choice([1, 2, 3]))
+                else:
+                    portal_idx = {'Hyrule Castle': 0, 'Desert Palace': 0, 'Skull Woods': 3, 'Turtle Rock': 3}[dungeon]
+            portal = world.get_portal(portal_list[portal_idx], player)
+            entrance = portal.find_portal_entrance()
+            world_indicator = 0x01 if entrance.parent_region.type == RegionType.DarkWorld else 0x00
+            coords = ow_prize_table[entrance.name]
+            # figure out compass entrances and what world (light/dark)
+            rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
+            rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
+            rom.write_byte(0x53EA6+ow_map_index, world_indicator)
+            # in crossed doors - flip the compass exists flags
+            if world.doorShuffle[player] == 'crossed':
+                exists_flag = any(x for x in world.get_dungeon(dungeon, player).dungeon_items if x.type == 'Compass')
+                rom.write_byte(0x53E96+ow_map_index, 0x1 if exists_flag else 0x0)
+
+
+    rom.write_byte(0x18003C, compass_mode)
 
      # Bitfield - enable free items to show up in menu
      #
@@ -2228,6 +2262,7 @@ def write_strings(rom, world, player, team):
                 else:
                     entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
         hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 0
+        hint_count -= 2 if world.shuffle[player] not in ['simple', 'restricted'] else 0
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
                 if hint_count > 0:
@@ -2334,11 +2369,67 @@ def write_strings(rom, world, player, team):
             else:
                 tt[hint_locations.pop(0)] = this_hint
 
-        # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint isn't selected twice.
-        junk_hints = junk_texts.copy()
-        random.shuffle(junk_hints)
-        for location in hint_locations:
-            tt[location] = junk_hints.pop(0)
+        hint_candidates = []
+        for name, district in world.districts[player].items():
+            hint_type = 'foolish'
+            choice_set = set()
+            item_count, item_type = 0, 'useful'
+            for loc_name in district.locations:
+                location_item = world.get_location(loc_name, player).item
+                if location_item.advancement:
+                    if 'Heart Container' in location_item.name:
+                        continue
+                    itm_type = 'useful' if useful_item_for_hint(location_item, world) else 'vital'
+                    hint_type = 'path'
+                    if item_type == itm_type:
+                        choice_set.add(location_item)
+                        item_count += 1
+                    elif itm_type == 'vital':
+                        item_type = 'vital'
+                        item_count = 1
+                        choice_set.clear()
+                        choice_set.add(location_item)
+            if hint_type == 'foolish':
+                if district.dungeons and world.shuffle[player] != 'vanilla':
+                    choice_set.update(district.dungeons)
+                    hint_type = 'dungeon_path'
+                elif district.access_points and world.shuffle[player] not in ['vanilla', 'dungeonssimple',
+                                                                              'dungeonsfull']:
+                    choice_set.update([x.hint_text for x in district.access_points])
+                    hint_type = 'connector'
+            if hint_type == 'foolish':
+                hint_candidates.append((hint_type, f'{name} is a foolish choice'))
+            elif hint_type == 'dungeon_path':
+                choices = sorted(list(choice_set))
+                dungeon_choice = random.choice(choices)  # prefer required dungeons...
+                hint_candidates.append((hint_type, f'{name} is on the path to {dungeon_choice}'))
+            elif hint_type == 'connector':
+                choices = sorted(list(choice_set))
+                access_point = random.choice(choices)  # prefer required access...
+                hint_candidates.append((hint_type, f'{name} can reach {access_point}'))
+            elif hint_type == 'path':
+                if item_count == 1:
+                    the_item = text_for_item(next(iter(choice_set)), world, player, team)
+                    hint_candidates.append((hint_type, f'{name} conceals {the_item}'))
+                else:
+                    hint_candidates.append((hint_type, f'{name} conceals {item_count} {item_type} items'))
+        district_hints = min(len(hint_candidates), len(hint_locations))
+        random.shuffle(hint_candidates)
+        hint_candidates.sort(key=lambda x: 1 if x[0] == 'foolish' else 0)
+        foolish_only = min(2, district_hints)  # 2 foolish only
+        for i in range(0, foolish_only):
+            tt[hint_locations.pop(0)] = hint_candidates.pop(0)[1]
+        random.shuffle(hint_candidates)
+        district_hints -= foolish_only  # the rest can be anything
+        for i in range(0, district_hints):
+            tt[hint_locations.pop(0)] = hint_candidates.pop(0)[1]
+        if len(hint_locations) > 0:
+            # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint
+            # isn't selected twice.
+            junk_hints = junk_texts.copy()
+            random.shuffle(junk_hints)
+            for location in hint_locations:
+                tt[location] = junk_hints.pop(0)
 
     # We still need the older hints of course. Those are done here.
 
@@ -2488,6 +2579,25 @@ def write_strings(rom, world, player, team):
     (pointers, data) = credits.get_bytes()
     rom.write_bytes(0x181500, data)
     rom.write_bytes(0x76CC0, [byte for p in pointers for byte in [p & 0xFF, p >> 8 & 0xFF]])
+
+
+useful_item_names = {
+    'Mushroom', 'Shovel', 'Magic Powder', 'Progressive Shield', 'Progressive Armor', 'Blue Mail',  'Red Mail',
+    'Mirror Shield', 'Blue Boomerang', 'Red Boomerang', 'Bug Catching Net', 'Cane of Byrna', 'Cape',
+    'Magic Upgrade (1/2)', 'Magic Upgrade (1/4)', 'Ether', 'Quake'}
+
+
+def useful_item_for_hint(item, world):
+    return 'Bottle' in item.name or (item.name in useful_item_names
+                                     and item.name not in world.required_medallions[item.player])
+
+
+def text_for_item(item, world, player, team):
+    if item.player == player:
+        return item.hint_text
+    else:
+        return f'{item.hint_text} for {world.player_names[item.player][team]}'
+
 
 def set_inverted_mode(world, player, rom, inverted_buffer):
     if world.mode[player] == 'inverted':
