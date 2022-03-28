@@ -202,7 +202,7 @@ def district_item_pool_config(world):
         scale_factors = defaultdict(int)
         scale_total = 0
         for p in range(1, world.players + 1):
-            ent = 'Agahnims Tower' if world.is_tile_swapped(0x1b, player) and world.is_tile_swapped(0x1b, player) else 'Ganons Tower'
+            ent = 'Agahnims Tower' if world.is_atgt_swapped(player) else 'Ganons Tower'
             dungeon = world.get_entrance(ent, p).connected_region.dungeon
             if dungeon:
                 scale = world.crystals_needed_for_gt[p]

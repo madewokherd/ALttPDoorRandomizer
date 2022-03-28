@@ -913,7 +913,7 @@ def enable_new_entrances(region, connections, potentials, enabled, world, player
 
 
 def inverted_aga_check(entrances_map, connections, potentials, enabled, world, player):
-    if world.mode[player] == 'inverted':
+    if world.is_atgt_swapped(player):
         if 'Agahnims Tower' in entrances_map.keys() or aga_tower_enabled(enabled):
             for region in list(potentials.keys()):
                 if region.name == 'Hyrule Castle Ledge':
