@@ -211,6 +211,8 @@ def main(args, seed=None, fish=None):
 
     for player in range(1, world.players + 1):
         set_rules(world, player)
+    
+    district_item_pool_config(world)
 
     for player in range(1, world.players + 1):
         if world.shopsanity[player]:
@@ -223,7 +225,6 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         set_prize_drops(world, player)
 
-    district_item_pool_config(world)
     massage_item_pool(world)
     logger.info(world.fish.translate("cli", "cli", "placing.dungeon.prizes"))
 
