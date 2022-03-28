@@ -115,7 +115,7 @@ Triforce_texts = [
     "    Spam those\n      emotes in\n      wilds chat",
     "\n       O  M  G",
     "   Hello.  Will\n     you be my\n      friend?",
-    "     Beetorp\n          was\n         here!",
+    "     Beetorp\n       was\n         here!",
     "The Wind Fish\nwill wake\nsoon.    Hoot!",
     "Meow Meow Meow\nMeow Meow Meow\n  Oh My God!",
     "Ahhhhhhhhh\nYa ya yaaaah\nYa ya yaaah",
