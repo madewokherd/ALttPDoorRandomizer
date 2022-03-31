@@ -312,7 +312,7 @@ class World(object):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
     def is_atgt_swapped(self, player):
-        return (0x03 in self.owswaps[player][0]) == (0x1b in self.owswaps[player][0]) == (self.mode[player] != 'inverted')
+        return self.is_tile_swapped(0x03, player) and self.is_tile_swapped(0x1b, player)
 
     def is_bombshop_start(self, player):
         return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
