@@ -405,9 +405,13 @@ def link_overworld(world, player):
 
             random.shuffle(sector[1])
             f = 0
+            t = 0
             while len(new_spots) < target_spots:
                 if f >= len(sector[1]):
                     f = 0
+                    t += 1
+                    if t > 5:
+                        raise GenerationException('Infinite loop detected in flute shuffle')
                 if sector[1][f] not in new_spots:
                     addSpot(flute_regions[sector[1][f]])
                 f += 1
