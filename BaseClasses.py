@@ -121,7 +121,7 @@ class World(object):
             set_player_attr('ganonstower_vanilla', True)
             set_player_attr('sewer_light_cone', self.mode[player] == 'standard')
             set_player_attr('initial_overworld_flags', [0] * 0x80)
-            set_player_attr('fix_trock_doors', self.shuffle[player] != 'vanilla' or ((self.mode[player] == 'inverted') != 0x05 in self.owswaps[player][0]))
+            set_player_attr('fix_trock_doors', self.shuffle[player] != 'vanilla' or self.is_tile_swapped(0x05, player))
             set_player_attr('fix_skullwoods_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'] or self.doorShuffle[player] not in ['vanilla'])
             set_player_attr('fix_palaceofdarkness_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'])
             set_player_attr('fix_trock_exit', self.shuffle[player] not in ['vanilla', 'simple', 'restricted', 'dungeonssimple'])

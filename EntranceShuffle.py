@@ -2296,9 +2296,9 @@ one_way_ledges = {
 
 indirect_connections = {
     'Turtle Rock Ledge': 'Turtle Rock',
-    #'Big Bomb Shop': 'Pyramid Fairy',
+    'Big Bomb Shop': 'Pyramid Crack',
     #'East Dark World': 'Pyramid Fairy',
-    'Pyramid Area': 'Pyramid Fairy', # HC Ledge/Courtyard
+    'Pyramid Area': 'Pyramid Crack', # HC Ledge/Courtyard
     #'Dark Desert': 'Pyramid Fairy',
     #'Misery Mire Area': 'Pyramid Fairy', # Desert/Checkerboard Ledge
     #'West Dark World': 'Pyramid Fairy',
