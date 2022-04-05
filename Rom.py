@@ -1527,7 +1527,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
             if world.compassshuffle[player] and world.overworld_map[player] == 'compass':
                 compass_mode |= 0x40  # compasses are wild
-        if not (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default'):
+        else:
             # disable HC/AT/GT icons
             # rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
             # rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
