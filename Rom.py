@@ -1529,8 +1529,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 compass_mode |= 0x40  # compasses are wild
         if not (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default'):
             # disable HC/AT/GT icons
-            rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # GT
-            rom.write_bytes(0x53E8E, int16_as_bytes(0xFF00)) # AT
+            # rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
+            # rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
+            rom.write_bytes(0x53E8E, int16_as_bytes(0xFF00)) # HC
         for dungeon, portal_list in dungeon_portals.items():
             ow_map_index = dungeon_table[dungeon].map_index
             if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
