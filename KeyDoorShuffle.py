@@ -1391,7 +1391,7 @@ def forced_big_key_avail(locations):
 
 def prize_relevance(key_layout, dungeon_entrance, is_atgt_swapped):
     if len(key_layout.start_regions) > 1 and dungeon_entrance and dungeon_table[key_layout.key_logic.dungeon].prize:
-        if dungeon_entrance.name == 'Agahnims Tower' if is_atgt_swapped else 'Ganons Tower':
+        if dungeon_entrance.name == ('Agahnims Tower' if is_atgt_swapped else 'Ganons Tower'):
             return 'GT'
         elif dungeon_entrance.name == 'Pyramid Fairy':
             return 'BigBomb'
