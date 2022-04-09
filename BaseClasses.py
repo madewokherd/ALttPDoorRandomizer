@@ -949,7 +949,7 @@ class CollectionState(object):
                  'Golden Sword', 'Progressive Sword', 'Progressive Glove', 'Silver Arrows', 'Green Pendant',
                  'Blue Pendant', 'Red Pendant', 'Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 5',
                  'Crystal 6', 'Crystal 7', 'Blue Boomerang', 'Red Boomerang', 'Blue Shield', 'Red Shield',
-                 'Mirror Shield', 'Progressive Shield', 'Bug Catching Net', 'Cane of Byrna',
+                 'Mirror Shield', 'Progressive Shield', 'Bug Catching Net', 'Cane of Byrna', 'Ocarina (Activated)'
                  'Boss Heart Container', 'Sanctuary Heart Container', 'Piece of Heart', 'Magic Upgrade (1/2)',
                  'Magic Upgrade (1/4)']
             or item_name.startswith(('Bottle', 'Small Key', 'Big Key'))
