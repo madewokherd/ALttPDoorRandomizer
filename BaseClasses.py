@@ -3089,7 +3089,7 @@ class Spoiler(object):
             for fairy, bottle in self.bottles.items():
                 outfile.write(f'{fairy}: {bottle}\n')
 
-            if self.overworlds:
+            if self.overworlds or self.maps:
                 outfile.write('\n\nOverworld:\n\n')
 
                 # flute shuffle
@@ -3114,6 +3114,7 @@ class Spoiler(object):
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
                         outfile.write(self.maps[('swaps', player)]['text'] + '\n\n')
 
+            if self.overworlds:
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
             

@@ -425,6 +425,7 @@ def link_overworld(world, player):
         connect_flutes(new_spots)
 
         # update spoiler
+        new_spots = list(map(lambda o: flute_data[o][1], new_spots))
         s = list(map(lambda x: ' ' if x not in new_spots else 'F', [i for i in range(0x40)]))
         text_output = tile_swap_spoiler_table.replace('s', '%s') % (                         s[0x02],                                s[0x07],
                                                                                  s[0x00],                s[0x03],        s[0x05],
