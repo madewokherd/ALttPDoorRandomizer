@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '735bfeb907d34ad1e023ce8c9be8bf0f'
+RANDOMIZERBASEHASH = '0aa8a508e8d90e95aec2d92db6dccce5'
 
 
 class JsonRom(object):
@@ -1520,13 +1520,19 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         compass_mode = 0x01  # show on pickup
     if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') or world.owMixed[player]:
         compass_mode |= 0x80  # turn on locating dungeons
+        if world.overworld_map[player] == 'compass':
+            compass_mode |= 0x20  # show icon if compass is collected, 0x00 for maps
+            if world.compassshuffle[player]:
+                compass_mode |= 0x40  # dungeon item that enables icon is wild
+        elif world.overworld_map[player] == 'map':
+            if world.mapshuffle[player]:
+                compass_mode |= 0x40  # dungeon item that enables icon is wild
+        
         if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
             x_map_position_generic = [0x3c0, 0xbc0, 0x7c0, 0x1c0, 0x5c0, 0xdc0, 0x7c0, 0xbc0, 0x9c0, 0x3c0]
             for idx, x_map in enumerate(x_map_position_generic):
                 rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
                 rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
-            if world.compassshuffle[player] and world.overworld_map[player] == 'compass':
-                compass_mode |= 0x40  # compasses are wild
         else:
             # disable HC/AT/GT icons
             # rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
