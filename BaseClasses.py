@@ -2843,8 +2843,10 @@ class Spoiler(object):
                          'shuffle': self.world.shuffle,
                          'shuffleganon': self.world.shuffle_ganon,
                          'shufflelinks': self.world.shufflelinks,
+                         'overworld_map': self.world.overworld_map,
                          'door_shuffle': self.world.doorShuffle,
                          'intensity': self.world.intensity,
+                         'dungeon_counters': self.world.dungeon_counters,
                          'item_pool': self.world.difficulty,
                          'item_functionality': self.world.difficulty_adjustments,
                          'gt_crystals': self.world.crystals_needed_for_gt,
@@ -3030,9 +3032,9 @@ class Spoiler(object):
                 outfile.write('Bombbag:'.ljust(line_width) + '%s\n' % yn(self.metadata['bombbag'][player]))
                 outfile.write('Pseudoboots:'.ljust(line_width) + '%s\n' % yn(self.metadata['pseudoboots'][player]))
                 outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
-                if self.metadata['ow_shuffle'][player] != 'vanilla':
-                    outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))
                 outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
+                if self.metadata['ow_shuffle'][player] != 'vanilla' or self.metadata['ow_crossed'][player] not in ['none', 'allowed']:
+                    outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))
                 outfile.write('Swapped OW (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
                 outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
@@ -3040,12 +3042,15 @@ class Spoiler(object):
                 if self.metadata['shuffle'][player] != 'vanilla':
                     outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
                     outfile.write('Shuffle Links:'.ljust(line_width) + '%s\n' % yn(self.metadata['shufflelinks'][player]))
+                if self.metadata['shuffle'][player] != 'vanilla' or self.metadata['ow_mixed'][player]:
+                    outfile.write('Overworld Map:'.ljust(line_width) + '%s\n' % self.metadata['overworld_map'][player])
                 if self.metadata['goal'][player] != 'trinity':
                     outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % yn(self.metadata['open_pyramid'][player]))
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
                 if self.metadata['door_shuffle'][player] != 'vanilla':
                     outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
                     outfile.write('Experimental:'.ljust(line_width) + '%s\n' % yn(self.metadata['experimental'][player]))
+                outfile.write('Dungeon Counters:'.ljust(line_width) + '%s\n' % self.metadata['dungeon_counters'][player])
                 outfile.write('Pot Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['potshuffle'][player]))
                 outfile.write('Key Drop Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['keydropshuffle'][player]))
                 outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['mapshuffle'][player]))
