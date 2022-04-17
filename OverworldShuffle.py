@@ -557,7 +557,7 @@ def shuffle_tiles(world, groups, result_list, player):
     return swapped_edges
 
 def reorganize_tile_groups(world, player):
-    def can_shuffle_group(name, group):
+    def can_shuffle_group(name, groupType):
         return name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
             or world.mode[player] == 'inverted' \
             or (world.mode[player] == 'open' and (name in ['Links House', 'Central Bonk Rocks'] or world.doorShuffle[player] == 'crossed' or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'])) \
