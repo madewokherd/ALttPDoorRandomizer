@@ -559,9 +559,11 @@ def shuffle_tiles(world, groups, result_list, player):
 def reorganize_tile_groups(world, player):
     def can_shuffle_group(name, groupType):
         return name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-            or world.mode[player] == 'inverted' \
-            or (world.mode[player] == 'open' and (name in ['Links House', 'Central Bonk Rocks'] or world.doorShuffle[player] == 'crossed' or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'])) \
-            or (world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance')
+            or (world.mode[player] != 'standard' and (name != 'Castle' \
+                or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
+                or (world.mode[player] == 'open' and world.doorShuffle[player] == 'crossed') \
+                or world.owCrossed[player] in ['grouped', 'polar', 'chaos'])) \
+            or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance')
     
     groups = {}
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
