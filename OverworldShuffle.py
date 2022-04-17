@@ -387,7 +387,7 @@ def link_overworld(world, player):
             return True
         
         # determine sectors (isolated groups of regions) to place flute spots
-        flute_regions = {(f[0][0] if f[1] not in world.owswaps[player][0] else f[0][1]) : o for o, f in flute_data.items()}
+        flute_regions = {(f[0][0] if (f[1] not in world.owswaps[player][0]) != (world.mode[player] == 'inverted') else f[0][1]) : o for o, f in flute_data.items()}
         flute_sectors = [(len([r for l in s for r in l]), [r for l in s for r in l if r in flute_regions]) for s in world.owsectors[player]]
         flute_sectors = [s for s in flute_sectors if len(s[1]) > 0]
         region_total = sum([c for c,_ in flute_sectors])
