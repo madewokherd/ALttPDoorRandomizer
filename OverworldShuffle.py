@@ -557,12 +557,15 @@ def shuffle_tiles(world, groups, result_list, player):
     return swapped_edges
 
 def reorganize_tile_groups(world, player):
+    def can_shuffle_group(name, group):
+        return name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
+            or world.mode[player] == 'inverted' \
+            or (world.mode[player] == 'open' and (name in ['Links House', 'Central Bonk Rocks'] or world.doorShuffle[player] == 'crossed' or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'])) \
+            or (world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance')
+    
     groups = {}
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
-        if world.mode[player] == 'inverted' \
-                or (world.mode[player] == 'open' and (world.doorShuffle[player] == 'crossed' or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not (name == 'Castle' and groupType == 'Entrance'))) \
-                or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+        if can_shuffle_group(name, groupType):
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
                     groups[(name, whirlpoolGroup)] = ([], [], [])
@@ -575,10 +578,7 @@ def reorganize_tile_groups(world, player):
                     groups[(name, groupType)] = ([], [], [])
 
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
-        if world.mode[player] == 'inverted' \
-                or (world.mode[player] == 'open' and (world.doorShuffle[player] == 'crossed' or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not (name == 'Castle' and groupType == 'Entrance'))) \
-                or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+        if can_shuffle_group(name, groupType):
             (lw_owids, dw_owids) = OWTileGroups[(name, groupType, whirlpoolGroup)]
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
