@@ -359,7 +359,7 @@ def link_overworld(world, player):
         new_spots = list()
         ignored_regions = set()
 
-        def addSpot(owid):
+        def addSpot(owid, ignore_proximity):
             if world.owFluteShuffle[player] == 'balanced':
                 def getIgnored(regionname, base_owid, owid):
                     region = world.get_region(regionname, player)
@@ -379,10 +379,12 @@ def link_overworld(world, player):
                 
                 new_ignored = {new_region}
                 getIgnored(new_region, OWTileRegions[new_region], OWTileRegions[new_region])
-                if random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
+                if not ignore_proximity and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
                     return False
                 ignored_regions.update(new_ignored)
             flute_pool.remove(owid)
+            if ignore_proximity:
+                logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
             new_spots.append(owid)
             return True
         
@@ -401,7 +403,7 @@ def link_overworld(world, player):
             target_spots = len(new_spots) + spots_to_place
             
             if 'Desert Palace Teleporter Ledge' in sector[1] or 'Misery Mire Teleporter Ledge' in sector[1]:
-                addSpot(0x38) # guarantee desert/mire access
+                addSpot(0x38, False) # guarantee desert/mire access
 
             random.shuffle(sector[1])
             f = 0
@@ -413,7 +415,7 @@ def link_overworld(world, player):
                     if t > 5:
                         raise GenerationException('Infinite loop detected in flute shuffle')
                 if sector[1][f] not in new_spots:
-                    addSpot(flute_regions[sector[1][f]])
+                    addSpot(flute_regions[sector[1][f]], t > 0)
                 f += 1
 
             region_total -= sector[0]
