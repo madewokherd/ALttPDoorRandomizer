@@ -692,12 +692,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         inverted_buffer[0x7F] |= 0x2  # added C to terrain
 
         if world.owMixed[player]:
+            megatiles = {0x00, 0x03, 0x05, 0x18, 0x1b, 0x1e, 0x30, 0x35}
             for b in world.owswaps[player][0]:
                 # load inverted maps
                 inverted_buffer[b] ^= 0x1
 
                 # set world flag
-                rom.write_byte(0x153A00 + b, 0x00 if b >= 0x40 else 0x40)
+                world_flag = 0x00 if b >= 0x40 else 0x40
+                rom.write_byte(0x153A00 + b, world_flag)
+                if b % 0x40 in megatiles:
+                    rom.write_byte(0x153A00 + b + 1, world_flag)
+                    rom.write_byte(0x153A00 + b + 8, world_flag)
+                    rom.write_byte(0x153A00 + b + 9, world_flag)
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
