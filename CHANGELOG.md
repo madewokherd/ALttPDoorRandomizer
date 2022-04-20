@@ -1,5 +1,17 @@
 # Changelog
 
+### 0.2.7.0
+- ~~Merged DR v1.0.0.3 - MANY changes, major things listed below~~
+  - New Item Fills (Districts/Vanilla/Major Location/Dungeon)
+  - New OW Map Prize Indicators (In ER, map checks can spoil dungeon locations with a user setting)
+  - Forbidden Boss Items (Exclude certain dungeon items from dropping on bosses)
+- Map checks in Mixed OWR now will show dungeon prizes for dungeons actually in the world you map check on
+- In Mixed OWR, Sanc screen must stay in LW if the starting location is guaranteed to exit at the Sanc entrance
+- Fixed various issues with Flute logic
+- Fixed issue that resulted in infinite loops in Flute Shuffle
+- Changed map in attract mode to always show a vanilla LW map
+- Various improvements to increase generation success rate
+
 ### 0.2.6.1
 - Fixed issue with mirror bonking deleting portal in Crossed OW
 - Fixed issue with mirror portal not spawning when entering the OW from the DW, in Crossed OW
