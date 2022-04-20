@@ -1524,13 +1524,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         compass_mode = 0x02  # always on
     elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dungeon_counters[player] == 'pickup':
         compass_mode = 0x01  # show on pickup
-    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') or world.owMixed[player]:
+    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') \
+            or (world.owMixed[player] and not (world.shuffle[player] != 'vanilla' and world.overworld_map[player] == 'default')):
         compass_mode |= 0x80  # turn on locating dungeons
         if world.overworld_map[player] == 'compass':
             compass_mode |= 0x20  # show icon if compass is collected, 0x00 for maps
             if world.compassshuffle[player]:
                 compass_mode |= 0x40  # dungeon item that enables icon is wild
-        elif world.overworld_map[player] == 'map':
+        elif world.overworld_map[player] == 'map' or world.owMixed[player]:
             if world.mapshuffle[player]:
                 compass_mode |= 0x40  # dungeon item that enables icon is wild
         
@@ -1539,7 +1540,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             for idx, x_map in enumerate(x_map_position_generic):
                 rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
                 rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
-        else:
+        elif world.shuffle[player] == 'vanilla':
             # disable HC/AT/GT icons
             # rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
             # rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
@@ -1568,8 +1569,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             world_indicator = 0x01 if entrance.parent_region.type == RegionType.DarkWorld else 0x00
             coords = ow_prize_table[entrance.name]
             # figure out compass entrances and what world (light/dark)
-            rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
-            rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
+            if world.shuffle[player] == 'vanilla' or world.overworld_map[player] != 'default':
+                rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
+                rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
             rom.write_byte(0x53EA6+ow_map_index, world_indicator)
             # in crossed doors - flip the compass exists flags
             if world.doorShuffle[player] == 'crossed':
