@@ -29,6 +29,8 @@ def main():
     parser.add_argument('--teams', default=1, type=lambda value: max(int(value), 1))
     parser.add_argument('--create_spoiler', action='store_true')
     parser.add_argument('--no_race', action='store_true')
+    parser.add_argument('--suppress_rom', action='store_true')
+    parser.add_argument('--bps', action='store_true')
     parser.add_argument('--rom')
     parser.add_argument('--enemizercli')
     parser.add_argument('--outputpath')
@@ -62,6 +64,8 @@ def main():
     erargs.seed = seed
     erargs.names = args.names
     erargs.create_spoiler = args.create_spoiler
+    erargs.suppress_rom = args.suppress_rom
+    erargs.bps = args.bps
     erargs.race = not args.no_race
     erargs.outputname = seedname
     if args.outputpath:
@@ -73,6 +77,8 @@ def main():
     if args.enemizercli:
         erargs.enemizercli = args.enemizercli
 
+    mw_settings = {'algorithm': False}
+
     settings_cache = {k: (roll_settings(v) if args.samesettings else None) for k, v in weights_cache.items()}
 
     for player in range(1, args.multi + 1):
@@ -81,7 +87,12 @@ def main():
             settings = settings_cache[path] if settings_cache[path] else roll_settings(weights_cache[path])
             for k, v in vars(settings).items():
                 if v is not None:
-                    getattr(erargs, k)[player] = v
+                    if k == 'algorithm':  # multiworld wide parameters
+                        if not mw_settings[k]:  # only use the first roll
+                            setattr(erargs, k, v)
+                            mw_settings[k] = True
+                    else:
+                        getattr(erargs, k)[player] = v
         else:
             raise RuntimeError(f'No weights specified for player {player}')
 
@@ -129,12 +140,16 @@ def roll_settings(weights):
 
     ret = argparse.Namespace()
 
+    ret.algorithm = get_choice('algorithm')
+
+    glitch_map = {'none': 'noglitches', 'no_logic': 'nologic', 'owg': 'owglitches',
+                  'minorglitches': 'minorglitches'}
     glitches_required = get_choice('glitches_required')
     if glitches_required is not None:
-        if glitches_required not in ['none', 'owg', 'no_logic']:
-            print("Only NMG, OWG, and No Logic supported")
+        if glitches_required not in glitch_map.keys():
+            print(f'Logic did not match one of: {", ".join(glitch_map.keys())}')
             glitches_required = 'none'
-        ret.logic = {'none': 'noglitches', 'owg': 'owglitches', 'no_logic': 'nologic'}[glitches_required]
+        ret.logic = glitch_map[glitches_required]
 
     item_placement = get_choice('item_placement')
     # not supported in ER
@@ -146,6 +161,7 @@ def roll_settings(weights):
     ret.bigkeyshuffle = get_choice('bigkey_shuffle') == 'on' if 'bigkey_shuffle' in weights else dungeon_items in ['full']
 
     ret.accessibility = get_choice('accessibility')
+    ret.restrict_boss_items = get_choice('restrict_boss_items')
 
     overworld_shuffle = get_choice('overworld_shuffle')
     ret.ow_shuffle = overworld_shuffle if overworld_shuffle != 'none' else 'vanilla'
@@ -157,6 +173,8 @@ def roll_settings(weights):
     ret.ow_fluteshuffle = overworld_flute if overworld_flute != 'none' else 'vanilla'
     entrance_shuffle = get_choice('entrance_shuffle')
     ret.shuffle = entrance_shuffle if entrance_shuffle != 'none' else 'vanilla'
+    overworld_map = get_choice('overworld_map')
+    ret.overworld_map = overworld_map if overworld_map != 'default' else 'default'
     door_shuffle = get_choice('door_shuffle')
     ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
     ret.intensity = get_choice('intensity')

@@ -5,7 +5,7 @@ from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSl
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
-__version__ = '0.2.6.1-u'
+__version__ = '0.2.7.0-u'
 
 def link_overworld(world, player):
     # setup mandatory connections
@@ -359,7 +359,7 @@ def link_overworld(world, player):
         new_spots = list()
         ignored_regions = set()
 
-        def addSpot(owid):
+        def addSpot(owid, ignore_proximity):
             if world.owFluteShuffle[player] == 'balanced':
                 def getIgnored(regionname, base_owid, owid):
                     region = world.get_region(regionname, player)
@@ -379,15 +379,17 @@ def link_overworld(world, player):
                 
                 new_ignored = {new_region}
                 getIgnored(new_region, OWTileRegions[new_region], OWTileRegions[new_region])
-                if random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
+                if not ignore_proximity and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
                     return False
                 ignored_regions.update(new_ignored)
             flute_pool.remove(owid)
+            if ignore_proximity:
+                logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
             new_spots.append(owid)
             return True
         
         # determine sectors (isolated groups of regions) to place flute spots
-        flute_regions = {(f[0][0] if f[1] not in world.owswaps[player][0] else f[0][1]) : o for o, f in flute_data.items()}
+        flute_regions = {(f[0][0] if (f[1] not in world.owswaps[player][0]) != (world.mode[player] == 'inverted') else f[0][1]) : o for o, f in flute_data.items()}
         flute_sectors = [(len([r for l in s for r in l]), [r for l in s for r in l if r in flute_regions]) for s in world.owsectors[player]]
         flute_sectors = [s for s in flute_sectors if len(s[1]) > 0]
         region_total = sum([c for c,_ in flute_sectors])
@@ -401,15 +403,19 @@ def link_overworld(world, player):
             target_spots = len(new_spots) + spots_to_place
             
             if 'Desert Palace Teleporter Ledge' in sector[1] or 'Misery Mire Teleporter Ledge' in sector[1]:
-                addSpot(0x38) # guarantee desert/mire access
+                addSpot(0x38, False) # guarantee desert/mire access
 
             random.shuffle(sector[1])
             f = 0
+            t = 0
             while len(new_spots) < target_spots:
                 if f >= len(sector[1]):
                     f = 0
+                    t += 1
+                    if t > 5:
+                        raise GenerationException('Infinite loop detected in flute shuffle')
                 if sector[1][f] not in new_spots:
-                    addSpot(flute_regions[sector[1][f]])
+                    addSpot(flute_regions[sector[1][f]], t > 0)
                 f += 1
 
             region_total -= sector[0]
@@ -421,6 +427,7 @@ def link_overworld(world, player):
         connect_flutes(new_spots)
 
         # update spoiler
+        new_spots = list(map(lambda o: flute_data[o][1], new_spots))
         s = list(map(lambda x: ' ' if x not in new_spots else 'F', [i for i in range(0x40)]))
         text_output = tile_swap_spoiler_table.replace('s', '%s') % (                         s[0x02],                                s[0x07],
                                                                                  s[0x00],                s[0x03],        s[0x05],
@@ -552,10 +559,17 @@ def shuffle_tiles(world, groups, result_list, player):
     return swapped_edges
 
 def reorganize_tile_groups(world, player):
+    def can_shuffle_group(name, groupType):
+        return name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
+            or (world.mode[player] != 'standard' and (name != 'Castle' \
+                or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
+                or (world.mode[player] == 'open' and world.doorShuffle[player] == 'crossed') \
+                or world.owCrossed[player] in ['grouped', 'polar', 'chaos'])) \
+            or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance')
+    
     groups = {}
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
-        if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+        if can_shuffle_group(name, groupType):
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
                     groups[(name, whirlpoolGroup)] = ([], [], [])
@@ -568,8 +582,7 @@ def reorganize_tile_groups(world, player):
                     groups[(name, groupType)] = ([], [], [])
 
     for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
-        if world.mode[player] != 'standard' or name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
-                or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance'):
+        if can_shuffle_group(name, groupType):
             (lw_owids, dw_owids) = OWTileGroups[(name, groupType, whirlpoolGroup)]
             if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
                 if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':

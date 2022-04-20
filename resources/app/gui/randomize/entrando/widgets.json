@@ -3,6 +3,17 @@
     "openpyramid":      { "type": "checkbox" },
     "shuffleganon":     { "type": "checkbox" },
     "shufflelinks":     { "type": "checkbox" },
+    "overworld_map": {
+      "type": "selectbox",
+      "options": [
+        "default",
+        "compass",
+        "map"
+      ],
+      "config": {
+        "width": 45
+      }
+    },
     "entranceshuffle":  {
       "type": "selectbox",
       "options": [

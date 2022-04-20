@@ -16,8 +16,8 @@ except ImportError:
     raise Exception('Could not load BPS module')
 
 from BaseClasses import CollectionState, ShopType, Region, Location, OWEdge, Door, DoorType, RegionType, PotItem
-from DoorShuffle import compass_data, DROptions, boss_indicator
-from Dungeons import dungeon_music_addresses
+from DoorShuffle import compass_data, DROptions, boss_indicator, dungeon_portals
+from Dungeons import dungeon_music_addresses, dungeon_table
 from Regions import location_table, shop_to_location_table, retro_shops
 from RoomData import DoorKind
 from Text import MultiByteTextMapper, CompressedTextMapper, text_addresses, Credits, TextTable
@@ -26,14 +26,14 @@ from Text import Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts, LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts, Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
 from Items import ItemFactory
-from EntranceShuffle import door_addresses, exit_ids
+from EntranceShuffle import door_addresses, exit_ids, ow_prize_table
 from OverworldShuffle import default_flute_connections, flute_data
 
 from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '497aac112b42e50ea66ce793340cdb18'
+RANDOMIZERBASEHASH = '786c28c4735da56f0dbca879d02b22f6'
 
 
 class JsonRom(object):
@@ -692,12 +692,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         inverted_buffer[0x7F] |= 0x2  # added C to terrain
 
         if world.owMixed[player]:
+            megatiles = {0x00, 0x03, 0x05, 0x18, 0x1b, 0x1e, 0x30, 0x35}
             for b in world.owswaps[player][0]:
                 # load inverted maps
                 inverted_buffer[b] ^= 0x1
 
                 # set world flag
-                rom.write_byte(0x153A00 + b, 0x00 if b >= 0x40 else 0x40)
+                world_flag = 0x00 if b >= 0x40 else 0x40
+                rom.write_byte(0x153A00 + b, world_flag)
+                if b % 0x40 in megatiles:
+                    rom.write_byte(0x153A00 + b + 1, world_flag)
+                    rom.write_byte(0x153A00 + b + 8, world_flag)
+                    rom.write_byte(0x153A00 + b + 9, world_flag)
         
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
@@ -812,10 +818,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if should_be_bunny(sanc_region, world.mode[player]):
         rom.write_bytes(0x13fff2, [0x12, 0x00])
 
-    if not world.is_bombshop_start(player):
-        lh_name = 'Links House'
-    else:
-        lh_name = 'Big Bomb Shop'
+    lh_name = 'Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop'
     links_house = world.get_region(lh_name, player)
     if should_be_bunny(links_house, world.mode[player]):
         rom.write_bytes(0x13fff0, [0x04 if lh_name == 'Links House' else 0x1C, 0x01])
@@ -1388,7 +1391,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                     'Big Key (Turtle Rock)': (0x366, 0x08), 'Compass (Turtle Rock)': (0x364, 0x08), 'Map (Turtle Rock)': (0x368, 0x08),
                     'Big Key (Ganons Tower)': (0x366, 0x04), 'Compass (Ganons Tower)': (0x364, 0x04), 'Map (Ganons Tower)': (0x368, 0x04)}
         set_or_table = {'Flippers': (0x356, 1, 0x379, 0x02),'Pegasus Boots': (0x355, 1, 0x379, 0x04),
-                        'Shovel': (0x34C, 1, 0x38C, 0x04), 'Ocarina': (0x34C, 3, 0x38C, 0x01),
+                        'Shovel': (0x34C, 1, 0x38C, 0x04), 'Ocarina': (0x34C, 3, 0x38C, 0x01), 'Ocarina (Activated)': (0x34C, 3, 0x38C, 0x01),
                         'Mushroom': (0x344, 1, 0x38C, 0x20 | 0x08), 'Magic Powder': (0x344, 2, 0x38C, 0x10),
                         'Blue Boomerang': (0x341, 1, 0x38C, 0x80), 'Red Boomerang': (0x341, 2, 0x38C, 0x40)}
         keys = {'Small Key (Eastern Palace)': [0x37E], 'Small Key (Desert Palace)': [0x37F],
@@ -1513,14 +1516,70 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18003B, 0x01 if world.mapshuffle[player] else 0x00)  # maps showing crystals on overworld
 
     # compasses showing dungeon count
+    compass_mode = 0x00
     if world.clock_mode != 'none' or world.dungeon_counters[player] == 'off':
-        rom.write_byte(0x18003C, 0x00)  # Currently must be off if timer is on, because they use same HUD location
-    elif world.dungeon_counters[player] == 'on':
-        rom.write_byte(0x18003C, 0x02)  # always on
-    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dungeon_counters[player] == 'pickup':
-        rom.write_byte(0x18003C, 0x01)  # show on pickup
-    else:
+        compass_mode = 0x00  # Currently must be off if timer is on, because they use same HUD location
         rom.write_byte(0x18003C, 0x00)
+    elif world.dungeon_counters[player] == 'on':
+        compass_mode = 0x02  # always on
+    elif world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dungeon_counters[player] == 'pickup':
+        compass_mode = 0x01  # show on pickup
+    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') \
+            or (world.owMixed[player] and not (world.shuffle[player] != 'vanilla' and world.overworld_map[player] == 'default')):
+        compass_mode |= 0x80  # turn on locating dungeons
+        if world.overworld_map[player] == 'compass':
+            compass_mode |= 0x20  # show icon if compass is collected, 0x00 for maps
+            if world.compassshuffle[player]:
+                compass_mode |= 0x40  # dungeon item that enables icon is wild
+        elif world.overworld_map[player] == 'map' or world.owMixed[player]:
+            if world.mapshuffle[player]:
+                compass_mode |= 0x40  # dungeon item that enables icon is wild
+        
+        if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
+            x_map_position_generic = [0x3c0, 0xbc0, 0x7c0, 0x1c0, 0x5c0, 0xdc0, 0x7c0, 0xbc0, 0x9c0, 0x3c0]
+            for idx, x_map in enumerate(x_map_position_generic):
+                rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
+                rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
+        elif world.shuffle[player] == 'vanilla':
+            # disable HC/AT/GT icons
+            # rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
+            # rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
+            rom.write_bytes(0x53E8E, int16_as_bytes(0xFF00)) # HC
+        for dungeon, portal_list in dungeon_portals.items():
+            ow_map_index = dungeon_table[dungeon].map_index
+            if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
+                if len(portal_list) == 1:
+                    portal_idx = 0
+                else:
+                    if world.doorShuffle[player] == 'crossed':
+                        # the random choice excludes sanctuary
+                        portal_idx = next((i for i, elem in enumerate(portal_list)
+                                        if world.get_portal(elem, player).chosen), random.choice([1, 2, 3]))
+                    else:
+                        portal_idx = {'Hyrule Castle': 0, 'Desert Palace': 0, 'Skull Woods': 3, 'Turtle Rock': 3}[dungeon]
+            else:
+                if dungeon in ['Hyrule Castle', 'Agahnims Tower', 'Ganons Tower']:
+                    portal_idx = -1
+                elif len(portal_list) == 1:
+                    portal_idx = 0
+                else:
+                    portal_idx = {'Desert Palace': 1, 'Skull Woods': 3, 'Turtle Rock': 0}[dungeon]
+            portal = world.get_portal(portal_list[0 if portal_idx == -1 else portal_idx], player)
+            entrance = portal.find_portal_entrance()
+            world_indicator = 0x01 if entrance.parent_region.type == RegionType.DarkWorld else 0x00
+            coords = ow_prize_table[entrance.name]
+            # figure out compass entrances and what world (light/dark)
+            if world.shuffle[player] == 'vanilla' or world.overworld_map[player] != 'default':
+                rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
+                rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
+            rom.write_byte(0x53EA6+ow_map_index, world_indicator)
+            # in crossed doors - flip the compass exists flags
+            if world.doorShuffle[player] == 'crossed':
+                exists_flag = any(x for x in world.get_dungeon(dungeon, player).dungeon_items if x.type == 'Compass')
+                rom.write_byte(0x53E96+ow_map_index, 0x1 if exists_flag else 0x0)
+
+
+    rom.write_byte(0x18003C, compass_mode)
 
      # Bitfield - enable free items to show up in menu
      #
@@ -1934,61 +1993,6 @@ def dump_zspr(basesprite, basepalette, baseglove, outfilename, author_name, spri
     with open('%s' % outfilename, "wb") as zspr_file:
         zspr_file.write(write_buffer)
 
-# .zspr file dumping logic copied with permission from SpriteSomething:
-# https://github.com/Artheau/SpriteSomething/blob/master/source/meta/classes/spritelib.py#L443 (thanks miketrethewey!)
-def dump_zspr(basesprite, basepalette, baseglove, outfilename, author_name, sprite_name):
-    palettes = basepalette
-    # Add glove data
-    palettes.extend(baseglove)
-    HEADER_STRING = b"ZSPR"
-    VERSION = 0x01
-    SPRITE_TYPE = 0x01  # this format has "1" for the player sprite
-    RESERVED_BYTES = b'\x00\x00\x00\x00\x00\x00'
-    QUAD_BYTE_NULL_CHAR = b'\x00\x00\x00\x00'
-    DOUBLE_BYTE_NULL_CHAR = b'\x00\x00'
-    SINGLE_BYTE_NULL_CHAR = b'\x00'
-
-    write_buffer = bytearray()
-
-    write_buffer.extend(HEADER_STRING)
-    write_buffer.extend(struct.pack('B', VERSION)) # as_u8
-    checksum_start = len(write_buffer)
-    write_buffer.extend(QUAD_BYTE_NULL_CHAR)  # checksum
-    sprite_sheet_pointer = len(write_buffer)
-    write_buffer.extend(QUAD_BYTE_NULL_CHAR)
-    write_buffer.extend(struct.pack('<H', len(basesprite)))  # as_u16
-    palettes_pointer = len(write_buffer)
-    write_buffer.extend(QUAD_BYTE_NULL_CHAR)
-    write_buffer.extend(struct.pack('<H', len(palettes)))  # as_u16
-    write_buffer.extend(struct.pack('<H', SPRITE_TYPE))  # as_u16
-    write_buffer.extend(RESERVED_BYTES)
-    # sprite.name
-    write_buffer.extend(sprite_name.encode('utf-16-le'))
-    write_buffer.extend(DOUBLE_BYTE_NULL_CHAR)
-    # author.name
-    write_buffer.extend(author_name.encode('utf-16-le'))
-    write_buffer.extend(DOUBLE_BYTE_NULL_CHAR)
-    # author.name-short
-    write_buffer.extend(author_name.encode('ascii'))
-    write_buffer.extend(SINGLE_BYTE_NULL_CHAR)
-    write_buffer[sprite_sheet_pointer:sprite_sheet_pointer +
-                                      4] = struct.pack('<L', len(write_buffer)) # as_u32
-    write_buffer.extend(basesprite)
-    write_buffer[palettes_pointer:palettes_pointer +
-                                  4] = struct.pack('<L', len(write_buffer)) # as_u32
-    write_buffer.extend(palettes)
-
-    checksum = (sum(write_buffer) + 0xFF + 0xFF) % 0x10000
-    checksum_complement = 0xFFFF - checksum
-
-    write_buffer[checksum_start:checksum_start +
-                                2] = struct.pack('<H', checksum) # as_u16
-    write_buffer[checksum_start + 2:checksum_start +
-                                    4] = struct.pack('<H', checksum_complement) # as_u16
-
-    with open('%s' % outfilename, "wb") as zspr_file:
-        zspr_file.write(write_buffer)
-
 def write_sprite(rom, sprite):
     if not sprite.valid:
         return
@@ -2228,6 +2232,7 @@ def write_strings(rom, world, player, team):
                 else:
                     entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
         hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 0
+        hint_count -= 2 if world.shuffle[player] not in ['simple', 'restricted'] else 0
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
                 if hint_count > 0:
@@ -2334,11 +2339,67 @@ def write_strings(rom, world, player, team):
             else:
                 tt[hint_locations.pop(0)] = this_hint
 
-        # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint isn't selected twice.
-        junk_hints = junk_texts.copy()
-        random.shuffle(junk_hints)
-        for location in hint_locations:
-            tt[location] = junk_hints.pop(0)
+        hint_candidates = []
+        for name, district in world.districts[player].items():
+            hint_type = 'foolish'
+            choice_set = set()
+            item_count, item_type = 0, 'useful'
+            for loc_name in district.locations:
+                location_item = world.get_location(loc_name, player).item
+                if location_item.advancement:
+                    if 'Heart Container' in location_item.name:
+                        continue
+                    itm_type = 'useful' if useful_item_for_hint(location_item, world) else 'vital'
+                    hint_type = 'path'
+                    if item_type == itm_type:
+                        choice_set.add(location_item)
+                        item_count += 1
+                    elif itm_type == 'vital':
+                        item_type = 'vital'
+                        item_count = 1
+                        choice_set.clear()
+                        choice_set.add(location_item)
+            if hint_type == 'foolish':
+                if district.dungeons and world.shuffle[player] != 'vanilla':
+                    choice_set.update(district.dungeons)
+                    hint_type = 'dungeon_path'
+                elif district.access_points and world.shuffle[player] not in ['vanilla', 'dungeonssimple',
+                                                                              'dungeonsfull']:
+                    choice_set.update([x.hint_text for x in district.access_points])
+                    hint_type = 'connector'
+            if hint_type == 'foolish':
+                hint_candidates.append((hint_type, f'{name} is a foolish choice'))
+            elif hint_type == 'dungeon_path':
+                choices = sorted(list(choice_set))
+                dungeon_choice = random.choice(choices)  # prefer required dungeons...
+                hint_candidates.append((hint_type, f'{name} is on the path to {dungeon_choice}'))
+            elif hint_type == 'connector':
+                choices = sorted(list(choice_set))
+                access_point = random.choice(choices)  # prefer required access...
+                hint_candidates.append((hint_type, f'{name} can reach {access_point}'))
+            elif hint_type == 'path':
+                if item_count == 1:
+                    the_item = text_for_item(next(iter(choice_set)), world, player, team)
+                    hint_candidates.append((hint_type, f'{name} conceals {the_item}'))
+                else:
+                    hint_candidates.append((hint_type, f'{name} conceals {item_count} {item_type} items'))
+        district_hints = min(len(hint_candidates), len(hint_locations))
+        random.shuffle(hint_candidates)
+        hint_candidates.sort(key=lambda x: 1 if x[0] == 'foolish' else 0)
+        foolish_only = min(2, district_hints)  # 2 foolish only
+        for i in range(0, foolish_only):
+            tt[hint_locations.pop(0)] = hint_candidates.pop(0)[1]
+        random.shuffle(hint_candidates)
+        district_hints -= foolish_only  # the rest can be anything
+        for i in range(0, district_hints):
+            tt[hint_locations.pop(0)] = hint_candidates.pop(0)[1]
+        if len(hint_locations) > 0:
+            # All remaining hint slots are filled with junk hints. It is done this way to ensure the same junk hint
+            # isn't selected twice.
+            junk_hints = junk_texts.copy()
+            random.shuffle(junk_hints)
+            for location in hint_locations:
+                tt[location] = junk_hints.pop(0)
 
     # We still need the older hints of course. Those are done here.
 
@@ -2488,6 +2549,25 @@ def write_strings(rom, world, player, team):
     (pointers, data) = credits.get_bytes()
     rom.write_bytes(0x181500, data)
     rom.write_bytes(0x76CC0, [byte for p in pointers for byte in [p & 0xFF, p >> 8 & 0xFF]])
+
+
+useful_item_names = {
+    'Mushroom', 'Shovel', 'Magic Powder', 'Progressive Shield', 'Progressive Armor', 'Blue Mail',  'Red Mail',
+    'Mirror Shield', 'Blue Boomerang', 'Red Boomerang', 'Bug Catching Net', 'Cane of Byrna', 'Cape',
+    'Magic Upgrade (1/2)', 'Magic Upgrade (1/4)', 'Ether', 'Quake'}
+
+
+def useful_item_for_hint(item, world):
+    return 'Bottle' in item.name or (item.name in useful_item_names
+                                     and item.name not in world.required_medallions[item.player])
+
+
+def text_for_item(item, world, player, team):
+    if item.player == player:
+        return item.hint_text
+    else:
+        return f'{item.hint_text} for {world.player_names[item.player][team]}'
+
 
 def set_inverted_mode(world, player, rom, inverted_buffer):
     if world.mode[player] == 'inverted':
@@ -2922,6 +3002,7 @@ RelevantItems = ['Bow',
                  'Hookshot',
                  'Magic Mirror',
                  'Ocarina',
+                 'Ocarina (Activated)',
                  'Pegasus Boots',
                  'Power Glove',
                  'Cape',

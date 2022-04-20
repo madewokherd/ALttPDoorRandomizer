@@ -14,6 +14,7 @@ from RoomData import DoorKind, PairedDoor, reset_rooms
 from DungeonGenerator import ExplorationState, convert_regions, generate_dungeon, pre_validate, determine_required_paths, drop_entrances
 from DungeonGenerator import create_dungeon_builders, split_dungeon_builder, simple_dungeon_builder, default_dungeon_entrances
 from DungeonGenerator import dungeon_portals, dungeon_drops, GenerationException
+from DungeonGenerator import valid_region_to_explore as valid_region_to_explore_lim
 from KeyDoorShuffle import analyze_dungeon, build_key_layout, validate_key_layout, determine_prize_lock
 from Utils import ncr, kth_combination
 
@@ -44,10 +45,10 @@ def link_doors(world, player):
             reset_rooms(world, player)
             world.get_door("Skull Pinball WS", player).no_exit()
             world.swamp_patch_required[player] = orig_swamp_patch
+            link_doors_prep(world, player)
 
 
-def link_doors_main(world, player):
-
+def link_doors_prep(world, player):
     # Drop-down connections & push blocks
     for exitName, regionName in logical_connections:
         connect_simple_door(world, exitName, regionName, player)
@@ -100,6 +101,7 @@ def link_doors_main(world, player):
             analyze_portals(world, player)
         for portal in world.dungeon_portals[player]:
             connect_portal(portal, world, player)
+
     if not world.doorShuffle[player] == 'vanilla':
         fix_big_key_doors_with_ugly_smalls(world, player)
     else:
@@ -120,11 +122,14 @@ def link_doors_main(world, player):
         for ent, ext in default_one_way_connections:
             connect_one_way(world, ent, ext, player)
         vanilla_key_logic(world, player)
-    elif world.doorShuffle[player] == 'basic':
+
+
+def link_doors_main(world, player):
+    if world.doorShuffle[player] == 'basic':
         within_dungeon(world, player)
     elif world.doorShuffle[player] == 'crossed':
         cross_dungeon(world, player)
-    else:
+    elif world.doorShuffle[player] != 'vanilla':
         logging.getLogger('').error('Invalid door shuffle setting: %s' % world.doorShuffle[player])
         raise Exception('Invalid door shuffle setting: %s' % world.doorShuffle[player])
 
@@ -215,9 +220,14 @@ def vanilla_key_logic(world, player):
             world.key_logic[player] = {}
         analyze_dungeon(key_layout, world, player)
         world.key_logic[player][builder.name] = key_layout.key_logic
+        world.key_layout[player][builder.name] = key_layout
         log_key_logic(builder.name, key_layout.key_logic)
     # if world.shuffle[player] == 'vanilla' and world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'none' and not world.owMixed[player] and world.accessibility[player] == 'items' and not world.retro[player] and not world.keydropshuffle[player]:
     #     validate_vanilla_key_logic(world, player)
+
+
+def validate_vanilla_reservation(dungeon, world, player):
+    return validate_key_layout(world.key_layout[player][dungeon.name], world, player)
 
 
 # some useful functions
@@ -903,7 +913,7 @@ def enable_new_entrances(region, connections, potentials, enabled, world, player
 
 
 def inverted_aga_check(entrances_map, connections, potentials, enabled, world, player):
-    if world.mode[player] == 'inverted':
+    if world.is_atgt_swapped(player):
         if 'Agahnims Tower' in entrances_map.keys() or aga_tower_enabled(enabled):
             for region in list(potentials.keys()):
                 if region.name == 'Hyrule Castle Ledge':
@@ -1279,6 +1289,7 @@ def refine_boss_exits(world, player):
             if 0 < len(filtered) < len(reachable_portals):
                 reachable_portals = filtered
             chosen_one = random.choice(reachable_portals) if len(reachable_portals) > 1 else reachable_portals[0]
+            chosen_one.chosen = True
             if chosen_one != current_boss:
                 chosen_one.change_boss_exit(current_boss.boss_exit_idx)
                 current_boss.change_boss_exit(-1)
@@ -1369,6 +1380,8 @@ def combine_layouts(recombinant_builders, dungeon_builders, entrances_map):
         dungeon_builders[recombine.name] = recombine
 
 
+# todo: this allows cross-dungeon exploring via HC Ledge or Inaccessible Regions
+# todo: @deprecated
 def valid_region_to_explore(region, world, player):
     return region and (region.type == RegionType.Dungeon
                        or region.name in world.inaccessible_regions[player]
@@ -1560,7 +1573,7 @@ okay_normals = [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.
 
 
 def find_key_door_candidates(region, checked, world, player):
-    dungeon = region.dungeon
+    dungeon_name = region.dungeon.name
     candidates = []
     checked_doors = list(checked)
     queue = deque([(region, None, None)])
@@ -1570,14 +1583,16 @@ def find_key_door_candidates(region, checked, world, player):
             d = ext.door
             if d and d.controller:
                 d = d.controller
-            if d and not d.blocked and not d.entranceFlag and d.dest is not last_door and d.dest is not last_region and d not in checked_doors:
+            if d and not d.blocked and d.dest is not last_door and d.dest is not last_region and d not in checked_doors:
                 valid = False
-                if 0 <= d.doorListPos < 4 and d.type in [DoorType.Interior, DoorType.Normal, DoorType.SpiralStairs]:
+                if (0 <= d.doorListPos < 4 and d.type in [DoorType.Interior, DoorType.Normal, DoorType.SpiralStairs]
+                   and not d.entranceFlag):
                     room = world.get_room(d.roomIndex, player)
                     position, kind = room.doorList[d.doorListPos]
-
                     if d.type == DoorType.Interior:
                         valid = kind in [DoorKind.Normal, DoorKind.SmallKey, DoorKind.Bombable, DoorKind.Dashable]
+                        if valid and d.dest not in candidates:  # interior doors are not separable yet
+                            candidates.append(d.dest)
                     elif d.type == DoorType.SpiralStairs:
                         valid = kind in [DoorKind.StairKey, DoorKind.StairKey2, DoorKind.StairKeyLow]
                     elif d.type == DoorType.Normal:
@@ -1596,7 +1611,7 @@ def find_key_door_candidates(region, checked, world, player):
                 if valid and d not in candidates:
                     candidates.append(d)
                 connected = ext.connected_region
-                if connected and (connected.type != RegionType.Dungeon or connected.dungeon == dungeon):
+                if valid_region_to_explore_lim(connected, dungeon_name, world, player):
                     queue.append((ext.connected_region, d, current))
                 if d is not None:
                     checked_doors.append(d)
@@ -1823,7 +1838,7 @@ def find_inaccessible_regions(world, player):
     while len(queue) > 0:
         next_region = queue.popleft()
         visited_regions.add(next_region)
-        if next_region.name == 'Dark Sanctuary Hint':  # special spawn point in cave
+        if world.mode[player] == 'inverted' and next_region.name == 'Dark Sanctuary Hint':  # special spawn point in cave
             for ent in next_region.entrances:
                 parent = ent.parent_region
                 if parent and parent.type is not RegionType.Dungeon and parent not in queue and parent not in visited_regions:

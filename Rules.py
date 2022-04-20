@@ -4,6 +4,7 @@ from collections import deque
 
 import OverworldGlitchRules
 from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier, KeyRuleType
+from Dungeons import dungeon_table
 from RoomData import DoorKind
 from OverworldGlitchRules import overworld_glitches_rules
 
@@ -591,15 +592,33 @@ def global_rules(world, player):
     add_key_logic_rules(world, player)
     # End of door rando rules.
 
+    if world.restrict_boss_items[player] != 'none':
+        def add_mc_rule(l):
+            boss_location = world.get_location(l, player)
+            d_name = boss_location.parent_region.dungeon.name
+            compass_name = f'Compass ({d_name})'
+            map_name = f'Map ({d_name})'
+            add_rule(boss_location, lambda state: state.has(compass_name, player) and state.has(map_name, player))
+
+        for dungeon, info in dungeon_table.items():
+            if info.prize:
+                d_name = "Thieves' Town" if dungeon.startswith('Thieves') else dungeon
+                for loc in [info.prize, f'{d_name} - Boss']:
+                    add_mc_rule(loc)
+        if world.doorShuffle[player] == 'crossed':
+            add_mc_rule('Agahnim 1')
+        add_mc_rule('Agahnim 2')
+
     set_rule(world.get_location('Ganon', player), lambda state: state.has_beam_sword(player) and state.has_fire_source(player) and state.has_crystals(world.crystals_needed_for_ganon[player], player)
                                                                 and (state.has('Tempered Sword', player) or state.has('Golden Sword', player) or (state.has('Silver Arrows', player) and state.can_shoot_arrows(player)) or state.has('Lamp', player) or state.can_extend_magic(player, 12)))  # need to light torch a sufficient amount of times
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has_beam_sword(player))  # need to damage ganon to get tiles to drop
+
 
 def bomb_rules(world, player):
     bonkable_doors = ['Two Brothers House Exit (West)', 'Two Brothers House Exit (East)'] # Technically this is incorrectly defined, but functionally the same as what is intended.
     bombable_doors = ['Ice Rod Cave', 'Light World Bomb Hut', 'Light World Death Mountain Shop', 'Light Hype Fairy', 'Mini Moldorm Cave',
                       'Hookshot Cave Back to Middle', 'Hookshot Cave Front to Middle', 'Hookshot Cave Middle to Front','Hookshot Cave Middle to Back',
-                      'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery']
+                      'Dark Lake Hylia Ledge Fairy', 'Hype Cave', 'Brewery', 'Light Hype Fairy']
     for entrance in bonkable_doors:
         add_rule(world.get_entrance(entrance, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player))
         add_bunny_rule(world.get_entrance(entrance, player), player)
@@ -1672,9 +1691,10 @@ def set_bunny_rules(world, player, inverted):
                               'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
-                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
-                                  'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Purple Chest', 'Blacksmith',
-                                  'Missing Smith', 'Pyramid Crack', 'Big Bomb', 'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
+                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge',
+                                  'Frog', 'Missing Smith', 'Dark Blacksmith Ruins', 'Purple Chest', 'Pyramid Crack', 'Big Bomb',
+                                  'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Blacksmith',
+                                  'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
                                   'Kakariko Shop - Left', 'Kakariko Shop - Middle', 'Kakariko Shop - Right',
                                   'Lake Hylia Shop - Left', 'Lake Hylia Shop - Middle', 'Lake Hylia Shop - Right',
                                   'Potion Shop - Left', 'Potion Shop - Middle', 'Potion Shop - Right',
