@@ -56,6 +56,20 @@ jsl.l OWLightWorldOrCrossed
 org $0aba6c  ; < ? - Bank0a.asm:474 ()
 jsl.l OWMapWorldCheck16 : nop
 
+; Mixed Overworld Map
+org $0ABA99
+WorldMap_LoadDarkWorldMap:
+LDA.b $10 : CMP.b #$14 ; attract module
+BEQ .vanilla_light
+    LDA.l OWMode+1 : AND.b #$04 : BNE .mixed
+        LDA.b $8A : AND.b #$40
+        BEQ .vanilla_light
+    .mixed
+    PHB : PHK : PLB
+        JSL LoadMapDarkOrMixed
+    PLB
+.vanilla_light ; $0ABAB5
+
 ;(replacing -> LDA $8A : AND.b #$40)
 org $00d8c4  ; < ? - Bank00.asm:4068 ()
 jsl.l OWWorldCheck
@@ -80,8 +94,6 @@ jsl.l OWWorldCheck
 org $07aa34  ; < ? - Bank07.asm:6718 ()
 jsl.l OWWorldCheck
 org $08d408  ; < ? - ancilla_morph_poof.asm:48 ()
-jsl.l OWWorldCheck
-org $0aba99  ; < ? - Bank0a.asm:515 ()
 jsl.l OWWorldCheck
 org $0bfeab  ; < ? - Bank0b.asm:36 ()
 jsl.l OWWorldCheck16 : nop
@@ -239,6 +251,60 @@ OWOldManSpeed:
     .vanilla
     lda #$0c : sta $5e ; what we wrote over
     rtl
+}
+
+LoadMapDarkOrMixed:
+{
+    CMP.b #$04 : REP #$30 : BEQ .mixed
+        LDX.w #$03FE ; draw vanilla Dark World (what we wrote over)
+        .copy_next
+            LDA.w $D739,X : STA.w $1000,X ; DB is $0A
+            DEX : DEX : BPL .copy_next
+        BRL .end
+    .mixed
+        LDX.b $8A
+        LDA.l OWTileWorldAssoc,X
+        STA.b $00
+        LDY.w #$139C
+        LDX.w #$003F
+        .next_screen
+            PHX
+            LDA.l OWTileWorldAssoc,X
+            EOR.b $00
+            AND.w #$0040
+            BEQ .light
+                TYX : BRA .copy_screen
+            .light
+                TXA : AND.w #$0024 : LSR : TAX
+                TYA : SEC : SBC.l LWQuadrantOffsets,X
+                TYX : TAY
+            .copy_screen ; more efficient to have X on the right side
+            LDA.w $C739+$00,Y : STA.b $00,X
+            LDA.w $C739+$02,Y : STA.b $02,X
+            LDA.w $C739+$20,Y : STA.b $20,X
+            LDA.w $C739+$22,Y : STA.b $22,X
+            LDA.w $C739+$40,Y : STA.b $40,X
+            LDA.w $C739+$42,Y : STA.b $42,X
+            LDA.w $C739+$60,Y : STA.b $60,X
+            LDA.w $C739+$62,Y : STA.b $62,X
+            TXY : PLX
+            DEY : DEY : DEY : DEY ; move one screen left
+            TXA : AND.w #$0007 : BNE .same_row
+                TYA : SEC : SBC.w #$0060 : TAY ; move one screen row up
+            .same_row
+            DEX
+        BPL .next_screen
+    .end
+    SEP #$30
+    LDA.b #$15 : STA.b $17 ; what we wrote over
+    RTL
+
+    LWQuadrantOffsets:
+    dw $1000-$0210 ; top left
+    dw $0C00-$01F0 ; top right
+    dw 0,0,0,0,0,0
+    dw $0800+$01F0 ; bottom left
+    dw $0400+$0210 ; bottom 
 }
 
 org $aa9000
