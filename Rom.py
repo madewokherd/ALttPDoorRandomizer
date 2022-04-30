@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '4a1dfc4fa793b8659a95d579f6a5a925'
+RANDOMIZERBASEHASH = '32da3b3eb8f7a3e43f7c7351aeeddf11'
 
 
 class JsonRom(object):
@@ -698,17 +698,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 inverted_buffer[b] ^= 0x1
 
                 # set world flag
-                world_flag = 0x00 if b >= 0x40 else 0x40
+                world_flag = 0x00 if b >= 0x40 and b < 0x80 else 0x40
                 rom.write_byte(0x153A00 + b, world_flag)
-                if b % 0x40 in megatiles:
+                if b & 0xBF in megatiles:
                     rom.write_byte(0x153A00 + b + 1, world_flag)
                     rom.write_byte(0x153A00 + b + 8, world_flag)
                     rom.write_byte(0x153A00 + b + 9, world_flag)
-        
+
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
                 write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
-                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
+                if not edge.specialExit:
+                    rom.write_byte(0x1539e0 + (edge.specialID - 0x80) * 2 if edge.specialEntrance else edge.getAddress() + 0x0e, edge.getTarget())
     
     write_int16(rom, 0x150002, owMode)
     write_int16(rom, 0x150004, owFlags)

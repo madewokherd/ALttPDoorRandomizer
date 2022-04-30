@@ -9,10 +9,28 @@ OWReserved:
 dw 0
 
 ;Hooks
+org $02a929
+OWDetectTransitionReturn:
+
+org $02a939
+JSL OWDetectEdgeTransition
+BCS OWDetectTransitionReturn
+
+org $04e8ae
+JSL OWDetectSpecialTransition
+RTL : NOP
+
 org $02a999
 jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
-;org $02e238 ;LDX #$9E : - DEX : DEX : CMP $DAEE,X : BNE -
-;jsl OWSpecialTransition : nop #5
+
+org $02e809
+JSL OWSpecialExit
+
+org $02bfe8
+JSL OWAdjustExitPosition
+
+org $02c1a9
+JSL OWEndScrollTransition
 
 org $05af75
 jsl OWPreserveMirrorSprite : nop #2 ; LDA $7EF3CA : BNE $05AFDF
@@ -107,10 +125,14 @@ org $1bed95  ; < ? - palettes.asm:748 ()
 jsl.l OWWorldCheck16 : nop
 
 org $02b16e  ; AND #$3F : ORA 7EF3CA
-and #$7f : eor #$40 : nop #2 ; something to do with mirroring and simply toggling world to opposite one: TODO: better comment
+and #$7f : eor #$40 : nop #2
 
 ;Code
 org $aa8800
+OWTransitionDirection:
+dw 3, 2, 1, 0 ; $02 after $02A932
+OWEdgeDataOffset:
+dw OWSouthEdges, OWEastEdges, OWSouthEdges
 OWCoordIndex: ; Horizontal 1st
 db 2, 2, 0, 0 ; Coordinate Index $20-$23
 OWOppCoordIndex: ; Horizontal 1st
@@ -304,22 +326,88 @@ LoadMapDarkOrMixed:
     dw $0C00-$01F0 ; top right
     dw 0,0,0,0,0,0
     dw $0800+$01F0 ; bottom left
-    dw $0400+$0210 ; bottom 
+    dw $0400+$0210 ; bottom right
 }
 
 org $aa9000
+OWDetectEdgeTransition:
+{
+    STZ.w $06FC
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .normal
+        JSR OWShuffle
+        LDA.w $06FA : BMI .special
+    .normal
+    REP #$31 : LDX.b $02 : LDA.b $84 ; what we wrote over
+    RTL
+    .special
+    REP #$30
+    AND.w #$0003 : TAY : ASL : TAX
+    LDA.w #$007F : STA.w $06FA
+    JSR OWLoadSpecialArea
+    SEC
+    RTL
+}
+OWDetectSpecialTransition:
+{
+    STZ.w $06FC
+    LDA.l OWMode : BEQ .normal
+    LDA.l OWSpecialDestIndex,X : BIT.w #$0080 : BNE .special
+        STA.w $06FA
+        LDA.l OWEdgeDataOffset,X : STA.w $06F8
+        PLA : SEP #$30 : PLA ; delete 3 bytes from stack
+        JSL $07F413 : BCS .return ; Link_CheckForEdgeScreenTransition
+        LDA.l $04E879,X : STA.b $00 : CMP.b #$08 : BNE .hobo
+            LSR : STA.b $20 : STZ.b $E8 ; move Link and camera to edge
+            LDA.b #$06 : STA.b $02
+            STZ.w $0418
+            BRA .continue
+        .hobo
+            STA.b $02 : STA.w $0418
+            ASL : STA.b $22 : STZ.b $E2 ; move Link and camera to edge
+            LDA.b #$0A : STA.b $23 : STA.b $E3
+        .continue
+        STZ.b $03
+        ; copied from DeleteCertainAncillaeStopDashing at $028A0E
+        JSL $09AC57 ; Ancilla_TerminateSelectInteractives
+        LDA.w $0372 : BEQ .not_dashing
+            STZ.b $4D : STZ.b $46
+            LDA.b #$FF : STA.b $29 : STA.b $C7
+            STZ.b $3D : STZ.b $5E : STZ.w $032B : STZ.w $0372 : STZ.b $5D
+        .not_dashing
+        PLA : REP #$31 : PLA ; delete 3 bytes from stack
+        LDX.b $02
+        LDA.b $84
+        JML $02A93F
+    .special
+    AND.w #$0003 : TAY : ASL : TAX
+    .normal
+    JSR OWLoadSpecialArea
+    .return
+    RTL
+}
 OWEdgeTransition:
 {
-    php : phy
-    lda.l OWMode : ora.l OWMode+1 : beq +
-        jsl OWShuffle : bra .return
-    + jsl OWVanilla
-    .return
-    ply : plp : rtl
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .normal
+    LDY.w $06FA : CPY.b #$7F
+    BEQ .normal
+        REP #$10
+        LDX.w $06F8
+        PHB : PHK : PLB
+            JSR OWNewDestination
+        PLB
+        SEP #$30
+        RTL
+    .normal
+    LDA.l $02A4E3,X : ORA.l $7EF3CA ; what we wrote over
+    RTL
 }
-OWVanilla:
+OWSpecialExit:
 {
-    lda $02a4e3,X : ora $7ef3ca : rtl
+    LDA.l OWMode+1 : AND.b #!FLAG_OW_CROSSED : BEQ .return
+        JSR OWWorldUpdate
+    .return
+    LDA.l $7EFD40,X ; what we wrote over
+    RTL
 }
 OWShuffle:
 {
@@ -330,21 +418,13 @@ OWShuffle:
     ;down X = $34
 
     ;compares X to determine direction of edge transition
-    phx : lsr $700 : cpx $700 : !blt .upOrLeft
-        dex : cpx $700 : bne .downEdge
-            lda #$3 : sta $418 : bra .setOWID ;right
-        .downEdge
-            lda #$1 : sta $418 : bra .setOWID ;down
-    .upOrLeft
-        inx : cpx $700 : bne .upEdge
-                lda #$2 : sta $418 : bra .setOWID ;left
-            .upEdge
-                lda #$0 : sta $418 ;up
+    phx : lsr.w $0700
+    tyx : lda.l OWTransitionDirection,X : sta.w $0418
 
     .setOWID
     ;look up transitions in current area in table OWEdgeOffsets
     ;offset is (8bytes * OW Slot ID) + (2bytes * direction)
-    asl : rep #$20 : pha : sep #$20 ;2 bytes per direction
+    asl : rep #$20 : and.w #$00ff : pha : sep #$20 ;2 bytes per direction
     lda $8a : and #$40 : !add $700 : rep #$30 : and #$00ff : asl #3
     adc 1,S : tax
     asl $700 : pla
@@ -368,25 +448,25 @@ OWShuffle:
     pla : dec : bne .nextTransition : bra .noTransition
 
     .newDestination
-    pla : sep #$30 : plx : lda $8a : bra .return
+    pla : sep #$30 : plx : rts
 
     .noTransition
-    sep #$30 : plx : jsl OWVanilla
+    sep #$30 : plx
+    lda.b #$7f : sta.w $06fa
 
     .return
-    rtl
+    rts
 }
 OWSearchTransition:
 {
     ;A-16 XY-16
     lda $418 : bne + ;north
         lda.l OWNorthEdges,x : dec
-        cmp $22 : !bge .nomatch
-        lda.l OWNorthEdges+2,x : cmp $22 : !blt .nomatch
+        cmp $22 : !bge .exitloop
+        lda.l OWNorthEdges+2,x : cmp $22 : !blt .exitloop
             ;MATCH
             lda.l OWNorthEdges+14,x : tay ;y = record id of dest
-            sep #$20 : lda #OWSouthEdges>>16 : phb : pha : plb
-                ldx #OWSouthEdges : jsr OWNewDestination : plb ;x = address of table
+            ldx.w #OWSouthEdges ;x = address of table
             bra .matchfound
     + dec : bne + ;south
         lda.l OWSouthEdges,x : dec
@@ -394,29 +474,25 @@ OWSearchTransition:
         lda.l OWSouthEdges+2,x : cmp $22 : !blt .exitloop
             ;MATCH
             lda.l OWSouthEdges+14,x : tay ;y = record id of dest
-            sep #$20 : lda #OWNorthEdges>>16 : phb : pha : plb : phx
-                ldx #OWNorthEdges : jsr OWNewDestination : plx : plb ;x = address of table
+            ldx.w #OWNorthEdges ;x = address of table
             bra .matchfound
-        .nomatch
-            bra .exitloop
     + dec : bne + ; west
         lda.l OWWestEdges,x : dec
         cmp $20 : !bge .exitloop
         lda.l OWWestEdges+2,x : cmp $20 : !blt .exitloop
             ;MATCH
             lda.l OWWestEdges+14,x : tay ;y = record id of dest
-            sep #$20 : lda #OWEastEdges>>16 : phb : pha : plb
-                ldx #OWEastEdges : jsr OWNewDestination : plb ;x = address of table
+            ldx.w #OWEastEdges ;x = address of table
             bra .matchfound
     + lda.l OWEastEdges,x : dec ;east
         cmp $20 : !bge .exitloop
         lda.l OWEastEdges+2,x : cmp $20 : !blt .exitloop
             ;MATCH
             lda.l OWEastEdges+14,x : tay ;y = record id of dest
-            sep #$20 : lda #OWWestEdges>>16 : phb : pha : plb
-                ldx #OWWestEdges : jsr OWNewDestination : plb ;x = address of table
+            ldx.w #OWWestEdges ;x = address of table
 
     .matchfound
+    stx $06f8 : sty $06fa : sec : rts
     plx : pla : pea $0001 : phx
     sec : rts
 
@@ -449,9 +525,10 @@ OWNewDestination:
         ++ lda $84 : !add 1,s : sta $84 : pla : pla
 
     .adjustMainAxis
-    ;LDA $84 : SEC : SBC #$0400 : AND #$0F80 : ASL : XBA : STA $88 ; vram
-    LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88
+    LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88 ; vram
     LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
+
+    LDA.w $000F,X : AND.w #$00FF : STA.w $06FC ; position to walk to after transition (if non-zero)
 
     pla : pla : sep #$10 : ldy $418
     ldx OWCoordIndex,y : lda $20,x : and #$fe00 : pha
@@ -496,7 +573,7 @@ OWNewDestination:
     ldx OWOppBGIndex,y : lda $e0,x : !add 1,s : sta $e0,x
     lda $418 : asl : tax : lda $610,x : !add 1,s : sta $610,x : pla
 
-    sep #$30 : lda OWOppSlotOffset,y : !add $04 : asl : and #$7f : sta $700
+    sep #$30 : lda $04 : and #$3f : !add OWOppSlotOffset,y : asl : sta $700
     
     ; crossed OW shuffle
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .return
@@ -504,12 +581,17 @@ OWNewDestination:
 
     .return
     lda $05 : sta $8a
-    ;bra +
-    ;    nop #8
-    ;    jsl $02EA41
-    ;    nop #8
-    ;+
     rep #$30 : rts
+}
+OWLoadSpecialArea:
+{
+    LDA.l $04E881,X : STA.b $A0
+    JSL $04E8B4
+    LDA.l OWMode+1 : AND.b #!FLAG_OW_CROSSED : BEQ .return
+        TYX : LDA.l OWSpecialDestSlot,X : TAX
+        JSR OWWorldUpdate
+    .return
+    RTS
 }
 OWWorldUpdate: ; x = owid of destination screen
 {
@@ -545,10 +627,29 @@ OWWorldUpdate: ; x = owid of destination screen
     .return
     rts
 }
-OWSpecialTransition:
+OWAdjustExitPosition:
 {
-    LDX #$9E
-    - DEX : DEX : CMP $DAEE,X : BNE -
+    LDA.w $06FC : CMP.b #$60 : BEQ .stone_bridge
+    CMP.b #$B0 : BNE .normal
+        LDA.b #$80 : STA.b $20 : STZ.b $21
+        BRA .normal
+    .stone_bridge
+        LDA.b #$A0 : STA.b $E2
+        LDA.b #$3D : STA.w $061C
+        LDA.b #$3B : STA.w $061E
+        INC.b $23 : INC.w $061D : INC.w $061F
+    .normal
+    INC.b $11 : STZ.b $B0 ; what we wrote over
+    RTL
+}
+OWEndScrollTransition:
+{
+    LDY.w $06FC : BEQ .normal
+        CMP.w $06FC
+        RTL
+    .normal
+    CMP.l $02C176,X ; what we wrote over
+    RTL
 }
 
 ;Data
@@ -556,7 +657,7 @@ org $aaa000
 OWEdgeOffsets:
 ;2 bytes per each direction per each OW Slot, order is NSWE per value at $0418
 ;AABB, A = offset to the transition table, B = number of transitions
-dw $0001, $0000, $0000, $0000 ;OW Slot 00, OWID 0x00 Lost Woods
+dw $0000, $0000, $0000, $0000 ;OW Slot 00, OWID 0x00 Lost Woods
 dw $0000, $0000, $0000, $0001 ;OW Slot 01, OWID 0x00
 dw $0000, $0001, $0001, $0000 ;OW Slot 02, OWID 0x02 Lumberjack
 dw $0000, $0000, $0000, $0000
@@ -572,7 +673,7 @@ dw $0000, $0000, $0000, $0000
 dw $0000, $0000, $0000, $0301
 dw $0000, $0000, $0301, $0000
 dw $0000, $0000, $0000, $0000
-dw $0201, $0501, $0000, $0000 ;Zora
+dw $0000, $0501, $0000, $0000 ;Zora
 
 dw $0302, $0602, $0000, $0000
 dw $0501, $0801, $0000, $0402
@@ -606,7 +707,7 @@ dw $1101, $0000, $1201, $1301
 dw $0000, $1502, $1301, $0000
 dw $1201, $1701, $0000, $1403
 dw $1301, $1801, $1403, $1701 ;Links
-dw $1401, $1901, $1702, $1802 ;Hobo
+dw $1401, $1901, $1801, $1802 ;Hobo
 dw $1501, $1a02, $1902, $0000
 dw $1601, $0000, $0000, $0000
 
@@ -704,12 +805,15 @@ dw $0000, $4001, $0000, $0000
 dw $0000, $0000, $0000, $4a01
 dw $0000, $4101, $0000, $0000
 
+OWSpecialDestSlot:
+db $80, $80, $81
+
 org $aaa800 ;PC 152800
 OWNorthEdges:
 ;   Min    Max   Width   Mid OW Slot/OWID VRAM *FREE* Dest Index
-dw $00a0, $00a0, $0000, $00a0, $0000, $0000, $0000, $0040 ;Lost Woods
+dw $00a0, $00a0, $0000, $00a0, $0000, $0000, $0000, $B040 ;Lost Woods (exit only)
 dw $0458, $0540, $00e8, $04cc, $0a0a, $0000, $0000, $0000
-dw $0f38, $0f60, $0028, $0f4c, $0f0f, $0000, $0000, $0041
+dw $0f38, $0f60, $0028, $0f4c, $0f0f, $0000, $0000, $2041 ;Waterfall (exit only)
 dw $0058, $0058, $0000, $0058, $1010, $0000, $0000, $0001
 dw $0178, $0178, $0000, $0178, $1010, $0000, $0000, $0002
 dw $0388, $0388, $0000, $0388, $1111, $0000, $0000, $0003
@@ -838,8 +942,8 @@ dw $06a0, $07b0, $0110, $0728, $7373, $0000, $0000, $003e
 dw $0830, $09b0, $0180, $08f0, $7474, $0000, $0000, $003f
 dw $0e78, $0e88, $0010, $0e80, $7777, $0000, $0000, $0040
 dw $0ee0, $0fc0, $00e0, $0f50, $7777, $0000, $0000, $0041
-dw $0080, $0080, $0000, $0080, $8080, $0000, $0000, $0000 ;Pedestal
-dw $0288, $02c0, $0038, $02a4, $8189, $0000, $0000, $0002 ;Zora
+dw $0080, $0080, $0000, $0080, $8080, $0000, $0000, $0000 ;Pedestal (unused)
+dw $0288, $02c0, $0038, $02a4, $8189, $0000, $0000, $0002 ;Zora (unused)
 OWWestEdges:
 dw $0070, $00a0, $0030, $0088, $0202, $0000, $0000, $0000
 dw $0068, $0078, $0010, $0070, $0505, $0000, $0000, $0001
@@ -864,7 +968,7 @@ dw $0b60, $0ba0, $0040, $0b80, $2a2a, $0000, $0000, $0013
 dw $0ab0, $0ad0, $0020, $0ac0, $2c2c, $0000, $0000, $0014
 dw $0af0, $0b40, $0050, $0b18, $2c2c, $0000, $0000, $0015
 dw $0b78, $0ba0, $0028, $0b8c, $2c2c, $0000, $0000, $0016
-dw $0b10, $0b28, $0018, $0b1c, $2d2d, $0000, $0000, $004a
+dw $0b10, $0b28, $0018, $0b1c, $2d2d, $0000, $0000, $604a ;Stone Bridge (exit only)
 dw $0b68, $0b98, $0030, $0b80, $2d2d, $0000, $0000, $0017
 dw $0a68, $0ab8, $0050, $0a90, $2e2e, $0000, $0000, $0018
 dw $0b00, $0b78, $0078, $0b3c, $2e2e, $0000, $0000, $0019
@@ -991,7 +1095,11 @@ dw $0e28, $0fb8, $0190, $0ef0, $7b7b, $0000, $0000, $0047
 dw $0f78, $0fb8, $0040, $0f98, $7c7c, $0000, $0000, $0048
 dw $0f20, $0f40, $0020, $0f30, $757e, $0000, $0000, $0049
 dw $0f70, $0fb8, $0048, $0f94, $757e, $0000, $0000, $004a
-dw $0058, $00c0, $0068, $008c, $8080, $0000, $0000, $0017 ;Hobo
+dw $0058, $00c0, $0068, $008c, $8080, $0000, $0000, $0017 ;Hobo (unused)
+
+org $aab9e0 ;PC 1539e0
+OWSpecialDestIndex:
+dw $0080, $0081, $0082
 
 org $aaba00 ;PC 153a00
 OWTileWorldAssoc:
@@ -1011,6 +1119,7 @@ db $40, $40, $40, $40, $40, $40, $40, $40
 db $40, $40, $40, $40, $40, $40, $40, $40
 db $40, $40, $40, $40, $40, $40, $40, $40
 db $40, $40, $40, $40, $40, $40, $40, $40
+db $00, $00
 
 org $aabb00 ;PC 153b00
 OWTileMapAlt:
@@ -1031,3 +1140,5 @@ db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
+
+db 0, 0

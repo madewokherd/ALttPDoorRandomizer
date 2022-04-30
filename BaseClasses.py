@@ -2225,7 +2225,6 @@ class Door(object):
 class WorldType(IntEnum):
     Light = 0
     Dark = 1
-    Special = 2
 
 
 @unique
@@ -2241,6 +2240,8 @@ class OWEdge(object):
         self.type = DoorType.Open
         self.direction = direction
         self.terrain = terrain
+        self.specialEntrance = False
+        self.specialExit = False
         self.deadEnd = False
 
         # rom properties
@@ -2254,6 +2255,7 @@ class OWEdge(object):
         self.zeroHzCam = False
         self.zeroVtCam = False
         self.edge_id = edge_id
+        self.specialID = 0x0
 
         self.midpoint = 0x0
         self.linkOpp = 0x0
@@ -2265,12 +2267,10 @@ class OWEdge(object):
         self.unknownX = 0x0
         self.unknownY = 0x0
 
-        if self.owIndex < 0x40:
+        if self.owIndex < 0x40 or self.owIndex >= 0x80:
             self.worldType = WorldType.Light
-        elif self.owIndex < 0x80:
-            self.worldType = WorldType.Dark
         else:
-            self.worldType = WorldType.Special
+            self.worldType = WorldType.Dark
 
         # logical properties
         # self.connected = False  # combine with Dest?
@@ -2288,7 +2288,7 @@ class OWEdge(object):
         return base_address[self.direction] + (self.edge_id * 16)
 
     def getTarget(self):
-        return self.dest.edge_id
+        return self.dest.specialID if self.dest.specialExit else self.dest.edge_id
 
     def dead_end(self):
         self.deadEnd = True
@@ -2296,6 +2296,16 @@ class OWEdge(object):
     def coordInfo(self, midpoint, vram_loc):
         self.midpoint = midpoint
         self.vramLoc = vram_loc
+        return self
+
+    def special_entrance(self, special_id):
+        self.specialEntrance = True
+        self.specialID = special_id
+        return self
+
+    def special_exit(self, special_id):
+        self.specialExit = True
+        self.specialID = special_id
         return self
 
     def __eq__(self, other):
