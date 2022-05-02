@@ -119,7 +119,7 @@ def main(args, seed=None, fish=None):
     logger.info(
       world.fish.translate("cli","cli","app.title") + "\n",
       ORVersion,
-      world.seed,
+      "%s (%s)" % (world.seed, str(args.outputname)) if str(args.outputname).startswith('M') else world.seed,
       Settings.make_code(world, 1) if world.players == 1 else ''
     )
 
