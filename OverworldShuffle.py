@@ -6,7 +6,7 @@ from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 
 version_number = '0.2.7.1'
-version_branch = '-u'
+version_branch = ''
 __version__ = '%s%s' % (version_number, version_branch)
 
 def link_overworld(world, player):
