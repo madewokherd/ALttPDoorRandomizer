@@ -4,6 +4,7 @@ import RaceRandom as random
 from BaseClasses import CollectionState, RegionType
 from OverworldShuffle import build_accessible_region_list
 from OWEdges import OWTileRegions
+from Utils import stack_size3a
 
 entrance_pool = list()
 exit_pool = list()
@@ -1480,6 +1481,10 @@ def junk_fill_inaccessible(world, player):
 
 def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player, ignore_list=[]):
     invFlag = world.mode[player] == 'inverted'
+
+    if stack_size3a() > 500:
+        from DungeonGenerator import GenerationException
+        raise GenerationException(f'Infinite loop detected at \'connect_inaccessible_regions\'')
 
     random.shuffle(lw_entrances)
     random.shuffle(dw_entrances)
