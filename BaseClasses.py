@@ -3309,8 +3309,8 @@ e_dmg = {"default": 0, "shuffled": 1, "random": 2}
 
 # byte 8: RRAA A??? (restrict boss mode, algorithm, ? = unused)
 rb_mode = {"none": 0, "mapcompass": 1, "dungeon": 2}
-# algorithm: todo with "biased shuffles"
-algo_mode = {"balanced": 0, "equitable": 1, "vanilla_fill": 2, "dungeon_only": 3, "district": 4}
+# algorithm:
+algo_mode = {"balanced": 0, "equitable": 1, "vanilla_fill": 2, "dungeon_only": 3, "district": 4, 'major_only': 5}
 
 # additions
 # psuedoboots does not effect code
