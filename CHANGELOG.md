@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.7.1
+- Map checks in Mixed OWR now will show the proper tile images when screens are swapped (ie. Pyramid shows in the LW if that screen is swapped)
+- Added mystery seed number to spoiler log, so it is easier to match a spoiler log to a rom filename
+- Added proper branch-specific versioning (ie. Dev branch has '-u' suffixing the version number while Release/Main branch does not)
+
 ### 0.2.7.0
 - ~~Merged DR v1.0.0.3 - MANY changes, major things listed below~~
   - New Item Fills (Districts/Vanilla/Major Location/Dungeon)
