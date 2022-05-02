@@ -7,7 +7,7 @@ from OWEdges import OWTileRegions, OWTileGroups, OWEdgeGroups, OWExitTypes, Open
 
 version_number = '0.2.7.0'
 version_branch = '-u'
-__version__ = '%s%s' % (version_number, version_suffix)
+__version__ = '%s%s' % (version_number, version_branch)
 
 def link_overworld(world, player):
     # setup mandatory connections
