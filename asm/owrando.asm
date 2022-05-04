@@ -13,15 +13,16 @@ org $02a929
 OWDetectTransitionReturn:
 
 org $02a939
+OverworldHandleTransitions_SpecialTrigger:
 JSL OWDetectEdgeTransition
 BCS OWDetectTransitionReturn
+
+org $02a999
+jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 
 org $04e8ae
 JSL OWDetectSpecialTransition
 RTL : NOP
-
-org $02a999
-jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 
 org $02e809
 JSL OWSpecialExit
@@ -31,6 +32,12 @@ JSL OWAdjustExitPosition
 
 org $02c1a9
 JSL OWEndScrollTransition
+
+org $04E881
+Overworld_LoadSpecialOverworld_RoomId:
+org $04E8B4
+Overworld_LoadSpecialOverworld:
+
 
 org $05af75
 jsl OWPreserveMirrorSprite : nop #2 ; LDA $7EF3CA : BNE $05AFDF
@@ -355,7 +362,7 @@ OWDetectSpecialTransition:
         STA.w $06FA
         LDA.l OWEdgeDataOffset,X : STA.w $06F8
         PLA : SEP #$30 : PLA ; delete 3 bytes from stack
-        JSL $07F413 : BCS .return ; Link_CheckForEdgeScreenTransition
+        JSL Link_CheckForEdgeScreenTransition : BCS .return ; Link_CheckForEdgeScreenTransition
         LDA.l $04E879,X : STA.b $00 : CMP.b #$08 : BNE .hobo
             LSR : STA.b $20 : STZ.b $E8 ; move Link and camera to edge
             LDA.b #$06 : STA.b $02
@@ -368,7 +375,7 @@ OWDetectSpecialTransition:
         .continue
         STZ.b $03
         ; copied from DeleteCertainAncillaeStopDashing at $028A0E
-        JSL $09AC57 ; Ancilla_TerminateSelectInteractives
+        JSL Ancilla_TerminateSelectInteractives
         LDA.w $0372 : BEQ .not_dashing
             STZ.b $4D : STZ.b $46
             LDA.b #$FF : STA.b $29 : STA.b $C7
@@ -377,7 +384,7 @@ OWDetectSpecialTransition:
         PLA : REP #$31 : PLA ; delete 3 bytes from stack
         LDX.b $02
         LDA.b $84
-        JML $02A93F
+        JML OverworldHandleTransitions_SpecialTrigger+6
     .special
     AND.w #$0003 : TAY : ASL : TAX
     .normal
@@ -411,13 +418,7 @@ OWSpecialExit:
 }
 OWShuffle:
 {
-    ;Assume you're at links house = $2c
-    ;transitioning right will result in X = $2d
-    ;transitioning left will result in X = $2b
-    ;up X = $24
-    ;down X = $34
-
-    ;compares X to determine direction of edge transition
+    ;determine direction of edge transition
     phx : lsr.w $0700
     tyx : lda.l OWTransitionDirection,X : sta.w $0418
 
@@ -585,8 +586,8 @@ OWNewDestination:
 }
 OWLoadSpecialArea:
 {
-    LDA.l $04E881,X : STA.b $A0
-    JSL $04E8B4
+    LDA.l Overworld_LoadSpecialOverworld_RoomId,X : STA.b $A0
+    JSL Overworld_LoadSpecialOverworld
     LDA.l OWMode+1 : AND.b #!FLAG_OW_CROSSED : BEQ .return
         TYX : LDA.l OWSpecialDestSlot,X : TAX
         JSR OWWorldUpdate
