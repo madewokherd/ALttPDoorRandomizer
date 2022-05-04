@@ -53,6 +53,10 @@
     lean: 2
     crossed: 3
     insanity: 1
+  open_pyramid:
+    auto: 1
+    yes: 0
+    no: 0
   shufflelinks:
     on: 1
     off: 1
