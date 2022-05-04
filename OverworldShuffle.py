@@ -13,8 +13,6 @@ def link_overworld(world, player):
     # setup mandatory connections
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
-    for exitname, destname in temporary_mandatory_connections:
-        connect_two_way(world, exitname, destname, player)
 
     def performSwap(groups, swaps):
         def getParallel(edgename):
@@ -541,18 +539,13 @@ def shuffle_tiles(world, groups, result_list, player):
     exist_dw_regions.extend(new_results[2])
 
     # replace LW edges with DW
-    ignore_list = list() #TODO: Remove ignore_list when special OW areas are included in pool
-    for edgeset in temporary_mandatory_connections:
-        for edge in edgeset:
-            ignore_list.append(edge)
-    
     if world.owCrossed[player] != 'polar':
         # in polar, the actual edge connections remain vanilla
         def getSwappedEdges(world, lst, player):
             for regionname in lst:
                 region = world.get_region(regionname, player)
                 for exit in region.exits:
-                    if exit.spot_type == 'OWEdge' and exit.name not in ignore_list:
+                    if exit.spot_type == 'OWEdge':
                         swapped_edges.append(exit.name)
 
         getSwappedEdges(world, result_list[1], player)
@@ -992,13 +985,6 @@ test_connections = [
                     #('Links House ES', 'Octoballoon WS'),
                     #('Links House NE', 'Lost Woods Pass SW')
                     ]
-
-temporary_mandatory_connections = [
-                         # Special OW Areas
-                         ('Lost Woods NW', 'Master Sword Meadow SC'),
-                         ('Zora Waterfall NE', 'Zoras Domain SW'),
-                         ('Stone Bridge WC', 'Hobo EC'),
-                        ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
 mandatory_connections = [# Intra-tile OW Connections
@@ -1603,14 +1589,14 @@ parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
                             ]
 
 # non shuffled overworld
-default_connections = [#('Lost Woods NW', 'Master Sword Meadow SC'),
+default_connections = [('Lost Woods NW', 'Master Sword Meadow SC'),
                         ('Lost Woods SW', 'Lost Woods Pass NW'),
                         ('Lost Woods SC', 'Lost Woods Pass NE'),
                         ('Lost Woods SE', 'Kakariko Fortune NE'),
                         ('Lost Woods EN', 'Lumberjack WN'),
                         ('Lumberjack SW', 'Mountain Entry NW'),
                         ('Mountain Entry SE', 'Kakariko Pond NE'),
-                        #('Zora Waterfall NE', 'Zoras Domain SW'),
+                        ('Zora Waterfall NE', 'Zoras Domain SW'),
                         ('Lost Woods Pass SW', 'Kakariko NW'),
                         ('Lost Woods Pass SE', 'Kakariko NC'),
                         ('Kakariko Fortune SC', 'Kakariko NE'),
@@ -1659,7 +1645,7 @@ default_connections = [#('Lost Woods NW', 'Master Sword Meadow SC'),
                         ('Stone Bridge SC', 'Lake Hylia NW'),
                         ('Stone Bridge EN', 'Tree Line WN'),
                         ('Stone Bridge EC', 'Tree Line WC'),
-                        #('Stone Bridge WC', 'Hobo EC'),
+                        ('Stone Bridge WC', 'Hobo EC'),
                         ('Tree Line SC', 'Lake Hylia NC'),
                         ('Tree Line SE', 'Lake Hylia NE'),
                         ('Desert EC', 'Desert Pass WC'),
