@@ -561,7 +561,17 @@ def shuffle_tiles(world, groups, result_list, player):
     return swapped_edges
 
 def reorganize_tile_groups(world, player):
-    def can_shuffle_group(name, groupType):
+    def get_group_key(group):
+        #(name, groupType, whirlpoolGroup) = group
+        new_group = list(group)
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
+            new_group[1] = None
+        if not world.owWhirlpoolShuffle[player] and world.owCrossed[player] == 'none':
+            new_group[2] = None
+        return tuple(new_group)
+
+    def can_shuffle_group(group):
+        (name, groupType, whirlpoolGroup) = group
         return name not in ['Castle', 'Links', 'Central Bonk Rocks'] \
             or (world.mode[player] != 'standard' and (name != 'Castle' \
                 or world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
@@ -570,60 +580,22 @@ def reorganize_tile_groups(world, player):
             or (world.mode[player] == 'standard' and world.shuffle[player] in ['lean', 'crossed', 'insanity'] and name == 'Castle' and groupType == 'Entrance')
     
     groups = {}
-    for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
-        if can_shuffle_group(name, groupType):
-            if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
-                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
-                    groups[(name, whirlpoolGroup)] = ([], [], [])
-                else:
-                    groups[(name,)] = ([], [], [])
-            else:
-                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
-                    groups[(name, groupType, whirlpoolGroup)] = ([], [], [])
-                else:
-                    groups[(name, groupType)] = ([], [], [])
+    for group in OWTileGroups.keys():
+        if can_shuffle_group(group):
+            groups[get_group_key(group)] = ([], [], [])
 
-    for (name, groupType, whirlpoolGroup) in OWTileGroups.keys():
-        if can_shuffle_group(name, groupType):
-            (lw_owids, dw_owids) = OWTileGroups[(name, groupType, whirlpoolGroup)]
-            if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'simple', 'restricted']:
-                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
-                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, whirlpoolGroup)]
-                    exist_owids.extend(lw_owids)
-                    exist_owids.extend(dw_owids)
-                    for owid in lw_owids:
-                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
-                    for owid in dw_owids:
-                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
-                    groups[(name, whirlpoolGroup)] = (exist_owids, exist_lw_regions, exist_dw_regions)
-                else:
-                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name,)]
-                    exist_owids.extend(lw_owids)
-                    exist_owids.extend(dw_owids)
-                    for owid in lw_owids:
-                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
-                    for owid in dw_owids:
-                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
-                    groups[(name,)] = (exist_owids, exist_lw_regions, exist_dw_regions)
-            else:
-                if world.owWhirlpoolShuffle[player] or world.owCrossed[player] != 'none':
-                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, groupType, whirlpoolGroup)]
-                    exist_owids.extend(lw_owids)
-                    exist_owids.extend(dw_owids)
-                    for owid in lw_owids:
-                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
-                    for owid in dw_owids:
-                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
-                    groups[(name, groupType, whirlpoolGroup)] = (exist_owids, exist_lw_regions, exist_dw_regions)
-                else:
-                    (exist_owids, exist_lw_regions, exist_dw_regions) = groups[(name, groupType)]
-                    exist_owids.extend(lw_owids)
-                    exist_owids.extend(dw_owids)
-                    for owid in lw_owids:
-                        exist_lw_regions.extend(OWTileRegions.inverse[owid])
-                    for owid in dw_owids:
-                        exist_dw_regions.extend(OWTileRegions.inverse[owid])
-                    groups[(name, groupType)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+    for group in OWTileGroups.keys():
+        if can_shuffle_group(group):
+            (lw_owids, dw_owids) = OWTileGroups[group]
+            (exist_owids, exist_lw_regions, exist_dw_regions) = groups[get_group_key(group)]
+            exist_owids.extend(lw_owids)
+            exist_owids.extend(dw_owids)
+            for owid in lw_owids:
+                exist_lw_regions.extend(OWTileRegions.inverse[owid])
+            for owid in dw_owids:
+                exist_dw_regions.extend(OWTileRegions.inverse[owid])
+            groups[get_group_key(group)] = (exist_owids, exist_lw_regions, exist_dw_regions)
+    
     return groups
 
 def remove_reserved(world, groupedlist, connected_edges, player):
