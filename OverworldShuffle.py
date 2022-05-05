@@ -288,7 +288,7 @@ def link_overworld(world, player):
         trimmed_groups = remove_reserved(world, trimmed_groups, connected_edges, player)
         groups = reorganize_groups(world, trimmed_groups, player)
         
-        tries = 10
+        tries = 20
         valid_layout = False
         connected_edge_cache = connected_edges.copy()
         while not valid_layout and tries > 0:
@@ -939,12 +939,10 @@ def validate_layout(world, player):
     while unreachable_count != len(unreachable_regions):
         # find unreachable regions
         unreachable_regions = {}
-        flat_sectors = [[r for l in s for r in l] for s in world.owsectors[player]]
-        for sector in flat_sectors:
-            for region_name in sector:
-                if region_name not in explored_regions and region_name not in isolated_regions:
-                    region = base_world.get_region(region_name, player)
-                    unreachable_regions[region_name] = region
+        for region_name in list(OWTileRegions.copy().keys()):
+            if region_name not in explored_regions and region_name not in isolated_regions:
+                region = base_world.get_region(region_name, player)
+                unreachable_regions[region_name] = region
         
         # loop thru unreachable regions to check if some can be excluded
         unreachable_count = len(unreachable_regions)
