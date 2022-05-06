@@ -1186,6 +1186,7 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('Lake Hylia Island Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player) and state.has('Flippers', player))
         set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Lake Hylia Water Mirror Spot', player), lambda state: state.has_Mirror(player))
+        set_rule(world.get_entrance('Lake Hylia Water D Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('South Shore Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('South Shore East Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Lake Hylia Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))

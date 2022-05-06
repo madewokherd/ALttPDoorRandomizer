@@ -1863,6 +1863,7 @@ OWExitTypes = {
                 'South Shore East Mirror Spot',
                 'Lake Hylia Island Mirror Spot',
                 'Lake Hylia Water Mirror Spot',
+                'Lake Hylia Water D Mirror Spot',
                 'Lake Hylia Central Island Mirror Spot',
                 'Ice Cave Mirror Spot',
                 'Desert Pass Ledge Mirror Spot',

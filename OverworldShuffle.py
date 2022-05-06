@@ -1540,6 +1540,7 @@ ow_connections = {
             ('Lake Hylia Island Mirror Spot', 'Lake Hylia Island'),
             ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
             ('Lake Hylia Water Mirror Spot', 'Lake Hylia Water'),
+            ('Lake Hylia Water D Mirror Spot', 'Lake Hylia Water D'),
             ('Lake Hylia Teleporter', 'Ice Palace Area')
         ], [
             ('Lake Hylia Island Pier', 'Lake Hylia Island'),
