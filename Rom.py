@@ -33,7 +33,7 @@ from source.classes.SFX import randomize_sfx
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '4a1dfc4fa793b8659a95d579f6a5a925'
+RANDOMIZERBASEHASH = '538bf256ff03bb7576991114395eeccc'
 
 
 class JsonRom(object):
@@ -698,17 +698,18 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 inverted_buffer[b] ^= 0x1
 
                 # set world flag
-                world_flag = 0x00 if b >= 0x40 else 0x40
+                world_flag = 0x00 if b >= 0x40 and b < 0x80 else 0x40
                 rom.write_byte(0x153A00 + b, world_flag)
-                if b % 0x40 in megatiles:
+                if b & 0xBF in megatiles:
                     rom.write_byte(0x153A00 + b + 1, world_flag)
                     rom.write_byte(0x153A00 + b + 8, world_flag)
                     rom.write_byte(0x153A00 + b + 9, world_flag)
-        
+
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
                 write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
-                write_int16(rom, edge.getAddress() + 0x0e, edge.getTarget())
+                if not edge.specialExit:
+                    rom.write_byte(0x1539e0 + (edge.specialID - 0x80) * 2 if edge.specialEntrance else edge.getAddress() + 0x0e, edge.getTarget())
     
     write_int16(rom, 0x150002, owMode)
     write_int16(rom, 0x150004, owFlags)
@@ -1287,7 +1288,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x50563, [0x3F, 0x14]) # disable below ganon chest
     rom.write_byte(0x50599, 0x00) # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest
-    rom.write_byte(0x18008B, 0x01 if world.open_pyramid[player] or world.goal[player] == 'trinity' else 0x00) # pre-open Pyramid Hole
+    rom.write_byte(0x18008B, 0x01 if world.is_pyramid_open(player) else 0x00) # pre-open Pyramid Hole
     rom.write_byte(0x18008C, 0x01 if world.crystals_needed_for_gt[player] == 0 else 0x00) # GT pre-opened if crystal requirement is 0
     rom.write_byte(0x18008F, 0x01 if world.is_atgt_swapped(player) else 0x00) # AT/GT swapped
     rom.write_byte(0xF5D73, 0xF0) # bees are catchable

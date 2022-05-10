@@ -38,7 +38,7 @@ NP = IsParallel.No
 def create_owedges(world, player):
     edges = [
                              # name,                        owID,dir,type,edge_id,(owSlot)        vram
-        create_owedge(player, 'Lost Woods NW',               0x00, No, Ld, 0x00)      .coordInfo(0x00a0, 0x0284),
+        create_owedge(player, 'Lost Woods NW',               0x00, No, Ld, 0x00)      .coordInfo(0x00a0, 0x0284).special_entrance(0x80),
         create_owedge(player, 'Lost Woods SW',               0x00, So, Ld, 0x01, 0x08).coordInfo(0x0058, 0x2000),
         create_owedge(player, 'Lost Woods SC',               0x00, So, Ld, 0x02, 0x08).coordInfo(0x0178, 0x2020),
         create_owedge(player, 'Lost Woods SE',               0x00, So, Ld, 0x03, 0x09).coordInfo(0x0388, 0x2060),
@@ -53,7 +53,7 @@ def create_owedges(world, player):
         create_owedge(player, 'Death Mountain TR Pegs WN',   0x07, We, Ld, 0x02)      .coordInfo(0x0078, 0x00e0),
         create_owedge(player, 'Mountain Entry NW',           0x0a, No, Ld, 0x01)      .coordInfo(0x04cc, 0x180a),
         create_owedge(player, 'Mountain Entry SE',           0x0a, So, Ld, 0x04)      .coordInfo(0x0518, 0x1012),
-        create_owedge(player, 'Zora Waterfall NE',           0x0f, No, Ld, 0x02)      .coordInfo(0x0f80, 0x009a),
+        create_owedge(player, 'Zora Waterfall NE',           0x0f, No, Ld, 0x02)      .coordInfo(0x0f80, 0x009a).special_entrance(0x82),
         create_owedge(player, 'Zora Waterfall SE',           0x0f, So, Ld, 0x05)      .coordInfo(0x0f80, 0x1020),
         create_owedge(player, 'Lost Woods Pass NW',          0x10, No, Ld, 0x03)      .coordInfo(0x0058, 0x1800),
         create_owedge(player, 'Lost Woods Pass NE',          0x10, No, Ld, 0x04)      .coordInfo(0x0178, 0x181e),
@@ -132,7 +132,7 @@ def create_owedges(world, player):
         create_owedge(player, 'Links House ES',              0x2c, Ea, Ld, 0x17)      .coordInfo(0x0b80, 0x08c0),
         create_owedge(player, 'Stone Bridge NC',             0x2d, No, Ld, 0x14)      .coordInfo(0x0af0, 0x180e),
         create_owedge(player, 'Stone Bridge SC',             0x2d, So, Ld, 0x19)      .coordInfo(0x0ae0, 0x100c),
-        create_owedge(player, 'Stone Bridge WC',             0x2d, We, Wr, 0x17)      .coordInfo(0x0b1c, 0x061c),
+        create_owedge(player, 'Stone Bridge WC',             0x2d, We, Wr, 0x17)      .coordInfo(0x0b1c, 0x061c).special_entrance(0x81),
         create_owedge(player, 'Stone Bridge WS',             0x2d, We, Ld, 0x18)      .coordInfo(0x0b80, 0x08e0),
         create_owedge(player, 'Stone Bridge EN',             0x2d, Ea, Ld, 0x18)      .coordInfo(0x0a90, 0x01c0),
         create_owedge(player, 'Stone Bridge EC',             0x2d, Ea, Wr, 0x19)      .coordInfo(0x0b3c, 0x0640),
@@ -317,9 +317,9 @@ def create_owedges(world, player):
         create_owedge(player, 'Bomber Corner NE',            0x7f, No, Ld, 0x41)      .coordInfo(0x0f50, 0x181c),
         create_owedge(player, 'Bomber Corner WC',            0x7f, We, Wr, 0x49)      .coordInfo(0x0f30, 0x05e0),
         create_owedge(player, 'Bomber Corner WS',            0x7f, We, Ld, 0x4a)      .coordInfo(0x0f94, 0x0860),
-        create_owedge(player, 'Master Sword Meadow SC',      0x80, So, Ld, 0x40)      .coordInfo(0x0080, 0x0000),
-        create_owedge(player, 'Hobo EC',                     0x80, Ea, Wr, 0x4a)      .coordInfo(0x008c, 0x0020),
-        create_owedge(player, 'Zoras Domain SW',             0x81, So, Ld, 0x41, 0x89).coordInfo(0x02a4, 0x1782)
+        create_owedge(player, 'Master Sword Meadow SC',      0x80, So, Ld, 0x40)      .coordInfo(0x0080, 0x0000).special_exit(0x80),
+        create_owedge(player, 'Hobo EC',                     0x80, Ea, Wr, 0x4a)      .coordInfo(0x008c, 0x0020).special_exit(0x81),
+        create_owedge(player, 'Zoras Domain SW',             0x81, So, Ld, 0x41, 0x89).coordInfo(0x02a4, 0x1782).special_exit(0x82)
     ]
         
     world.owedges += edges
@@ -439,16 +439,16 @@ OWEdgeGroups = {
             ['Octoballoon NE']
         ]
     ),
-    # (Op, LW, Vt, Ld, NP, 1): (
-    #     [
-    #         ['Master Sword Meadow SC'],
-    #         ['Zoras Domain SW']
-    #     ],
-    #     [
-    #         ['Lost Woods NW'],
-    #         ['Zora Waterfall NE']
-    #     ]
-    # ),
+    (Op, LW, Vt, Ld, NP, 1): (
+        [
+            ['Master Sword Meadow SC'],
+            ['Zoras Domain SW']
+        ],
+        [
+            ['Lost Woods NW'],
+            ['Zora Waterfall NE']
+        ]
+    ),
     (Op, LW, Hz, Ld, PL, 2): (
         [
             ['Kakariko Fortune EN', 'Kakariko Fortune ES'],
@@ -505,14 +505,14 @@ OWEdgeGroups = {
             ['Statues WC']
         ]
     ),
-    # (Op, LW, Hz, Wr, NP, 1): (
-    #     [
-    #         ['Hobo EC']
-    #     ],
-    #     [
-    #         ['Stone Bridge WC']
-    #     ]
-    # ),
+    (Op, LW, Hz, Wr, NP, 1): (
+        [
+            ['Hobo EC']
+        ],
+        [
+            ['Stone Bridge WC']
+        ]
+    ),
     (Op, LW, Vt, Wr, PL, 1): (
         [
             ['Tree Line SC'],
@@ -627,6 +627,10 @@ OWEdgeGroups = {
             ['Hype Cave WN', 'Hype Cave WS']
         ]
     ),
+    (Op, DW, Vt, Ld, NP, 1): (
+        [ ],
+        [ ]
+    ),
     (Op, DW, Hz, Ld, NP, 2): (
         [
             ['Dig Game EC', 'Dig Game ES']
@@ -674,6 +678,10 @@ OWEdgeGroups = {
             ['Dark Witch WN'],
             ['Hype Cave WC']
         ]
+    ),
+    (Op, DW, Hz, Wr, NP, 1): (
+        [ ],
+        [ ]
     ),
     (Op, DW, Vt, Wr, PL, 1): (
         [
@@ -1585,7 +1593,8 @@ OWExitTypes = {
                 'Lake Hylia West Pier',
                 'Lake Hylia Northeast Water Drop',
                 'Lake Hylia East Pier',
-                'Lake Hylia Water D Entry',
+                'Lake Hylia Water D Approach',
+                'Lake Hylia Water D Leave',
                 'Desert Pass Ladder (South)',
                 'Desert Pass Rocks (North)',
                 'Desert Pass Rocks (South)',
@@ -1854,6 +1863,7 @@ OWExitTypes = {
                 'South Shore East Mirror Spot',
                 'Lake Hylia Island Mirror Spot',
                 'Lake Hylia Water Mirror Spot',
+                'Lake Hylia Water D Mirror Spot',
                 'Lake Hylia Central Island Mirror Spot',
                 'Ice Cave Mirror Spot',
                 'Desert Pass Ledge Mirror Spot',

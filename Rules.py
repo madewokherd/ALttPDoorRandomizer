@@ -844,7 +844,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia Central Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia Island Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Lake Hylia Water D Entry', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Lake Hylia Water D Leave', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Ice Cave SW', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Octoballoon Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
@@ -1046,7 +1046,7 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has('Beat Agahnim 1', player))
         set_rule(world.get_entrance('Top of Pyramid (Inner)', player), lambda state: state.has('Beat Agahnim 1', player))
     else:
-        set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: world.open_pyramid[player] or world.goal[player] == 'trinity' or state.has('Beat Agahnim 2', player))
+        set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: world.is_pyramid_open(player) or state.has('Beat Agahnim 2', player))
         set_rule(world.get_entrance('Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Pyramid Entrance', player), lambda state: False)
         
@@ -1186,6 +1186,7 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('Lake Hylia Island Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player) and state.has('Flippers', player))
         set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Lake Hylia Water Mirror Spot', player), lambda state: state.has_Mirror(player))
+        set_rule(world.get_entrance('Lake Hylia Water D Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('South Shore Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('South Shore East Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Lake Hylia Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))

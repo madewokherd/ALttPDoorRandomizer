@@ -184,7 +184,6 @@ def roll_settings(weights):
     if ret.dungeon_counters == 'default':
         ret.dungeon_counters = 'pickup' if ret.door_shuffle != 'vanilla' or ret.compassshuffle == 'on' else 'off'
 
-    ret.shufflelinks = get_choice('shufflelinks') == 'on'
     ret.pseudoboots = get_choice('pseudoboots') == 'on'
     ret.shopsanity = get_choice('shopsanity') == 'on'
     ret.keydropshuffle = get_choice('keydropshuffle') == 'on'
@@ -200,12 +199,13 @@ def roll_settings(weights):
                     'triforce-hunt': 'triforcehunt',
                     'trinity': 'trinity'
                     }[goal]
-    ret.openpyramid = goal in ['fast_ganon', 'trinity'] if ret.shuffle in ['vanilla', 'dungeonsfull', 'dungeonssimple'] else False
+
+    ret.openpyramid = get_choice('open_pyramid') if 'open_pyramid' in weights else 'auto'
 
     ret.shuffleganon = get_choice('shuffleganon') == 'on'
+    ret.shufflelinks = get_choice('shufflelinks') == 'on'
 
     ret.crystals_gt = get_choice('tower_open')
-
     ret.crystals_ganon = get_choice('ganon_open')
 
     goal_min = get_choice_default('triforce_goal_min', default=20)

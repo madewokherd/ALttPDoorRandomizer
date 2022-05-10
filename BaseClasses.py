@@ -147,7 +147,7 @@ class World(object):
             set_player_attr('crystals_needed_for_gt', 7)
             set_player_attr('crystals_ganon_orig', {})
             set_player_attr('crystals_gt_orig', {})
-            set_player_attr('open_pyramid', False)
+            set_player_attr('open_pyramid', 'auto')
             set_player_attr('treasure_hunt_icon', 'Triforce Piece')
             set_player_attr('treasure_hunt_count', 0)
             set_player_attr('treasure_hunt_total', 0)
@@ -317,6 +317,19 @@ class World(object):
     def is_bombshop_start(self, player):
         return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
 
+    def is_pyramid_open(self, player):
+        if self.open_pyramid[player] == 'yes':
+            return True
+        elif self.open_pyramid[player] == 'no':
+            return False
+        else:
+            if self.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+                return False
+            elif self.goal[player] in ['crystals', 'trinity']:
+                return True
+            else:
+                return False
+    
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
@@ -1265,7 +1278,7 @@ class CollectionState(object):
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player)) and ((hasattr(self.world,"override_bomb_check") and self.world.override_bomb_check) or self.can_farm_bombs(player))
+        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2)) and ((hasattr(self.world,"override_bomb_check") and self.world.override_bomb_check) or self.can_farm_bombs(player))
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)
@@ -2225,7 +2238,6 @@ class Door(object):
 class WorldType(IntEnum):
     Light = 0
     Dark = 1
-    Special = 2
 
 
 @unique
@@ -2241,6 +2253,8 @@ class OWEdge(object):
         self.type = DoorType.Open
         self.direction = direction
         self.terrain = terrain
+        self.specialEntrance = False
+        self.specialExit = False
         self.deadEnd = False
 
         # rom properties
@@ -2254,6 +2268,7 @@ class OWEdge(object):
         self.zeroHzCam = False
         self.zeroVtCam = False
         self.edge_id = edge_id
+        self.specialID = 0x0
 
         self.midpoint = 0x0
         self.linkOpp = 0x0
@@ -2265,12 +2280,10 @@ class OWEdge(object):
         self.unknownX = 0x0
         self.unknownY = 0x0
 
-        if self.owIndex < 0x40:
+        if self.owIndex < 0x40 or self.owIndex >= 0x80:
             self.worldType = WorldType.Light
-        elif self.owIndex < 0x80:
-            self.worldType = WorldType.Dark
         else:
-            self.worldType = WorldType.Special
+            self.worldType = WorldType.Dark
 
         # logical properties
         # self.connected = False  # combine with Dest?
@@ -2288,7 +2301,7 @@ class OWEdge(object):
         return base_address[self.direction] + (self.edge_id * 16)
 
     def getTarget(self):
-        return self.dest.edge_id
+        return self.dest.specialID if self.dest.specialExit else self.dest.edge_id
 
     def dead_end(self):
         self.deadEnd = True
@@ -2296,6 +2309,16 @@ class OWEdge(object):
     def coordInfo(self, midpoint, vram_loc):
         self.midpoint = midpoint
         self.vramLoc = vram_loc
+        return self
+
+    def special_entrance(self, special_id):
+        self.specialEntrance = True
+        self.specialID = special_id
+        return self
+
+    def special_exit(self, special_id):
+        self.specialExit = True
+        self.specialID = special_id
         return self
 
     def __eq__(self, other):
@@ -3045,7 +3068,7 @@ class Spoiler(object):
                 if self.metadata['shuffle'][player] != 'vanilla' or self.metadata['ow_mixed'][player]:
                     outfile.write('Overworld Map:'.ljust(line_width) + '%s\n' % self.metadata['overworld_map'][player])
                 if self.metadata['goal'][player] != 'trinity':
-                    outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % yn(self.metadata['open_pyramid'][player]))
+                    outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % self.metadata['open_pyramid'][player])
                 outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
                 if self.metadata['door_shuffle'][player] != 'vanilla':
                     outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
@@ -3338,7 +3361,7 @@ class Settings(object):
             | (counter_mode[w.dungeon_counters[p]] << 1) | (1 if w.experimental[p] else 0),
 
             ((8 if w.crystals_ganon_orig[p] == "random" else int(w.crystals_ganon_orig[p])) << 3)
-            | (0x4 if w.open_pyramid[p] else 0) | access_mode[w.accessibility[p]],
+            | (0x4 if w.is_pyramid_open(p) else 0) | access_mode[w.accessibility[p]],
 
             (0x80 if w.bigkeyshuffle[p] else 0) | (0x40 if w.keyshuffle[p] else 0)
             | (0x20 if w.mapshuffle[p] else 0) | (0x10 if w.compassshuffle[p] else 0)

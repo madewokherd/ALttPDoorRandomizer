@@ -1668,7 +1668,7 @@ def get_starting_entrances(world, player, force_starting_world=True):
         # get entrances from list of regions
         entrances = list()
         for region_name in regions:
-            if world.shuffle[player] == 'simple' and region_name in OWTileRegions and OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
+            if world.shuffle[player] == 'simple' and region_name in OWTileRegions.keys() and OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
                 continue
             region = world.get_region(region_name, player)
             if not force_starting_world or region.type == (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
@@ -1710,7 +1710,7 @@ def get_distant_entrances(world, start_entrance, player):
     # get entrances from remaining regions
     candidates = list()
     for region_name in [r for r in regions if r not in explored_regions]:
-        if OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
+        if region_name in OWTileRegions.keys() and OWTileRegions[region_name] in [0x03, 0x05, 0x07]:
             continue
         region = world.get_region(region_name, player)
         for exit in region.exits:
