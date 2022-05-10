@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.7.2
+- Special OW Area are now shuffled in Layout Shuffle (Zora/Hobo/Pedestal)
+- Fixed some broken water region graph modelling, fixed some reachability logic
+- Some minor code simplifications
+
 ### 0.2.7.1
 - Map checks in Mixed OWR now will show the proper tile images when screens are swapped (ie. Pyramid shows in the LW if that screen is swapped)
 - Added mystery seed number to spoiler log, so it is easier to match a spoiler log to a rom filename
