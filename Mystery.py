@@ -214,8 +214,6 @@ def roll_settings(weights):
     goal_max = get_choice_default('triforce_goal_max', default=default_tf_goal)
     pool_min = get_choice_default('triforce_pool_min', default=default_tf_pool)
     pool_max = get_choice_default('triforce_pool_max', default=default_tf_pool)
-    logging.getLogger('').warning(goal_min)
-    logging.getLogger('').warning(goal_max)
     ret.triforce_goal = random.randint(int(goal_min), int(goal_max))
     min_diff = get_choice_default('triforce_min_difference', default=(default_tf_pool-default_tf_goal))
     ret.triforce_pool = random.randint(max(int(pool_min), ret.triforce_goal + int(min_diff)), int(pool_max))
