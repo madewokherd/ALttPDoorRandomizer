@@ -759,9 +759,11 @@ def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, 
     placed_items = {}
     precollected_items = []
     clock_mode = None
-    if goal in ['triforcehunt', 'trinity']:
-        if treasure_hunt_total == 0:
+    if treasure_hunt_total == 0:
+        if goal == 'triforcehunt':
             treasure_hunt_total = 30
+        elif goal == 'trinity':
+            treasure_hunt_total = 10
     triforcepool = ['Triforce Piece'] * int(treasure_hunt_total)
 
     pool.extend(alwaysitems)
