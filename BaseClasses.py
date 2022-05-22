@@ -1089,6 +1089,10 @@ class CollectionState(object):
 
         rupee_farms = ['Archery Game', '50 Rupee Cave', '20 Rupee Cave']
 
+        bush_crabs = ['Lost Woods East Area', 'Mountain Entry Area']
+        pre_aga_bush_crabs = ['Lumberjack Area', 'South Pass Area']
+        rock_crabs = ['Desert Pass Area']
+
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
@@ -1109,6 +1113,22 @@ class CollectionState(object):
                 for region in post_aga_tree_pulls:
                     if can_reach_non_bunny(region):
                         return True
+
+        # bush crabs (final item isn't considered)
+        if self.world.enemy_shuffle[player] != 'none':
+            if self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
+                for region in bush_crabs:
+                    if can_reach_non_bunny(region):
+                        return True
+                if not self.has('Beat Agahnim 1', player):
+                    for region in pre_aga_bush_crabs:
+                        if can_reach_non_bunny(region):
+                            return True
+            if self.can_lift_rocks(player) and self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
+                for region in rock_crabs:
+                    if can_reach_non_bunny(region):
+                        return True
+
         return False
     
     def can_farm_bombs(self, player):
