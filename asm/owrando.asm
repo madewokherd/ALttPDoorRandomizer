@@ -39,8 +39,17 @@ org $04E8B4
 Overworld_LoadSpecialOverworld:
 
 
-org $05af75
+; mirror hooks
+org $02FBAB
+JSL OWMirrorSpriteRestore : NOP
+org $05AF75
+Sprite_6C_MirrorPortal:
 jsl OWPreserveMirrorSprite : nop #2 ; LDA $7EF3CA : BNE $05AFDF
+org $05AFDF
+Sprite_6C_MirrorPortal_missing_mirror:
+JML OWMirrorSpriteDelete : NOP ; STZ $0DD0,X : BRA $05AFF1
+org $0ABFBF
+JSL OWMirrorSpriteOnMap : BRA + : NOP #6 : +
 
 ; whirlpool shuffle cross world change
 org $02b3bd
@@ -196,38 +205,61 @@ OWWhirlpoolUpdate:
     rtl
 }
 
+OWMirrorSpriteOnMap:
+{
+    lda.w $1ac0,x : bit.b #$f0 : beq .continue
+        lda.b #$00 : rtl
+    .continue
+    ora.w $1ab0,x
+    ora.w $1ad0,x
+    ora.w $1ae0,x
+    rtl
+}
 OWPreserveMirrorSprite:
 {
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla
-        rtl ; if OW Crossed, skip world check and continue
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla ; if OW Crossed, skip world check and continue
+        lda $10 : cmp.b #$0f : beq .vanilla
+            rtl
     
     .vanilla
-    lda InvertedMode : beq +
-        lda $7ef3ca : beq .deleteMirror
+    lda.l InvertedMode : beq +
+        lda.l $7ef3ca : beq .deleteMirror
         rtl
-    + lda $7ef3ca : bne .deleteMirror
+    + lda.l $7ef3ca : bne .deleteMirror
         rtl
 
     .deleteMirror
-    pla : lda #$de : pha ; in vanilla, if in dark world, jump to $05afdf
-    rtl
+    lda.b $10 : cmp.b #$0f : bne +
+        jsr.w OWMirrorSpriteMove ; if performing mirror superbunny
+    + pla : pla : pla : jml Sprite_6C_MirrorPortal_missing_mirror
 }
 OWMirrorSpriteMove:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
-        lda $1acf : eor #$80 : sta $1acf
-    + lda #$2c : jml.l $07A985 ; what we wrote over
+        lda.w $1acf : ora.b #$40 : sta.w $1acf
+    + rts
+}
+OWMirrorSpriteBonk:
+{
+    jsr.w OWMirrorSpriteMove
+    lda.b #$2c : jml.l SetGameModeLikeMirror ; what we wrote over
+}
+OWMirrorSpriteDelete:
+{
+    stz.w $0dd0,x ; what we wrote over
+    jsr.w OWMirrorSpriteMove
+    jml Sprite_6C_MirrorPortal_dont_do_warp
 }
 OWMirrorSpriteRestore:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .return
-        lda InvertedMode : beq +
-            lda $7ef3ca : beq .return
+        lda.l InvertedMode : beq +
+            lda.l $7ef3ca : beq .return
             bra .restorePortal
-        + lda $7ef3ca : bne .return
+        + lda.l $7ef3ca : bne .return
         
     .restorePortal
-    lda $1acf : and #$0f : sta $1acf
+    lda.w $1acf : and.b #$0f : sta.w $1acf
     
     .return
     rep #$30 : lda.w $04AC ; what we wrote over
@@ -603,7 +635,7 @@ OWWorldUpdate: ; x = owid of destination screen
         cmp #0 : beq + : lda #1
         + cmp.l InvertedMode : bne +
             lda $1acf : and #$0f : sta $1acf : bra .playSfx ; bring portal back into position
-        + lda $1acf : eor #$80 : sta $1acf ; move portal off screen
+        + lda $1acf : ora #$40 : sta $1acf ; move portal off screen
         
         .playSfx
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
