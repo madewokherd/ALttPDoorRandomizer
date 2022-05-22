@@ -1101,7 +1101,8 @@ class CollectionState(object):
             if can_reach_non_bunny(region):
                 return True
 
-        if any(i in [0xda, 0xdb] for i in self.world.prizes[player]['pull']):
+        # tree pulls
+        if self.can_kill_most_things(player) and any(i in [0xda, 0xdb] for i in self.world.prizes[player]['pull']):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
@@ -1193,7 +1194,7 @@ class CollectionState(object):
                     return True
 
         # tree pulls
-        if any(i in [0xdc, 0xdd, 0xde] for i in self.world.prizes[player]['pull']):
+        if self.can_kill_most_things(player) and any(i in [0xdc, 0xdd, 0xde] for i in self.world.prizes[player]['pull']):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
