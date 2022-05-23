@@ -1116,7 +1116,7 @@ class CollectionState(object):
                         return True
 
         # bush crabs (final item isn't considered)
-        if self.world.enemy_shuffle[player] != 'none':
+        if self.world.enemy_shuffle[player] == 'none':
             if self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
@@ -1208,7 +1208,7 @@ class CollectionState(object):
                         return True
 
         # bush crabs (final item isn't considered)
-        if self.world.enemy_shuffle[player] != 'none':
+        if self.world.enemy_shuffle[player] == 'none':
             if self.world.prizes[player]['crab'][0] in [0xdc, 0xdd, 0xde]:
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
