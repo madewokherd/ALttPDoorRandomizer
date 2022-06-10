@@ -1089,6 +1089,10 @@ class CollectionState(object):
 
         rupee_farms = ['Archery Game', '50 Rupee Cave', '20 Rupee Cave']
 
+        bush_crabs = ['Lost Woods East Area', 'Mountain Entry Area']
+        pre_aga_bush_crabs = ['Lumberjack Area', 'South Pass Area']
+        rock_crabs = ['Desert Pass Area']
+
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
@@ -1097,7 +1101,8 @@ class CollectionState(object):
             if can_reach_non_bunny(region):
                 return True
 
-        if any(i in [0xda, 0xdb] for i in self.world.prizes[player]['pull']):
+        # tree pulls
+        if self.can_kill_most_things(player) and any(i in [0xda, 0xdb] for i in self.world.prizes[player]['pull']):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
@@ -1109,6 +1114,22 @@ class CollectionState(object):
                 for region in post_aga_tree_pulls:
                     if can_reach_non_bunny(region):
                         return True
+
+        # bush crabs (final item isn't considered)
+        if self.world.enemy_shuffle[player] == 'none':
+            if self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
+                for region in bush_crabs:
+                    if can_reach_non_bunny(region):
+                        return True
+                if not self.has('Beat Agahnim 1', player):
+                    for region in pre_aga_bush_crabs:
+                        if can_reach_non_bunny(region):
+                            return True
+            if self.can_lift_rocks(player) and self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
+                for region in rock_crabs:
+                    if can_reach_non_bunny(region):
+                        return True
+
         return False
     
     def can_farm_bombs(self, player):
@@ -1173,7 +1194,7 @@ class CollectionState(object):
                     return True
 
         # tree pulls
-        if any(i in [0xdc, 0xdd, 0xde] for i in self.world.prizes[player]['pull']):
+        if self.can_kill_most_things(player) and any(i in [0xdc, 0xdd, 0xde] for i in self.world.prizes[player]['pull']):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
@@ -1187,7 +1208,7 @@ class CollectionState(object):
                         return True
 
         # bush crabs (final item isn't considered)
-        if self.world.enemy_shuffle[player] != 'none':
+        if self.world.enemy_shuffle[player] == 'none':
             if self.world.prizes[player]['crab'][0] in [0xdc, 0xdd, 0xde]:
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
@@ -3141,7 +3162,18 @@ class Spoiler(object):
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
                         outfile.write(self.maps[('swaps', player)]['text'] + '\n\n')
-
+                
+                # crossed groups
+                for player in range(1, self.world.players + 1):
+                    if ('groups', player) in self.maps:
+                        outfile.write('OW Crossed Groups:\n')
+                        break
+                for player in range(1, self.world.players + 1):
+                    if ('groups', player) in self.maps:
+                        if self.world.players > 1:
+                            outfile.write(str('(Player ' + str(player) + ')\n')) # player name
+                        outfile.write(self.maps[('groups', player)]['text'] + '\n\n')
+            
             if self.overworlds:
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))

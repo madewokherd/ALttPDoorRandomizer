@@ -1,7 +1,15 @@
 # Changelog
 
+### 0.2.7.3
+- Restructured OWR algorithm to include some additional scenarios not previously allowed
+- Added new Inverted D-pad controls for Social Distorion (ie. Mirror Mode) support
+- Crossed OWR/Special OW Areas are now included in the spoiler log
+- Fixed default TF pieces with Trinity in Mystery
+- Added bush crabs to rupee farm logic (only in non-enemizer)
+- Updated tree pull logic to also require ability to kill most things
+
 ### 0.2.7.2
-- Special OW Area are now shuffled in Layout Shuffle (Zora/Hobo/Pedestal)
+- Special OW Areas are now shuffled in Layout Shuffle (Zora/Hobo/Pedestal)
 - Fixed some broken water region graph modelling, fixed some reachability logic
 - Some minor code simplifications
 
