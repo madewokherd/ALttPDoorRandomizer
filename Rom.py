@@ -1403,10 +1403,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180174, 0x01 if world.fix_fake_world[player] else 0x00)
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
 
-    # starting overworld flags
-    assert len(world.initial_overworld_flags[player]) == 0x80 and all([i < 0x100 for i in world.initial_overworld_flags[player]])
-    rom.write_bytes(0x183280, world.initial_overworld_flags[player])
-
     # Starting equipment
     if world.pseudoboots[player]:
         rom.write_byte(0x18008E, 0x01)
@@ -2765,7 +2761,7 @@ def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[dark_sanc_entrance][1]
     door_index = door_addresses[str(dark_sanc_entrance)][0]
-    world.initial_overworld_flags[player][ow_area] |= door_addresses[dark_sanc_entrance][2]
+    rom.initial_sram.pre_set_overworld_flag(ow_area, door_addresses[dark_sanc_entrance][2])
 
     rom.write_byte(0x180241, 0x01)
     rom.write_byte(0x180248, door_index + 1)
@@ -2780,7 +2776,7 @@ def patch_shuffled_bomb_shop(world, rom, player):
     bomb_shop_entrance = str([i for i in bomb_shop.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[bomb_shop_entrance][1]
     door_index = door_addresses[str(bomb_shop_entrance)][0]
-    world.initial_overworld_flags[player][ow_area] |= door_addresses[bomb_shop_entrance][2]
+    rom.initial_sram.pre_set_overworld_flag(ow_area, door_addresses[bomb_shop_entrance][2])
 
     rom.write_byte(0x180240, 0x02)
     rom.write_byte(0x180247, door_index + 1)

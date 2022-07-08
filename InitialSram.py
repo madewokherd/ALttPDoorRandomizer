@@ -53,6 +53,9 @@ class InitialSram:
     def pre_open_pyramid_hole(self):
         self._or_value(OVERWORLD_DATA+0x5B, 0x20)
 
+    def pre_set_overworld_flag(self, owid, bitmask)
+        self._or_value(OVERWORLD_DATA+owid, bitmask)
+
     def set_starting_equipment(self, world: object, player: int):
         equip = [0] * (0x340 + 0x4F)
         equip[0x36C] = 0x18
