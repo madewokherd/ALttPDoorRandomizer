@@ -59,7 +59,8 @@ def set_rules(world, player):
         # require aga2 to beat ganon
         add_rule(world.get_location('Ganon', player), lambda state: state.has('Beat Agahnim 2', player))
     elif world.goal[player] in ['triforcehunt', 'trinity']:
-        add_rule(world.get_location('Murahdahla', player), lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
+        if ('Murahdahla', player) in world._location_cache:
+            add_rule(world.get_location('Murahdahla', player), lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
 
     # if swamp and dam have not been moved we require mirror for swamp palace
     if not world.swamp_patch_required[player]:
