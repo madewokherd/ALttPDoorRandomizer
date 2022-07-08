@@ -218,14 +218,14 @@ OWMirrorSpriteOnMap:
 OWPreserveMirrorSprite:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .vanilla ; if OW Crossed, skip world check and continue
-        lda $10 : cmp.b #$0f : beq .vanilla
+        lda.b $10 : cmp.b #$0f : beq .vanilla ; if performing mirror superbunny
             rtl
     
     .vanilla
     lda.l InvertedMode : beq +
-        lda.l $7ef3ca : beq .deleteMirror
+        lda.l CurrentWorld : beq .deleteMirror
         rtl
-    + lda.l $7ef3ca : bne .deleteMirror
+    + lda.l CurrentWorld : bne .deleteMirror
         rtl
 
     .deleteMirror
@@ -242,7 +242,7 @@ OWMirrorSpriteMove:
 OWMirrorSpriteBonk:
 {
     jsr.w OWMirrorSpriteMove
-    lda.b #$2c : jml.l SetGameModeLikeMirror ; what we wrote over
+    lda.b #$2c : jml SetGameModeLikeMirror ; what we wrote over
 }
 OWMirrorSpriteDelete:
 {
@@ -254,9 +254,9 @@ OWMirrorSpriteRestore:
 {
     lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq .return
         lda.l InvertedMode : beq +
-            lda.l $7ef3ca : beq .return
+            lda.l CurrentWorld : beq .return
             bra .restorePortal
-        + lda.l $7ef3ca : bne .return
+        + lda.l CurrentWorld : bne .return
         
     .restorePortal
     lda.w $1acf : and.b #$0f : sta.w $1acf
@@ -275,15 +275,15 @@ OWLightWorldOrCrossed:
 OWFluteCancel:
 {
     lda.l OWFlags+1 : and #$01 : bne +
-        jsl $02e99d : rtl
+        jsl FluteMenu_LoadTransport : rtl
     + lda $7f5006 : cmp #$01 : beq +
-        jsl $02e99d
+        jsl FluteMenu_LoadTransport
     + lda #$00 : sta $7f5006 : rtl
 }
 OWFluteCancel2:
 {
     lda $f2 : ora $f0 : and #$c0 : bne +
-        jml $0ab7bd
+        jml FluteMenu_HandleSelection_NoSelection
     + inc $0200
     lda.l OWFlags+1 : and #$01 : beq +
     lda $f2 : cmp #$40 : bne +
@@ -292,7 +292,7 @@ OWFluteCancel2:
 }
 OWSmithAccept:
 {
-    lda $7ef3cc : cmp #$07 : beq +
+    lda FollowerIndicator : cmp #$07 : beq +
     cmp #$08 : beq +
         clc : rtl
     + sec : rtl
@@ -395,7 +395,7 @@ OWDetectSpecialTransition:
         LDA.l OWEdgeDataOffset,X : STA.w $06F8
         PLA : SEP #$30 : PLA ; delete 3 bytes from stack
         JSL Link_CheckForEdgeScreenTransition : BCS .return ; Link_CheckForEdgeScreenTransition
-        LDA.l $04E879,X : STA.b $00 : CMP.b #$08 : BNE .hobo
+        LDA.l Overworld_CheckForSpecialOverworldTrigger_Direction,X : STA.b $00 : CMP.b #$08 : BNE .hobo
             LSR : STA.b $20 : STZ.b $E8 ; move Link and camera to edge
             LDA.b #$06 : STA.b $02
             STZ.w $0418
@@ -437,7 +437,7 @@ OWEdgeTransition:
         SEP #$30
         RTL
     .normal
-    LDA.l $02A4E3,X : ORA.l $7EF3CA ; what we wrote over
+    LDA.l Overworld_ActualScreenID,X : ORA.l CurrentWorld ; what we wrote over
     RTL
 }
 OWSpecialExit:
@@ -628,8 +628,8 @@ OWLoadSpecialArea:
 }
 OWWorldUpdate: ; x = owid of destination screen
 {
-    lda.l OWTileWorldAssoc,x : cmp.l $7ef3ca : beq .return
-        sta.l $7ef3ca ; change world
+    lda.l OWTileWorldAssoc,x : cmp.l CurrentWorld : beq .return
+        sta.l CurrentWorld ; change world
 
         ; moving mirror portal off screen when in DW
         cmp #0 : beq + : lda #1
@@ -641,10 +641,10 @@ OWWorldUpdate: ; x = owid of destination screen
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
 
         ; toggle bunny mode
-        lda $7ef357 : bne .nobunny
+        lda MoonPearlEquipment : bne .nobunny
         lda.l InvertedMode : bne .inverted
-            lda $7ef3ca : and.b #$40 : bra +
-            .inverted lda $7ef3ca : and.b #$40 : eor #$40
+            lda CurrentWorld : and.b #$40 : bra +
+            .inverted lda CurrentWorld : and.b #$40 : eor #$40
         + cmp #$40 : bne .nobunny
             ; turn into bunny
             lda $5d : cmp #$04 : beq + ; if swimming, continue
@@ -681,7 +681,7 @@ OWEndScrollTransition:
         CMP.w $06FC
         RTL
     .normal
-    CMP.l $02C176,X ; what we wrote over
+    CMP.l Overworld_FinalizeEntryOntoScreen_Data,X ; what we wrote over
     RTL
 }
 

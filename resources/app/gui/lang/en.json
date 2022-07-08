@@ -4,6 +4,7 @@
     "adjust.quickswap": "L/R Quickswapping",
     "adjust.reduce_flashing": "Reduce Flashing",
     "adjust.shuffle_sfx": "Shuffle Sound Effects",
+    "adjust.msu_resume": "MSU Resume",
 
     "adjust.heartcolor": "Heart Color",
     "adjust.heartcolor.red": "Red",
@@ -53,7 +54,20 @@
     "randomizer.dungeon.compassshuffle": "Compasses",
     "randomizer.dungeon.smallkeyshuffle": "Small Keys",
     "randomizer.dungeon.bigkeyshuffle": "Big Keys",
-    "randomizer.dungeon.keydropshuffle": "Key Drops (pots and enemies)",
+    "randomizer.dungeon.keydropshuffle": "Key Drop Shuffle (Legacy)",
+    "randomizer.dungeon.dropshuffle": "Shuffle Enemy Key Drops",
+    "randomizer.dungeon.potshuffle": "Pot Shuffle (Legacy)",
+    "randomizer.dungeon.pottery": "Pottery",
+    "randomizer.dungeon.pottery.none": "None",
+    "randomizer.dungeon.pottery.keys": "Key Pots",
+    "randomizer.dungeon.pottery.cave": "Cave Pots",
+    "randomizer.dungeon.pottery.cavekeys": "Cave+Key Pots",
+    "randomizer.dungeon.pottery.reduced": "Reduced Dungeon Pots (Dynamic)",
+    "randomizer.dungeon.pottery.clustered": "Clustered Dungeon Pots (Dynamic)",
+    "randomizer.dungeon.pottery.nonempty": "Excludes Empty Pots",
+    "randomizer.dungeon.pottery.dungeon": "Dungeon Pots",
+    "randomizer.dungeon.pottery.lottery": "Lottery (All Pots and Large Blocks)",
+    "randomizer.dungeon.colorizepots": "Colorize Randomized Pots",
 
     "randomizer.dungeon.dungeondoorshuffle": "Dungeon Door Shuffle",
     "randomizer.dungeon.dungeondoorshuffle.vanilla": "Vanilla",
@@ -66,7 +80,6 @@
     "randomizer.dungeon.dungeonintensity.3": "3: Dungeon Lobbies",
     "randomizer.dungeon.dungeonintensity.random": "Random",
 
-    "randomizer.dungeon.potshuffle": "Pot Shuffle",
     "randomizer.dungeon.experimental": "Enable Experimental Features",
 
     "randomizer.dungeon.dungeon_counters": "Dungeon Chest Counters",
@@ -93,6 +106,7 @@
     "randomizer.enemizer.bossshuffle": "Boss Shuffle",
     "randomizer.enemizer.bossshuffle.none": "None",
     "randomizer.enemizer.bossshuffle.simple": "Simple",
+    "randomizer.enemizer.bossshuffle.unique": "Unique",
     "randomizer.enemizer.bossshuffle.full": "Full",
     "randomizer.enemizer.bossshuffle.random": "Random",
 
@@ -170,6 +184,8 @@
     "randomizer.gameoptions.quickswap": "L/R Quickswapping",
     "randomizer.gameoptions.reduce_flashing": "Reduce Flashing",
     "randomizer.gameoptions.shuffle_sfx": "Shuffle Sound Effects",
+    "randomizer.gameoptions.msu_resume": "MSU Resume",
+    "randomizer.gameoptions.collection_rate": "Display Collection Rate",
 
     "randomizer.gameoptions.heartcolor": "Heart Color",
     "randomizer.gameoptions.heartcolor.red": "Red",
@@ -207,6 +223,7 @@
     "randomizer.gameoptions.sprite.unchanged": "(unchanged)",
 
 
+    "randomizer.generation.bps": "Create BPS Patches",
     "randomizer.generation.createspoiler": "Create Spoiler Log",
     "randomizer.generation.createrom": "Create Patched ROM",
     "randomizer.generation.calcplaythrough": "Calculate Playthrough",
@@ -315,7 +332,6 @@
 
     "randomizer.item.sortingalgo": "Item Sorting",
     "randomizer.item.sortingalgo.balanced": "Balanced",
-    "randomizer.item.sortingalgo.equitable": "Equitable",
     "randomizer.item.sortingalgo.vanilla_fill": "Vanilla Fill",
     "randomizer.item.sortingalgo.major_only": "Major Location Restriction",
     "randomizer.item.sortingalgo.dungeon_only": "Dungeon Restriction",

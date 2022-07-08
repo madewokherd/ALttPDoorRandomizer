@@ -1152,7 +1152,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Zora Waterfall Landing', 'Zora Waterfall Area'),
                          ('Zora Waterfall Water Drop', 'Zora Waterfall Water'), #flippers
                          ('Zora Waterfall Water Entry', 'Zora Waterfall Water'), #flippers
-                         ('Waterfall of Wishing Cave Entry', 'Waterfall of Wishing Cave'), #flippers
+                         ('Zora Waterfall Water Approach', 'Zora Waterfall Entryway'), #flippers
                          ('Lost Woods Pass Hammer (North)', 'Lost Woods Pass Portal Area'), #hammer
                          ('Lost Woods Pass Hammer (South)', 'Lost Woods Pass East Top Area'), #hammer
                          ('Lost Woods Pass Rock (North)', 'Lost Woods Pass East Bottom Area'), #mitts

@@ -2,11 +2,13 @@ import RaceRandom as random
 import collections
 import itertools
 import logging
+import math
 
-from BaseClasses import CollectionState, FillError
+from BaseClasses import CollectionState, FillError, LocationType
 from Items import ItemFactory
 from Regions import shop_to_location_table, retro_shops
 from source.item.FillUtil import filter_locations, classify_major_items, replace_trash_item, vanilla_fallback
+from source.item.FillUtil import filter_pot_locations, valid_pot_items
 
 
 def get_dungeon_item_pool(world):
@@ -350,6 +352,25 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
 
     # get items to distribute
     classify_major_items(world)
+    # handle pot shuffle
+    pots_used = False
+    pot_item_pool = collections.defaultdict(list)
+    for item in world.itempool:
+        if item.name in ['Chicken', 'Big Magic']:  # can only fill these in that players world
+            pot_item_pool[item.player].append(item)
+    for player, pot_pool in pot_item_pool.items():
+        if pot_pool:
+            for pot_item in pot_pool:
+                world.itempool.remove(pot_item)
+            pot_locations = [location for location in fill_locations
+                             if location.type == LocationType.Pot and location.player == player]
+            pot_locations = filter_pot_locations(pot_locations, world)
+            fast_fill_helper(world, pot_pool, pot_locations)
+            pots_used = True
+    if pots_used:
+        fill_locations = world.get_unfilled_locations()
+        random.shuffle(fill_locations)
+
     random.shuffle(world.itempool)
     progitempool = [item for item in world.itempool if item.advancement]
     prioitempool = [item for item in world.itempool if not item.advancement and item.priority]
@@ -360,12 +381,24 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
 
     # fill in gtower locations with trash first
     for player in range(1, world.players + 1):
-        if not gftower_trash or not world.ganonstower_vanilla[player] or world.doorShuffle[player] == 'crossed' or world.logic[player] in ['owglitches', 'nologic']:
+        if (not gftower_trash or not world.ganonstower_vanilla[player]
+           or world.logic[player] in ['owglitches', 'nologic']):
             continue
-        max_trash = 8 if world.algorithm == 'dungeon_only' else 15
-        gftower_trash_count = (random.randint(15, 50) if world.goal[player] in ['triforcehunt', 'trinity'] else random.randint(0, max_trash))
+        gt_count, total_count = calc_trash_locations(world, player)
+        scale_factor = .75 * (world.crystals_needed_for_gt[player] / 7)
+        if world.algorithm == 'dungeon_only':
+            reserved_space = sum(1 for i in progitempool+prioitempool if i.player == player)
+            max_trash = max(0, min(gt_count, total_count - reserved_space))
+        else:
+            max_trash = gt_count
+        scaled_trash = math.floor(max_trash * scale_factor)
+        if world.goal[player] in ['triforcehunt', 'trinity']:
+            gftower_trash_count = random.randint(scaled_trash, max_trash)
+        else:
+            gftower_trash_count = random.randint(0, scaled_trash)
 
-        gtower_locations = [location for location in fill_locations if 'Ganons Tower' in location.name and location.player == player]
+        gtower_locations = [location for location in fill_locations if location.parent_region.dungeon
+                            and location.parent_region.dungeon.name == 'Ganons Tower' and location.player == player]
         random.shuffle(gtower_locations)
         trashcnt = 0
         while gtower_locations and restitempool and trashcnt < gftower_trash_count:
@@ -415,6 +448,8 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
                 fill_locations.remove(l)
             filtered_fill(world, placeholder_items, placeholder_locations)
 
+    if world.players > 1:
+        fast_fill_pot_for_multiworld(world, restitempool, fill_locations)
     if world.algorithm == 'vanilla_fill':
         fast_vanilla_fill(world, restitempool, fill_locations)
     else:
@@ -424,6 +459,55 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     unfilled = [location.name for location in fill_locations]
     if unplaced or unfilled:
         logging.warning('Unplaced items: %s - Unfilled Locations: %s', unplaced, unfilled)
+    ensure_good_pots(world)
+
+
+def calc_trash_locations(world, player):
+    total_count, gt_count = 0, 0
+    for loc in world.get_locations():
+        if (loc.player == player and loc.item is None
+           and (loc.type not in {LocationType.Pot, LocationType.Drop, LocationType.Normal} or not loc.forced_item)
+           and (loc.type != LocationType.Shop or world.shopsanity[player])
+           and loc.parent_region.dungeon):
+                total_count += 1
+                if loc.parent_region.dungeon.name == 'Ganons Tower':
+                    gt_count += 1
+    return gt_count, total_count
+
+
+def ensure_good_pots(world, write_skips=False):
+    for loc in world.get_locations():
+        # convert Arrows 5 and Nothing when necessary
+        if (loc.item.name in {'Arrows (5)', 'Nothing'}
+           and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
+            loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
+        # can be placed here by multiworld balancing or shop balancing
+        # change it to something normal for the player it got swapped to
+        elif (loc.item.name in {'Chicken', 'Big Magic'}
+              and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
+                if loc.type == LocationType.Pot:
+                    loc.item.player = loc.player
+                else:
+                    loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
+        # do the arrow retro check
+        if world.retro[loc.item.player] and loc.item.name in {'Arrows (5)', 'Arrows (10)'}:
+            loc.item = ItemFactory('Rupees (5)', loc.item.player)
+        # don't write out all pots to spoiler
+        if write_skips:
+            if loc.type == LocationType.Pot and loc.item.name in valid_pot_items:
+                loc.skip = True
+
+
+invalid_location_replacement = {'Arrows (5)': 'Arrows (10)', 'Nothing':  'Rupees (5)',
+                                'Chicken': 'Rupees (5)', 'Big Magic': 'Small Magic'}
+
+
+def fast_fill_helper(world, item_pool, fill_locations):
+    if world.algorithm == 'vanilla_fill':
+        fast_vanilla_fill(world, item_pool, fill_locations)
+    else:
+        fast_fill(world, item_pool, fill_locations)
+    # todo: other fast fill methods?
 
 
 def fast_fill(world, item_pool, fill_locations):
@@ -431,6 +515,28 @@ def fast_fill(world, item_pool, fill_locations):
         spot_to_fill = fill_locations.pop()
         item_to_place = item_pool.pop()
         world.push_item(spot_to_fill, item_to_place, False)
+
+
+def fast_fill_pot_for_multiworld(world, item_pool, fill_locations):
+    pot_item_pool = collections.defaultdict(list)
+    pot_fill_locations = collections.defaultdict(list)
+    for item in item_pool:
+        if item.name in valid_pot_items:
+            pot_item_pool[item.player].append(item)
+    for loc in fill_locations:
+        if loc.type == LocationType.Pot:
+            pot_fill_locations[loc.player].append(loc)
+    for player in range(1, world.players+1):
+        flex = 256 - world.pot_contents[player].multiworld_count
+        fill_count = len(pot_fill_locations[player]) - flex
+        if fill_count > 0:
+            fill_spots = random.sample(pot_fill_locations[player], fill_count)
+            fill_items = random.sample(pot_item_pool[player], fill_count)
+            for x in fill_items:
+                item_pool.remove(x)
+            for x in fill_spots:
+                fill_locations.remove(x)
+            fast_fill(world, fill_items, fill_spots)
 
 
 def filtered_fill(world, item_pool, fill_locations):
