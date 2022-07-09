@@ -143,8 +143,6 @@ def main(args, seed=None, fish=None):
     else:
         outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
 
-    outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
-
     for player in range(1, world.players + 1):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
 
