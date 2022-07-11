@@ -377,7 +377,7 @@ def main(args, seed=None, fish=None):
         if args.jsonout:
             with open(output_path('%s_Spoiler.json' % outfilebase), 'w') as outfile:
               outfile.write(world.spoiler.to_json())
-        else:
+        elif world.players > 1 or world.logic[1] != "nologic":
             world.spoiler.playthrough_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
 
     YES = world.fish.translate("cli","cli","yes")
@@ -697,9 +697,14 @@ def create_playthrough(world):
 
     old_world.spoiler.paths = dict()
     for player in range(1, world.players + 1):
-        old_world.spoiler.paths.update({location.gen_name(): get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
+        if world.logic[player] != 'nologic':
+            old_world.spoiler.paths.update({location.gen_name(): get_path(state, location.parent_region) for sphere in collection_spheres for location in sphere if location.player == player})
+            # for path in dict(old_world.spoiler.paths).values():
+            #     if any(exit == 'Pyramid Fairy' for (_, exit) in path):
+            #         old_world.spoiler.paths[str(world.get_region('Big Bomb Shop', player))] = get_path(state, world.get_region('Big Bomb Shop', player))
 
     # we can finally output our playthrough
     old_world.spoiler.playthrough = {"0": [str(item) for item in world.precollected_items if item.advancement]}
     for i, sphere in enumerate(collection_spheres):
-        old_world.spoiler.playthrough[str(i + 1)] = {location.gen_name(): str(location.item) for location in sphere}
+        if world.logic[player] != 'nologic':
+            old_world.spoiler.playthrough[str(i + 1)] = {location.gen_name(): str(location.item) for location in sphere}
