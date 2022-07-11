@@ -882,8 +882,7 @@ def build_sectors(world, player):
     # perform accessibility check on duplicate world
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
-    world.key_logic = {}
+    base_world = copy_world(world, True)
     
     # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
     regions = list(OWTileRegions.copy().keys())
@@ -958,9 +957,8 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     if build_copy_world:
         for p in range(1, world.players + 1):
             world.key_logic[p] = {}
-        base_world = copy_world(world)
+        base_world = copy_world(world, True)
         base_world.override_bomb_check = True
-        world.key_logic = {}
     else:
         base_world = world
     
@@ -1048,8 +1046,7 @@ def validate_layout(world, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
-    world.key_logic = {}
+    base_world = copy_world(world, True)
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:

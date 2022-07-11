@@ -1448,9 +1448,8 @@ def junk_fill_inaccessible(world, player):
 
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
+    base_world = copy_world(world, True)
     base_world.override_bomb_check = True
-    world.key_logic = {}
     
     # remove regions that have a dungeon entrance
     accessible_regions = list()
@@ -1617,9 +1616,8 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
+    base_world = copy_world(world, True)
     base_world.override_bomb_check = True
-    world.key_logic = {}
     
     connect_simple(base_world, 'Links House S&Q', start_region, player)
     blank_state = CollectionState(base_world)
@@ -1727,9 +1725,8 @@ def can_reach(world, entrance_name, region_name, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
+    base_world = copy_world(world, True)
     base_world.override_bomb_check = True
-    world.key_logic = {}
     
     entrance = world.get_entrance(entrance_name, player)
     connect_simple(base_world, 'Links House S&Q', entrance.parent_region.name, player)

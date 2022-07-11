@@ -398,7 +398,7 @@ def main(args, seed=None, fish=None):
     return world
 
 
-def copy_world(world):
+def copy_world(world, partial_copy=False):
     # ToDo: Not good yet
     ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
@@ -544,15 +544,20 @@ def copy_world(world):
     ret.dungeon_layouts = world.dungeon_layouts
     ret.key_logic = world.key_logic
     ret.dungeon_portals = world.dungeon_portals
-    for player, portals in world.dungeon_portals.items():
-        for portal in portals:
-            connect_portal(portal, ret, player)
+    if not partial_copy:
+        for player, portals in world.dungeon_portals.items():
+            for portal in portals:
+                connect_portal(portal, ret, player)
     ret.sanc_portal = world.sanc_portal
 
     from OverworldShuffle import categorize_world_regions
     for player in range(1, world.players + 1):
         categorize_world_regions(ret, player)
         set_rules(ret, player)
+
+    if partial_copy:
+        # undo some of the things that unintentionally affect the original world object
+        world.key_logic = {}
 
     return ret
 
