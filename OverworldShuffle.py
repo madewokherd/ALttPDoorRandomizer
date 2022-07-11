@@ -972,7 +972,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     return explored_regions
 
 def validate_layout(world, player):
-    if world.accessibility[player] == 'beatable':
+    if world.accessibility[player] == 'none':
         return True
     
     entrance_connectors = {
