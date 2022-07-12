@@ -30,9 +30,19 @@
     1: 2
     2: 2
     3: 4
-  keydropshuffle:
+  dropshuffle:
     on: 1
     off: 1
+  pottery:
+    none: 8
+    keys: 1
+    cave: 1
+    dungeon: 1
+    lottery: 1
+    cavekeys: 1
+    reduced: 1
+    clustered: 1
+    nonempty: 1
   shopsanity:
     on: 1
     off: 1
@@ -81,17 +91,17 @@
     dungeons: 1
     pedestal: 2
     triforce-hunt: 2
-    trinity: 1
+    trinity: 2
   triforce_goal_min: 10
   triforce_goal_max: 30
   triforce_pool_min: 20
   triforce_pool_max: 40
   triforce_min_difference: 10
   algorithm:
+    balanced: 12
+    vanilla_fill: 1
     major_only: 1
     dungeon_only: 1
-    vanilla_fill: 1
-    balanced: 10
     district: 1
   restrict_boss_items:
     none: 1
@@ -175,13 +185,9 @@
     on: 1
     off: 0
   startinventory:
-    "Pegasus Boots":
-      on: 0
-      off: 1
+    Pegasus Boots: on
   rom:
-    quickswap:
-      on: 1
-      off: 0
+    quickswap: on
     heartcolor:
       red: 1
       blue: 1

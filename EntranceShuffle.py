@@ -1448,9 +1448,8 @@ def junk_fill_inaccessible(world, player):
 
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
+    base_world = copy_world(world, True)
     base_world.override_bomb_check = True
-    world.key_logic = {}
     
     # remove regions that have a dungeon entrance
     accessible_regions = list()
@@ -1617,9 +1616,8 @@ def build_accessible_entrance_list(world, start_region, player, assumed_inventor
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
+    base_world = copy_world(world, True)
     base_world.override_bomb_check = True
-    world.key_logic = {}
     
     connect_simple(base_world, 'Links House S&Q', start_region, player)
     blank_state = CollectionState(base_world)
@@ -1727,9 +1725,8 @@ def can_reach(world, entrance_name, region_name, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
+    base_world = copy_world(world, True)
     base_world.override_bomb_check = True
-    world.key_logic = {}
     
     entrance = world.get_entrance(entrance_name, player)
     connect_simple(base_world, 'Links House S&Q', entrance.parent_region.name, player)
@@ -2059,6 +2056,8 @@ mandatory_connections = [('Old Man S&Q', 'Old Man House'),
                          ('Lost Woods Hideout (top to bottom)', 'Lost Woods Hideout (bottom)'),
                          ('Lumberjack Tree (top to bottom)', 'Lumberjack Tree (bottom)'),
                          ('Kakariko Well (top to bottom)', 'Kakariko Well (bottom)'),
+                         ('Kakariko Well (top to back)', 'Kakariko Well (back)'),
+                         ('Blinds Hideout N', 'Blinds Hideout (Top)'),
                          ('Bat Cave Door', 'Bat Cave (left)'),
                          ('Sewer Drop', 'Sewers Rat Path'),
                          ('Old Man Cave Dropdown', 'Old Man Cave'),
@@ -2066,10 +2065,13 @@ mandatory_connections = [('Old Man S&Q', 'Old Man House'),
                          ('Old Man House Back to Front', 'Old Man House'),
                          ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave (Bottom)'),
                          ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave (Bottom)'),
+                         ('Death Mountain Return Cave E', 'Death Mountain Return Cave (right)'),
+                         ('Death Mountain Return Cave W', 'Death Mountain Return Cave (left)'),
                          ('Spiral Cave (top to bottom)', 'Spiral Cave (Bottom)'),
                          ('Light World Death Mountain Shop', 'Light World Death Mountain Shop'),
                          ('Paradox Cave Push Block Reverse', 'Paradox Cave Chest Area'),
                          ('Paradox Cave Push Block', 'Paradox Cave Front'),
+                         ('Paradox Cave Chest Area NE', 'Paradox Cave Bomb Area'),
                          ('Paradox Cave Bomb Jump', 'Paradox Cave'),
                          ('Paradox Cave Drop', 'Paradox Cave Chest Area'),
                          ('Fairy Ascension Cave Climb', 'Fairy Ascension Cave (Top)'),
@@ -2081,6 +2083,8 @@ mandatory_connections = [('Old Man S&Q', 'Old Man House'),
                          ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),
                          ('Hookshot Cave Middle to Back', 'Hookshot Cave (Back)'),
                          ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
+                         ('Hookshot Cave Bonk Path', 'Hookshot Cave (Bonk Islands)'),
+                         ('Hookshot Cave Hook Path', 'Hookshot Cave (Hook Islands)'),
                          ('Ganon Drop', 'Bottom of Pyramid')
                     ]
 

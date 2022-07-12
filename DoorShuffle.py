@@ -6,6 +6,7 @@ from enum import unique, Flag
 from typing import DefaultDict, Dict, List
 
 from BaseClasses import RegionType, Region, Door, DoorType, Direction, Sector, CrystalBarrier, DungeonInfo, dungeon_keys
+from BaseClasses import PotFlags, LocationType
 from Doors import reset_portals
 from Dungeons import dungeon_regions, region_starts, standard_starts, split_region_starts
 from Dungeons import dungeon_bigs, dungeon_hints
@@ -380,7 +381,7 @@ def choose_portals(world, player):
     if world.doorShuffle[player] in ['basic', 'crossed']:
         cross_flag = world.doorShuffle[player] == 'crossed'
         # key drops allow the big key in the right place in Desert Tiles 2
-        bk_shuffle = world.bigkeyshuffle[player] or world.keydropshuffle[player]
+        bk_shuffle = world.bigkeyshuffle[player] or world.dropshuffle[player]
         std_flag = world.mode[player] == 'standard'
         # roast incognito doors
         world.get_room(0x60, player).delete(5)
@@ -414,7 +415,7 @@ def choose_portals(world, player):
                     info.sole_entrance = inaccessible_portals[0]
                     info.required_passage.clear()
                 else:
-                    raise Exception('please inspect this case')
+                    raise Exception(f'No reachable entrances for {dungeon}')
             if len(reachable_portals) == 1:
                 info.sole_entrance = reachable_portals[0]
             info_map[dungeon] = info
@@ -521,7 +522,7 @@ def analyze_portals(world, player):
                 info.sole_entrance = inaccessible_portals[0]
                 info.required_passage.clear()
             else:
-                raise Exception('please inspect this case')
+                raise Exception(f'No reachable entrances for {dungeon}')
         if len(reachable_portals) == 1:
             info.sole_entrance = reachable_portals[0]
         if world.intensity[player] < 2 and world.doorShuffle[player] == 'basic' and dungeon == 'Desert Palace':
@@ -996,10 +997,15 @@ def cross_dungeon(world, player):
 
     assign_cross_keys(dungeon_builders, world, player)
     all_dungeon_items_cnt = len(list(y for x in world.dungeons if x.player == player for y in x.all_items))
-    if world.keydropshuffle[player]:
-        target_items = 35 if world.retro[player] else 96
+    target_items = 34
+    if world.retro[player]:
+        target_items += 1 if world.dropshuffle[player] else 0  # the hc big key
     else:
-        target_items = 34 if world.retro[player] else 63
+        target_items += 29  # small keys in chests
+        if world.dropshuffle[player]:
+            target_items += 14  # 13 dropped smalls + 1 big
+        if world.pottery[player] not in ['none', 'cave']:
+            target_items += 19  # 19 pot keys
     d_items = target_items - all_dungeon_items_cnt
     world.pool_adjustment[player] = d_items
     smooth_door_pairs(world, player)
@@ -1057,7 +1063,11 @@ def assign_cross_keys(dungeon_builders, world, player):
     logging.getLogger('').info(world.fish.translate("cli", "cli", "shuffling.keydoors"))
     start = time.process_time()
     if world.retro[player]:
-        remaining = 61 if world.keydropshuffle[player] else 29
+        remaining = 29
+        if world.dropshuffle[player]:
+            remaining += 13
+        if world.pottery[player] not in ['none', 'cave']:
+            remaining += 19
     else:
         remaining = len(list(x for dgn in world.dungeons if dgn.player == player for x in dgn.small_keys))
     total_keys = remaining
@@ -1076,11 +1086,10 @@ def assign_cross_keys(dungeon_builders, world, player):
         total_candidates += builder.key_doors_num
         start_regions_map[name] = start_regions
 
-
     # Step 2: Initial Key Number Assignment & Calculate Flexibility
     for name, builder in dungeon_builders.items():
         calculated = int(round(builder.key_doors_num*total_keys/total_candidates))
-        max_keys = builder.location_cnt - calc_used_dungeon_items(builder)
+        max_keys = max(0, builder.location_cnt - calc_used_dungeon_items(builder))
         cand_len = max(0, len(builder.candidates) - builder.key_drop_cnt)
         limit = min(max_keys, cand_len)
         suggested = min(calculated, limit)
@@ -1253,7 +1262,13 @@ def refine_hints(dungeon_builders):
         for region in builder.master_sector.regions:
             for location in region.locations:
                 if not location.event and '- Boss' not in location.name and '- Prize' not in location.name and location.name != 'Sanctuary':
-                    location.hint_text = dungeon_hints[name]
+                    if location.type == LocationType.Pot and location.pot:
+                        hint_text = ('under a block' if location.pot.flags & PotFlags.Block else 'in a pot')
+                        location.hint_text = f'{hint_text} {dungeon_hints[name]}'
+                    elif location.type == LocationType.Drop:
+                        location.hint_text = f'dropped {dungeon_hints[name]}'
+                    else:
+                        location.hint_text = dungeon_hints[name]
 
 
 def refine_boss_exits(world, player):
@@ -1729,7 +1744,7 @@ def smooth_door_pairs(world, player):
                         if type_b == DoorKind.SmallKey:
                             remove_pair(door, world, player)
                 else:
-                    if valid_pair:
+                    if valid_pair and not std_forbidden(door, world, player):
                         bd_candidates[door.entrance.parent_region.dungeon].append(door)
                     elif type_a in [DoorKind.Bombable, DoorKind.Dashable] or type_b in [DoorKind.Bombable, DoorKind.Dashable]:
                         if type_a in [DoorKind.Bombable, DoorKind.Dashable]:
@@ -1738,7 +1753,8 @@ def smooth_door_pairs(world, player):
                         else:
                             room_b.change(partner.doorListPos, DoorKind.Normal)
                             remove_pair(partner, world, player)
-            elif valid_pair and type_a != DoorKind.SmallKey and type_b != DoorKind.SmallKey:
+            elif (valid_pair and type_a != DoorKind.SmallKey and type_b != DoorKind.SmallKey
+                  and not std_forbidden(door, world, player)):
                 bd_candidates[door.entrance.parent_region.dungeon].append(door)
     shuffle_bombable_dashable(bd_candidates, world, player)
     world.paired_doors[player] = [x for x in world.paired_doors[player] if x.pair or x.original]
@@ -1777,12 +1793,37 @@ def stateful_door(door, kind):
     return False
 
 
+def std_forbidden(door, world, player):
+    return (world.mode[player] == 'standard' and door.entrance.parent_region.dungeon.name == 'Hyrule Castle' and
+            'Hyrule Castle Throne Room N' in [door.name, door.dest.name])
+
+
+dashable_forbidden = {
+    'Swamp Trench 1 Key Ledge NW', 'Swamp Left Elbow WN', 'Swamp Right Elbow SE', 'Mire Hub WN', 'Mire Hub WS',
+    'Mire Hub Top NW', 'Mire Hub NE', 'Ice Dead End WS'
+}
+
+ohko_forbidden = {
+    'GT Invisible Catwalk NE', 'GT Falling Bridge WN', 'GT Falling Bridge WS', 'GT Hidden Star ES', 'GT Hookshot EN',
+    'GT Torch Cross WN', 'TR Torches WN', 'Mire Falling Bridge WS', 'Mire Falling Bridge W', 'Ice Hookshot Balcony SW',
+    'Ice Catwalk WN', 'Ice Catwalk NW', 'Ice Bomb Jump NW', 'GT Cannonball Bridge SE'
+}
+
+
+def filter_dashable_candidates(candidates, world):
+    forbidden_set = dashable_forbidden
+    if world.timer in ['ohko', 'timed-ohko']:
+        forbidden_set = ohko_forbidden.union(dashable_forbidden)
+    return [x for x in candidates if x.name not in forbidden_set and x.dest.name not in forbidden_set]
+
+
 def shuffle_bombable_dashable(bd_candidates, world, player):
     if world.doorShuffle[player] == 'basic':
         for dungeon, candidates in bd_candidates.items():
             diff = bomb_dash_counts[dungeon.name][1]
             if diff > 0:
-                for chosen in random.sample(candidates, min(diff, len(candidates))):
+                dash_candidates = filter_dashable_candidates(candidates, world)
+                for chosen in random.sample(dash_candidates, min(diff, len(candidates))):
                     change_pair_type(chosen, DoorKind.Dashable, world, player)
                     candidates.remove(chosen)
             diff = bomb_dash_counts[dungeon.name][0]
@@ -1794,7 +1835,8 @@ def shuffle_bombable_dashable(bd_candidates, world, player):
                 remove_pair_type_if_present(excluded, world, player)
     elif world.doorShuffle[player] == 'crossed':
         all_candidates = sum(bd_candidates.values(), [])
-        for chosen in random.sample(all_candidates, min(8, len(all_candidates))):
+        dash_candidates = filter_dashable_candidates(all_candidates, world)
+        for chosen in random.sample(dash_candidates, min(8, len(all_candidates))):
             change_pair_type(chosen, DoorKind.Dashable, world, player)
             all_candidates.remove(chosen)
         for chosen in random.sample(all_candidates, min(12, len(all_candidates))):
@@ -2113,6 +2155,7 @@ logical_connections = [
     ('Hera Startile Wide Crystal Exit', 'Hera Startile Wide'),
     ('Hera Big Chest Hook Path', 'Hera Big Chest Landing'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
+    ('Hera 5F Orange Path', 'Hera 5F Pot Block'),
 
     ('PoD Pit Room Block Path N', 'PoD Pit Room Blocked'),
     ('PoD Pit Room Block Path S', 'PoD Pit Room'),
@@ -2176,6 +2219,7 @@ logical_connections = [
     ('Swamp Trench 1 Departure Approach', 'Swamp Trench 1 Approach'),
     ('Swamp Trench 1 Departure Key', 'Swamp Trench 1 Key Ledge'),
     ('Swamp Hub Hook Path', 'Swamp Hub North Ledge'),
+    ('Swamp Hub Side Hook Path', 'Swamp Hub Side Ledges'),
     ('Swamp Hub North Ledge Drop Down', 'Swamp Hub'),
     ('Swamp Crystal Switch Outer to Inner Barrier - Blue', 'Swamp Crystal Switch Inner'),
     ('Swamp Crystal Switch Outer to Ranged Crystal', 'Swamp Crystal Switch Outer - Ranged Crystal'),
@@ -2207,13 +2251,17 @@ logical_connections = [
     ('Skull Pot Circle Star Path', 'Skull Map Room'),
     ('Skull Big Chest Hookpath', 'Skull 1 Lobby'),
     ('Skull Back Drop Star Path', 'Skull Small Hall'),
+    ('Skull 2 West Lobby Pits', 'Skull 2 West Lobby Ledge'),
+    ('Skull 2 West Lobby Ledge Pits', 'Skull 2 West Lobby'),
     ('Thieves Rail Ledge Drop Down', 'Thieves BK Corner'),
     ('Thieves Hellway Orange Barrier', 'Thieves Hellway S Crystal'),
     ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
     ('Thieves Hellway Blue Barrier', 'Thieves Hellway N Crystal'),
     ('Thieves Hellway Crystal Blue Barrier', 'Thieves Hellway'),
     ('Thieves Attic Orange Barrier', 'Thieves Attic Hint'),
+    ('Thieves Attic Blue Barrier', 'Thieves Attic Switch'),
     ('Thieves Attic Hint Orange Barrier', 'Thieves Attic'),
+    ('Thieves Attic Switch Blue Barrier', 'Thieves Attic'),
     ('Thieves Basement Block Path', 'Thieves Blocked Entry'),
     ('Thieves Blocked Entry Path', 'Thieves Basement Block'),
     ('Thieves Conveyor Bridge Block Path', 'Thieves Conveyor Block'),
@@ -2272,6 +2320,8 @@ logical_connections = [
 
     ('TR Main Lobby Gap', 'TR Lobby Ledge'),
     ('TR Lobby Ledge Gap', 'TR Main Lobby'),
+    ('TR Hub Path', 'TR Hub Ledges'),
+    ('TR Hub Ledges Path', 'TR Hub'),
     ('TR Pipe Ledge Drop Down', 'TR Pipe Pit'),
     ('TR Big Chest Gap', 'TR Big Chest Entrance'),
     ('TR Big Chest Entrance Gap', 'TR Big Chest'),
@@ -2300,6 +2350,8 @@ logical_connections = [
     ('TR Crystaroller Chest to Middle Barrier - Blue', 'TR Crystaroller Middle'),
     ('TR Crystaroller Middle Ranged Crystal Exit', 'TR Crystaroller Middle'),
     ('TR Crystaroller Bottom Ranged Crystal Exit', 'TR Crystaroller Bottom'),
+    ('TR Dark Ride Path', 'TR Dark Ride Ledges'),
+    ('TR Dark Ride Ledges Path', 'TR Dark Ride'),
     ('TR Crystal Maze Start to Interior Barrier - Blue', 'TR Crystal Maze Interior'),
     ('TR Crystal Maze Start to Crystal', 'TR Crystal Maze Start - Crystal'),
     ('TR Crystal Maze Start Crystal Exit', 'TR Crystal Maze Start'),
@@ -2310,16 +2362,18 @@ logical_connections = [
     ('TR Crystal Maze End to Interior Barrier - Blue', 'TR Crystal Maze Interior'),
     ('TR Crystal Maze End to Ranged Crystal', 'TR Crystal Maze End - Ranged Crystal'),
     ('TR Crystal Maze End Ranged Crystal Exit', 'TR Crystal Maze End'),
+    ('TR Final Abyss Balcony Path', 'TR Final Abyss Ledge'),
+    ('TR Final Abyss Ledge Path', 'TR Final Abyss Balcony'),
 
     ('GT Blocked Stairs Block Path', 'GT Big Chest'),
     ('GT Speed Torch South Path', 'GT Speed Torch'),
     ('GT Speed Torch North Path', 'GT Speed Torch Upper'),
-    ('GT Hookshot East-North Path', 'GT Hookshot North Platform'),
-    ('GT Hookshot East-South Path', 'GT Hookshot South Platform'),
-    ('GT Hookshot North-East Path', 'GT Hookshot East Platform'),
-    ('GT Hookshot North-South Path', 'GT Hookshot South Platform'),
-    ('GT Hookshot South-East Path', 'GT Hookshot East Platform'),
-    ('GT Hookshot South-North Path', 'GT Hookshot North Platform'),
+    ('GT Hookshot East-Mid Path', 'GT Hookshot Mid Platform'),
+    ('GT Hookshot Mid-East Path', 'GT Hookshot East Platform'),
+    ('GT Hookshot North-Mid Path', 'GT Hookshot Mid Platform'),
+    ('GT Hookshot Mid-North Path', 'GT Hookshot North Platform'),
+    ('GT Hookshot South-Mid Path', 'GT Hookshot Mid Platform'),
+    ('GT Hookshot Mid-South Path', 'GT Hookshot South Platform'),
     ('GT Hookshot Platform Blue Barrier', 'GT Hookshot South Entry'),
     ('GT Hookshot Platform Barrier Bypass', 'GT Hookshot South Entry'),
     ('GT Hookshot Entry Blue Barrier', 'GT Hookshot South Platform'),
@@ -2350,8 +2404,8 @@ logical_connections = [
     ('GT Crystal Conveyor to Corner Barrier - Blue', 'GT Crystal Conveyor Corner'),
     ('GT Crystal Conveyor to Ranged Crystal', 'GT Crystal Conveyor - Ranged Crystal'),
     ('GT Crystal Conveyor Corner to Left Bypass', 'GT Crystal Conveyor Left'),
-    ('GT Crystal Conveyor Corner to Barrier - Blue', 'GT Crystal Conveyor Left'),
-    ('GT Crystal Conveyor Corner to Barrier - Orange', 'GT Crystal Conveyor'),
+    ('GT Crystal Conveyor Corner to Barrier - Blue', 'GT Crystal Conveyor'),
+    ('GT Crystal Conveyor Corner to Barrier - Orange', 'GT Crystal Conveyor Left'),
     ('GT Crystal Conveyor Corner to Ranged Crystal', 'GT Crystal Conveyor Corner - Ranged Crystal'),
     ('GT Crystal Conveyor Left to Corner Barrier - Orange', 'GT Crystal Conveyor Corner'),
     ('GT Crystal Conveyor Ranged Crystal Exit', 'GT Crystal Conveyor'),
@@ -3017,7 +3071,8 @@ palette_map = {
     'Tower of Hera': (0x6, None),
     'Thieves Town': (0x17, None),  # the attic uses 0x23
     'Turtle Rock': (0x18, 0x19, 'TR Boss SW'),
-    'Ganons Tower': (0x28, 0x1b, 'GT Agahnim 2 SW'),  # other palettes: 0x1a (other) 0x24 (Gauntlet - Lanmo) 0x25 (conveyor-torch-wizzrode moldorm pit f5?)
+    'Ganons Tower': (0x28, 0x1b, 'GT Agahnim 2 SW'),
+    # other palettes: 0x1a (other) 0x24 (Gauntlet - Lanmo) 0x25 (conveyor-torch-wizzrobe moldorm pit f5?)
 }
 
 # implications:

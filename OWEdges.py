@@ -727,7 +727,7 @@ OWTileRegions = bidict({
 
     'Zora Waterfall Area': 0x0f,
     'Zora Waterfall Water': 0x0f,
-    'Waterfall of Wishing Cave': 0x0f,
+    'Zora Waterfall Entryway': 0x0f,
 
     'Lost Woods Pass West Area': 0x10,
     'Lost Woods Pass East Top Area': 0x10,
@@ -1253,7 +1253,7 @@ OWExitTypes = {
                 'Mountain Entry Entrance Rock (West)',
                 'Mountain Entry Entrance Rock (East)',
                 'Zora Waterfall Water Entry',
-                'Waterfall of Wishing Cave Entry',
+                'Zora Waterfall Water Approach',
                 'Zora Waterfall Landing',
                 'Lost Woods Pass Hammer (North)',
                 'Lost Woods Pass Hammer (South)',

@@ -13,6 +13,11 @@
   "suppress_spoiler": {
     "action": "store_true"
   },
+  "mystery": {
+    "action": "store_true",
+    "type": "bool",
+    "help": "suppress"
+  },
   "logic": {
     "choices": [
       "noglitches",
@@ -43,8 +48,8 @@
       "pedestal",
       "dungeons",
       "triforcehunt",
-      "crystals",
-      "trinity"
+      "trinity",
+      "crystals"
     ]
   },
   "difficulty": {
@@ -69,7 +74,32 @@
     "action": "store_true",
     "type": "bool"
   },
-  "mixed_travel": {
+  "dropshuffle" : {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "pottery" : {
+    "choices" : [
+      "none",
+      "keys",
+      "dungeon",
+      "cave",
+      "cavekeys",
+      "reduced",
+      "clustered",
+      "nonempty",
+      "lottery"
+    ]
+  },
+  "colorizepots" : {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "shufflepots": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "mixed_travel" : {
     "choices": [
       "prevent",
       "allow",
@@ -102,7 +132,6 @@
   "algorithm": {
     "choices": [
       "balanced",
-      "equitable",
       "vanilla_fill",
       "major_only",
       "dungeon_only",
@@ -259,6 +288,14 @@
     "action": "store_true",
     "type": "bool"
   },
+  "msu_resume": {
+    "action": "store_true",
+    "type": "bool"
+  },
+  "collection_rate": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "mapshuffle": {
     "action": "store_true",
     "type": "bool"
@@ -368,6 +405,10 @@
     "dest": "create_rom",
     "help": "suppress"
   },
+  "suppress_meta": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "shuffleganon": {
     "action": "store_true",
     "type": "bool",
@@ -407,6 +448,9 @@
   "jsonout": {
     "action": "store_true"
   },
+  "bps": {
+    "action": "store_true"
+  },
   "enemizercli": {
     "setting": "enemizercli"
   },
@@ -414,6 +458,7 @@
     "choices": [
       "none",
       "simple",
+      "unique",
       "full",
       "random"
     ]
@@ -441,10 +486,6 @@
       "shuffled",
       "random"
     ]
-  },
-  "shufflepots": {
-    "action": "store_true",
-    "type": "bool"
   },
   "remote_items": {
     "action": "store_true",

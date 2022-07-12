@@ -30,6 +30,7 @@ def main():
     parser.add_argument('--create_spoiler', action='store_true')
     parser.add_argument('--no_race', action='store_true')
     parser.add_argument('--suppress_rom', action='store_true')
+    parser.add_argument('--suppress_meta', action='store_true')
     parser.add_argument('--bps', action='store_true')
     parser.add_argument('--rom')
     parser.add_argument('--enemizercli')
@@ -65,12 +66,14 @@ def main():
     erargs.names = args.names
     erargs.create_spoiler = args.create_spoiler
     erargs.suppress_rom = args.suppress_rom
+    erargs.suppress_meta = args.suppress_meta
     erargs.bps = args.bps
     erargs.race = not args.no_race
     erargs.outputname = seedname
     if args.outputpath:
         erargs.outputpath = args.outputpath
     erargs.loglevel = args.loglevel
+    erargs.mystery = True
 
     if args.rom:
         erargs.rom = args.rom
@@ -142,8 +145,8 @@ def roll_settings(weights):
 
     ret.algorithm = get_choice('algorithm')
 
-    glitch_map = {'none': 'noglitches', 'no_logic': 'nologic', 'owg': 'owglitches',
-                  'minorglitches': 'minorglitches'}
+    glitch_map = {'none': 'noglitches', 'no_logic': 'nologic', 'owglitches': 'owglitches',
+                  'owg': 'owglitches', 'minorglitches': 'minorglitches'}
     glitches_required = get_choice('glitches_required')
     if glitches_required is not None:
         if glitches_required not in glitch_map.keys():
@@ -179,6 +182,7 @@ def roll_settings(weights):
     ret.door_shuffle = door_shuffle if door_shuffle != 'none' else 'vanilla'
     ret.intensity = get_choice('intensity')
     ret.experimental = get_choice('experimental') == 'on'
+    ret.collection_rate = get_choice('collection_rate') == 'on'
 
     ret.dungeon_counters = get_choice('dungeon_counters') if 'dungeon_counters' in weights else 'default'
     if ret.dungeon_counters == 'default':
@@ -186,7 +190,10 @@ def roll_settings(weights):
 
     ret.pseudoboots = get_choice('pseudoboots') == 'on'
     ret.shopsanity = get_choice('shopsanity') == 'on'
-    ret.keydropshuffle = get_choice('keydropshuffle') == 'on'
+    ret.dropshuffle = get_choice('dropshuffle') == 'on'
+    ret.pottery = get_choice('pottery') if 'pottery' in weights else 'none'
+    ret.colorizepots = get_choice('colorizepots') == 'on'
+    ret.shufflepots = get_choice('pot_shuffle') == 'on'
     ret.mixed_travel = get_choice('mixed_travel') if 'mixed_travel' in weights else 'prevent'
     ret.standardize_palettes = get_choice('standardize_palettes') if 'standardize_palettes' in weights else 'standardize'
 
@@ -262,8 +269,6 @@ def roll_settings(weights):
 
     ret.enemy_health = get_choice('enemy_health')
 
-    ret.shufflepots = get_choice('pot_shuffle') == 'on'
-
     ret.beemizer = get_choice('beemizer') if 'beemizer' in weights else '0'
 
     inventoryweights = weights.get('startinventory', {})
@@ -272,6 +277,8 @@ def roll_settings(weights):
         if get_choice(item, inventoryweights) == 'on':
             startitems.append(item)
     ret.startinventory = ','.join(startitems)
+    if len(startitems) > 0:
+        ret.usestartinventory = True
 
     if 'rom' in weights:
         romweights = weights['rom']
@@ -279,6 +286,7 @@ def roll_settings(weights):
         ret.disablemusic = get_choice('disablemusic', romweights) == 'on'
         ret.quickswap = get_choice('quickswap', romweights) == 'on'
         ret.reduce_flashing = get_choice('reduce_flashing', romweights) == 'on'
+        ret.msu_resume = get_choice('msu_resume', romweights) == 'on'
         ret.fastmenu = get_choice('menuspeed', romweights)
         ret.heartcolor = get_choice('heartcolor', romweights)
         ret.heartbeep = get_choice('heartbeep', romweights)

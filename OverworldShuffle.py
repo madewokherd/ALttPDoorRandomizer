@@ -6,7 +6,7 @@ from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 from Utils import bidict
 
-version_number = '0.2.7.3'
+version_number = '0.2.8.0'
 version_branch = ''
 __version__ = '%s%s' % (version_number, version_branch)
 
@@ -882,8 +882,7 @@ def build_sectors(world, player):
     # perform accessibility check on duplicate world
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
-    world.key_logic = {}
+    base_world = copy_world(world, True)
     
     # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
     regions = list(OWTileRegions.copy().keys())
@@ -958,9 +957,8 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     if build_copy_world:
         for p in range(1, world.players + 1):
             world.key_logic[p] = {}
-        base_world = copy_world(world)
+        base_world = copy_world(world, True)
         base_world.override_bomb_check = True
-        world.key_logic = {}
     else:
         base_world = world
     
@@ -974,7 +972,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     return explored_regions
 
 def validate_layout(world, player):
-    if world.accessibility[player] == 'beatable':
+    if world.accessibility[player] == 'none':
         return True
     
     entrance_connectors = {
@@ -1048,8 +1046,7 @@ def validate_layout(world, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world)
-    world.key_logic = {}
+    base_world = copy_world(world, True)
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:
@@ -1152,7 +1149,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Zora Waterfall Landing', 'Zora Waterfall Area'),
                          ('Zora Waterfall Water Drop', 'Zora Waterfall Water'), #flippers
                          ('Zora Waterfall Water Entry', 'Zora Waterfall Water'), #flippers
-                         ('Waterfall of Wishing Cave Entry', 'Waterfall of Wishing Cave'), #flippers
+                         ('Zora Waterfall Water Approach', 'Zora Waterfall Entryway'), #flippers
                          ('Lost Woods Pass Hammer (North)', 'Lost Woods Pass Portal Area'), #hammer
                          ('Lost Woods Pass Hammer (South)', 'Lost Woods Pass East Top Area'), #hammer
                          ('Lost Woods Pass Rock (North)', 'Lost Woods Pass East Bottom Area'), #mitts
