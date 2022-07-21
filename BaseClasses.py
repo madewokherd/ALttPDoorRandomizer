@@ -1344,7 +1344,7 @@ class CollectionState(object):
         )
 
     def has_beaten_aga(self, player):
-        return self.has_beaten_aga(player) and (self.world.mode[player] != 'standard' or self.has('Zelda Delivered', player))
+        return self.has('Beat Agahnim 1', player) and (self.world.mode[player] != 'standard' or self.has('Zelda Delivered', player))
 
     def has_sword(self, player):
         return self.has('Fighter Sword', player) or self.has('Master Sword', player) or self.has('Tempered Sword', player) or self.has('Golden Sword', player)
