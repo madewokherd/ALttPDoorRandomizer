@@ -1110,7 +1110,7 @@ class CollectionState(object):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
-            if not self.has('Beat Agahnim 1', player):
+            if not self.has_beaten_aga(player):
                 for region in pre_aga_tree_pulls:
                     if can_reach_non_bunny(region):
                         return True
@@ -1125,7 +1125,7 @@ class CollectionState(object):
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
                         return True
-                if not self.has('Beat Agahnim 1', player):
+                if not self.has_beaten_aga(player):
                     for region in pre_aga_bush_crabs:
                         if can_reach_non_bunny(region):
                             return True
@@ -1202,7 +1202,7 @@ class CollectionState(object):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
-            if not self.has('Beat Agahnim 1', player):
+            if not self.has_beaten_aga(player):
                 for region in pre_aga_tree_pulls:
                     if can_reach_non_bunny(region):
                         return True
@@ -1217,7 +1217,7 @@ class CollectionState(object):
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
                         return True
-                if not self.has('Beat Agahnim 1', player):
+                if not self.has_beaten_aga(player):
                     for region in pre_aga_bush_crabs:
                         if can_reach_non_bunny(region):
                             return True
@@ -1342,6 +1342,9 @@ class CollectionState(object):
             cave.can_reach(self) and
             self.is_not_bunny(cave, player)
         )
+
+    def has_beaten_aga(self, player):
+        return self.has_beaten_aga(player) and (self.world.mode[player] != 'standard' or self.has('Zelda Delivered', player))
 
     def has_sword(self, player):
         return self.has('Fighter Sword', player) or self.has('Master Sword', player) or self.has('Tempered Sword', player) or self.has('Golden Sword', player)

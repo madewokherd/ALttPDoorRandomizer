@@ -54,7 +54,7 @@ def set_rules(world, player):
 
     if world.goal[player] == 'dungeons':
         # require all dungeons to beat ganon
-        add_rule(world.get_location('Ganon', player), lambda state: state.can_reach('Master Sword Pedestal', 'Location', player) and state.has('Beat Agahnim 1', player) and state.has('Beat Agahnim 2', player) and state.has_crystals(7, player))
+        add_rule(world.get_location('Ganon', player), lambda state: state.can_reach('Master Sword Pedestal', 'Location', player) and state.has_beaten_aga(player) and state.has('Beat Agahnim 2', player) and state.has_crystals(7, player))
     elif world.goal[player] == 'ganon':
         # require aga2 to beat ganon
         add_rule(world.get_location('Ganon', player), lambda state: state.has('Beat Agahnim 2', player))
@@ -807,7 +807,7 @@ def pot_rules(world, player):
 
 
 def default_rules(world, player):
-    set_rule(world.get_entrance('Other World S&Q', player), lambda state: state.has_Mirror(player) and state.has('Beat Agahnim 1', player))
+    set_rule(world.get_entrance('Other World S&Q', player), lambda state: state.has_Mirror(player) and state.has_beaten_aga(player))
 
     # Underworld Logic
     set_rule(world.get_entrance('Old Man Cave Exit (West)', player), lambda state: False)  # drop cannot be climbed up
@@ -950,7 +950,7 @@ def ow_rules(world, player):
     if world.is_atgt_swapped(player):
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
     else:
-        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
+        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has_beaten_aga(player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
         set_rule(world.get_entrance('GT Entry Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
         set_rule(world.get_entrance('GT Entry Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'))
 
@@ -1117,8 +1117,8 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('HC East Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('HC Courtyard Left Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('HC Area South Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has('Beat Agahnim 1', player))
-        set_rule(world.get_entrance('Top of Pyramid (Inner)', player), lambda state: state.has('Beat Agahnim 1', player))
+        set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has_beaten_aga(player))
+        set_rule(world.get_entrance('Top of Pyramid (Inner)', player), lambda state: state.has_beaten_aga(player))
     else:
         set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: world.is_pyramid_open(player) or state.has('Beat Agahnim 2', player))
         set_rule(world.get_entrance('Pyramid Hole', player), lambda state: False)
@@ -1130,7 +1130,7 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('Pyramid Uncle Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Pyramid From Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Pyramid Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Post Aga Inverted Teleporter', player), lambda state: state.has('Beat Agahnim 1', player))
+        set_rule(world.get_entrance('Post Aga Inverted Teleporter', player), lambda state: state.has_beaten_aga(player))
         
     if not world.is_tile_swapped(0x1d, player):
         set_rule(world.get_entrance('Wooden Bridge Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -1620,7 +1620,7 @@ def swordless_rules(world, player):
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has('Hammer', player))  # need to damage ganon to get tiles to drop
     
     if not world.is_atgt_swapped(player):
-        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
+        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has_beaten_aga(player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
 
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_misery_mire_medallion(player))   # sword not required to use medallion for opening in swordless (!)
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock Ledge', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
