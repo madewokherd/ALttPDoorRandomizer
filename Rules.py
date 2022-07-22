@@ -1109,7 +1109,7 @@ def ow_rules(world, player):
     if not world.is_tile_swapped(0x1b, player):
         set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Inverted Pyramid Entrance', player), lambda state: False)
-        set_rule(world.get_entrance('Pyramid Hole', player), lambda state: world.open_pyramid[player] or state.has('Beat Agahnim 2', player))
+        set_rule(world.get_entrance('Pyramid Hole', player), lambda state: world.is_pyramid_open(player) or state.has('Beat Agahnim 2', player))
         
         set_rule(world.get_entrance('HC Area Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('HC Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
