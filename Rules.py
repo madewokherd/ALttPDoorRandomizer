@@ -824,7 +824,7 @@ def default_rules(world, player):
     set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     
     # Entrance Access
-    set_rule(world.get_entrance('Lumberjack Tree Tree', player), lambda state: state.has_Boots(player) and state.has('Beat Agahnim 1', player))
+    set_rule(world.get_entrance('Lumberjack Tree Tree', player), lambda state: state.has_Boots(player) and state.has_beaten_aga(player))
     set_rule(world.get_entrance('Bonk Rock Cave', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Sanctuary Grave', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player))
