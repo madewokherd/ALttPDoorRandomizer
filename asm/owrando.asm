@@ -143,6 +143,9 @@ jsl.l OWWorldCheck16 : nop
 org $02b16e  ; AND #$3F : ORA 7EF3CA
 and #$7f : eor #$40 : nop #2
 
+org $06AD4C
+jsl.l OWBonkDrops : nop #4
+
 ;Code
 org $aa8800
 OWTransitionDirection:
@@ -366,6 +369,136 @@ LoadMapDarkOrMixed:
     dw 0,0,0,0,0,0
     dw $0800+$01F0 ; bottom left
     dw $0400+$0210 ; bottom right
+}
+
+; Y = sprite slot index of bonk sprite
+OWBonkDrops:
+{
+    CMP.b #$D8 : BEQ +
+        RTL
+    + LDA.l OWFlags+1 : AND.b #$02 : BNE +
+        JSL.l Sprite_TransmuteToBomb : RTL
+    +
+
+    ; loop thru rando bonk table to find match
+    PHB : PHK : PLB
+    LDA.b $8A
+    LDX.b #(40*6) ; 40 bonk items, 6 bytes each
+    - CMP.w OWBonkPrizeData,X : BNE +
+        INX
+        LDA.w $0D10,Y : LSR A : LSR A : LSR A : LSR A
+        EOR.w $0D00,Y : CMP.w OWBonkPrizeData,X : BNE ++ ; X = row + 1
+            BRA .found_match
+        ++ DEX : LDA.b $8A
+    + CPX.b #$00 : BNE +
+        PLB : RTL
+    + DEX : DEX : DEX : DEX : DEX : DEX : BRA -
+
+    .found_match
+    INX : LDA.w OWBonkPrizeData,X : PHX : PHA ; S = FlagBitmask, X (row + 2)
+    LDX.b $8A : LDA.l OverworldEventDataWRAM,X : AND 1,S : PHA : BNE + ; S = Collected, FlagBitmask, X (row + 2)
+        LDA.b #$1B : STA $12F ; JSL Sound_SetSfx3PanLong ; seems that when you bonk, there is a pending bonk sfx, so we clear that out and replace with reveal secret sfx
+    +
+    LDA 3,S : TAX : INX : LDA.w OWBonkPrizeData,X
+    PHA : INX : LDA.w OWBonkPrizeData,X : BEQ +
+        ; multiworld item
+        DEX : PLA ; X = row + 3
+        JMP .spawn_item
+    + DEX : PLA ; X = row + 3
+
+    .determine_type ; A = item id ; S = Collected, FlagBitmask, X (row + 2)
+    CMP.b #$B0 : BNE +
+        LDA.b #$79 : JMP .sprite_transform ; transform to bees
+    + CMP.b #$42 : BNE +
+        JSL.l Sprite_TransmuteToBomb ; transform a heart to bomb, vanilla behavior
+        JMP .mark_collected
+    + CMP.b #$34 : BNE +
+        LDA.b #$D9 : CLC : JMP .sprite_transform ; transform to single rupee
+    + CMP.b #$35 : BNE +
+        LDA.b #$DA : CLC : BRA .sprite_transform ; transform to blue rupee
+    + CMP.b #$36 : BNE +
+        LDA.b #$DB : CLC : BRA .sprite_transform ; transform to red rupee
+    + CMP.b #$27 : BNE +
+        LDA.b #$DC : CLC : BRA .sprite_transform ; transform to 1 bomb
+    + CMP.b #$28 : BNE +
+        LDA.b #$DD : CLC : BRA .sprite_transform ; transform to 4 bombs
+    + CMP.b #$31 : BNE +
+        LDA.b #$DE : CLC : BRA .sprite_transform ; transform to 8 bombs
+    + CMP.b #$45 : BNE +
+        LDA.b #$DF : CLC : BRA .sprite_transform ; transform to small magic
+    + CMP.b #$B4 : BNE +
+        LDA.b #$E0 : CLC : BRA .sprite_transform ; transform to big magic
+    + CMP.b #$B5 : BNE +
+        LDA.b #$E1 : CLC : BRA .sprite_transform ; transform to 5 arrows
+    + CMP.b #$44 : BNE +
+        LDA.b #$E2 : CLC : BRA .sprite_transform ; transform to 10 arrows
+    + CMP.b #$B1 : BNE +
+        LDA.b #$AC : BRA .sprite_transform ; transform to apples
+    + CMP.b #$B2 : BNE +
+        LDA.b #$E3 : BRA .sprite_transform ; transform to fairy
+    + CMP.b #$B3 : BNE .spawn_item
+        INX : INX : LDA.w OWBonkPrizeData,X ; X = row + 5
+        CLC : ADC.b #$08 : PHA
+        LDA.w $0D00,Y : SEC : SBC.b 1,S : STA.w $0D00,Y
+            LDA.w $0D20,Y : SBC.b #$00 : STA.w $0D20,Y : PLX
+        LDA.b #$0B : SEC ; BRA .sprite_transform ; transform to chicken
+    
+    .sprite_transform
+    STA.w $0E20,Y
+    TYX : JSL.l Sprite_LoadProperties
+    BEQ +
+        ; these are sprite properties that make it fall out of the tree to the east 
+        LDA #$30 : STA $0F80,Y ; amount of force (related to speed)
+        LDA #$10 : STA $0D50,Y ; eastward rate of speed
+        LDA #$FF : STA $0B58,Y ; expiration timer
+    +
+
+    .mark_collected ; S = Collected, FlagBitmask, X (row + 2)
+    PLA : BNE + ; S = FlagBitmask, X (row + 2)
+        LDX.b $8A : LDA.l OverworldEventDataWRAM,X : ORA 1,S : STA.l OverworldEventDataWRAM,X
+        
+        REP #$20
+			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
+        SEP #$20
+    + JMP .return
+
+    ; spawn itemget item
+    .spawn_item ; A = item id ; Y = tree sprite slot ; S = Collected, FlagBitmask, X (row + 2)
+    PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : JMP .return ; S = FlagBitmask, X (row + 2)
+        + LDA 2,S : TAX : INX : INX
+        LDA.w OWBonkPrizeData,X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        DEX
+
+        LDA.b #$01 : STA !REDRAW
+
+        LDA.b #$EB
+        STA.l $7FFE00
+        JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
+
+        ; affects the rate the item moves in the Y/X direction
+        LDA.b #$00 : STA.w $0D40,Y
+        LDA.b #$0A : STA.w $0D50,Y
+
+        LDA.b #$20 : STA.w $0F80,Y ; amount of force (gives height to the arch)
+        LDA.b #$FF : STA.w $0B58,Y ; stun timer
+        LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
+
+        LDA.b #$00 : STA.w $0F20,Y ; layer the sprite is on
+
+        ; sets OW event bitmask flag, uses free RAM
+        PLA : STA.w $0ED0,Y ; S = X (row + 2)
+        
+        ; determines the initial spawn point of item
+        PLX : INX : INX : INX
+        LDA.w $0D00,Y : SEC : SBC.w OWBonkPrizeData,X : STA.w $0D00,Y
+            LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
+
+        LDA.b #$01 : STA !REDRAW : STA !FORCE_HEART_SPAWN
+        
+        PLB : RTL
+
+    .return
+    PLA : PLA : PLB : RTL
 }
 
 org $aa9000
@@ -1130,11 +1263,11 @@ dw $0f20, $0f40, $0020, $0f30, $757e, $0000, $0000, $0049
 dw $0f70, $0fb8, $0048, $0f94, $757e, $0000, $0000, $004a
 dw $0058, $00c0, $0068, $008c, $8080, $0000, $0000, $0017 ;Hobo (unused)
 
-org $aab9e0 ;PC 1539e0
+org $aab9a0 ;PC 1539a0
 OWSpecialDestIndex:
 dw $0080, $0081, $0082
 
-org $aaba00 ;PC 153a00
+org $aab9b0 ;PC 1539b0
 OWTileWorldAssoc:
 db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
@@ -1154,7 +1287,7 @@ db $40, $40, $40, $40, $40, $40, $40, $40
 db $40, $40, $40, $40, $40, $40, $40, $40
 db $00, $00
 
-org $aabb00 ;PC 153b00
+org $aaba70 ;PC 153a70
 OWTileMapAlt:
 db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
@@ -1175,3 +1308,63 @@ db 0, 0, 0, 0, 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
 
 db 0, 0
+
+org $aabb00 ;PC 153b00
+OWBonkPrizeData:
+; OWID  YX  Flag  Item  MW Offset
+db $00, $59, $10, $b0, $00, $20
+db $05, $04, $10, $b2, $00, $00
+db $0a, $4e, $10, $b0, $00, $20
+db $0a, $a9, $08, $b1, $00, $20
+db $10, $c7, $10, $b1, $00, $20
+db $10, $f7, $08, $b4, $00, $20
+db $11, $08, $10, $27, $00, $00
+db $12, $a4, $10, $b2, $00, $20
+db $13, $c7, $10, $31, $00, $20
+db $13, $98, $08, $b1, $00, $20
+db $15, $a4, $10, $b1, $00, $20
+db $15, $fb, $08, $b2, $00, $20
+db $18, $a8, $10, $b2, $00, $20
+db $18, $36, $08, $35, $00, $20
+db $1a, $8a, $10, $42, $00, $20
+db $1a, $1d, $08, $b2, $00, $20
+;db $1a, $77, $04, $35, $00, $20  ; pre aga ONLY ; hijacked murahdahla bonk tree
+db $1b, $46, $10, $b1, $00, $10
+db $1d, $6b, $10, $b1, $00, $20
+db $1e, $72, $10, $b2, $00, $20
+db $2a, $8f, $10, $36, $00, $20
+db $2a, $45, $08, $36, $00, $20
+db $2b, $d6, $10, $b2, $00, $20
+db $2e, $9c, $10, $b2, $00, $20
+db $2e, $b4, $08, $b0, $00, $20
+db $32, $29, $10, $42, $00, $20
+db $32, $9a, $08, $b2, $00, $20
+db $42, $66, $10, $b2, $00, $20
+db $51, $08, $10, $b2, $00, $00
+db $51, $09, $08, $b2, $00, $00
+db $54, $b5, $10, $27, $00, $00
+db $54, $ef, $08, $b2, $00, $08
+db $54, $b9, $04, $36, $00, $00
+db $55, $aa, $10, $b0, $00, $20
+db $55, $fb, $08, $35, $00, $20
+db $56, $e4, $10, $b0, $00, $20
+db $5b, $a7, $10, $b2, $00, $20
+db $5e, $00, $10, $b2, $00, $20
+db $6e, $8c, $10, $35, $00, $10
+db $6e, $90, $08, $b0, $00, $10
+db $6e, $a4, $04, $b1, $00, $10
+db $74, $4e, $10, $b1, $00, $1c
+
+; temporary fix - murahdahla replaces one of the bonk tree prizes
+;    so we copy the sprite table here and update the pointer
+;    longterm solution should be to spawn in murahdahla separately
+org $09AE2A
+Overworld_Sprites_Screen1A_2:
+db $08, $0F, $41 ; yx:{ 0x080, 0x0F0 }
+db $0E, $0C, $41 ; yx:{ 0x0E0, 0x0C0 }
+db $11, $0D, $E3 ; yx:{ 0x110, 0x0D0 }
+db $18, $0A, $D8 ; yx:{ 0x180, 0x0A0 }
+db $18, $0F, $45 ; yx:{ 0x180, 0x0F0 }
+db $FF ; END
+org $09CA55
+dw Overworld_Sprites_Screen1A_2&$FFFF

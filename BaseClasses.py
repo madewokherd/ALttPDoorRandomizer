@@ -1080,6 +1080,9 @@ class CollectionState(object):
                 return True
         return False
 
+    def can_collect_bonkdrops(self, player):
+        return self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))
+
     def can_farm_rupees(self, player):
         tree_pulls = ['Lost Woods East Area',
                     'Snitch Lady (East)',
@@ -1192,7 +1195,7 @@ class CollectionState(object):
                 if can_reach_non_bunny(region):
                     return True
 
-        if self.has_Boots(player):
+        if not self.world.shuffle_bonk_drops[player] and self.can_collect_bonkdrops(player):
             for region in bonk_bombs:
                 if can_reach_non_bunny(region):
                     return True
@@ -2696,6 +2699,7 @@ class LocationType(FastEnum):
     Shop = 3
     Pot = 4
     Drop = 5
+    Bonk = 6
 
 
 class Item(object):
@@ -2911,6 +2915,7 @@ class Spoiler(object):
                          'ow_mixed': self.world.owMixed,
                          'ow_whirlpool': self.world.owWhirlpoolShuffle,
                          'ow_fluteshuffle': self.world.owFluteShuffle,
+                         'bonk_drops': self.world.shuffle_bonk_drops,
                          'shuffle': self.world.shuffle,
                          'shuffleganon': self.world.shuffle_ganon,
                          'shufflelinks': self.world.shufflelinks,
@@ -3123,6 +3128,7 @@ class Spoiler(object):
                 outfile.write('Swapped OW (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
                 outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
+                outfile.write('Bonk Drops:'.ljust(line_width) + '%s\n' % yn(self.metadata['bonk_drops'][player]))
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 if self.metadata['shuffle'][player] != 'vanilla':
                     outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))

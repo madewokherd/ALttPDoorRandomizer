@@ -22,6 +22,9 @@
     vanilla: 0
     balanced: 1
     random: 1
+  bonk_drops:
+    on: 1
+    off: 1
   door_shuffle:
     vanilla: 0
     basic: 2

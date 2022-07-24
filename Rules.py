@@ -823,6 +823,15 @@ def default_rules(world, player):
     set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     
+    # Bonk Item Access
+    if world.shuffle_bonk_drops[player]:
+        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+            from Regions import bonk_prize_table
+            for location_name, (_, aga_required, _, _, _) in bonk_prize_table.items():
+                loc = world.get_location(location_name, player)
+                set_rule(loc, lambda state: (state.can_collect_bonkdrops(player)) and (not aga_required or state.has_beaten_aga(player)))
+                add_bunny_rule(loc, player)
+    
     # Entrance Access
     set_rule(world.get_entrance('Lumberjack Tree Tree', player), lambda state: state.has_Boots(player) and state.has_beaten_aga(player))
     set_rule(world.get_entrance('Bonk Rock Cave', player), lambda state: state.has_Boots(player))
@@ -1730,6 +1739,11 @@ def standard_rules(world, player):
     add_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has('Zelda Delivered', player))
     add_rule(world.get_entrance('Hyrule Castle Ledge Drop', player), lambda state: state.has('Zelda Delivered', player))
     add_rule(world.get_entrance('Bonk Fairy (Light)', player), lambda state: state.has('Zelda Delivered', player))
+
+    if world.shuffle_bonk_drops[player]:
+        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+            add_rule(world.get_location('Hyrule Castle Tree', player), lambda state: state.has('Zelda Delivered', player))
+            add_rule(world.get_location('Central Bonk Rocks Tree', player), lambda state: state.has('Zelda Delivered', player))
 
     # don't allow bombs to get past here before zelda is rescued
     set_rule(world.get_entrance('GT Hookshot South Entry to Ranged Crystal', player), lambda state: (state.can_use_bombs(player) and state.has('Zelda Delivered', player)) or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player))  # or state.has('Cane of Somaria', player))

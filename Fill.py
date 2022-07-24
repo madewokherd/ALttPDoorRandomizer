@@ -355,18 +355,23 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     # handle pot shuffle
     pots_used = False
     pot_item_pool = collections.defaultdict(list)
-    for item in world.itempool:
-        if item.name in ['Chicken', 'Big Magic']:  # can only fill these in that players world
-            pot_item_pool[item.player].append(item)
-    for player, pot_pool in pot_item_pool.items():
-        if pot_pool:
-            for pot_item in pot_pool:
-                world.itempool.remove(pot_item)
-            pot_locations = [location for location in fill_locations
-                             if location.type == LocationType.Pot and location.player == player]
-            pot_locations = filter_pot_locations(pot_locations, world)
-            fast_fill_helper(world, pot_pool, pot_locations)
-            pots_used = True
+
+    # guarantee one big magic in a bonk location
+    for player in range(1, world.players + 1):
+        if world.shuffle_bonk_drops[player]:
+            for item in world.itempool:
+                if item.name in ['Big Magic']:
+                    pot_item_pool[player].append(item)
+                    break
+        
+    for player, magic_pool in pot_item_pool.items():
+        world.itempool.remove(magic_pool[0])
+        pot_locations = [location for location in fill_locations
+                        if location.type == LocationType.Bonk and location.player == player]
+        pot_locations = filter_pot_locations(pot_locations, world)
+        fast_fill_helper(world, magic_pool, pot_locations)
+        pots_used = True
+    
     if pots_used:
         fill_locations = world.get_unfilled_locations()
         random.shuffle(fill_locations)
