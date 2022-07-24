@@ -471,7 +471,7 @@ def calc_trash_locations(world, player):
     total_count, gt_count = 0, 0
     for loc in world.get_locations():
         if (loc.player == player and loc.item is None
-           and (loc.type not in {LocationType.Pot, LocationType.Drop, LocationType.Normal} or not loc.forced_item)
+           and (loc.type not in {LocationType.Bonk, LocationType.Pot, LocationType.Drop, LocationType.Normal} or not loc.forced_item)
            and (loc.type != LocationType.Shop or world.shopsanity[player])
            and loc.parent_region.dungeon):
                 total_count += 1
@@ -482,18 +482,22 @@ def calc_trash_locations(world, player):
 
 def ensure_good_pots(world, write_skips=False):
     for loc in world.get_locations():
-        # convert Arrows 5 and Nothing when necessary
-        if (loc.item.name in {'Arrows (5)', 'Nothing'}
+        # # convert Arrows 5 when necessary
+        # if (loc.item.name in {'Arrows (5)'}
+        #    and loc.type not in [LocationType.Pot, LocationType.Bonk]):
+        #     loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
+        # convert Nothing when necessary
+        if (loc.item.name in {'Nothing'}
            and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
-        # can be placed here by multiworld balancing or shop balancing
-        # change it to something normal for the player it got swapped to
-        elif (loc.item.name in {'Chicken', 'Big Magic'}
-              and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
-                if loc.type == LocationType.Pot:
-                    loc.item.player = loc.player
-                else:
-                    loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
+        # # can be placed here by multiworld balancing or shop balancing
+        # # change it to something normal for the player it got swapped to
+        # elif (loc.item.name in {'Chicken', 'Big Magic'}
+        #       and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
+        #         if loc.type == LocationType.Pot:
+        #             loc.item.player = loc.player
+        #         else:
+        #             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
         # do the arrow retro check
         if world.retro[loc.item.player] and loc.item.name in {'Arrows (5)', 'Arrows (10)'}:
             loc.item = ItemFactory('Rupees (5)', loc.item.player)
