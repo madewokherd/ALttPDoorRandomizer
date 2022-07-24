@@ -167,6 +167,10 @@
     "action": "store_true",
     "type": "bool"
   },
+  "bonk_drops": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "ow_fluteshuffle": {
     "choices": [
       "vanilla",

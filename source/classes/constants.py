@@ -81,6 +81,7 @@ SETTINGSTOPROCESS = {
       "keepsimilar": "ow_keepsimilar",
       "mixed": "ow_mixed",
       "whirlpool": "ow_whirlpool",
+      "bonk_drops": "bonk_drops",
       "overworldflute": "ow_fluteshuffle"
     },
     "entrance": {

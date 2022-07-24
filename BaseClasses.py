@@ -54,7 +54,7 @@ class World(object):
         self._entrance_cache = {}
         self._location_cache = {}
         self.required_locations = []
-        self.shuffle_bonk_prizes = False
+        self.shuffle_bonk_drops = {}
         self.light_world_light_cone = False
         self.dark_world_light_cone = False
         self.clock_mode = 'none'

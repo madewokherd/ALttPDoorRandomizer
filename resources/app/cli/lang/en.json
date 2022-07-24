@@ -234,6 +234,9 @@
     "ow_whirlpool": [
       "Whirlpools will be shuffled and paired together."
     ],
+    "bonk_drops": [
+      "Bonk drops from trees, rocks, and statues are shuffled with the item pool."
+    ],
     "ow_fluteshuffle": [
       "This randomizes the flute spot destinations.",
       "Vanilla:        All flute spots remain unchanged.",

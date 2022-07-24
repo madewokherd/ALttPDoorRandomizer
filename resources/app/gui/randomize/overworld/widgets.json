@@ -1,4 +1,10 @@
 {
+  "topOverworldFrame": {
+    "bonk_drops": {
+      "type": "checkbox",
+      "default": false
+    }
+  },
   "leftOverworldFrame": {
     "overworldshuffle": {
       "type": "selectbox",
