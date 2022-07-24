@@ -827,7 +827,7 @@ def default_rules(world, player):
     if world.shuffle_bonk_drops[player]:
         if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
             from Regions import bonk_prize_table
-            for location_name, (_, aga_required, _, _, _) in bonk_prize_table.items():
+            for location_name, (_, _, aga_required, _, _, _) in bonk_prize_table.items():
                 loc = world.get_location(location_name, player)
                 set_rule(loc, lambda state: (state.can_collect_bonkdrops(player)) and (not aga_required or state.has_beaten_aga(player)))
                 add_bunny_rule(loc, player)

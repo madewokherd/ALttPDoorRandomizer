@@ -929,14 +929,22 @@ async def track_locations(ctx : Context, roomid, roomdata):
     ow_unchecked = {}
     for location, screenid in location_table_ow.items():
         if location not in ctx.locations_checked:
-            ow_unchecked[location] = screenid
+            ow_unchecked[location] = (screenid, 0x40)
+            ow_begin = min(ow_begin, screenid)
+            ow_end = max(ow_end, screenid + 1)
+    from Regions import bonk_prize_table
+    from OWEdges import OWTileRegions
+    for location, (_, flag, _, _, region_name, _) in bonk_prize_table.items():
+        if location not in ctx.locations_checked:
+            screenid = OWTileRegions[region_name]
+            ow_unchecked[location] = (screenid, flag)
             ow_begin = min(ow_begin, screenid)
             ow_end = max(ow_end, screenid + 1)
     if ow_begin < ow_end:
         ow_data = await snes_read(ctx, SAVEDATA_START + 0x280 + ow_begin, ow_end - ow_begin)
         if ow_data is not None:
-            for location, screenid in ow_unchecked.items():
-                if ow_data[screenid - ow_begin] & 0x40 != 0:
+            for location, (screenid, flag) in ow_unchecked.items():
+                if ow_data[screenid - ow_begin] & flag != 0:
                     new_check(location)
 
     if not all([location in ctx.locations_checked for location in location_table_npc.keys()]):

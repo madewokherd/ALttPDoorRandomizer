@@ -507,7 +507,7 @@ def create_dynamic_shop_locations(world, player):
 
 def create_dynamic_bonkdrop_locations(world, player):
     from Regions import bonk_prize_table
-    for bonk_location, (_, _, _, region_name, hint_text) in bonk_prize_table.items():
+    for bonk_location, (_, _, _, _, region_name, hint_text) in bonk_prize_table.items():
         region = world.get_region(region_name, player)
         loc = Location(player, bonk_location, 0, region, hint_text)
         loc.type = LocationType.Bonk
