@@ -829,7 +829,10 @@ def default_rules(world, player):
             from Regions import bonk_prize_table
             for location_name, (_, _, aga_required, _, _, _) in bonk_prize_table.items():
                 loc = world.get_location(location_name, player)
-                set_rule(loc, lambda state: (state.can_collect_bonkdrops(player)) and (not aga_required or state.has_beaten_aga(player)))
+                if not aga_required:
+                    set_rule(loc, lambda state: state.can_collect_bonkdrops(player))
+                else:
+                    set_rule(loc, lambda state: state.can_collect_bonkdrops(player) and state.has_beaten_aga(player))
                 add_bunny_rule(loc, player)
     
     # Entrance Access
