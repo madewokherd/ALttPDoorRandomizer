@@ -364,10 +364,11 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
                     pot_item_pool[player].append(item)
                     break
         
+    from Regions import bonk_prize_table
     for player, magic_pool in pot_item_pool.items():
         world.itempool.remove(magic_pool[0])
-        pot_locations = [location for location in fill_locations
-                        if location.type == LocationType.Bonk and location.player == player]
+        pot_locations = [location for location in fill_locations if location.player == player
+                and location.name in [n for n, (_, _, aga, _, _, _) in bonk_prize_table.items() if not aga]]
         pot_locations = filter_pot_locations(pot_locations, world)
         fast_fill_helper(world, magic_pool, pot_locations)
         pots_used = True
