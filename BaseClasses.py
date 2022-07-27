@@ -3141,7 +3141,7 @@ class Spoiler(object):
                     outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
                     outfile.write('Experimental:'.ljust(line_width) + '%s\n' % yn(self.metadata['experimental'][player]))
                 outfile.write('Dungeon Counters:'.ljust(line_width) + '%s\n' % self.metadata['dungeon_counters'][player])
-                outfile.write('Drop Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['dropshuffle'][player]))
+                outfile.write('Enemy Drop Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['dropshuffle'][player]))
                 outfile.write('Pottery Mode:'.ljust(line_width) + '%s\n' % self.metadata['pottery'][player])
                 outfile.write('Pot Shuffle (Legacy):'.ljust(line_width) + '%s\n' % yn(self.metadata['potshuffle'][player]))
                 outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['mapshuffle'][player]))
