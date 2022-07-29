@@ -385,7 +385,7 @@ OWBonkDrops:
     ; loop thru rando bonk table to find match
     PHB : PHK : PLB
     LDA.b $8A
-    LDX.b #(40*6) ; 40 bonk items, 6 bytes each
+    LDX.b #(41*6) ; 41 bonk items, 6 bytes each
     - CMP.w OWBonkPrizeData,X : BNE +
         INX
         LDA.w $0D10,Y : LSR A : LSR A : LSR A : LSR A
@@ -1311,6 +1311,47 @@ db 0, 0, 0, 0, 0, 0, 0, 0
 
 db 0, 0
 
+;================================================================================
+; Bonk Prize Data ($AABB00 - $AABBFB)
+;--------------------------------------------------------------------------------
+; This table stores data relating to bonk locations for Bonk Drop Shuffle
+; 
+; Example: We can use OWBonkPrizeTable[$09].loot to read what item is in the
+; east tree on the Sanctuary screen
+;--------------------------------------------------------------------------------
+; Search Criteria - The following two fields are used as a unique index
+; .owid         = OW screen ID 
+; .yx           = Y & X coordinate data *see below*
+; 
+; .flag         = OW event flag bitmask
+; .loot         = Loot ID
+; .mw_player    = Multiworld player ID
+; .vert_offset  = Vertical offset, # of pixels the sprite moves up when activated
+;
+; .yx field is a combination of both the least significant digits of the Y and X
+; coordinates of the static location of the sprite located in a bonk location.
+; All sprites, when initialized, are aligned by a 16 pixel increment.
+; The coordinate system in LTTP is handled by two bytes:
+;        (high)             (low)
+;   - - - w  w w w s   s s s s  s s s s
+;   w = world absolute coords, every screen is $200 pixels in each dimension
+;   s = local screen coords, coords relative to the bounds of the current screen
+; Because of the 16 pixel alignment of sprites, the last four bits of the coords
+; are unset. This leaves 5 bits remaining, we simply disregard the highest bit
+; and then combine the Y and X coords together to be used as search criteria.
+; This does open the possibility of a false positive match from 3 other coords
+; on the same screen (15 on megatile screens) but there are no bonk sprites that
+; have collision in this regard.
+;--------------------------------------------------------------------------------
+struct OWBonkPrizeTable $AABB00
+    .owid: skip 1
+    .yx: skip 1
+    .flag: skip 1
+    .loot: skip 1
+    .mw_player: skip 1
+    .vert_offset: skip 1
+endstruct align 6
+
 org $aabb00 ;PC 153b00
 OWBonkPrizeData:
 ; OWID  YX  Flag  Item  MW Offset
@@ -1330,7 +1371,7 @@ db $18, $a8, $10, $b2, $00, $20
 db $18, $36, $08, $35, $00, $20
 db $1a, $8a, $10, $42, $00, $20
 db $1a, $1d, $08, $b2, $00, $20
-;db $1a, $77, $04, $35, $00, $20  ; pre aga ONLY ; hijacked murahdahla bonk tree
+db $ff, $77, $04, $35, $00, $20  ; pre aga ONLY ; hijacked murahdahla bonk tree
 db $1b, $46, $10, $b1, $00, $10
 db $1d, $6b, $10, $b1, $00, $20
 db $1e, $72, $10, $b2, $00, $20
