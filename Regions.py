@@ -1312,7 +1312,7 @@ bonk_prize_table = {
     'Hype Cave Statue':                 (0x29, 0x10, False, '', 'Hype Cave Area',                 'encased in stone')
 }
 
-bonk_table_by_location_id = {0x153B00+(data[0]*6)+3: name for name, data in bonk_prize_table.items()}
+bonk_table_by_location_id = {0x2ABB00+(data[0]*6)+3: name for name, data in bonk_prize_table.items()}
 bonk_table_by_location = {y: x for x, y in bonk_table_by_location_id.items()}
 
 

@@ -360,18 +360,18 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     for player in range(1, world.players + 1):
         if world.shuffle_bonk_drops[player]:
             for item in world.itempool:
-                if item.name in ['Big Magic']:
+                if item.name in ['Big Magic'] and item.player == player:
                     pot_item_pool[player].append(item)
                     break
-        
     from Regions import bonk_prize_table
     for player, magic_pool in pot_item_pool.items():
-        world.itempool.remove(magic_pool[0])
-        pot_locations = [location for location in fill_locations if location.player == player
-                and location.name in [n for n, (_, _, aga, _, _, _) in bonk_prize_table.items() if not aga]]
-        pot_locations = filter_pot_locations(pot_locations, world)
-        fast_fill_helper(world, magic_pool, pot_locations)
-        pots_used = True
+        if len(magic_pool) > 0:
+            world.itempool.remove(magic_pool[0])
+            pot_locations = [location for location in fill_locations if location.player == player
+                    and location.name in [n for n, (_, _, aga, _, _, _) in bonk_prize_table.items() if not aga]]
+            pot_locations = filter_pot_locations(pot_locations, world)
+            fast_fill_helper(world, magic_pool, pot_locations)
+            pots_used = True
     
     if pots_used:
         fill_locations = world.get_unfilled_locations()
