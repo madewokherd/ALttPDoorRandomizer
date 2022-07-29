@@ -1072,7 +1072,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_byte(cr_pc+0x1f, thousands_bot)
             # modify stat config
             stat_address = 0x23B969
-            stat_pc = snes_to_pc(stat_address)
+            owr_difference = 0x26 # can't remember why there is a difference between DR fork
+            stat_pc = snes_to_pc(stat_address - owr_difference)
             rom.write_byte(stat_pc, 0xa9)  # change to pos 21 (from b1)
             rom.write_byte(stat_pc+2, 0xc0)  # change to 12 bits (from a0)
             rom.write_byte(stat_pc+3, 0x80)  # change to four digits (from 60)
