@@ -355,18 +355,24 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     # handle pot shuffle
     pots_used = False
     pot_item_pool = collections.defaultdict(list)
-    for item in world.itempool:
-        if item.name in ['Chicken', 'Big Magic']:  # can only fill these in that players world
-            pot_item_pool[item.player].append(item)
-    for player, pot_pool in pot_item_pool.items():
-        if pot_pool:
-            for pot_item in pot_pool:
-                world.itempool.remove(pot_item)
-            pot_locations = [location for location in fill_locations
-                             if location.type == LocationType.Pot and location.player == player]
+
+    # guarantee one big magic in a bonk location
+    for player in range(1, world.players + 1):
+        if world.shuffle_bonk_drops[player]:
+            for item in world.itempool:
+                if item.name in ['Big Magic'] and item.player == player:
+                    pot_item_pool[player].append(item)
+                    break
+    from Regions import bonk_prize_table
+    for player, magic_pool in pot_item_pool.items():
+        if len(magic_pool) > 0:
+            world.itempool.remove(magic_pool[0])
+            pot_locations = [location for location in fill_locations if location.player == player
+                    and location.name in [n for n, (_, _, aga, _, _, _) in bonk_prize_table.items() if not aga]]
             pot_locations = filter_pot_locations(pot_locations, world)
-            fast_fill_helper(world, pot_pool, pot_locations)
+            fast_fill_helper(world, magic_pool, pot_locations)
             pots_used = True
+    
     if pots_used:
         fill_locations = world.get_unfilled_locations()
         random.shuffle(fill_locations)
@@ -466,7 +472,7 @@ def calc_trash_locations(world, player):
     total_count, gt_count = 0, 0
     for loc in world.get_locations():
         if (loc.player == player and loc.item is None
-           and (loc.type not in {LocationType.Pot, LocationType.Drop, LocationType.Normal} or not loc.forced_item)
+           and (loc.type not in {LocationType.Bonk, LocationType.Pot, LocationType.Drop, LocationType.Normal} or not loc.forced_item)
            and (loc.type != LocationType.Shop or world.shopsanity[player])
            and loc.parent_region.dungeon):
                 total_count += 1
@@ -477,18 +483,22 @@ def calc_trash_locations(world, player):
 
 def ensure_good_pots(world, write_skips=False):
     for loc in world.get_locations():
-        # convert Arrows 5 and Nothing when necessary
-        if (loc.item.name in {'Arrows (5)', 'Nothing'}
+        # # convert Arrows 5 when necessary
+        # if (loc.item.name in {'Arrows (5)'}
+        #    and loc.type not in [LocationType.Pot, LocationType.Bonk]):
+        #     loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
+        # convert Nothing when necessary
+        if (loc.item.name in {'Nothing'}
            and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
-        # can be placed here by multiworld balancing or shop balancing
-        # change it to something normal for the player it got swapped to
-        elif (loc.item.name in {'Chicken', 'Big Magic'}
-              and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
-                if loc.type == LocationType.Pot:
-                    loc.item.player = loc.player
-                else:
-                    loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
+        # # can be placed here by multiworld balancing or shop balancing
+        # # change it to something normal for the player it got swapped to
+        # elif (loc.item.name in {'Chicken', 'Big Magic'}
+        #       and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
+        #         if loc.type == LocationType.Pot:
+        #             loc.item.player = loc.player
+        #         else:
+        #             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
         # do the arrow retro check
         if world.retro[loc.item.player] and loc.item.name in {'Arrows (5)', 'Arrows (10)'}:
             loc.item = ItemFactory('Rupees (5)', loc.item.player)
@@ -820,7 +830,12 @@ def balance_money_progression(world):
         return False
 
     done = False
+    attempts = world.players * 20 + 20
     while not done:
+        attempts -= 1
+        if attempts < 0:
+            from DungeonGenerator import GenerationException
+            raise GenerationException(f'Infinite loop detected at "balance_money_progression"')
         sphere_costs = {player: 0 for player in range(1, world.players+1)}
         locked_by_money = {player: set() for player in range(1, world.players+1)}
         sphere_locations = get_sphere_locations(state, unchecked_locations)

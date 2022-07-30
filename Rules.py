@@ -54,7 +54,7 @@ def set_rules(world, player):
 
     if world.goal[player] == 'dungeons':
         # require all dungeons to beat ganon
-        add_rule(world.get_location('Ganon', player), lambda state: state.can_reach('Master Sword Pedestal', 'Location', player) and state.has('Beat Agahnim 1', player) and state.has('Beat Agahnim 2', player) and state.has_crystals(7, player))
+        add_rule(world.get_location('Ganon', player), lambda state: state.can_reach('Master Sword Pedestal', 'Location', player) and state.has_beaten_aga(player) and state.has('Beat Agahnim 2', player) and state.has_crystals(7, player))
     elif world.goal[player] == 'ganon':
         # require aga2 to beat ganon
         add_rule(world.get_location('Ganon', player), lambda state: state.has('Beat Agahnim 2', player))
@@ -356,7 +356,7 @@ def global_rules(world, player):
             # byrna could work with sufficient magic
     set_rule(world.get_location('Misery Mire - Spike Chest', player), lambda state: (state.world.can_take_damage and state.has_hearts(player, 4)) or state.has('Cane of Byrna', player) or state.has('Cape', player))
     loc = world.get_location('Misery Mire - Spikes Pot Key', player)
-    if loc.pot.x == 48 and loc.pot.y == 28:  # pot shuffled to spike area
+    if loc.pot is not None and loc.pot.x == 48 and loc.pot.y == 28:  # pot shuffled to spike area
         set_rule(loc, lambda state: (state.world.can_take_damage and state.has_hearts(player, 4)) or state.has('Cane of Byrna', player) or state.has('Cape', player))
     set_rule(world.get_entrance('Mire Left Bridge Hook Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire Tile Room NW', player), lambda state: state.has_fire_source(player))
@@ -807,7 +807,7 @@ def pot_rules(world, player):
 
 
 def default_rules(world, player):
-    set_rule(world.get_entrance('Other World S&Q', player), lambda state: state.has_Mirror(player) and state.has('Beat Agahnim 1', player))
+    set_rule(world.get_entrance('Other World S&Q', player), lambda state: state.has_Mirror(player) and state.has_beaten_aga(player))
 
     # Underworld Logic
     set_rule(world.get_entrance('Old Man Cave Exit (West)', player), lambda state: False)  # drop cannot be climbed up
@@ -823,8 +823,20 @@ def default_rules(world, player):
     set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     
+    # Bonk Item Access
+    if world.shuffle_bonk_drops[player]:
+        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+            from Regions import bonk_prize_table
+            for location_name, (_, _, aga_required, _, _, _) in bonk_prize_table.items():
+                loc = world.get_location(location_name, player)
+                if not aga_required:
+                    set_rule(loc, lambda state: state.can_collect_bonkdrops(player))
+                else:
+                    set_rule(loc, lambda state: state.can_collect_bonkdrops(player) and state.has_beaten_aga(player))
+                add_bunny_rule(loc, player)
+    
     # Entrance Access
-    set_rule(world.get_entrance('Lumberjack Tree Tree', player), lambda state: state.has_Boots(player) and state.has('Beat Agahnim 1', player))
+    set_rule(world.get_entrance('Lumberjack Tree Tree', player), lambda state: state.has_Boots(player) and state.has_beaten_aga(player))
     set_rule(world.get_entrance('Bonk Rock Cave', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Sanctuary Grave', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Kings Grave', player), lambda state: state.has_Boots(player))
@@ -950,7 +962,7 @@ def ow_rules(world, player):
     if world.is_atgt_swapped(player):
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
     else:
-        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
+        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player) or state.has_beaten_aga(player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
         set_rule(world.get_entrance('GT Entry Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
         set_rule(world.get_entrance('GT Entry Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'))
 
@@ -1109,7 +1121,7 @@ def ow_rules(world, player):
     if not world.is_tile_swapped(0x1b, player):
         set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Inverted Pyramid Entrance', player), lambda state: False)
-        set_rule(world.get_entrance('Pyramid Hole', player), lambda state: world.open_pyramid[player] or state.has('Beat Agahnim 2', player))
+        set_rule(world.get_entrance('Pyramid Hole', player), lambda state: world.is_pyramid_open(player) or state.has('Beat Agahnim 2', player))
         
         set_rule(world.get_entrance('HC Area Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('HC Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -1117,8 +1129,8 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('HC East Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('HC Courtyard Left Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('HC Area South Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has('Beat Agahnim 1', player))
-        set_rule(world.get_entrance('Top of Pyramid (Inner)', player), lambda state: state.has('Beat Agahnim 1', player))
+        set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has_beaten_aga(player))
+        set_rule(world.get_entrance('Top of Pyramid (Inner)', player), lambda state: state.has_beaten_aga(player))
     else:
         set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: world.is_pyramid_open(player) or state.has('Beat Agahnim 2', player))
         set_rule(world.get_entrance('Pyramid Hole', player), lambda state: False)
@@ -1130,7 +1142,7 @@ def ow_rules(world, player):
         set_rule(world.get_entrance('Pyramid Uncle Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Pyramid From Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Pyramid Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Post Aga Inverted Teleporter', player), lambda state: state.has('Beat Agahnim 1', player))
+        set_rule(world.get_entrance('Post Aga Inverted Teleporter', player), lambda state: state.has_beaten_aga(player))
         
     if not world.is_tile_swapped(0x1d, player):
         set_rule(world.get_entrance('Wooden Bridge Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -1620,7 +1632,7 @@ def swordless_rules(world, player):
     set_rule(world.get_entrance('Ganon Drop', player), lambda state: state.has('Hammer', player))  # need to damage ganon to get tiles to drop
     
     if not world.is_atgt_swapped(player):
-        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has('Beat Agahnim 1', player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
+        set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has_beaten_aga(player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
 
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_misery_mire_medallion(player))   # sword not required to use medallion for opening in swordless (!)
     set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_turtle_rock_medallion(player) and state.can_reach('Turtle Rock Ledge', 'Region', player))   # sword not required to use medallion for opening in swordless (!)
@@ -1730,6 +1742,11 @@ def standard_rules(world, player):
     add_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has('Zelda Delivered', player))
     add_rule(world.get_entrance('Hyrule Castle Ledge Drop', player), lambda state: state.has('Zelda Delivered', player))
     add_rule(world.get_entrance('Bonk Fairy (Light)', player), lambda state: state.has('Zelda Delivered', player))
+
+    if world.shuffle_bonk_drops[player]:
+        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+            add_rule(world.get_location('Hyrule Castle Tree', player), lambda state: state.has('Zelda Delivered', player))
+            add_rule(world.get_location('Central Bonk Rocks Tree', player), lambda state: state.has('Zelda Delivered', player))
 
     # don't allow bombs to get past here before zelda is rescued
     set_rule(world.get_entrance('GT Hookshot South Entry to Ranged Crystal', player), lambda state: (state.can_use_bombs(player) and state.has('Zelda Delivered', player)) or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player))  # or state.has('Cane of Somaria', player))

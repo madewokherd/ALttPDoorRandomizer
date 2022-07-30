@@ -3,11 +3,12 @@ import logging
 import math
 import RaceRandom as random
 
-from BaseClasses import Region, RegionType, Shop, ShopType, Location, CollectionState, PotItem
+from BaseClasses import LocationType, Region, RegionType, Shop, ShopType, Location, CollectionState, PotItem
 from EntranceShuffle import connect_entrance
 from Regions import shop_to_location_table, retro_shops, shop_table_by_location, valid_pot_location
 from Fill import FillError, fill_restrictive, fast_fill, get_dungeon_item_pool
 from PotShuffle import vanilla_pots
+from Tables import bonk_prize_lookup
 from Items import ItemFactory
 
 from source.item.FillUtil import trash_items, pot_items
@@ -411,6 +412,10 @@ def generate_itempool(world, player):
     if world.pottery[player] not in ['none', 'keys']:
         add_pot_contents(world, player)
 
+    if world.shuffle_bonk_drops[player]:
+        create_dynamic_bonkdrop_locations(world, player)
+        add_bonkdrop_contents(world, player)
+
 
 take_any_locations = [
     'Snitch Lady (East)', 'Snitch Lady (West)', 'Bush Covered House', 'Light World Bomb Hut',
@@ -498,6 +503,21 @@ def create_dynamic_shop_locations(world, player):
                         world.push_item(loc, ItemFactory(item['item'], player), False)
                         loc.event = True
                         loc.locked = True
+
+
+def create_dynamic_bonkdrop_locations(world, player):
+    from Regions import bonk_prize_table
+    for bonk_location, (_, _, _, _, region_name, hint_text) in bonk_prize_table.items():
+        region = world.get_region(region_name, player)
+        loc = Location(player, bonk_location, 0, region, hint_text)
+        loc.type = LocationType.Bonk
+        loc.parent_region = region
+        loc.address = 0x2abb00 + (bonk_prize_table[loc.name][0] * 6) + 3
+
+        region.locations.append(loc)
+        world.dynamic_locations.append(loc)
+
+        world.clear_location_cache()
 
 
 def fill_prizes(world, attempts=15):
@@ -777,6 +797,17 @@ def add_pot_contents(world, player):
                     item = ('Rupees (5)' if world.retro[player] and pot_items[pot.item] == 'Arrows (5)'
                             else pot_items[pot.item])
                     world.itempool.append(ItemFactory(item, player))
+
+
+def add_bonkdrop_contents(world, player):
+    from Items import item_table
+    for item_name, (_, count, alt_item) in bonk_prize_lookup.items():
+        if item_name not in item_table:
+            item_name = alt_item
+        while (count > 0):
+            item = ItemFactory(item_name, player)
+            world.itempool.append(item)
+            count -= 1
 
 
 def get_pool_core(progressive, shuffle, difficulty, treasure_hunt_total, timer, goal, mode, swords, retro, bombbag, door_shuffle, logic, flute_activated):

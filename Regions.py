@@ -1266,7 +1266,57 @@ def pot_address(pot_index, super_tile):
     return 0x7f6018 + super_tile * 2 + (pot_index << 24)
 
 
-# (type, room_id, shopkeeper, custom, locked, [items])
+# bonk location: record id, OW flag bitmask, aga required, default item, region, hint text
+bonk_prize_table = {
+    'Lost Woods Hideout Tree':          (0x00, 0x10, False, '', 'Lost Woods East Area',           'in a tree'),
+    'Death Mountain Bonk Rocks':        (0x01, 0x10, False, '', 'East Death Mountain (Top East)', 'encased in stone'),
+    'Mountain Entry Pull Tree':         (0x02, 0x10, False, '', 'Mountain Entry Area',            'in a tree'),
+    'Mountain Entry Southeast Tree':    (0x03, 0x08, False, '', 'Mountain Entry Area',            'in a tree'),
+    'Lost Woods Pass West Tree':        (0x04, 0x10, False, '', 'Lost Woods Pass West Area',      'in a tree'),
+    'Kakariko Portal Tree':             (0x05, 0x08, False, '', 'Lost Woods Pass East Top Area',  'in a tree'),
+    'Fortune Bonk Rocks':               (0x06, 0x10, False, '', 'Kakariko Fortune Area',          'in a tree'),
+    'Kakariko Pond Tree':               (0x07, 0x10, True,  '', 'Kakariko Pond Area',             'in a tree'),
+    'Bonk Rocks Tree':                  (0x08, 0x10, True,  '', 'Bonk Rock Ledge',                'in a tree'),
+    'Sanctuary Tree':                   (0x09, 0x08, False, '', 'Sanctuary Area',                 'in a tree'),
+    'River Bend West Tree':             (0x0a, 0x10, True,  '', 'River Bend Area',                'in a tree'),
+    'River Bend East Tree':             (0x0b, 0x08, False, '', 'River Bend East Bank',           'in a tree'),
+    'Blinds Hideout Tree':              (0x0c, 0x10, False, '', 'Kakariko Area',                  'in a tree'),
+    'Kakariko Welcome Tree':            (0x0d, 0x08, False, '', 'Kakariko Area',                  'in a tree'),
+    'Forgotten Forest Southwest Tree':  (0x0e, 0x10, False, '', 'Forgotten Forest Area',          'in a tree'),
+    'Forgotten Forest Central Tree':    (0x0f, 0x08, False, '', 'Forgotten Forest Area',          'in a tree'),
+    #'Forgotten Forest Southeast Tree':  (0x10, 0x04, False, '', 'Forgotten Forest Area',          'in a tree'),
+    'Hyrule Castle Tree':               (0x11, 0x10, False, '', 'Hyrule Castle Courtyard',        'in a tree'),
+    'Wooden Bridge Tree':               (0x12, 0x10, False, '', 'Wooden Bridge Area',             'in a tree'),
+    'Eastern Palace Tree':              (0x13, 0x10, True,  '', 'Eastern Palace Area',            'in a tree'),
+    'Flute Boy South Tree':             (0x14, 0x10, True,  '', 'Flute Boy Area',                 'in a tree'),
+    'Flute Boy East Tree':              (0x15, 0x08, True,  '', 'Flute Boy Area',                 'in a tree'),
+    'Central Bonk Rocks Tree':          (0x16, 0x10, False, '', 'Central Bonk Rocks Area',        'in a tree'),
+    'Tree Line Tree 2':                 (0x17, 0x10, True,  '', 'Tree Line Area',                 'in a tree'),
+    'Tree Line Tree 4':                 (0x18, 0x08, True,  '', 'Tree Line Area',                 'in a tree'),
+    'Flute Boy Approach South Tree':    (0x19, 0x10, False, '', 'Flute Boy Approach Area',        'in a tree'),
+    'Flute Boy Approach North Tree':    (0x1a, 0x08, False, '', 'Flute Boy Approach Area',        'in a tree'),
+    'Dark Lumberjack Tree':             (0x1b, 0x10, False, '', 'Dark Lumberjack Area',           'in a tree'),
+    'Dark Fortune Bonk Rocks (Drop 1)': (0x1c, 0x10, False, '', 'Dark Fortune Area',              'encased in stone'),
+    'Dark Fortune Bonk Rocks (Drop 2)': (0x1d, 0x08, False, '', 'Dark Fortune Area',              'encased in stone'),
+    'Dark Graveyard West Bonk Rocks':   (0x1e, 0x10, False, '', 'Dark Graveyard Area',            'encased in stone'),
+    'Dark Graveyard North Bonk Rocks':  (0x1f, 0x08, False, '', 'Dark Graveyard North',           'encased in stone'),
+    'Dark Graveyard Tomb Bonk Rocks':   (0x20, 0x04, False, '', 'Dark Graveyard North',           'encased in stone'),
+    'Qirn Jump West Tree':              (0x21, 0x10, False, '', 'Qirn Jump Area',                 'in a tree'),
+    'Qirn Jump East Tree':              (0x22, 0x08, False, '', 'Qirn Jump East Bank',            'in a tree'),
+    'Dark Witch Tree':                  (0x23, 0x10, False, '', 'Dark Witch Area',                'in a tree'),
+    'Pyramid Tree':                     (0x24, 0x10, False, '', 'Pyramid Area',                   'in a tree'),
+    'Palace of Darkness Tree':          (0x25, 0x10, False, '', 'Palace of Darkness Area',        'in a tree'),
+    'Dark Tree Line Tree 2':            (0x26, 0x10, False, '', 'Dark Tree Line Area',            'in a tree'),
+    'Dark Tree Line Tree 3':            (0x27, 0x08, False, '', 'Dark Tree Line Area',            'in a tree'),
+    'Dark Tree Line Tree 4':            (0x28, 0x04, False, '', 'Dark Tree Line Area',            'in a tree'),
+    'Hype Cave Statue':                 (0x29, 0x10, False, '', 'Hype Cave Area',                 'encased in stone')
+}
+
+bonk_table_by_location_id = {0x2ABB00+(data[0]*6)+3: name for name, data in bonk_prize_table.items()}
+bonk_table_by_location = {y: x for x, y in bonk_table_by_location_id.items()}
+
+
+# (room_id, type, shopkeeper, custom, locked, [items])
 # item = (item, price, max=0, replacement=None, replacement_price=0)
 _basic_shop_defaults = [('Red Potion', 150), ('Small Heart', 10), ('Bombs (10)', 50)]
 _dark_world_shop_defaults = [('Red Potion', 150), ('Blue Shield', 50), ('Bombs (10)', 50)]
@@ -1615,5 +1665,7 @@ location_table = {'Mushroom': (0x180013, 0x186338, False, 'in the woods'),
 
 lookup_id_to_name = {data[0]: name for name, data in location_table.items() if type(data[0]) == int}
 lookup_id_to_name.update(shop_table_by_location_id)
+lookup_id_to_name.update(bonk_table_by_location_id)
 lookup_name_to_id = {name: data[0] for name, data in location_table.items() if type(data[0]) == int}
 lookup_name_to_id.update(shop_table_by_location)
+lookup_name_to_id.update(bonk_table_by_location)

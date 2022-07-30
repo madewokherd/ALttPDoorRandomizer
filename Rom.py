@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '210e4631353e3d094f01bf91562844a5'
+RANDOMIZERBASEHASH = '0574a782e225a87b90637db0847c5ae0'
 
 
 class JsonRom(object):
@@ -630,6 +630,14 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 rom.write_byte(sprite_pointer+1, 0)
             rom.write_byte(sprite_pointer+2, code)
             continue
+        elif location.type == LocationType.Bonk:
+            address = snes_to_pc(location.address)
+            rom.write_byte(address, handle_native_dungeon(location, itemid))
+            if location.item.player != player:
+                rom.write_byte(address+1, location.item.player)
+            else:
+                rom.write_byte(address+1, 0)
+            continue
         if location.address is None or (type(location.address) is int and location.address >= 0x400000):
             continue
 
@@ -771,18 +779,42 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
                 # set world flag
                 world_flag = 0x00 if b >= 0x40 and b < 0x80 else 0x40
-                rom.write_byte(0x153A00 + b, world_flag)
+                rom.write_byte(0x1539B0 + b, world_flag)
                 if b & 0xBF in megatiles:
-                    rom.write_byte(0x153A00 + b + 1, world_flag)
-                    rom.write_byte(0x153A00 + b + 8, world_flag)
-                    rom.write_byte(0x153A00 + b + 9, world_flag)
+                    rom.write_byte(0x1539B0 + b + 1, world_flag)
+                    rom.write_byte(0x1539B0 + b + 8, world_flag)
+                    rom.write_byte(0x1539B0 + b + 9, world_flag)
 
         for edge in world.owedges:
             if edge.dest is not None and isinstance(edge.dest, OWEdge) and edge.player == player:
                 write_int16(rom, edge.getAddress() + 0x0a, edge.vramLoc)
                 if not edge.specialExit:
-                    rom.write_byte(0x1539e0 + (edge.specialID - 0x80) * 2 if edge.specialEntrance else edge.getAddress() + 0x0e, edge.getTarget())
+                    rom.write_byte(0x1539A0 + (edge.specialID - 0x80) * 2 if edge.specialEntrance else edge.getAddress() + 0x0e, edge.getTarget())
     
+    # patch bonk prizes
+    if world.shuffle_bonk_drops[player]:
+        bonk_prizes = [0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xAC, 0xE3, 0xE3, 0xDA, 0xE3, 0xDA, 0xD8, 0xAC, 0xAC, 0xE3, 0xD8, 0xE3, 0xE3, 0xE3, 0xE3, 0xE3, 0xE3, 0xDC, 0xDB, 0xE3, 0xDA, 0x79, 0x79, 0xE3, 0xE3,
+                    0xDA, 0x79, 0xAC, 0xAC, 0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xE3, 0x79, 0xDE, 0xE3, 0xAC, 0xDB, 0x79, 0xE3, 0xD8, 0xAC, 0x79, 0xE3, 0xDB, 0xDB, 0xE3, 0xE3, 0x79, 0xD8, 0xDD]
+        bonk_addresses = [0x4CF6C, 0x4CFBA, 0x4CFE0, 0x4CFFB, 0x4D018, 0x4D01B, 0x4D028, 0x4D03C, 0x4D059, 0x4D07A, 0x4D09E, 0x4D0A8, 0x4D0AB, 0x4D0AE, 0x4D0BE, 0x4D0DD,
+                        0x4D16A, 0x4D1E5, 0x4D1EE, 0x4D20B, 0x4CBBF, 0x4CBBF, 0x4CC17, 0x4CC1A, 0x4CC4A, 0x4CC4D, 0x4CC53, 0x4CC69, 0x4CC6F, 0x4CC7C, 0x4CCEF, 0x4CD51,
+                        0x4CDC0, 0x4CDC3, 0x4CDC6, 0x4CE37, 0x4D2DE, 0x4D32F, 0x4D355, 0x4D367, 0x4D384, 0x4D387, 0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
+                        0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3, 0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
+        
+        # # legacy bonk prize shuffle, shuffles bonk prizes amongst themselves
+        # random.shuffle(bonk_prizes)
+        # for prize, address in zip(bonk_prizes, bonk_addresses):
+        #     rom.write_byte(address, prize)
+
+        owFlags |= 0x200
+
+        # setting spriteID to D8, a placeholder sprite we use to inform ROM to spawn a dynamic item
+        #for address in bonk_addresses:
+        for address in [b for b in bonk_addresses if b != 0x4D0AE]: # temp fix for screen 1A murahdahla sprite replacement
+            rom.write_byte(address, 0xD8)
+        # temporary fix for screen 1A
+        rom.write_byte(snes_to_pc(0x09AE32), 0xD8)
+        rom.write_byte(snes_to_pc(0x09AE35), 0xD8)
+
     write_int16(rom, 0x150002, owMode)
     write_int16(rom, 0x150004, owFlags)
 
@@ -875,6 +907,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     valid_locations = [l for l in my_locations if ((l.type == LocationType.Pot and not l.forced_item)
                                                    or (l.type == LocationType.Drop and not l.forced_item)
                                                    or (l.type == LocationType.Normal and not l.forced_item)
+                                                   or (l.type == LocationType.Bonk and not l.forced_item)
                                                    or (l.type == LocationType.Shop and world.shopsanity[player]))]
     valid_loc_by_dungeon = valid_dungeon_locations(valid_locations)
 
@@ -1039,7 +1072,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             rom.write_byte(cr_pc+0x1f, thousands_bot)
             # modify stat config
             stat_address = 0x23B969
-            stat_pc = snes_to_pc(stat_address)
+            owr_difference = 0x26 # can't remember why there is a difference between DR fork
+            stat_pc = snes_to_pc(stat_address - owr_difference)
             rom.write_byte(stat_pc, 0xa9)  # change to pos 21 (from b1)
             rom.write_byte(stat_pc+2, 0xc0)  # change to 12 bits (from a0)
             rom.write_byte(stat_pc+3, 0x80)  # change to four digits (from 60)
@@ -1251,18 +1285,6 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # fill enemy prize packs
     rom.write_bytes(0x37A78, pack_prizes)
 
-    # set bonk prizes
-    bonk_prizes = [0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xAC, 0xE3, 0xE3, 0xDA, 0xE3, 0xDA, 0xD8, 0xAC, 0xAC, 0xE3, 0xD8, 0xE3, 0xE3, 0xE3, 0xE3, 0xE3, 0xE3, 0xDC, 0xDB, 0xE3, 0xDA, 0x79, 0x79, 0xE3, 0xE3,
-                   0xDA, 0x79, 0xAC, 0xAC, 0x79, 0xE3, 0x79, 0xAC, 0xAC, 0xE0, 0xDC, 0xE3, 0x79, 0xDE, 0xE3, 0xAC, 0xDB, 0x79, 0xE3, 0xD8, 0xAC, 0x79, 0xE3, 0xDB, 0xDB, 0xE3, 0xE3, 0x79, 0xD8, 0xDD]
-    bonk_addresses = [0x4CF6C, 0x4CFBA, 0x4CFE0, 0x4CFFB, 0x4D018, 0x4D01B, 0x4D028, 0x4D03C, 0x4D059, 0x4D07A, 0x4D09E, 0x4D0A8, 0x4D0AB, 0x4D0AE, 0x4D0BE, 0x4D0DD,
-                      0x4D16A, 0x4D1E5, 0x4D1EE, 0x4D20B, 0x4CBBF, 0x4CBBF, 0x4CC17, 0x4CC1A, 0x4CC4A, 0x4CC4D, 0x4CC53, 0x4CC69, 0x4CC6F, 0x4CC7C, 0x4CCEF, 0x4CD51,
-                      0x4CDC0, 0x4CDC3, 0x4CDC6, 0x4CE37, 0x4D2DE, 0x4D32F, 0x4D355, 0x4D367, 0x4D384, 0x4D387, 0x4D397, 0x4D39E, 0x4D3AB, 0x4D3AE, 0x4D3D1, 0x4D3D7,
-                      0x4D3F8, 0x4D416, 0x4D420, 0x4D423, 0x4D42D, 0x4D449, 0x4D48C, 0x4D4D9, 0x4D4DC, 0x4D4E3, 0x4D504, 0x4D507, 0x4D55E, 0x4D56A]
-    if world.shuffle_bonk_prizes:
-        random.shuffle(bonk_prizes)
-    for prize, address in zip(bonk_prizes, bonk_addresses):
-        rom.write_byte(address, prize)
-
     # Fill in item substitutions table
     rom.write_bytes(0x184000, [
         # original_item, limit, replacement_item, filler
@@ -1390,7 +1412,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x50563, [0x3F, 0x14]) # disable below ganon chest
     rom.write_byte(0x50599, 0x00) # disable below ganon chest
     rom.write_bytes(0xE9A5, [0x7E, 0x00, 0x24]) # disable below ganon chest
-    if world.open_pyramid[player]:
+    if world.is_pyramid_open(player):
         rom.initial_sram.pre_open_pyramid_hole()
     if world.crystals_needed_for_gt[player] == 0:
         rom.initial_sram.pre_open_ganons_tower()
@@ -1643,6 +1665,13 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # powder patch: remove the need to leave the screen after powder, since it causes problems for potion shop at race game
     # temporarally we are just nopping out this check we will conver this to a rom fix soon.
     rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
+
+    # sprite patches
+    rom.write_byte(snes_to_pc(0x0DB7D1), 0x03) # patch apple sprites to not permadeatch like enemies
+    rom.write_byte(snes_to_pc(0x0DB4F8), 0x40) # patch apples to not prevent kill rooms from opening
+    if world.shuffle_bonk_drops[player]:
+        # warning, this temporary patch might cause fairies to respawn differently?, limiting this to bonk drop mode only
+        rom.write_byte(snes_to_pc(0x0DB808), 0x03) # patch fairies sprites to not permadeath like enemies
 
     # allow smith into multi-entrance caves in appropriate shuffles
     if world.shuffle[player] in ['restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
@@ -2754,7 +2783,7 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
     
     # apply inverted map changes
     for b in range(0x00, len(inverted_buffer)):
-        rom.write_byte(0x153B00 + b, inverted_buffer[b])
+        rom.write_byte(0x153A70 + b, inverted_buffer[b])
     
 def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc = world.get_region('Dark Sanctuary Hint', player)

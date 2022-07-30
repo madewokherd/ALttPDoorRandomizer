@@ -91,6 +91,7 @@ def main(args, seed=None, fish=None):
     world.owKeepSimilar = args.ow_keepsimilar.copy()
     world.owWhirlpoolShuffle = args.ow_whirlpool.copy()
     world.owFluteShuffle = args.ow_fluteshuffle.copy()
+    world.shuffle_bonk_drops = args.bonk_drops.copy()
     world.open_pyramid = args.openpyramid.copy()
     world.boss_shuffle = args.shufflebosses.copy()
     world.enemy_shuffle = args.shuffleenemies.copy()
@@ -138,10 +139,7 @@ def main(args, seed=None, fish=None):
             world.player_names[player].append(name)
     logger.info('')
     
-    if world.owShuffle[1] != 'vanilla' or world.owCrossed[1] not in ['none', 'polar'] or world.owMixed[1] or world.owWhirlpoolShuffle[1] or world.owFluteShuffle[1] != 'vanilla' or str(args.outputname).startswith('M'):
-        outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
-    else:
-        outfilebase = f'DR_{args.outputname if args.outputname else world.seed}'
+    outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
 
     for player in range(1, world.players + 1):
         world.difficulty_requirements[player] = difficulties[world.difficulty[player]]
@@ -159,7 +157,7 @@ def main(args, seed=None, fish=None):
     if args.create_spoiler and not args.jsonout:
         logger.info(world.fish.translate("cli", "cli", "create.meta"))
         world.spoiler.meta_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
-    if args.mystery and not args.suppress_meta:
+    if args.mystery and not (args.suppress_meta or args.create_spoiler):
         world.spoiler.mystery_meta_to_file(output_path(f'{outfilebase}_meta.txt'))
 
     for player in range(1, world.players + 1):
@@ -358,7 +356,7 @@ def main(args, seed=None, fish=None):
                 with open(output_path('%s_multidata' % outfilebase), 'wb') as f:
                     f.write(multidata)
 
-    if args.mystery and not args.suppress_meta:
+    if args.mystery and not (args.suppress_meta or args.create_spoiler):
         world.spoiler.hashes_to_file(output_path(f'{outfilebase}_meta.txt'))
     elif args.create_spoiler and not args.jsonout:
         world.spoiler.hashes_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
@@ -438,6 +436,7 @@ def copy_world(world, partial_copy=False):
     ret.owKeepSimilar = world.owKeepSimilar.copy()
     ret.owWhirlpoolShuffle = world.owWhirlpoolShuffle.copy()
     ret.owFluteShuffle = world.owFluteShuffle.copy()
+    ret.shuffle_bonk_drops = world.shuffle_bonk_drops.copy()
     ret.open_pyramid = world.open_pyramid.copy()
     ret.boss_shuffle = world.boss_shuffle.copy()
     ret.enemy_shuffle = world.enemy_shuffle.copy()

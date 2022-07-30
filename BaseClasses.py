@@ -54,7 +54,7 @@ class World(object):
         self._entrance_cache = {}
         self._location_cache = {}
         self.required_locations = []
-        self.shuffle_bonk_prizes = False
+        self.shuffle_bonk_drops = {}
         self.light_world_light_cone = False
         self.dark_world_light_cone = False
         self.clock_mode = 'none'
@@ -1080,6 +1080,9 @@ class CollectionState(object):
                 return True
         return False
 
+    def can_collect_bonkdrops(self, player):
+        return self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))
+
     def can_farm_rupees(self, player):
         tree_pulls = ['Lost Woods East Area',
                     'Snitch Lady (East)',
@@ -1110,7 +1113,7 @@ class CollectionState(object):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
-            if not self.has('Beat Agahnim 1', player):
+            if not self.has_beaten_aga(player):
                 for region in pre_aga_tree_pulls:
                     if can_reach_non_bunny(region):
                         return True
@@ -1125,7 +1128,7 @@ class CollectionState(object):
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
                         return True
-                if not self.has('Beat Agahnim 1', player):
+                if not self.has_beaten_aga(player):
                     for region in pre_aga_bush_crabs:
                         if can_reach_non_bunny(region):
                             return True
@@ -1192,7 +1195,7 @@ class CollectionState(object):
                 if can_reach_non_bunny(region):
                     return True
 
-        if self.has_Boots(player):
+        if not self.world.shuffle_bonk_drops[player] and self.can_collect_bonkdrops(player):
             for region in bonk_bombs:
                 if can_reach_non_bunny(region):
                     return True
@@ -1202,7 +1205,7 @@ class CollectionState(object):
             for region in tree_pulls:
                 if can_reach_non_bunny(region):
                     return True
-            if not self.has('Beat Agahnim 1', player):
+            if not self.has_beaten_aga(player):
                 for region in pre_aga_tree_pulls:
                     if can_reach_non_bunny(region):
                         return True
@@ -1217,7 +1220,7 @@ class CollectionState(object):
                 for region in bush_crabs:
                     if can_reach_non_bunny(region):
                         return True
-                if not self.has('Beat Agahnim 1', player):
+                if not self.has_beaten_aga(player):
                     for region in pre_aga_bush_crabs:
                         if can_reach_non_bunny(region):
                             return True
@@ -1342,6 +1345,9 @@ class CollectionState(object):
             cave.can_reach(self) and
             self.is_not_bunny(cave, player)
         )
+
+    def has_beaten_aga(self, player):
+        return self.has('Beat Agahnim 1', player) and (self.world.mode[player] != 'standard' or self.has('Zelda Delivered', player))
 
     def has_sword(self, player):
         return self.has('Fighter Sword', player) or self.has('Master Sword', player) or self.has('Tempered Sword', player) or self.has('Golden Sword', player)
@@ -1600,7 +1606,7 @@ class Region(object):
     def can_reach(self, state):
         from Utils import stack_size3a
         from DungeonGenerator import GenerationException
-        if stack_size3a() > 500:
+        if stack_size3a() > self.world.players * 500:
             raise GenerationException(f'Infinite loop detected for "{self.name}" located at \'Region.can_reach\'')
         
         if state.stale[self.player]:
@@ -2693,6 +2699,7 @@ class LocationType(FastEnum):
     Shop = 3
     Pot = 4
     Drop = 5
+    Bonk = 6
 
 
 class Item(object):
@@ -2908,6 +2915,7 @@ class Spoiler(object):
                          'ow_mixed': self.world.owMixed,
                          'ow_whirlpool': self.world.owWhirlpoolShuffle,
                          'ow_fluteshuffle': self.world.owFluteShuffle,
+                         'bonk_drops': self.world.shuffle_bonk_drops,
                          'shuffle': self.world.shuffle,
                          'shuffleganon': self.world.shuffle_ganon,
                          'shufflelinks': self.world.shufflelinks,
@@ -3120,6 +3128,7 @@ class Spoiler(object):
                 outfile.write('Swapped OW (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
                 outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
+                outfile.write('Bonk Drops:'.ljust(line_width) + '%s\n' % yn(self.metadata['bonk_drops'][player]))
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 if self.metadata['shuffle'][player] != 'vanilla':
                     outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
@@ -3132,7 +3141,7 @@ class Spoiler(object):
                     outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
                     outfile.write('Experimental:'.ljust(line_width) + '%s\n' % yn(self.metadata['experimental'][player]))
                 outfile.write('Dungeon Counters:'.ljust(line_width) + '%s\n' % self.metadata['dungeon_counters'][player])
-                outfile.write('Drop Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['dropshuffle'][player]))
+                outfile.write('Enemy Drop Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['dropshuffle'][player]))
                 outfile.write('Pottery Mode:'.ljust(line_width) + '%s\n' % self.metadata['pottery'][player])
                 outfile.write('Pot Shuffle (Legacy):'.ljust(line_width) + '%s\n' % yn(self.metadata['potshuffle'][player]))
                 outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['mapshuffle'][player]))
