@@ -1667,10 +1667,11 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
 
     # sprite patches
-    rom.write_byte(snes_to_pc(0x0db7d1), 0x03) # patch apple sprites to not permadeatch like enemies
+    rom.write_byte(snes_to_pc(0x0DB7D1), 0x03) # patch apple sprites to not permadeatch like enemies
+    rom.write_byte(snes_to_pc(0x0DB4F8), 0x40) # patch apples to not prevent kill rooms from opening
     if world.shuffle_bonk_drops[player]:
         # warning, this temporary patch might cause fairies to respawn differently?, limiting this to bonk drop mode only
-        rom.write_byte(snes_to_pc(0x0db808), 0x03) # patch fairies sprites to not permadeatch like enemies
+        rom.write_byte(snes_to_pc(0x0DB808), 0x03) # patch fairies sprites to not permadeath like enemies
 
     # allow smith into multi-entrance caves in appropriate shuffles
     if world.shuffle[player] in ['restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
