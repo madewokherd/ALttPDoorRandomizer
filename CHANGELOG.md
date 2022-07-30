@@ -1,5 +1,12 @@
 # Changelog
 
+### 0.2.9.0
+- Added Bonk Drop Shuffle
+- Fixed disappearing mirror portal issue in Inverted+Crossed OWR
+- Fixed 4-digit collection rate in credits
+- Fixed Ganon vulnerability to reference Aga2 boss flag rather than pyramid hole
+- Fixed issue with pre-opened pyramid when not expected
+
 ### 0.2.8.0
 - ~Merged DR v1.0.1.0 - Pottery options, BPS support, MSU Resume, Collection Rate Counter~
 - Various improvements to increase generation success rate and reduce generation time
