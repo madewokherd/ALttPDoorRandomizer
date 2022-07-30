@@ -1606,7 +1606,7 @@ class Region(object):
     def can_reach(self, state):
         from Utils import stack_size3a
         from DungeonGenerator import GenerationException
-        if stack_size3a() > 500:
+        if stack_size3a() > self.world.players * 500:
             raise GenerationException(f'Infinite loop detected for "{self.name}" located at \'Region.can_reach\'')
         
         if state.stale[self.player]:
