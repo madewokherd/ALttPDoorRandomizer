@@ -6,8 +6,10 @@ from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 from Utils import bidict
 
-version_number = '0.2.9.0'
+version_number = '0.2.9.1'
+# branch indicator is intentionally different across branches
 version_branch = '-u'
+
 __version__ = '%s%s' % (version_number, version_branch)
 
 def link_overworld(world, player):
