@@ -20,7 +20,6 @@
       "default": "vanilla",
       "options": [
         "none",
-        "allowed",
         "polar",
         "grouped",
         "limited",
