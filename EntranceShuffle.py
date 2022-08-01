@@ -73,7 +73,7 @@ def link_entrances(world, player):
 
     # if we do not shuffle, set default connections
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-        for entrancename, exitname in default_connections + drop_connections + default_item_connections + default_shop_connections:
+        for entrancename, exitname in default_connections + default_pot_connections + drop_connections + default_item_connections + default_shop_connections:
             connect_logical(world, entrancename, exitname, player, exitname.endswith(' Exit'))
         for entrancename, exitname in default_connector_connections + dropexit_connections:
             connect_logical(world, entrancename, exitname, player, True)
@@ -341,7 +341,7 @@ def link_entrances(world, player):
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
     elif world.shuffle[player] == 'lite':
-        for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections):
+        for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections) + ([] if world.pottery[player] not in ['none', 'keys', 'dungeon'] else default_pot_connections):
             connect_logical(world, entrancename, exitname, player, False)
         if invFlag:
             world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance('Dark Sanctuary Hint', player).parent_region)
@@ -433,7 +433,7 @@ def link_entrances(world, player):
         # place remaining doors
         connect_doors(world, list(entrance_pool), list(exit_pool), player)
     elif world.shuffle[player] == 'lean':
-        for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections):
+        for entrancename, exitname in default_connections + ([] if world.shopsanity[player] else default_shop_connections) + ([] if world.pottery[player] not in ['none', 'keys', 'dungeon'] else default_pot_connections):
             connect_logical(world, entrancename, exitname, player, False)
         if invFlag:
             world.get_entrance('Dark Sanctuary Hint Exit', player).connect(world.get_entrance('Dark Sanctuary Hint', player).parent_region)
@@ -1356,7 +1356,7 @@ def place_links_house(world, player, ignore_list=[]):
         else:
             links_house_doors = [i for i in get_starting_entrances(world, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
         if world.shuffle[player] in ['lite', 'lean']:
-            links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
+            links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []) + (default_pot_connections if world.pottery[player] not in ['none', 'keys', 'dungeon'] else []))))[0]]
         
         #TODO: Need to improve Links House placement to choose a better sector or eliminate entrances that are after ledge drops
         links_house_doors = [e for e in links_house_doors if e not in ignore_list]
@@ -1404,7 +1404,7 @@ def place_blacksmith(world, links_house, player):
         sanc_region = world.get_entrance('Sanctuary Exit', player).connected_region.name
         blacksmith_doors = list(OrderedDict.fromkeys(blacksmith_doors + list(build_accessible_entrance_list(world, sanc_region, player, assumed_inventory, False, True, True))))
     if world.shuffle[player] in ['lite', 'lean']:
-        blacksmith_doors = [e for e in blacksmith_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []))))[0]]
+        blacksmith_doors = [e for e in blacksmith_doors if e in list(zip(*(default_item_connections + (default_shop_connections if world.shopsanity[player] else []) + (default_pot_connections if world.pottery[player] not in ['none', 'keys', 'dungeon'] else []))))[0]]
     
     assert len(blacksmith_doors), 'No valid candidates to place Blacksmiths Hut'
     blacksmith_hut = random.choice(blacksmith_doors)
@@ -1472,7 +1472,7 @@ def junk_fill_inaccessible(world, player):
                 if not exit.connected_region and exit.name in entrance_pool:
                     inaccessible_entrances.append(exit.name)
 
-    junk_locations = [e for e in list(zip(*default_connections))[1] if e in exit_pool]
+    junk_locations = [e for e in list(zip(*(default_connections + ([] if world.pottery[player] not in ['none', 'keys', 'dungeon'] else default_pot_connections))))[1] if e in exit_pool]
     random.shuffle(junk_locations)
     for entrance in inaccessible_entrances:
         connect_entrance(world, entrance, junk_locations.pop(), player)
@@ -2089,40 +2089,42 @@ mandatory_connections = [('Old Man S&Q', 'Old Man House'),
                     ]
 
 # non-shuffled entrance links
-default_connections = [('Lumberjack House', 'Lumberjack House'),
-                       ('Bonk Fairy (Light)', 'Bonk Fairy (Light)'),
+default_connections = [('Bonk Fairy (Light)', 'Bonk Fairy (Light)'),
                        ('Lake Hylia Fairy', 'Lake Hylia Healer Fairy'),
                        ('Lake Hylia Fortune Teller', 'Lake Hylia Fortune Teller'),
                        ('Light Hype Fairy', 'Swamp Healer Fairy'),
                        ('Desert Fairy', 'Desert Healer Fairy'),
                        ('Lost Woods Gamble', 'Lost Woods Gamble'),
                        ('Fortune Teller (Light)', 'Fortune Teller (Light)'),
-                       ('Snitch Lady (East)', 'Snitch Lady (East)'),
-                       ('Snitch Lady (West)', 'Snitch Lady (West)'),
                        ('Bush Covered House', 'Bush Covered House'),
-                       ('Tavern (Front)', 'Tavern (Front)'),
-                       ('Light World Bomb Hut', 'Light World Bomb Hut'),
                        ('Long Fairy Cave', 'Long Fairy Cave'),  # near East Light World Teleporter
                        ('Good Bee Cave', 'Good Bee Cave'),
-                       ('20 Rupee Cave', '20 Rupee Cave'),
-                       ('50 Rupee Cave', '50 Rupee Cave'),
                        ('Kakariko Gamble Game', 'Kakariko Gamble Game'),
-                       ('Hookshot Fairy', 'Hookshot Fairy'),
                        
                        ('East Dark World Hint', 'East Dark World Hint'),
-                       ('Palace of Darkness Hint', 'Palace of Darkness Hint'),
                        ('Dark Lake Hylia Fairy', 'Dark Lake Hylia Healer Fairy'),
                        ('Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Healer Fairy'),
-                       ('Dark Lake Hylia Ledge Spike Cave', 'Dark Lake Hylia Ledge Spike Cave'),
                        ('Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Hint'),
                        ('Bonk Fairy (Dark)', 'Bonk Fairy (Dark)'),
                        ('Dark Sanctuary Hint', 'Dark Sanctuary Hint'),
                        ('Fortune Teller (Dark)', 'Fortune Teller (Dark)'),
                        ('Archery Game', 'Archery Game'),
-                       ('Dark Desert Hint', 'Dark Desert Hint'),
                        ('Dark Desert Fairy', 'Dark Desert Healer Fairy'),
                        ('Dark Death Mountain Fairy', 'Dark Death Mountain Healer Fairy'),
                     ]
+
+default_pot_connections = [('Lumberjack House', 'Lumberjack House'),
+                           ('Snitch Lady (East)', 'Snitch Lady (East)'),
+                           ('Snitch Lady (West)', 'Snitch Lady (West)'),
+                           ('Tavern (Front)', 'Tavern (Front)'),
+                           ('Light World Bomb Hut', 'Light World Bomb Hut'),
+                           ('20 Rupee Cave', '20 Rupee Cave'),
+                           ('50 Rupee Cave', '50 Rupee Cave'),
+                           ('Hookshot Fairy', 'Hookshot Fairy'),
+                           ('Palace of Darkness Hint', 'Palace of Darkness Hint'),
+                           ('Dark Lake Hylia Ledge Spike Cave', 'Dark Lake Hylia Ledge Spike Cave'),
+                           ('Dark Desert Hint', 'Dark Desert Hint')
+                        ]
 
 default_connector_connections = [('Old Man Cave (West)', 'Old Man Cave Exit (West)'),
                                  ('Old Man Cave (East)', 'Old Man Cave Exit (East)'),

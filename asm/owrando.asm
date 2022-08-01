@@ -270,11 +270,11 @@ OWMirrorSpriteRestore:
 }
 OWLightWorldOrCrossed:
 {
-    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq +
+    lda.l OWMode+1 : and.b #!FLAG_OW_CROSSED : beq ++
         lda.l InvertedMode : beq +
-            lda #$40 : rtl
-        + lda #$00 : rtl
-    + jsl OWWorldCheck : rtl
+            lda #$40
+        + rtl
+    ++ jsl OWWorldCheck : rtl
 }
 
 OWFluteCancel:

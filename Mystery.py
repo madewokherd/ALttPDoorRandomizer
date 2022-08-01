@@ -168,7 +168,9 @@ def roll_settings(weights):
 
     overworld_shuffle = get_choice('overworld_shuffle')
     ret.ow_shuffle = overworld_shuffle if overworld_shuffle != 'none' else 'vanilla'
+    valid_options = {'none', 'polar', 'grouped', 'limited', 'chaos'}
     ret.ow_crossed = get_choice('overworld_crossed')
+    ret.ow_crossed = ret.ow_crossed if ret.ow_crossed in valid_options else 'none'
     ret.ow_keepsimilar = get_choice('overworld_keepsimilar') == 'on'
     ret.ow_mixed = get_choice('overworld_swap') == 'on'
     ret.ow_whirlpool = get_choice('whirlpool_shuffle') == 'on'

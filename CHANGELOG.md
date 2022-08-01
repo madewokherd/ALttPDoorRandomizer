@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.2.9.1
+- Lite/Lean ER now includes Cave Pot locations with various Pottery options
+- Changed Unique Boss Shuffle so that GT Bosses are unique amongst themselves
+- Changed MSU-1 in Inverted to trigger DW2 track with Aga1 kill and LW2 with 7 crystals
+- Fixed disappearing mirror portal issue in Inverted (Hopefully for good)
+- Fixed issue with TR Peg Puzzle not spawning portal in some Mixed OWR scenarios
+- Removed ability to roll Myserty with phantom Crossed OWR options
+
 ### 0.2.9.0
 - Added Bonk Drop Shuffle
 - Fixed disappearing mirror portal issue in Inverted+Crossed OWR
