@@ -21,12 +21,12 @@ def set_rules(world, player):
 
     global_rules(world, player)
     default_rules(world, player)
-    ow_rules(world, player)
+    ow_inverted_rules(world, player)
 
     ow_bunny_rules(world, player)
 
     if world.mode[player] == 'standard':
-        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+        if not world.is_copied_world:
             standard_rules(world, player)
     elif world.mode[player] == 'open' or world.mode[player] == 'inverted':
         open_rules(world, player)
@@ -805,7 +805,6 @@ def pot_rules(world, player):
                 add_rule(l, lambda state: state.can_hit_crystal(player))
 
 
-
 def default_rules(world, player):
     set_rule(world.get_entrance('Other World S&Q', player), lambda state: state.has_Mirror(player) and state.has_beaten_aga(player))
 
@@ -825,7 +824,7 @@ def default_rules(world, player):
     
     # Bonk Item Access
     if world.shuffle_bonk_drops[player]:
-        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+        if not world.is_copied_world:
             from Regions import bonk_prize_table
             for location_name, (_, _, aga_required, _, _, _) in bonk_prize_table.items():
                 loc = world.get_location(location_name, player)
@@ -958,7 +957,7 @@ def default_rules(world, player):
         swordless_rules(world, player)
 
 
-def ow_rules(world, player):
+def ow_inverted_rules(world, player):
     if world.is_atgt_swapped(player):
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
     else:
@@ -1481,7 +1480,7 @@ def no_glitches_rules(world, player):
     #     add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: False)  # no glitches does not require block override
     forbid_bomb_jump_requirements(world, player)
-    if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent underworld rules from applying when trying to search reachability in the overworld
+    if not world.is_copied_world:
         add_conditional_lamps(world, player)
 
 
@@ -1744,7 +1743,7 @@ def standard_rules(world, player):
     add_rule(world.get_entrance('Bonk Fairy (Light)', player), lambda state: state.has('Zelda Delivered', player))
 
     if world.shuffle_bonk_drops[player]:
-        if world.get_region('Big Bomb Shop', player).entrances: # just some location that is placed late in the ER algorithm, prevent standard rules from applying when trying to search reachability in the overworld
+        if not world.is_copied_world:
             add_rule(world.get_location('Hyrule Castle Tree', player), lambda state: state.has('Zelda Delivered', player))
             add_rule(world.get_location('Central Bonk Rocks Tree', player), lambda state: state.has('Zelda Delivered', player))
 

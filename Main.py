@@ -557,6 +557,7 @@ def copy_world(world, partial_copy=False):
     if partial_copy:
         # undo some of the things that unintentionally affect the original world object
         world.key_logic = {}
+        ret.is_copied_world = True
 
     return ret
 

@@ -62,6 +62,8 @@ class World(object):
         self.aga_randomness = True
         self.lock_aga_door_in_escape = False
         self.save_and_quit_from_boss = True
+        self.override_bomb_check = False
+        self.is_copied_world = False
         self.accessibility = accessibility.copy()
         self.fix_skullwoods_exit = {}
         self.fix_palaceofdarkness_exit = {}
@@ -1306,7 +1308,7 @@ class CollectionState(object):
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2)) and ((hasattr(self.world,"override_bomb_check") and self.world.override_bomb_check) or self.can_farm_bombs(player))
+        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2)) and (self.world.override_bomb_check or self.can_farm_bombs(player))
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)
