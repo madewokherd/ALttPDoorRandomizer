@@ -425,11 +425,15 @@ def link_overworld(world, player):
                 if not ignore_proximity and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
                     return False
                 ignored_regions.update(new_ignored)
-            flute_pool.remove(owid)
-            if ignore_proximity:
-                logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
-            logging.getLogger('').debug(f'Placing flute at: {hex(owid)}')
-            new_spots.append(owid)
+            if owid in flute_pool:
+                flute_pool.remove(owid)
+                if ignore_proximity:
+                    logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
+                logging.getLogger('').debug(f'Placing flute at: {hex(owid)}')
+                new_spots.append(owid)
+            else:
+                # TODO: Inspect later, seems to happen only with 'random' flute shuffle
+                logging.getLogger('').warning(f'Warning: Attempted to place flute spot not in pool: {hex(owid)}')
             return True
         
         # determine sectors (isolated groups of regions) to place flute spots
