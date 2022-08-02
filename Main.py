@@ -621,13 +621,14 @@ def copy_world_limited(world):
     for player in range(1, world.players + 1):
         create_regions(ret, player)
         update_world_regions(ret, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(ret, player)
         create_flute_exits(ret, player)
         create_dungeon_regions(ret, player)
         create_shops(ret, player)
+        create_doors(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(ret, player)
 
     for player in range(1, world.players + 1):
         if world.mode[player] == 'standard':
@@ -644,7 +645,7 @@ def copy_world_limited(world):
         copied_region.is_light_world = region.is_light_world
         copied_region.is_dark_world = region.is_dark_world
         copied_region.dungeon = region.dungeon
-        copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations]
+        copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations if (location.name, location.player) in copied_locations]
         for location in copied_region.locations:
             location.parent_region = copied_region
         for entrance in region.entrances:
@@ -654,12 +655,10 @@ def copy_world_limited(world):
         ret.push_precollected(ItemFactory(item.name, item.player))
 
     ret.owedges = world.owedges.copy()
-    ret.doors = world.doors.copy()
     for door in ret.doors:
         entrance = ret.check_for_entrance(door.name, door.player)
         if entrance is not None:
             entrance.door = door
-            door.entrance = entrance
     ret.key_logic = world.key_logic.copy()
 
     from OverworldShuffle import categorize_world_regions
