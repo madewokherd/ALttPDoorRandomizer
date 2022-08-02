@@ -3,6 +3,7 @@ from collections import defaultdict, OrderedDict
 import RaceRandom as random
 from BaseClasses import CollectionState, RegionType
 from OverworldShuffle import build_accessible_region_list
+from DoorShuffle import find_inaccessible_regions
 from OWEdges import OWTileRegions
 from Utils import stack_size3a
 
@@ -831,8 +832,6 @@ def connect_mandatory_exits(world, entrances, caves, must_be_exits, player, must
     """This works inplace"""
     random.shuffle(entrances)
     random.shuffle(caves)
-
-    from DoorShuffle import find_inaccessible_regions
     
     used_caves = []
     required_entrances = 0  # Number of entrances reserved for used_caves
@@ -1274,7 +1273,6 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
             dw_entrances.extend([e for e in dungeon_owid_map[owid][0] if e in entrance_pool])
     
     # determine must-exit entrances
-    from DoorShuffle import find_inaccessible_regions
     find_inaccessible_regions(world, player)
 
     lw_must_exit = list()
@@ -1442,13 +1440,12 @@ def place_old_man(world, pool, player, ignore_list=[]):
 
 
 def junk_fill_inaccessible(world, player):
-    from Main import copy_world
-    from DoorShuffle import find_inaccessible_regions
+    from Main import copy_world_limited
     find_inaccessible_regions(world, player)
 
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     base_world.override_bomb_check = True
     
     # remove regions that have a dungeon entrance
@@ -1488,7 +1485,6 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
     random.shuffle(lw_entrances)
     random.shuffle(dw_entrances)
 
-    from DoorShuffle import find_inaccessible_regions
     find_inaccessible_regions(world, player)
     
     # remove regions that have a dungeon entrance
@@ -1611,12 +1607,12 @@ def unbias_dungeons(Dungeon_Exits):
 
 
 def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True, include_one_ways=False):
-    from Main import copy_world
+    from Main import copy_world_limited
     from Items import ItemFactory
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     base_world.override_bomb_check = True
     
     connect_simple(base_world, 'Links House S&Q', start_region, player)
@@ -1719,13 +1715,12 @@ def get_distant_entrances(world, start_entrance, player):
 
 
 def can_reach(world, entrance_name, region_name, player):
-    from Main import copy_world
+    from Main import copy_world_limited
     from Items import ItemFactory
-    from DoorShuffle import find_inaccessible_regions
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     base_world.override_bomb_check = True
     
     entrance = world.get_entrance(entrance_name, player)

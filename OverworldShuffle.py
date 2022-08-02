@@ -289,6 +289,8 @@ def link_overworld(world, player):
         for whirlpools in whirlpool_candidates:
             random.shuffle(whirlpools)
             while len(whirlpools):
+                if len(whirlpools) % 2 == 1:
+                    x=0
                 from_owid, from_whirlpool, from_region = whirlpools.pop()
                 to_owid, to_whirlpool, to_region = whirlpools.pop()
                 connect_simple(world, from_whirlpool, to_region, player)
@@ -329,7 +331,7 @@ def link_overworld(world, player):
         # layout shuffle
         groups = adjust_edge_groups(world, trimmed_groups, edges_to_swap, player)
         
-        tries = 20
+        tries = 100
         valid_layout = False
         connected_edge_cache = connected_edges.copy()
         while not valid_layout and tries > 0:
@@ -426,6 +428,7 @@ def link_overworld(world, player):
             flute_pool.remove(owid)
             if ignore_proximity:
                 logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
+            logging.getLogger('').debug(f'Placing flute at: {hex(owid)}')
             new_spots.append(owid)
             return True
         
@@ -442,6 +445,7 @@ def link_overworld(world, player):
             sector_total -= 1
             spots_to_place = min(flute_spots - sector_total, max(1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
             target_spots = len(new_spots) + spots_to_place
+            logging.getLogger('').debug(f'Sector of {sector[0]} regions gets {spots_to_place} spot(s)')
             
             if 'Desert Palace Teleporter Ledge' in sector[1] or 'Misery Mire Teleporter Ledge' in sector[1]:
                 addSpot(0x38, False) # guarantee desert/mire access
@@ -878,13 +882,13 @@ def can_reach_smith(world, player):
     return found
 
 def build_sectors(world, player):
-    from Main import copy_world
+    from Main import copy_world_limited
     from OWEdges import OWTileRegions
     
     # perform accessibility check on duplicate world
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     
     # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
     regions = list(OWTileRegions.copy().keys())
@@ -928,11 +932,23 @@ def build_sectors(world, player):
                 sectors2.append(explored_regions)
         sectors[s] = sectors2
 
+    #TODO: Keep largest LW sector for Links House consideration, keep sector containing WDM for Old Man consideration
+    # sector_entrances = list()
+    # for sector in sectors:
+    #     entrances = list()
+    #     for s2 in sector:
+    #         for region_name in s2:
+    #             region = world.get_region(region_name, player)
+    #             for exit in region.exits:
+    #                 if exit.spot_type == 'Entrance' and exit.name in entrance_pool:
+    #                     entrances.append(exit.name)
+    #     sector_entrances.append(entrances)
+    
     return sectors
 
 def build_accessible_region_list(world, start_region, player, build_copy_world=False, cross_world=False, region_rules=True, ignore_ledges = False):
-    from Main import copy_world
     from BaseClasses import CollectionState
+    from Main import copy_world_limited
     from Items import ItemFactory
     from Utils import stack_size3a
     
@@ -959,7 +975,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     if build_copy_world:
         for p in range(1, world.players + 1):
             world.key_logic[p] = {}
-        base_world = copy_world(world, True)
+        base_world = copy_world_limited(world)
         base_world.override_bomb_check = True
     else:
         base_world = world
@@ -1015,7 +1031,7 @@ def validate_layout(world, player):
             entrance_connectors['Bumper Cave Entrance'] = ['West Dark Death Mountain (Bottom)']
         entrance_connectors['Mountain Entry Entrance'] = ['Mountain Entry Ledge']
     
-    from Main import copy_world
+    from Main import copy_world_limited
     from Utils import stack_size3a
     from EntranceShuffle import default_dungeon_connections, default_connector_connections, default_item_connections, default_shop_connections, default_drop_connections, default_dropexit_connections
     
@@ -1048,7 +1064,7 @@ def validate_layout(world, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:
