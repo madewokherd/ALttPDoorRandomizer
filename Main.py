@@ -659,6 +659,7 @@ def copy_world_limited(world):
         entrance = ret.check_for_entrance(door.name, door.player)
         if entrance is not None:
             entrance.door = door
+            door.entrance = entrance
     ret.key_logic = world.key_logic.copy()
 
     from OverworldShuffle import categorize_world_regions
