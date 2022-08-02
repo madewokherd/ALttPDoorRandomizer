@@ -629,10 +629,6 @@ def copy_world_limited(world):
         if world.logic[player] in ('owglitches', 'nologic'):
             create_owg_connections(ret, player)
 
-    # # there are region references here they must be migrated to preserve integrity
-    # # ret.exp_cache = world.exp_cache.copy()
-
-    # copy_dynamic_regions_and_locations(world, ret)
     for player in range(1, world.players + 1):
         if world.mode[player] == 'standard':
             parent = ret.get_region('Menu', player)
@@ -657,23 +653,13 @@ def copy_world_limited(world):
     for item in world.precollected_items:
         ret.push_precollected(ItemFactory(item.name, item.player))
 
-    # copy progress items in state
-    ret.state.prog_items = world.state.prog_items.copy()
-    ret.state.stale = {player: True for player in range(1, world.players + 1)}
-
     ret.owedges = world.owedges.copy()
     ret.doors = world.doors.copy()
     for door in ret.doors:
         entrance = ret.check_for_entrance(door.name, door.player)
         if entrance is not None:
             entrance.door = door
-    ret.paired_doors = world.paired_doors.copy()
-    ret.rooms = world.rooms.copy()
-    ret.inaccessible_regions = world.inaccessible_regions.copy()
-    ret.dungeon_layouts = world.dungeon_layouts.copy()
     ret.key_logic = world.key_logic.copy()
-    ret.dungeon_portals = world.dungeon_portals.copy()
-    ret.sanc_portal = world.sanc_portal.copy()
 
     from OverworldShuffle import categorize_world_regions
     for player in range(1, world.players + 1):
