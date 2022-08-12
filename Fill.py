@@ -750,12 +750,14 @@ def balance_multiworld_progression(world):
             raise RuntimeError('Not all required items reachable. Something went terribly wrong here.')
 
 
-def check_shop_swap(l):
+def check_shop_swap(l, make_item_free=False):
     if l.parent_region.name in shop_to_location_table:
         if l.name in shop_to_location_table[l.parent_region.name]:
             idx = shop_to_location_table[l.parent_region.name].index(l.name)
             inv_slot = l.parent_region.shop.inventory[idx]
             inv_slot['item'] = l.item.name
+            if make_item_free:
+                inv_slot['price'] = 0
     elif l.parent_region in retro_shops:
         idx = retro_shops[l.parent_region.name].index(l.name)
         inv_slot = l.parent_region.shop.inventory[idx]
@@ -921,12 +923,13 @@ def balance_money_progression(world):
                     if len(increase_targets) == 0:
                         raise Exception('No early sphere swaps for rupees - money grind would be required - bailing for now')
                     best_target = min(increase_targets, key=lambda t: rupee_chart[t.item.name] if t.item.name in rupee_chart else 0)
-                    old_value = rupee_chart[best_target.item.name] if best_target.item.name in rupee_chart else 0
+                    make_item_free = wallet[target_player] < 20
+                    old_value = 0 if make_item_free else (rupee_chart[best_target.item.name] if best_target.item.name in rupee_chart else 0)
                     if best_swap is None:
                         logger.debug(f'Upgrading {best_target.item.name} @ {best_target.name} for 300 Rupees')
                         best_target.item = ItemFactory('Rupees (300)', best_target.item.player)
                         best_target.item.location = best_target
-                        check_shop_swap(best_target.item.location)
+                        check_shop_swap(best_target.item.location, make_item_free)
                     else:
                         old_item = best_target.item
                         logger.debug(f'Swapping {best_target.item.name} @ {best_target.name} for {best_swap.item.name} @ {best_swap.name}')
@@ -934,7 +937,7 @@ def balance_money_progression(world):
                         best_target.item.location = best_target
                         best_swap.item = old_item
                         best_swap.item.location = best_swap
-                        check_shop_swap(best_target.item.location)
+                        check_shop_swap(best_target.item.location, make_item_free)
                         check_shop_swap(best_swap.item.location)
                     increase = best_value - old_value
                     difference -= increase
