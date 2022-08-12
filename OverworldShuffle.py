@@ -689,7 +689,7 @@ def define_tile_groups(world, player, do_grouped):
         # sanctuary/chapel should not be swapped if S+Q guaranteed to output on that screen
         if 0x13 in group and ((world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
                     and (world.mode[player] in ['standard', 'inverted'] or world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3)) \
-                or (world.shuffle[player] == 'lite' and world.mode[player] == 'inverted')):
+                or (world.shuffle[player] in ['lite', 'lean'] and world.mode[player] == 'inverted')):
             return False
         
         return True
