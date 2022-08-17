@@ -4,6 +4,8 @@ import RaceRandom as random
 import urllib.request
 import urllib.parse
 import yaml
+import os
+from pathlib import Path
 
 from DungeonRandomizer import parse_cli
 from Main import main as DRMain
@@ -107,10 +109,11 @@ def main():
 
 def get_weights(path):
     try:
-        if urllib.parse.urlparse(path).scheme:
+        if os.path.exists(Path(path)):
+            with open(path, "r", encoding="utf-8") as f:
+                return yaml.load(f, Loader=yaml.SafeLoader)
+        elif urllib.parse.urlparse(path).scheme in ['http', 'https']:
             return yaml.load(urllib.request.urlopen(path), Loader=yaml.FullLoader)
-        with open(path, 'r', encoding='utf-8') as f:
-            return yaml.load(f, Loader=yaml.SafeLoader)
     except Exception as e:
         raise Exception(f'Failed to read weights file: {e}')
 
