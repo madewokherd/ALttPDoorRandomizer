@@ -615,7 +615,7 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
         # tile shuffle happens here
         removed = list()
         for group in groups:
-            # if 0x1b in group[0] or (0x1a in group[0] and world.owCrossed[player] == 'none'): # TODO: Standard + Inverted
+            #if 0x1b in group[0] or 0x13 in group[0] or (0x1a in group[0] and world.owCrossed[player] == 'none'): # TODO: Standard + Inverted
             if random.randint(0, 1):
                 removed.append(group)
 
