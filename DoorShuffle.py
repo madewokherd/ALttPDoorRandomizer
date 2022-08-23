@@ -1896,9 +1896,9 @@ def find_inaccessible_regions(world, player):
         if any(x for x in ledge.exits if x.connected_region and x.connected_region.name == 'Agahnims Tower Portal'):
             world.inaccessible_regions[player].append('Hyrule Castle Ledge')
     logger = logging.getLogger('')
-    logger.debug('Inaccessible Regions:')
-    for r in world.inaccessible_regions[player]:
-        logger.debug('%s', r)
+    #logger.debug('Inaccessible Regions:')
+    #for r in world.inaccessible_regions[player]:
+    #    logger.debug('%s', r)
 
 
 def find_accessible_entrances(world, player, builder):
