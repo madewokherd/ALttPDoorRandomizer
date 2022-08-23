@@ -502,6 +502,7 @@ OWBonkDrops:
     .return
     PLA : PLA : PLB : RTL
 }
+nop
 
 org $aa9000
 OWDetectEdgeTransition:

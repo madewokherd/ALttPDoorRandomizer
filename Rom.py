@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '94a8df9d13105abcd655c7d59294ad20'
+RANDOMIZERBASEHASH = 'b1ded43b30364c3e5d9a94afa2f46599'
 
 
 class JsonRom(object):
