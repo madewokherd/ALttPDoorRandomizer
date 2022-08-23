@@ -32,7 +32,7 @@ def link_entrances(world, player):
     Cave_Three_Exits = Cave_Three_Exits_Base.copy()
 
     from OverworldShuffle import build_sectors
-    if not world.owsectors[player]:
+    if not world.owsectors[player] and world.shuffle[player] != 'vanilla':
         world.owsectors[player] = build_sectors(world, player)
 
     # modifications to lists
