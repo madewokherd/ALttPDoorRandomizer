@@ -627,6 +627,7 @@ def copy_world_limited(world):
         create_dungeon_regions(ret, player)
         create_owedges(ret, player)
         create_shops(ret, player)
+        create_doors(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
 
@@ -658,13 +659,15 @@ def copy_world_limited(world):
         copiededge = ret.check_for_owedge(edge.name, edge.player)
         if copiededge is not None:
             copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
-    # for door in world.doors:
-    #     entrance = ret.check_for_entrance(door.name, door.player)
-    #     if entrance is not None:
-    #         destdoor = ret.check_for_door(entrance.door.name, entrance.door.player)
-    #         entrance.door = destdoor
-    #         if destdoor is not None:
-    #             destdoor.entrance = entrance
+
+    for door in world.doors:
+        entrance = ret.check_for_entrance(door.name, door.player)
+        if entrance is not None:
+            destdoor = ret.check_for_door(entrance.door.name, entrance.door.player)
+            entrance.door = destdoor
+            if destdoor is not None:
+                destdoor.entrance = entrance
+
     ret.key_logic = world.key_logic.copy()
 
     from OverworldShuffle import categorize_world_regions

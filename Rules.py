@@ -341,7 +341,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Ice Palace - Freezor Chest', player), lambda state: state.can_melt_things(player))
     set_rule(world.get_entrance('Ice Hookshot Ledge Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Ice Hookshot Balcony Path', player), lambda state: state.has('Hookshot', player))
-    if not world.is_copied_world and not world.get_door('Ice Switch Room SE', player).entranceFlag:
+    if not world.get_door('Ice Switch Room SE', player).entranceFlag:
         set_rule(world.get_entrance('Ice Switch Room SE', player), lambda state: state.has('Cane of Somaria', player) or state.has('Convenient Block', player))
     set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Prize', player))
@@ -398,7 +398,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Hope Room EN', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('GT Conveyor Cross WN', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('GT Conveyor Cross EN', player), lambda state: state.has('Hookshot', player))
-    if not world.is_copied_world and not world.get_door('GT Speed Torch SE', player).entranceFlag:
+    if not world.get_door('GT Speed Torch SE', player).entranceFlag:
         set_rule(world.get_entrance('GT Speed Torch SE', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('GT Hookshot South-Mid Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('GT Hookshot Mid-North Path', player), lambda state: state.has('Hookshot', player))
@@ -421,7 +421,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Gauntlet 2 EN', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Gauntlet 2 SW', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Gauntlet 3 NW', player), lambda state: state.can_kill_most_things(player))
-    if not world.is_copied_world and not world.get_door('GT Gauntlet 3 SW', player).entranceFlag:
+    if not world.get_door('GT Gauntlet 3 SW', player).entranceFlag:
         set_rule(world.get_entrance('GT Gauntlet 3 SW', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Gauntlet 4 NW', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Gauntlet 4 SW', player), lambda state: state.can_kill_most_things(player))
@@ -441,11 +441,10 @@ def global_rules(world, player):
     set_defeat_dungeon_boss_rule(world.get_location('Agahnim 2', player))
 
     # crystal switch rules
-    if not world.is_copied_world:
-        if world.get_door('Thieves Attic ES', player).crystal == CrystalBarrier.Blue:
-            set_rule(world.get_entrance('Thieves Attic ES', player), lambda state: state.can_reach_blue(world.get_region('Thieves Attic', player), player))
-        else:
-            set_rule(world.get_entrance('Thieves Attic ES', player), lambda state: state.can_reach_orange(world.get_region('Thieves Attic', player), player))
+    if world.get_door('Thieves Attic ES', player).crystal == CrystalBarrier.Blue:
+        set_rule(world.get_entrance('Thieves Attic ES', player), lambda state: state.can_reach_blue(world.get_region('Thieves Attic', player), player))
+    else:
+        set_rule(world.get_entrance('Thieves Attic ES', player), lambda state: state.can_reach_orange(world.get_region('Thieves Attic', player), player))
     set_rule(world.get_entrance('Thieves Attic Orange Barrier', player), lambda state: state.can_reach_orange(world.get_region('Thieves Attic', player), player))
     set_rule(world.get_entrance('Thieves Attic Blue Barrier', player), lambda state: state.can_reach_blue(world.get_region('Thieves Attic', player), player))
 
