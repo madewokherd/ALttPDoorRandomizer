@@ -61,7 +61,7 @@ def fill_dungeons_restrictive(world, shuffled_locations):
     small_state_base = all_state_base.copy()
     for x in others:
         small_state_base.collect(x, True)
-    fill(small_state_base, smalls, smalls)
+    fill(small_state_base, smalls, list(smalls))
     random.shuffle(shuffled_locations)
     fill(all_state_base, others, None)
 
