@@ -184,10 +184,14 @@ Same as above but both small keys and bigs keys of the dungeon are not allowed o
 #### Unstable
 
 * 1.0.1.2
+  * Removed "good bee" as an in-logic way of killing Mothula
+  * Fixed an issue with Mystery generation and Windows path
   * Fixed an issue with small key bias rework
   * Fixed an issue where trinity goal would open pyramid unexpectedly. (No longer does so if ER mdoe is shuffling holes). Crystals goal updated to match that behavior.
   * Fixed a playthrough issue that was not respecting pot rules
   * Fixed an issue that was conflicting with downstream OWR project
+  * Fixed an issue with inverted and certain pottery settings
+  * Fixed an issue with small keys being shuffled and big keys not (key distribution)
 * 1.0.1.1
   * Fixed the pots in Mire Storyteller/ Dark Desert Hint to be colorized when they should be
   * Certain pot items no longer reload when reloading the supertile (matches original pot behavior better)
