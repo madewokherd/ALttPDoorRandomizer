@@ -561,8 +561,8 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
     group_parity = {}
     for group_data in groups:
         group = group_data[0]
-        parity = [0, 0, 0, 0, 0]
-        # vertical land
+        parity = [0, 0, 0, 0, 0, 0]
+        # 0: vertical
         if 0x00 in group:
             parity[0] += 1
         if 0x0f in group:
@@ -571,40 +571,45 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
             parity[0] -= 1
         if 0x81 in group:
             parity[0] -= 1
-        # horizontal land
+        # 1: horizontal land single
         if 0x1a in group:
             parity[1] -= 1
         if 0x1b in group:
             parity[1] += 1
         if 0x28 in group:
-            parity[1] += 1
-        if 0x29 in group:
             parity[1] -= 1
-        if 0x30 in group:
-            parity[1] -= 2
-        if 0x3a in group:
-            parity[1] += 2
-        # horizontal water
-        if 0x2d in group:
+        if 0x29 in group:
+            parity[1] += 1
+        # 2: horizontal land double
+        if 0x28 in group:
             parity[2] += 1
-        if 0x80 in group:
+        if 0x29 in group:
             parity[2] -= 1
-        # whirlpool
+        if 0x30 in group:
+            parity[2] -= 1
+        if 0x3a in group:
+            parity[2] += 1
+        # 3: horizontal water
+        if 0x2d in group:
+            parity[3] += 1
+        if 0x80 in group:
+            parity[3] -= 1
+        # 4: whirlpool
         if 0x0f in group:
-            parity[3] += 1
+            parity[4] += 1
         if 0x12 in group:
-            parity[3] += 1
+            parity[4] += 1
         if 0x33 in group:
-            parity[3] += 1
+            parity[4] += 1
         if 0x35 in group:
-            parity[3] += 1
-        # dropdown exit
+            parity[4] += 1
+        # 5: dropdown exit
         if 0x00 in group or 0x02 in group or 0x13 in group or 0x15 in group or 0x18 in group or 0x22 in group:
-            parity[4] += 1
+            parity[5] += 1
         if 0x1b in group and world.mode[player] != 'standard':
-            parity[4] += 1
+            parity[5] += 1
         if 0x1b in group and world.shuffle_ganon:
-            parity[4] -= 1
+            parity[5] -= 1
         group_parity[group[0]] = parity
 
     attempts = 1000
@@ -629,18 +634,24 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
                 exist_lw_regions.extend(lw_regions)
                 exist_dw_regions.extend(dw_regions)
 
-        parity = [sum(group_parity[group[0][0]][i] for group in groups if group not in removed) for i in range(5)]
-        parity[3] %= 2 # actual parity
-        if (world.owCrossed[player] == 'none' or do_grouped) and parity[:4] != [0, 0, 0, 0]:
+        parity = [sum(group_parity[group[0][0]][i] for group in groups if group not in removed) for i in range(6)]
+        if not world.owKeepSimilar[player]:
+            parity[1] += 2*parity[2]
+            parity[2] = 0
+        # if crossed terrain:
+        #     parity[1] += parity[3]
+        #     parity[3] = 0
+        parity[4] %= 2 # actual parity
+        if (world.owCrossed[player] == 'none' or do_grouped) and parity[:5] != [0, 0, 0, 0, 0]:
             attempts -= 1
             continue
         # ensure sanc can be placed in LW in certain modes
         if not do_grouped and world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lean', 'crossed', 'insanity'] and world.mode[player] != 'inverted' and (world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3 or world.mode[player] == 'standard'):
-            free_dw_drops = parity[4] + (1 if world.shuffle_ganon else 0)
+            free_dw_drops = parity[5] + (1 if world.shuffle_ganon else 0)
             free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon else 0)
             if free_dw_drops == free_drops:
-                    attempts -= 1
-                    continue
+                attempts -= 1
+                continue
         break
 
     (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
