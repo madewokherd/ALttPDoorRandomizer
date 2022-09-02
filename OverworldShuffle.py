@@ -604,8 +604,9 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
         if 0x35 in group:
             parity[4] += 1
         # 5: dropdown exit
-        if 0x00 in group or 0x02 in group or 0x13 in group or 0x15 in group or 0x18 in group or 0x22 in group:
-            parity[5] += 1
+        for id in [0x00, 0x02, 0x13, 0x15, 0x18, 0x22]:
+            if id in group:
+                parity[5] += 1
         if 0x1b in group and world.mode[player] != 'standard':
             parity[5] += 1
         if 0x1b in group and world.shuffle_ganon:
