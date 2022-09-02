@@ -727,7 +727,7 @@ def define_tile_groups(world, player, do_grouped):
     if world.owShuffle[player] == 'vanilla' and (world.owCrossed[player] == 'none' or do_grouped):
         merge_groups([[0x00, 0x2d, 0x80], [0x0f, 0x81], [0x1a, 0x1b], [0x28, 0x29], [0x30, 0x3a]])
 
-    if world.owShuffle[player] == 'parallel' and world.owKeepSimilar[player] and world.owCrossed[player] == 'none':
+    if world.owShuffle[player] == 'parallel' and world.owKeepSimilar[player] and (world.owCrossed[player] == 'none' or do_grouped):
         merge_groups([[0x28, 0x29]])
 
     if not world.owWhirlpoolShuffle[player] and (world.owCrossed[player] == 'none' or do_grouped):
