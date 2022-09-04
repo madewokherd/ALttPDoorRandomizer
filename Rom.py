@@ -1484,8 +1484,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     elif (world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dropshuffle[player]
           or world.dungeon_counters[player] == 'pickup' or world.pottery[player] not in ['none', 'cave']):
         compass_mode = 0x01  # show on pickup
-    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') \
-            or (world.owMixed[player] and not (world.shuffle[player] != 'vanilla' and world.overworld_map[player] == 'default')):
+    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') or world.owMixed[player]:
         compass_mode |= 0x80  # turn on locating dungeons
         if world.overworld_map[player] == 'compass':
             compass_mode |= 0x20  # show icon if compass is collected, 0x00 for maps
@@ -1500,39 +1499,49 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             for idx, x_map in enumerate(x_map_position_generic):
                 rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
                 rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
-        elif world.shuffle[player] == 'vanilla':
+        elif world.overworld_map[player] == 'default':
             # disable HC/AT/GT icons
-            # rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
-            # rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
+            if not world.owMixed[player]:
+                rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
+                rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
             rom.write_bytes(0x53E8E, int16_as_bytes(0xFF00)) # HC
         for dungeon, portal_list in dungeon_portals.items():
             ow_map_index = dungeon_table[dungeon].map_index
-            if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
-                if len(portal_list) == 1:
-                    portal_idx = 0
-                else:
-                    if world.doorShuffle[player] == 'crossed':
-                        # the random choice excludes sanctuary
-                        portal_idx = next((i for i, elem in enumerate(portal_list)
-                                        if world.get_portal(elem, player).chosen), random.choice([1, 2, 3]))
-                    else:
-                        portal_idx = {'Hyrule Castle': 0, 'Desert Palace': 0, 'Skull Woods': 3, 'Turtle Rock': 3}[dungeon]
+            if world.shuffle[player] != 'vanilla' and world.overworld_map[player] == 'default':
+                vanilla_entrances = { 'Hyrule Castle': 'Hyrule Castle Entrance (South)',
+                                        'Desert Palace': 'Desert Palace Entrance (North)',
+                                        'Skull Woods': 'Skull Woods Final Section'
+                                    }
+                entrance_name = vanilla_entrances[dungeon] if dungeon in vanilla_entrances else dungeon
+                entrance = world.get_entrance(entrance_name, player)
             else:
-                if dungeon in ['Hyrule Castle', 'Agahnims Tower', 'Ganons Tower']:
-                    portal_idx = -1
-                elif len(portal_list) == 1:
-                    portal_idx = 0
+                if world.shuffle[player] != 'vanilla':
+                    if len(portal_list) == 1:
+                        portal_idx = 0
+                    else:
+                        if world.doorShuffle[player] == 'crossed':
+                            # the random choice excludes sanctuary
+                            portal_idx = next((i for i, elem in enumerate(portal_list)
+                                            if world.get_portal(elem, player).chosen), random.choice([1, 2, 3]))
+                        else:
+                            portal_idx = {'Hyrule Castle': 0, 'Desert Palace': 0, 'Skull Woods': 3, 'Turtle Rock': 3}[dungeon]
                 else:
-                    portal_idx = {'Desert Palace': 1, 'Skull Woods': 3, 'Turtle Rock': 0}[dungeon]
-            portal = world.get_portal(portal_list[0 if portal_idx == -1 else portal_idx], player)
-            entrance = portal.find_portal_entrance()
+                    if dungeon in ['Hyrule Castle', 'Agahnims Tower', 'Ganons Tower']:
+                        portal_idx = -1
+                    elif len(portal_list) == 1:
+                        portal_idx = 0
+                    else:
+                        portal_idx = {'Desert Palace': 1, 'Skull Woods': 3, 'Turtle Rock': 0}[dungeon]
+                portal = world.get_portal(portal_list[0 if portal_idx == -1 else portal_idx], player)
+                entrance = portal.find_portal_entrance()
             world_indicator = 0x01 if entrance.parent_region.type == RegionType.DarkWorld else 0x00
             coords = ow_prize_table[entrance.name]
             # figure out compass entrances and what world (light/dark)
-            if world.shuffle[player] == 'vanilla' or world.overworld_map[player] != 'default':
+            if world.overworld_map[player] != 'default' or world.owMixed[player]:
                 rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
                 rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
             rom.write_byte(0x53EA6+ow_map_index, world_indicator)
+
     # in crossed doors - flip the compass exists flags
     if world.doorShuffle[player] == 'crossed':
         for dungeon, portal_list in dungeon_portals.items():
