@@ -62,6 +62,8 @@ class World(object):
         self.aga_randomness = True
         self.lock_aga_door_in_escape = False
         self.save_and_quit_from_boss = True
+        self.override_bomb_check = False
+        self.is_copied_world = False
         self.accessibility = accessibility.copy()
         self.fix_skullwoods_exit = {}
         self.fix_palaceofdarkness_exit = {}
@@ -1104,7 +1106,7 @@ class CollectionState(object):
             region = self.world.get_region(regionname, player)
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
 
-        for region in rupee_farms:
+        for region in rupee_farms if self.world.pottery[player] in ['none', 'keys', 'dungeon'] else ['Archery Game']:
             if can_reach_non_bunny(region):
                 return True
 
@@ -1186,7 +1188,7 @@ class CollectionState(object):
             return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
 
         # bomb pickups
-        for region in bush_bombs + bomb_caves:
+        for region in bush_bombs + (bomb_caves if self.world.pottery[player] in ['none', 'keys', 'dungeon'] else []):
             if can_reach_non_bunny(region):
                 return True
 
@@ -1306,7 +1308,7 @@ class CollectionState(object):
 
     # In the future, this can be used to check if the player starts without bombs
     def can_use_bombs(self, player):
-        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2)) and ((hasattr(self.world,"override_bomb_check") and self.world.override_bomb_check) or self.can_farm_bombs(player))
+        return (not self.world.bombbag[player] or self.has('Bomb Upgrade (+10)', player) or self.has('Bomb Upgrade (+5)', player, 2)) and (self.world.override_bomb_check or self.can_farm_bombs(player))
 
     def can_hit_crystal(self, player):
         return (self.can_use_bombs(player)
@@ -1335,16 +1337,16 @@ class CollectionState(object):
             return self.has('Bow', player) and (self.can_buy_unlimited('Single Arrow', player) or self.has('Single Arrow', player))
         return self.has('Bow', player)
 
-    def can_get_good_bee(self, player):
-        cave = self.world.get_region('Good Bee Cave', player)
-        return (
-            self.can_use_bombs(player) and
-            self.has_bottle(player) and
-            self.has('Bug Catching Net', player) and
-            (self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))) and
-            cave.can_reach(self) and
-            self.is_not_bunny(cave, player)
-        )
+    # def can_get_good_bee(self, player):
+    #     cave = self.world.get_region('Good Bee Cave', player)
+    #     return (
+    #         self.can_use_bombs(player) and
+    #         self.has_bottle(player) and
+    #         self.has('Bug Catching Net', player) and
+    #         (self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))) and
+    #         cave.can_reach(self) and
+    #         self.is_not_bunny(cave, player)
+    #     )
 
     def has_beaten_aga(self, player):
         return self.has('Beat Agahnim 1', player) and (self.world.mode[player] != 'standard' or self.has('Zelda Delivered', player))

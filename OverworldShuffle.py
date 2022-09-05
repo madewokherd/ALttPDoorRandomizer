@@ -6,7 +6,7 @@ from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 from Utils import bidict
 
-version_number = '0.2.9.1'
+version_number = '0.2.10.0'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -289,6 +289,8 @@ def link_overworld(world, player):
         for whirlpools in whirlpool_candidates:
             random.shuffle(whirlpools)
             while len(whirlpools):
+                if len(whirlpools) % 2 == 1:
+                    x=0
                 from_owid, from_whirlpool, from_region = whirlpools.pop()
                 to_owid, to_whirlpool, to_region = whirlpools.pop()
                 connect_simple(world, from_whirlpool, to_region, player)
@@ -329,7 +331,7 @@ def link_overworld(world, player):
         # layout shuffle
         groups = adjust_edge_groups(world, trimmed_groups, edges_to_swap, player)
         
-        tries = 20
+        tries = 100
         valid_layout = False
         connected_edge_cache = connected_edges.copy()
         while not valid_layout and tries > 0:
@@ -423,10 +425,15 @@ def link_overworld(world, player):
                 if not ignore_proximity and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
                     return False
                 ignored_regions.update(new_ignored)
-            flute_pool.remove(owid)
-            if ignore_proximity:
-                logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
-            new_spots.append(owid)
+            if owid in flute_pool:
+                flute_pool.remove(owid)
+                if ignore_proximity:
+                    logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
+                logging.getLogger('').debug(f'Placing flute at: {hex(owid)}')
+                new_spots.append(owid)
+            else:
+                # TODO: Inspect later, seems to happen only with 'random' flute shuffle
+                logging.getLogger('').warning(f'Warning: Attempted to place flute spot not in pool: {hex(owid)}')
             return True
         
         # determine sectors (isolated groups of regions) to place flute spots
@@ -442,6 +449,7 @@ def link_overworld(world, player):
             sector_total -= 1
             spots_to_place = min(flute_spots - sector_total, max(1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
             target_spots = len(new_spots) + spots_to_place
+            logging.getLogger('').debug(f'Sector of {sector[0]} regions gets {spots_to_place} spot(s)')
             
             if 'Desert Palace Teleporter Ledge' in sector[1] or 'Misery Mire Teleporter Ledge' in sector[1]:
                 addSpot(0x38, False) # guarantee desert/mire access
@@ -553,8 +561,8 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
     group_parity = {}
     for group_data in groups:
         group = group_data[0]
-        parity = [0, 0, 0, 0, 0]
-        # vertical land
+        parity = [0, 0, 0, 0, 0, 0]
+        # 0: vertical
         if 0x00 in group:
             parity[0] += 1
         if 0x0f in group:
@@ -563,40 +571,46 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
             parity[0] -= 1
         if 0x81 in group:
             parity[0] -= 1
-        # horizontal land
+        # 1: horizontal land single
         if 0x1a in group:
             parity[1] -= 1
         if 0x1b in group:
             parity[1] += 1
         if 0x28 in group:
-            parity[1] += 1
-        if 0x29 in group:
             parity[1] -= 1
-        if 0x30 in group:
-            parity[1] -= 2
-        if 0x3a in group:
-            parity[1] += 2
-        # horizontal water
-        if 0x2d in group:
+        if 0x29 in group:
+            parity[1] += 1
+        # 2: horizontal land double
+        if 0x28 in group:
             parity[2] += 1
-        if 0x80 in group:
+        if 0x29 in group:
             parity[2] -= 1
-        # whirlpool
+        if 0x30 in group:
+            parity[2] -= 1
+        if 0x3a in group:
+            parity[2] += 1
+        # 3: horizontal water
+        if 0x2d in group:
+            parity[3] += 1
+        if 0x80 in group:
+            parity[3] -= 1
+        # 4: whirlpool
         if 0x0f in group:
-            parity[3] += 1
+            parity[4] += 1
         if 0x12 in group:
-            parity[3] += 1
+            parity[4] += 1
         if 0x33 in group:
-            parity[3] += 1
+            parity[4] += 1
         if 0x35 in group:
-            parity[3] += 1
-        # dropdown exit
-        if 0x00 in group or 0x02 in group or 0x13 in group or 0x15 in group or 0x18 in group or 0x22 in group:
             parity[4] += 1
+        # 5: dropdown exit
+        for id in [0x00, 0x02, 0x13, 0x15, 0x18, 0x22]:
+            if id in group:
+                parity[5] += 1
         if 0x1b in group and world.mode[player] != 'standard':
-            parity[4] += 1
+            parity[5] += 1
         if 0x1b in group and world.shuffle_ganon:
-            parity[4] -= 1
+            parity[5] -= 1
         group_parity[group[0]] = parity
 
     attempts = 1000
@@ -607,7 +621,7 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
         # tile shuffle happens here
         removed = list()
         for group in groups:
-            # if 0x1b in group[0] or (0x1a in group[0] and world.owCrossed[player] == 'none'): # TODO: Standard + Inverted
+            #if 0x1b in group[0] or 0x13 in group[0] or (0x1a in group[0] and world.owCrossed[player] == 'none'): # TODO: Standard + Inverted
             if random.randint(0, 1):
                 removed.append(group)
 
@@ -621,18 +635,24 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
                 exist_lw_regions.extend(lw_regions)
                 exist_dw_regions.extend(dw_regions)
 
-        parity = [sum(group_parity[group[0][0]][i] for group in groups if group not in removed) for i in range(5)]
-        parity[3] %= 2 # actual parity
-        if (world.owCrossed[player] == 'none' or do_grouped) and parity[:4] != [0, 0, 0, 0]:
+        parity = [sum(group_parity[group[0][0]][i] for group in groups if group not in removed) for i in range(6)]
+        if not world.owKeepSimilar[player]:
+            parity[1] += 2*parity[2]
+            parity[2] = 0
+        # if crossed terrain:
+        #     parity[1] += parity[3]
+        #     parity[3] = 0
+        parity[4] %= 2 # actual parity
+        if (world.owCrossed[player] == 'none' or do_grouped) and parity[:5] != [0, 0, 0, 0, 0]:
             attempts -= 1
             continue
         # ensure sanc can be placed in LW in certain modes
         if not do_grouped and world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lean', 'crossed', 'insanity'] and world.mode[player] != 'inverted' and (world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3 or world.mode[player] == 'standard'):
-            free_dw_drops = parity[4] + (1 if world.shuffle_ganon else 0)
+            free_dw_drops = parity[5] + (1 if world.shuffle_ganon else 0)
             free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon else 0)
             if free_dw_drops == free_drops:
-                    attempts -= 1
-                    continue
+                attempts -= 1
+                continue
         break
 
     (exist_owids, exist_lw_regions, exist_dw_regions) = result_list
@@ -681,7 +701,7 @@ def define_tile_groups(world, player, do_grouped):
         # sanctuary/chapel should not be swapped if S+Q guaranteed to output on that screen
         if 0x13 in group and ((world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
                     and (world.mode[player] in ['standard', 'inverted'] or world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3)) \
-                or (world.shuffle[player] == 'lite' and world.mode[player] == 'inverted')):
+                or (world.shuffle[player] in ['lite', 'lean'] and world.mode[player] == 'inverted')):
             return False
         
         return True
@@ -708,7 +728,7 @@ def define_tile_groups(world, player, do_grouped):
     if world.owShuffle[player] == 'vanilla' and (world.owCrossed[player] == 'none' or do_grouped):
         merge_groups([[0x00, 0x2d, 0x80], [0x0f, 0x81], [0x1a, 0x1b], [0x28, 0x29], [0x30, 0x3a]])
 
-    if world.owShuffle[player] == 'parallel' and world.owKeepSimilar[player] and world.owCrossed[player] == 'none':
+    if world.owShuffle[player] == 'parallel' and world.owKeepSimilar[player] and (world.owCrossed[player] == 'none' or do_grouped):
         merge_groups([[0x28, 0x29]])
 
     if not world.owWhirlpoolShuffle[player] and (world.owCrossed[player] == 'none' or do_grouped):
@@ -878,13 +898,13 @@ def can_reach_smith(world, player):
     return found
 
 def build_sectors(world, player):
-    from Main import copy_world
+    from Main import copy_world_limited
     from OWEdges import OWTileRegions
     
     # perform accessibility check on duplicate world
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     
     # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
     regions = list(OWTileRegions.copy().keys())
@@ -928,11 +948,23 @@ def build_sectors(world, player):
                 sectors2.append(explored_regions)
         sectors[s] = sectors2
 
+    #TODO: Keep largest LW sector for Links House consideration, keep sector containing WDM for Old Man consideration
+    # sector_entrances = list()
+    # for sector in sectors:
+    #     entrances = list()
+    #     for s2 in sector:
+    #         for region_name in s2:
+    #             region = world.get_region(region_name, player)
+    #             for exit in region.exits:
+    #                 if exit.spot_type == 'Entrance' and exit.name in entrance_pool:
+    #                     entrances.append(exit.name)
+    #     sector_entrances.append(entrances)
+    
     return sectors
 
 def build_accessible_region_list(world, start_region, player, build_copy_world=False, cross_world=False, region_rules=True, ignore_ledges = False):
-    from Main import copy_world
     from BaseClasses import CollectionState
+    from Main import copy_world_limited
     from Items import ItemFactory
     from Utils import stack_size3a
     
@@ -959,7 +991,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     if build_copy_world:
         for p in range(1, world.players + 1):
             world.key_logic[p] = {}
-        base_world = copy_world(world, True)
+        base_world = copy_world_limited(world)
         base_world.override_bomb_check = True
     else:
         base_world = world
@@ -1015,7 +1047,7 @@ def validate_layout(world, player):
             entrance_connectors['Bumper Cave Entrance'] = ['West Dark Death Mountain (Bottom)']
         entrance_connectors['Mountain Entry Entrance'] = ['Mountain Entry Ledge']
     
-    from Main import copy_world
+    from Main import copy_world_limited
     from Utils import stack_size3a
     from EntranceShuffle import default_dungeon_connections, default_connector_connections, default_item_connections, default_shop_connections, default_drop_connections, default_dropexit_connections
     
@@ -1048,7 +1080,7 @@ def validate_layout(world, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world(world, True)
+    base_world = copy_world_limited(world)
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:

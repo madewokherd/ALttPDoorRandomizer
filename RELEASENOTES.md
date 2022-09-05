@@ -183,6 +183,21 @@ Same as above but both small keys and bigs keys of the dungeon are not allowed o
 
 #### Unstable
 
+* 1.0.1.2
+  * Removed "good bee" as an in-logic way of killing Mothula
+  * Fixed an issue with Mystery generation and Windows path
+  * Fixed an issue with small key bias rework
+  * Fixed an issue where trinity goal would open pyramid unexpectedly. (No longer does so if ER mdoe is shuffling holes). Crystals goal updated to match that behavior.
+  * Fixed a playthrough issue that was not respecting pot rules
+  * Fixed an issue that was conflicting with downstream OWR project
+  * Fixed an issue with inverted and certain pottery settings
+  * Fixed an issue with small keys being shuffled and big keys not (key distribution)
+* 1.0.1.1
+  * Fixed the pots in Mire Storyteller/ Dark Desert Hint to be colorized when they should be
+  * Certain pot items no longer reload when reloading the supertile (matches original pot behavior better)
+  * Changed the key distribution that made small keys placement more random when keys are in their own dungeon
+  * Unique boss shuffle no longer allows repeat bosses in GT (e.g. only one Trinexx in GT, so exactly 3 bosses are repeated in the seed. This is a difference process than full which does affect the probability distribution.)
+  * Removed text color in hints due to vanilla bug
 * 1.0.1.0
   * Large features
     * New pottery modes - see notes above
@@ -206,7 +221,6 @@ Same as above but both small keys and bigs keys of the dungeon are not allowed o
     * Refactored spoiler to generate in stages for better error collection. A meta file will be generated additionally for mystery seeds. Some random settings moved later in the spoiler to have the meta section at the top not spoil certain things. (GT/Ganon requirements.) Thanks to codemann and OWR for most of this work.
     * Updated tourney winners (included Doors Async League winners)
     * Some textual changes for hints (capitalization standardization)
-        * Item will be highlighted in red if experimental is on. This will likely be removed.
     * Reworked GT Trash Fill. Base rate is 0-75% of locations fill with 7 crystals entrance requirements. Triforce hunt is 75%-100% of locations. The 75% number will decrease based on the crystal entrance requirement. Dungeon_only algorithm caps it based on how many items need to be placed in dungeons. Cross dungeon shuffle will now work with the trash fill.
     * Expanded Mystery logic options (e.g. owglitches)
     * Updated indicators on keysanity menu for overworld map option
@@ -235,7 +249,7 @@ Same as above but both small keys and bigs keys of the dungeon are not allowed o
     * Fixed a bug with shopsanity + district algorithm where pre-placed potions messed up the placeholder count
     * Fixed usestartinventory flag (can be use on a per player basis)
     * Sprite selector fix for systems with SSL issues
-	* Fix for Standard ER where locations in rain state could be in logic
+    * Fix for Standard ER where locations in rain state could be in logic
 * 1.0.0.3
     * overworld_map=map mode fixed. Location of dungeons with maps are not shown until map is retrieved. (Dungeon that do not have map like Castle Tower are simply never shown)
     * Aga2 completion on overworld_map now tied to boss defeat flag instead of pyramid hole being opened (fast ganon fix)

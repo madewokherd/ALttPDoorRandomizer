@@ -32,7 +32,7 @@ from Utils import output_path, parse_player_names
 from source.item.FillUtil import create_item_pool_config, massage_item_pool, district_item_pool_config
 from source.tools.BPS import create_bps_from_data
 
-__version__ = '1.0.1.0-u'
+__version__ = '1.0.1.2-u'
 
 from source.classes.BabelFish import BabelFish
 
@@ -396,7 +396,7 @@ def main(args, seed=None, fish=None):
     return world
 
 
-def copy_world(world, partial_copy=False):
+def copy_world(world):
     # ToDo: Not good yet
     ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
@@ -543,10 +543,9 @@ def copy_world(world, partial_copy=False):
     ret.dungeon_layouts = world.dungeon_layouts
     ret.key_logic = world.key_logic
     ret.dungeon_portals = world.dungeon_portals
-    if not partial_copy:
-        for player, portals in world.dungeon_portals.items():
-            for portal in portals:
-                connect_portal(portal, ret, player)
+    for player, portals in world.dungeon_portals.items():
+        for portal in portals:
+            connect_portal(portal, ret, player)
     ret.sanc_portal = world.sanc_portal
 
     from OverworldShuffle import categorize_world_regions
@@ -554,9 +553,127 @@ def copy_world(world, partial_copy=False):
         categorize_world_regions(ret, player)
         set_rules(ret, player)
 
-    if partial_copy:
-        # undo some of the things that unintentionally affect the original world object
-        world.key_logic = {}
+    return ret
+
+
+def copy_world_limited(world):
+    # ToDo: Not good yet
+    ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
+                world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
+                world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
+    ret.teams = world.teams
+    ret.player_names = copy.deepcopy(world.player_names)
+    ret.remote_items = world.remote_items.copy()
+    ret.required_medallions = world.required_medallions.copy()
+    ret.bottle_refills = world.bottle_refills.copy()
+    ret.swamp_patch_required = world.swamp_patch_required.copy()
+    ret.ganon_at_pyramid = world.ganon_at_pyramid.copy()
+    ret.powder_patch_required = world.powder_patch_required.copy()
+    ret.ganonstower_vanilla = world.ganonstower_vanilla.copy()
+    ret.treasure_hunt_count = world.treasure_hunt_count.copy()
+    ret.treasure_hunt_icon = world.treasure_hunt_icon.copy()
+    ret.sewer_light_cone = world.sewer_light_cone.copy()
+    ret.light_world_light_cone = world.light_world_light_cone
+    ret.dark_world_light_cone = world.dark_world_light_cone
+    ret.seed = world.seed
+    ret.can_access_trock_eyebridge = world.can_access_trock_eyebridge.copy()
+    ret.can_access_trock_front = world.can_access_trock_front.copy()
+    ret.can_access_trock_big_chest = world.can_access_trock_big_chest.copy()
+    ret.can_access_trock_middle = world.can_access_trock_middle.copy()
+    ret.can_take_damage = world.can_take_damage
+    ret.difficulty_requirements = world.difficulty_requirements.copy()
+    ret.fix_fake_world = world.fix_fake_world.copy()
+    ret.lamps_needed_for_dark_rooms = world.lamps_needed_for_dark_rooms
+    ret.mapshuffle = world.mapshuffle.copy()
+    ret.compassshuffle = world.compassshuffle.copy()
+    ret.keyshuffle = world.keyshuffle.copy()
+    ret.bigkeyshuffle = world.bigkeyshuffle.copy()
+    ret.bombbag = world.bombbag.copy()
+    ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
+    ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
+    ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
+    ret.crystals_gt_orig = world.crystals_gt_orig.copy()
+    ret.owKeepSimilar = world.owKeepSimilar.copy()
+    ret.owWhirlpoolShuffle = world.owWhirlpoolShuffle.copy()
+    ret.owFluteShuffle = world.owFluteShuffle.copy()
+    ret.shuffle_bonk_drops = world.shuffle_bonk_drops.copy()
+    ret.open_pyramid = world.open_pyramid.copy()
+    ret.boss_shuffle = world.boss_shuffle.copy()
+    ret.enemy_shuffle = world.enemy_shuffle.copy()
+    ret.enemy_health = world.enemy_health.copy()
+    ret.enemy_damage = world.enemy_damage.copy()
+    ret.beemizer = world.beemizer.copy()
+    ret.intensity = world.intensity.copy()
+    ret.experimental = world.experimental.copy()
+    ret.shopsanity = world.shopsanity.copy()
+    ret.dropshuffle = world.dropshuffle.copy()
+    ret.pottery = world.pottery.copy()
+    ret.potshuffle = world.potshuffle.copy()
+    ret.mixed_travel = world.mixed_travel.copy()
+    ret.standardize_palettes = world.standardize_palettes.copy()
+    ret.owswaps = world.owswaps.copy()
+    ret.owflutespots = world.owflutespots.copy()
+    ret.prizes = world.prizes.copy()
+    ret.restrict_boss_items = world.restrict_boss_items.copy()
+
+    ret.is_copied_world = True
+
+    for player in range(1, world.players + 1):
+        create_regions(ret, player)
+        update_world_regions(ret, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(ret, player)
+        create_flute_exits(ret, player)
+        create_dungeon_regions(ret, player)
+        create_owedges(ret, player)
+        create_shops(ret, player)
+        create_doors(ret, player)
+        create_rooms(ret, player)
+        create_dungeons(ret, player)
+
+    for player in range(1, world.players + 1):
+        if world.mode[player] == 'standard':
+            parent = ret.get_region('Menu', player)
+            target = ret.get_region('Hyrule Castle Secret Entrance', player)
+            connection = Entrance(player, 'Uncle S&Q', parent)
+            parent.exits.append(connection)
+            connection.connect(target)
+
+    # connect copied world
+    copied_locations = {(loc.name, loc.player): loc for loc in ret.get_locations()}  # caches all locations
+    for region in world.regions:
+        copied_region = ret.get_region(region.name, region.player)
+        copied_region.is_light_world = region.is_light_world
+        copied_region.is_dark_world = region.is_dark_world
+        copied_region.dungeon = region.dungeon
+        copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations if (location.name, location.player) in copied_locations]
+        for location in copied_region.locations:
+            location.parent_region = copied_region
+        for entrance in region.entrances:
+            ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
+
+    for item in world.precollected_items:
+        ret.push_precollected(ItemFactory(item.name, item.player))
+
+    for edge in world.owedges:
+        copiededge = ret.check_for_owedge(edge.name, edge.player)
+        if copiededge is not None:
+            copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
+
+    for door in world.doors:
+        entrance = ret.check_for_entrance(door.name, door.player)
+        if entrance is not None:
+            destdoor = ret.check_for_door(entrance.door.name, entrance.door.player)
+            entrance.door = destdoor
+            if destdoor is not None:
+                destdoor.entrance = entrance
+
+    ret.key_logic = world.key_logic.copy()
+
+    from OverworldShuffle import categorize_world_regions
+    for player in range(1, world.players + 1):
+        categorize_world_regions(ret, player)
+        set_rules(ret, player)
 
     return ret
 
@@ -578,11 +695,7 @@ def copy_dynamic_regions_and_locations(world, ret):
     for location in world.dynamic_locations:
         new_reg = ret.get_region(location.parent_region.name, location.parent_region.player)
         new_loc = Location(location.player, location.name, location.address, location.crystal, location.hint_text, new_reg)
-        # todo: this is potentially dangerous. later refactor so we
-        # can apply dynamic region rules on top of copied world like other rules
-        new_loc.access_rule = location.access_rule
-        new_loc.always_allow = location.always_allow
-        new_loc.item_rule = location.item_rule
+        new_loc.type = location.type
         new_reg.locations.append(new_loc)
 
         ret.clear_location_cache()

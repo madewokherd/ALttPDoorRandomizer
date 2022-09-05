@@ -61,8 +61,7 @@ def MothulaDefeatRule(state, player):
         # TODO: Not sure how much (if any) extend magic is needed for these two, since they only apply
         # to non-vanilla locations, so are harder to test, so sticking with what VT has for now:
         (state.has('Cane of Somaria', player) and state.can_extend_magic(player, 16)) or
-        (state.has('Cane of Byrna', player) and state.can_extend_magic(player, 16)) or
-        state.can_get_good_bee(player)
+        (state.has('Cane of Byrna', player) and state.can_extend_magic(player, 16))
     )
 
 def BlindDefeatRule(state, player):
@@ -202,13 +201,14 @@ def place_bosses(world, player):
             place_boss(boss, level, loc, loc_text, world, player)
     elif world.boss_shuffle[player] == 'unique':
         bosses = list(placeable_bosses)
-        gt_bosses = list()
+        gt_bosses = []
 
         for [loc, level] in boss_locations:
             loc_text = loc + (' ('+level+')' if level else '')
             try:
                 if level:
-                    boss = random.choice([b for b in placeable_bosses if can_place_boss(world, player, b, loc, level) and b not in gt_bosses])
+                    boss = random.choice([b for b in placeable_bosses if can_place_boss(world, player, b, loc, level)
+                                          and b not in gt_bosses])
                     gt_bosses.append(boss)
                 else:
                     boss = random.choice([b for b in bosses if can_place_boss(world, player, b, loc, level)])
