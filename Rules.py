@@ -67,7 +67,8 @@ def set_rules(world, player):
     if not world.swamp_patch_required[player]:
         add_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has_Mirror(player))
 
-    set_bunny_rules(world, player, world.mode[player] == 'inverted')
+    if not world.is_copied_world:
+        set_bunny_rules(world, player, world.mode[player] == 'inverted')
 
 
 def mirrorless_path_to_location(world, startName, targetName, player):
