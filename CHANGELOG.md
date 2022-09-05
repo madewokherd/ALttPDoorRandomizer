@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.10.0
+- Merged DR v1.0.1.1-1.0.1.2
+  - Removed text color from hint tiles
+  - Removed Good Bee requirement from Mothula
+  - Some keylogic/generation fixes
+  - Fixed a Pottery logic issue in the playthru
+- Fixed a generation error in Mixed OWR, resulting in more possible Mixed scenarios (thanks Catobat)
+- Added more scenarios where OW Map Checks in Mixed OWR show dungeon prizes in their respective worlds 
+- Fixed rupee logic to consider Pottery option and lack of early rupees
+- Changed Lean ER + Inverted Dark Chapel start is guaranteed to be in DW
+- Fixed graphical issue with Hammerpeg Cave
+- Fixed logic rule with HC Main Gate to not require mirror if screen is swapped
+- Removed Crossed OWR option: "None (Allowed)"
+
 ### 0.2.9.1
 - Lite/Lean ER now includes Cave Pot locations with various Pottery options
 - Changed Unique Boss Shuffle so that GT Bosses are unique amongst themselves
