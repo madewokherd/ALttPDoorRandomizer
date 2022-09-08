@@ -154,6 +154,7 @@
     none: 3
     simple: 1
     full: 1
+    unique: 1
     random: 1
   enemy_shuffle:
     none: 3
