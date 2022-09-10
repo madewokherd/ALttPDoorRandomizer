@@ -203,6 +203,13 @@
       half: 0
       quarter: 1
       off: 0
+    menuspeed:
+      normal: 1
+      double: 0
+      triple: 0
+      quadruple: 0
+      instant: 0
+      half: 0
     shuffle_sfx:
       on: 1
       off: 1
