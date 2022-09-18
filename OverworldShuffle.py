@@ -6,7 +6,7 @@ from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
 from Utils import bidict
 
-version_number = '0.2.10.0'
+version_number = '0.2.10.1'
 # branch indicator is intentionally different across branches
 version_branch = ''
 

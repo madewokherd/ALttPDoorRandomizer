@@ -157,9 +157,9 @@ db 2, 2, 0, 0 ; Coordinate Index $20-$23
 OWOppCoordIndex: ; Horizontal 1st
 db 0, 0, 2, 2 ; Coordinate Index $20-$23
 OWBGIndex: ; Horizontal 1st
-db 0, 0, 6, 6 ; BG Scroll Index $e2-$ea
+db 0, 0, 6, 6 ; BG Scroll Index $e0-$eb
 OWOppBGIndex: ; Horizontal 1st
-db 6, 6, 0, 0 ; BG Scroll Index $e2-$ea
+db 6, 6, 0, 0 ; BG Scroll Index $e0-$eb
 OWCameraIndex: ; Horizontal 1st
 db 4, 4, 0, 0 ; Camera Index $0618-$61f
 OWOppCameraIndex: ; Horizontal 1st
