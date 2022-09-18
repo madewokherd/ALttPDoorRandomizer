@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10.1
+- Merged DR v1.0.1.3
+  - Fixed Zelda despawn in TT Prison
+  - Fixed issue with key door usage in rainstate
+- Added missing modes to example mystery yaml
+
 ## 0.2.10.0
 - Merged DR v1.0.1.1-1.0.1.2
   - Removed text color from hint tiles
