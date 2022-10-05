@@ -1104,7 +1104,7 @@ class CollectionState(object):
 
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
-            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
+            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has_Pearl(player))
 
         for region in rupee_farms if self.world.pottery[player] in ['none', 'keys', 'dungeon'] else ['Archery Game']:
             if can_reach_non_bunny(region):
@@ -1185,7 +1185,7 @@ class CollectionState(object):
 
         def can_reach_non_bunny(regionname):
             region = self.world.get_region(regionname, player)
-            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
+            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has_Pearl(player))
 
         # bomb pickups
         for region in bush_bombs + (bomb_caves if self.world.pottery[player] in ['none', 'keys', 'dungeon'] else []):
