@@ -1237,7 +1237,6 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Bombos Tablet Drop', 'Desert Area'),
                          ('Flute Boy Bush (North)', 'Flute Boy Approach Area'), #pearl
                          ('Flute Boy Bush (South)', 'Flute Boy Bush Entry'), #pearl
-                         ('Cave 45 Ledge Drop', 'Flute Boy Approach Area'),
                          ('C Whirlpool Water Entry', 'C Whirlpool Water'), #flippers
                          ('C Whirlpool Landing', 'C Whirlpool Area'),
                          ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'), #glove
@@ -1681,6 +1680,7 @@ ow_connections = {
             ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge')
         ]),
     0x32: ([
+            ('Cave 45 Ledge Drop', 'Flute Boy Approach Area'),
             ('Flute Boy Entry Mirror Spot', 'Flute Boy Bush Entry'),
             ('Cave 45 Mirror Spot', 'Cave 45 Ledge')
         ], [
