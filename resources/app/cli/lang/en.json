@@ -214,6 +214,8 @@
       "Full:           Overworld transitions are shuffled, but both worlds",
       "                will have an independent map shape."
     ],
+    "ow_terrain": [
+      "With OW Layout Shuffle, this allows land and water edges to be connected." ],
     "ow_crossed": [
       "This allows cross-world connections to occur on the overworld.",
       "None:           No transitions are cross-world connections.",
@@ -226,7 +228,7 @@
     ],
     "ow_keepsimilar": [
       "This keeps similar edge transitions together. ie. the two west edges on",
-      "Potion Shop will be paired with another similar pair." ],
+      "Sanctuary will be paired with another similar pair." ],
     "ow_mixed": [
       "Overworld tiles are randomly chosen to become part of the opposite world."
     ],

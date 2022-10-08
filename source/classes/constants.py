@@ -77,6 +77,7 @@ SETTINGSTOPROCESS = {
     },
     "overworld": {
       "overworldshuffle": "ow_shuffle",
+      "terrain": "ow_terrain",
       "crossed": "ow_crossed",
       "keepsimilar": "ow_keepsimilar",
       "mixed": "ow_mixed",
