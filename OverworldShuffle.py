@@ -3,7 +3,7 @@ from collections import OrderedDict, defaultdict
 from DungeonGenerator import GenerationException
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from Regions import mark_dark_world_regions, mark_light_world_regions
-from OWEdges import OWTileRegions, OWEdgeGroups, OWExitTypes, OpenStd, parallel_links, IsParallel
+from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitTypes, OpenStd, parallel_links, IsParallel
 from Utils import bidict
 
 version_number = '0.2.10.1'
@@ -106,7 +106,7 @@ def link_overworld(world, player):
         return new_groups
 
     tile_groups = define_tile_groups(world, player, False)
-    trimmed_groups = copy.deepcopy(OWEdgeGroups)
+    trimmed_groups = copy.deepcopy(OWEdgeGroupsTerrain if world.owTerrain[player] else OWEdgeGroups)
     swapped_edges = list()
 
     # restructure Maze Race/Suburb/Frog/Dig Game manually due to NP/P relationship
@@ -639,9 +639,9 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
         if not world.owKeepSimilar[player]:
             parity[1] += 2*parity[2]
             parity[2] = 0
-        # if crossed terrain:
-        #     parity[1] += parity[3]
-        #     parity[3] = 0
+        if world.owTerrain[player]:
+            parity[1] += parity[3]
+            parity[3] = 0
         parity[4] %= 2 # actual parity
         if (world.owCrossed[player] == 'none' or do_grouped) and parity[:5] != [0, 0, 0, 0, 0]:
             attempts -= 1
@@ -775,6 +775,8 @@ def reorganize_groups(world, groups, player):
         new_group = list(group)
         if world.mode[player] != "standard":
             new_group[0] = None
+        if world.owTerrain[player]:
+            new_group[3] = None
         if world.owShuffle[player] != 'parallel':
             new_group[4] = None
         if not world.owKeepSimilar[player]:

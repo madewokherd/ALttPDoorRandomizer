@@ -64,6 +64,10 @@ OW Transitions are shuffled, but both worlds will have a matching layout.
 
 OW Transitions are shuffled within each world separately.
 
+## Free Terrain (--ow_terrain)
+
+With OW Layout Shuffle, this allows land and water edges to be connected.
+
 ## Crossed Options (--ow_crossed)
 
 This allows OW connections to be shuffled cross-world.
@@ -102,7 +106,7 @@ Same as Limited, except that there is no limit to the number of cross-world conn
 
 ## Keep Similar Edges Together (--ow_keepsimilar)
 
-This keeps similar edge transitions together. ie. The 2 west edges of Potion Shop will be paired to another set of two similar edges
+This keeps similar edge transitions together. ie. The 2 west land edges of Potion Shop will be paired to another set of two similar edges, unless Free Terrain is also enabled, in which case these 2 edges together with the west water edge form a group of 3 similar edges.
 
 Note: This affects OW Layout Shuffle mostly, but also affects Limited and Chaos modes in Crossed OW.
 

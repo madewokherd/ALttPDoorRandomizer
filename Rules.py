@@ -3,10 +3,11 @@ import logging
 from collections import deque
 
 import OverworldGlitchRules
-from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier, KeyRuleType, LocationType
+from BaseClasses import CollectionState, RegionType, DoorType, Entrance, CrystalBarrier, KeyRuleType, LocationType, Terrain
 from BaseClasses import PotFlags
 from Dungeons import dungeon_table
 from RoomData import DoorKind
+from OWEdges import OWExitTypes
 from OverworldGlitchRules import overworld_glitches_rules
 
 
@@ -24,6 +25,8 @@ def set_rules(world, player):
     ow_inverted_rules(world, player)
 
     ow_bunny_rules(world, player)
+
+    ow_terrain_rules(world, player)
 
     if world.mode[player] == 'standard':
         if not world.is_copied_world:
@@ -1472,6 +1475,21 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Shopping Mall SW', player), player)
     add_bunny_rule(world.get_entrance('Bomber Corner Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), player)
+
+
+def ow_terrain_rules(world, player):
+    for edge in world.owedges:
+        if edge.player == player and edge.dest and edge.dest.terrain == Terrain.Water:
+            ent = world.get_entrance(edge.name, player)
+            if edge.terrain == Terrain.Land:
+                set_rule(ent, lambda state: state.has('Flippers', player))
+            if ent.parent_region.is_light_world == (world.mode[player] != 'inverted') and ent.connected_region.is_dark_world == (world.mode[player] != 'inverted'):
+                add_rule(ent, lambda state: state.has_Pearl(player))
+
+    for whirlpool_name in OWExitTypes['Whirlpool']:
+        ent = world.get_entrance(whirlpool_name, player)
+        if ent.parent_region.is_light_world == (world.mode[player] != 'inverted') and ent.connected_region.is_dark_world == (world.mode[player] != 'inverted'):
+            add_rule(ent, lambda state: state.has_Pearl(player))
 
 
 def no_glitches_rules(world, player):
