@@ -135,7 +135,8 @@ def add_rule(spot, rule, combine='and'):
         spot.access_rule = lambda state: rule(state) and old_rule(state)
 
 def add_bunny_rule(spot, player):
-    add_rule(spot, lambda state: state.is_not_bunny(spot.parent_region, player))
+    if spot.can_cause_bunny(player):
+        add_rule(spot, lambda state: state.has_Pearl(player))
 
 
 def or_rule(rule1, rule2):

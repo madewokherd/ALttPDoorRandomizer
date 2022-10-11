@@ -26,7 +26,7 @@ from Rules import set_rules
 from Dungeons import create_dungeons
 from Fill import distribute_items_restrictive, promote_dungeon_items, fill_dungeons_restrictive, ensure_good_pots
 from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations, set_prize_drops
-from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
+from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops, create_farm_locations
 from Utils import output_path, parse_player_names
 
 from source.item.FillUtil import create_item_pool_config, massage_item_pool, district_item_pool_config
@@ -213,6 +213,10 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli", "cli", "generating.itempool"))
 
     for player in range(1, world.players + 1):
+        set_prize_drops(world, player)
+        create_farm_locations(world, player)
+
+    for player in range(1, world.players + 1):
         generate_itempool(world, player)
 
     logger.info(world.fish.translate("cli","cli","calc.access.rules"))
@@ -228,9 +232,6 @@ def main(args, seed=None, fish=None):
                 sell_keys(world, player)
         else:
             lock_shop_locations(world, player)
-
-    for player in range(1, world.players + 1):
-        set_prize_drops(world, player)
 
     massage_item_pool(world)
     logger.info(world.fish.translate("cli", "cli", "placing.dungeon.prizes"))
