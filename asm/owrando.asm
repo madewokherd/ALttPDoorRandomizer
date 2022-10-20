@@ -107,7 +107,7 @@ org $0ABA99
 WorldMap_LoadDarkWorldMap:
 LDA.b $10 : CMP.b #$14 ; attract module
 BEQ .vanilla_light
-    LDA.l OWMode+1 : AND.b #$04 : BNE .mixed
+    LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BNE .mixed
         LDA.b $8A : AND.b #$40
         BEQ .vanilla_light
     .mixed
@@ -343,7 +343,7 @@ OWOldManSpeed:
 
 LoadMapDarkOrMixed:
 {
-    CMP.b #$04 : REP #$30 : BEQ .mixed
+    CMP.b #!FLAG_OW_MIXED : REP #$30 : BEQ .mixed
         LDX.w #$03FE ; draw vanilla Dark World (what we wrote over)
         .copy_next
             LDA.w $D739,X : STA.w $1000,X ; DB is $0A
@@ -400,7 +400,7 @@ OWBonkDrops:
 {
     CMP.b #$D8 : BEQ +
         RTL
-    + LDA.l OWFlags+1 : AND.b #$02 : BNE +
+    + LDA.l OWFlags+1 : AND.b #!FLAG_OW_CROSSED : BNE +
         JSL.l Sprite_TransmuteToBomb : RTL
     +
 
@@ -529,10 +529,10 @@ org $aa9000
 OWDetectEdgeTransition:
 {
     STZ.w $06FC
-    LDA.l OWMode : ORA.l OWMode+1 : BEQ .normal
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
         JSR OWShuffle
         LDA.w $06FA : BMI .special
-    .normal
+    .vanilla
     REP #$31 : LDX.b $02 : LDA.b $84 ; what we wrote over
     RTL
     .special
@@ -586,9 +586,9 @@ OWDetectSpecialTransition:
 }
 OWEdgeTransition:
 {
-    LDA.l OWMode : ORA.l OWMode+1 : BEQ .normal
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
     LDY.w $06FA : CPY.b #$7F
-    BEQ .normal
+    BEQ .vanilla
         REP #$10
         LDX.w $06F8
         PHB : PHK : PLB
@@ -596,7 +596,7 @@ OWEdgeTransition:
         PLB
         SEP #$30
         RTL
-    .normal
+    .vanilla
     LDA.l Overworld_ActualScreenID,X : ORA.l CurrentWorld ; what we wrote over
     RTL
 }
@@ -835,9 +835,9 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         ; toggle bunny mode
         lda MoonPearlEquipment : bne .nobunny
         lda.l InvertedMode : bne .inverted
-            lda CurrentWorld : and.b #$40 : bra +
-            .inverted lda CurrentWorld : and.b #$40 : eor #$40
-        + cmp #$40 : bne .nobunny
+            lda CurrentWorld : bra +
+            .inverted lda CurrentWorld : eor #$40
+        + and #$40 : beq .nobunny
 
             LDA.w $0703 : BEQ + ; check if forced transition
                 CPY.b #$03 : BEQ .end_forced_whirlpool
@@ -865,8 +865,9 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
                 .whirlpool
                     PLX : RTS
             .to_bunny_reset_swim
-            JSL Link_ResetSwimmingState
-            STZ.w $0345
+            LDA.b $5D : CMP.b #$04 : BNE .to_bunny ; check if swimming
+                JSL Link_ResetSwimmingState
+                STZ.w $0345
             .to_bunny
             LDA.b #$17 : STA.b $5D
             .to_pseudo_bunny
@@ -886,7 +887,7 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         .end_forced_whirlpool
         STZ.w $0703
         CMP.b #$02 : BNE +
-            DEC : STA.w $0345
+            DEC : STA.w $0345 : STZ.w $0340
             LDA.b #$04 : BRA .set_state
         +
         CMP.b #$03 : BNE ++
@@ -897,17 +898,17 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         RTS
     .not_forced
     CPY.b #$02 : BNE + ; check if going from water to land
-        JSL Link_ResetSwimmingState
-        STZ.w $0345
-        LDA.b $5D : CMP.b #$04 : BNE + ; check if swimming
+        LDA.b $5D : CMP.b #$04 : BNE .return ; check if swimming
+            JSL Link_ResetSwimmingState
+            STZ.w $0345
             STZ.b $5D
     +
     CPY.b #$01 : BNE .return ; check if going from land to water
-    LDA.b #$01 : STA.w $0345
     LDA.b $5D : CMP.b #$04 : BEQ .return ; check if swimming
+        LDA.b #$01 : STA.w $0345
         LDA.l FlippersEquipment : BEQ .no_flippers ; check if flippers obtained
         LDA.b $5D : CMP.b #$17 : BEQ .no_flippers ; check if bunny
-            LDA.b #$04 : STA.b $5D : RTS
+            LDA.b #$04 : STA.b $5D : STZ.w $0340 : RTS
         .no_flippers
             PHX
             INC : STA.w $0703
