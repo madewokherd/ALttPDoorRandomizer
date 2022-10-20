@@ -1253,10 +1253,7 @@ class CollectionState(object):
         return self.has('Mirror Shield', player) or self.has('Cane of Byrna', player) or self.has('Cape', player)
 
     def is_not_bunny(self, region, player):
-        if self.has_Pearl(player):
-            return True
-
-        return not region.can_cause_bunny(player)
+        return self.has_Pearl(player) or not region.can_cause_bunny(player)
 
     def can_reach_light_world(self, player):
         if True in [i.is_light_world for i in self.reachable_regions[player]]:
