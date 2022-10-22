@@ -586,9 +586,9 @@ OWDetectSpecialTransition:
 }
 OWEdgeTransition:
 {
-    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .unshuffled
     LDY.w $06FA : CPY.b #$7F
-    BEQ .vanilla
+    BEQ .unshuffled
         REP #$10
         LDX.w $06F8
         PHB : PHK : PLB
@@ -596,9 +596,15 @@ OWEdgeTransition:
         PLB
         SEP #$30
         RTL
-    .vanilla
+
+    .unshuffled
     LDA.l Overworld_ActualScreenID,X : ORA.l CurrentWorld ; what we wrote over
-    RTL
+    TAX : LDA.l OWMode+1 : AND.b #!FLAG_OW_MIXED : BEQ .vanilla
+        LDA.l OWTileWorldAssoc,X : CMP.l CurrentWorld : BEQ .vanilla ; if dest screen mismatches the current world
+            TXA : EOR #$40 : RTL
+
+    .vanilla
+    TXA : RTL
 }
 OWSpecialExit:
 {

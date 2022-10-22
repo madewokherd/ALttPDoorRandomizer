@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '10c74317eecc403488d1a6e7e3d8f49f'
+RANDOMIZERBASEHASH = 'cb04e9b67920dcc8103f1e7a7fe86fe2'
 
 
 class JsonRom(object):
@@ -914,9 +914,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             return region.is_light_world and not region.is_dark_world
 
     # dark world spawns
-    sanc_region = world.get_region('Sanctuary', player)
+    sanc_name = 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint'
+    sanc_region = world.get_region(sanc_name, player)
     if should_be_bunny(sanc_region, world.mode[player]):
-        rom.write_bytes(0x13fff2, [0x12, 0x00])
+        rom.write_bytes(0x13fff2, [0x12, 0x00 if sanc_name == 'Sanctuary' else 0x01])
 
     lh_name = 'Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop'
     links_house = world.get_region(lh_name, player)
