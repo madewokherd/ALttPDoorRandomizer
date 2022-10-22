@@ -1137,6 +1137,7 @@ def simple_shuffle_dungeons(world, player):
     multi_dungeons = ['Desert Palace', 'Turtle Rock']
     if world.mode[player] == 'standard' or (world.mode[player] == 'inverted' and not world.shuffle_ganon):
         hc_target = 'Hyrule Castle'
+        random.shuffle(multi_dungeons)
     else:
         multi_dungeons.append('Hyrule Castle')
         
@@ -1163,6 +1164,7 @@ def simple_shuffle_dungeons(world, player):
             random.shuffle(candidate_dungeons)
             hc_target = candidate_dungeons.pop()
             multi_dungeons.remove(hc_target)
+            random.shuffle(multi_dungeons)
         else:
             random.shuffle(multi_dungeons)
             hc_target = multi_dungeons.pop()
