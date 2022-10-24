@@ -1021,7 +1021,11 @@ def validate_layout(world, player):
         'Turtle Rock Area':                   ['Dark Death Mountain Ledge',
                                                'Dark Death Mountain Isolated Ledge'],
         'Dark Death Mountain Ledge':          ['Turtle Rock Area'],
-        'Dark Death Mountain Isolated Ledge': ['Turtle Rock Area']
+        'Dark Death Mountain Isolated Ledge': ['Turtle Rock Area'],
+        'Mountain Entry Entrance':            ['West Death Mountain (Bottom)'],
+        'Mountain Entry Ledge':               ['West Death Mountain (Bottom)'],
+        'West Death Mountain (Bottom)':       ['Mountain Entry Ledge'],
+        'Bumper Cave Entrance':               ['Bumper Cave Ledge']
     }
     sane_connectors = {
         # guaranteed dungeon access
@@ -1032,23 +1036,6 @@ def validate_layout(world, player):
         'Pyramid Area':                       ['Pyramid Exit Ledge']
     }
 
-    if not world.is_tile_swapped(0x0a, player):
-        if not world.is_tile_swapped(0x03, player):
-            entrance_connectors['Mountain Entry Entrance'] = ['West Death Mountain (Bottom)']
-            entrance_connectors['Mountain Entry Ledge'] = ['West Death Mountain (Bottom)']
-            entrance_connectors['West Death Mountain (Bottom)'] = ['Mountain Entry Ledge']
-        else:
-            entrance_connectors['Mountain Entry Entrance'] = ['West Dark Death Mountain (Bottom)']
-        entrance_connectors['Bumper Cave Entrance'] = ['Bumper Cave Ledge']
-    else:
-        if not world.is_tile_swapped(0x03, player):
-            entrance_connectors['Bumper Cave Entrance'] = ['West Death Mountain (Bottom)']
-            entrance_connectors['Bumper Cave Ledge'] = ['West Death Mountain (Bottom)']
-            entrance_connectors['West Death Mountain (Bottom)'] = ['Bumper Cave Ledge']
-        else:
-            entrance_connectors['Bumper Cave Entrance'] = ['West Dark Death Mountain (Bottom)']
-        entrance_connectors['Mountain Entry Entrance'] = ['Mountain Entry Ledge']
-    
     from Main import copy_world_limited
     from Utils import stack_size3a
     from EntranceShuffle import default_dungeon_connections, default_connector_connections, default_item_connections, default_shop_connections, default_drop_connections, default_dropexit_connections
