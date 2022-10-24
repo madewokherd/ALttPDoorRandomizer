@@ -1087,6 +1087,7 @@ OWTileRegions = bidict({
     'Hyrule Castle Courtyard Northeast': 0x1b,
     'Hyrule Castle Ledge': 0x1b,
     'Hyrule Castle East Entry': 0x1b,
+    'Hyrule Castle Water': 0x1b,
 
     'Wooden Bridge Area': 0x1d,
     'Wooden Bridge Northeast': 0x1d,
@@ -1227,6 +1228,7 @@ OWTileRegions = bidict({
     'Pyramid Crack': 0x5b,
     'Pyramid Exit Ledge': 0x5b,
     'Pyramid Pass': 0x5b,
+    'Pyramid Water': 0x5b,
 
     'Broken Bridge Area': 0x5d,
     'Broken Bridge Northeast': 0x5d,
@@ -1491,7 +1493,6 @@ OWExitTypes = {
             'Cave 45 Cliff Ledge Drop',
             'Desert C Whirlpool Cliff Ledge Drop',
             'Desert Pass Cliff Ledge Drop',
-            'Desert Pass Southeast Cliff Ledge Drop',
             'Dam Cliff Ledge Drop',
             'Bombos Tablet Drop',
             'Cave 45 Ledge Drop',
@@ -1540,6 +1541,7 @@ OWExitTypes = {
             'Dark South Teleporter Cliff Ledge Drop',
             'Misery Mire Teleporter Ledge Drop',
             'Mire Cliff Ledge Drop',
+            'Dark Checkerboard Cliff Ledge Drop',
             'Archery Game Cliff Ledge Drop',
             'Stumpy Approach Cliff Ledge Drop',
             'Mire C Whirlpool Cliff Ledge Drop',

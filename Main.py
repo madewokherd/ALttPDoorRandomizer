@@ -163,8 +163,6 @@ def main(args, seed=None, fish=None):
 
     for player in range(1, world.players + 1):
         create_regions(world, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(world, player)
         create_dungeon_regions(world, player)
         create_owedges(world, player)
         create_shops(world, player)
@@ -189,6 +187,8 @@ def main(args, seed=None, fish=None):
         link_overworld(world, player)
         create_shops(world, player)
         update_world_regions(world, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(world, player)
         create_flute_exits(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))

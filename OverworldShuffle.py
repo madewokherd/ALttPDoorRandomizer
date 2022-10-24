@@ -1340,58 +1340,15 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Bomber Corner Waterfall Water Drop', 'Bomber Corner Water'), #flippers
                          ('Bomber Corner Pier', 'Bomber Corner Area'),
 
-                         # OWG Connections
-                         ('Sand Dunes Ledge Drop', 'Sand Dunes Area'),
-                         ('Stone Bridge East Ledge Drop', 'Stone Bridge Area'),
-                         ('Tree Line Ledge Drop', 'Tree Line Area'),
-                         ('Eastern Palace Ledge Drop', 'Eastern Palace Area'),
-                         
-                         ('Links House Cliff Ledge Drop', 'Links House Area'),
-                         ('Central Bonk Rocks Cliff Ledge Drop', 'Central Bonk Rocks Area'),
-                         ('Stone Bridge Cliff Ledge Drop', 'Stone Bridge Area'),
-                         ('Lake Hylia Area Cliff Ledge Drop', 'Lake Hylia Area'),
-                         ('C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'),
-                         ('C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'),
-                         ('South Teleporter Cliff Ledge Drop', 'Dark Central Cliffs'),
-                         ('Statues Cliff Ledge Drop', 'Statues Area'),
-                         ('Lake Hylia Island FAWT Ledge Drop', 'Lake Hylia Island'),
+                         # OWG In-Bounds Connections
                          ('Stone Bridge EC Cliff Water Drop', 'Stone Bridge Water'), #fake flipper
-                         ('Tree Line WC Cliff Water Drop', 'Tree Line Water'), #fake flipper
-                         
-                         ('Desert Boss Cliff Ledge Drop', 'Desert Palace Entrance (North) Spot'),
-                         ('Checkerboard Cliff Ledge Drop', 'Desert Checkerboard Ledge'),
-                         ('Suburb Cliff Ledge Drop', 'Kakariko Suburb Area'),
-                         ('Cave 45 Cliff Ledge Drop', 'Cave 45 Ledge'),
-                         ('Desert Pass Cliff Ledge Drop', 'Desert Pass Area'),
-                         ('Desert Pass Southeast Cliff Ledge Drop', 'Desert Pass Southeast'),
-                         ('Desert C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area'),
-                         ('Dam Cliff Ledge Drop', 'Dam Area'),
+                         ('Tree Line WC Cliff Water Drop', 'Tree Line Water'), #fake flipper,
 
-                         ('Dark Dunes Ledge Drop', 'Dark Dunes Area'),
-                         ('Hammer Bridge North Ledge Drop', 'Hammer Bridge North Area'),
-                         ('Dark Tree Line Ledge Drop', 'Dark Tree Line Area'),
-                         ('Palace of Darkness Ledge Drop', 'Palace of Darkness Area'),
-
-                         ('Mire Cliff Ledge Drop', 'Misery Mire Area'),
-                         ('Archery Game Cliff Ledge Drop', 'Archery Game Area'),
-                         ('Stumpy Approach Cliff Ledge Drop', 'Stumpy Approach Area'),
-                         ('Swamp Nook Cliff Ledge Drop', 'Swamp Nook Area'),
-                         ('Mire C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'),
-                         ('Swamp Cliff Ledge Drop', 'Swamp Area'),
-
-                         ('Bomb Shop Cliff Ledge Drop', 'Big Bomb Shop Area'),
-                         ('Dark Bonk Rocks Cliff Ledge Drop', 'Dark Bonk Rocks Area'),
-                         ('Hammer Bridge South Cliff Ledge Drop', 'Hammer Bridge South Area'),
-                         ('Ice Lake Area Cliff Ledge Drop', 'Ice Lake Area'),
-                         ('Ice Lake Northeast Pier Hop', 'Ice Lake Northeast Bank'),
-                         ('Ice Lake Moat Bomb Jump', 'Ice Lake Moat'),
-                         ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'),
-                         ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'),
-                         ('Hype Cliff Ledge Drop', 'Hype Cave Area'),
-                         ('Ice Palace Island FAWT Ledge Drop', 'Ice Lake Moat'),
                          ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), #fake flipper
-                         ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water') #fake flipper
-                         ]
+                         ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water'), #fake flipper
+                         ('Ice Lake Northeast Pier Hop', 'Ice Lake Northeast Bank'),
+                         ('Ice Lake Moat Bomb Jump', 'Ice Lake Moat')
+                        ]
 
 default_whirlpool_connections = [
     ((0x33, 'C Whirlpool', 'C Whirlpool Water'),              (0x15, 'River Bend Whirlpool', 'River Bend Water')),
@@ -1594,9 +1551,13 @@ ow_connections = {
             ('Broken Bridge Northeast Mirror Spot', 'Broken Bridge Northeast')
         ]),
     0x1e: ([
-            ('Eastern Palace Mirror Spot', 'Eastern Palace Area')
+            ('Eastern Palace Mirror Spot', 'Eastern Palace Area'),
+            ('Eastern Palace Ledge Drop', 'Eastern Palace Area'), # OWG
+            ('Palace of Darkness Ledge Drop', 'Palace of Darkness Area') # OWG
         ], [
-            ('Palace of Darkness Mirror Spot', 'Palace of Darkness Area')
+            ('Palace of Darkness Mirror Spot', 'Palace of Darkness Area'),
+            ('Eastern Palace Ledge Drop', 'Palace of Darkness Area'), # OWG
+            ('Palace of Darkness Ledge Drop', 'Eastern Palace Area') # OWG
         ]),
     0x22: ([
             ('Blacksmith Mirror Spot', 'Blacksmith Area'),
@@ -1607,9 +1568,13 @@ ow_connections = {
             ('Hammer Pegs Entry Mirror Spot', 'Hammer Pegs Entry')
         ]),
     0x25: ([
-            ('Sand Dunes Mirror Spot', 'Sand Dunes Area')
+            ('Sand Dunes Mirror Spot', 'Sand Dunes Area'),
+            ('Sand Dunes Ledge Drop', 'Sand Dunes Area'), # OWG
+            ('Dark Dunes Ledge Drop', 'Dark Dunes Area') # OWG
         ], [
-            ('Dark Dunes Mirror Spot', 'Dark Dunes Area')
+            ('Dark Dunes Mirror Spot', 'Dark Dunes Area'),
+            ('Sand Dunes Ledge Drop', 'Dark Dunes Area'), # OWG
+            ('Dark Dunes Ledge Drop', 'Sand Dunes Area') # OWG
         ]),
     0x28: ([
             ('Maze Race Mirror Spot', 'Maze Race Ledge'),
@@ -1620,11 +1585,15 @@ ow_connections = {
         ]),
     0x29: ([
             ('Kakariko Suburb Mirror Spot', 'Kakariko Suburb Area'),
-            ('Kakariko Suburb South Mirror Spot', 'Kakariko Suburb Area')
+            ('Kakariko Suburb South Mirror Spot', 'Kakariko Suburb Area'),
+            ('Suburb Cliff Ledge Drop', 'Kakariko Suburb Area'), # OWG
+            ('Archery Game Cliff Ledge Drop', 'Archery Game Area') # OWG
         ], [
             ('Frog Mirror Spot', 'Frog Area'),
             ('Frog Prison Mirror Spot', 'Frog Prison'),
-            ('Archery Game Mirror Spot', 'Archery Game Area')
+            ('Archery Game Mirror Spot', 'Archery Game Area'),
+            ('Suburb Cliff Ledge Drop', 'Archery Game Area'), # OWG
+            ('Archery Game Cliff Ledge Drop', 'Kakariko Suburb Area') # OWG
         ]),
     0x2a: ([
             ('Flute Boy Mirror Spot', 'Flute Boy Area'),
@@ -1634,28 +1603,48 @@ ow_connections = {
             ('Stumpy Pass Mirror Spot', 'Stumpy Pass')
         ]),
     0x2b: ([
-            ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area')
+            ('Central Bonk Rocks Mirror Spot', 'Central Bonk Rocks Area'),
+            ('Central Bonk Rocks Cliff Ledge Drop', 'Central Bonk Rocks Area'), # OWG
+            ('Dark Bonk Rocks Cliff Ledge Drop', 'Dark Bonk Rocks Area') # OWG
         ], [
-            ('Dark Bonk Rocks Mirror Spot', 'Dark Bonk Rocks Area')
+            ('Dark Bonk Rocks Mirror Spot', 'Dark Bonk Rocks Area'),
+            ('Central Bonk Rocks Cliff Ledge Drop', 'Dark Bonk Rocks Area'), # OWG
+            ('Dark Bonk Rocks Cliff Ledge Drop', 'Central Bonk Rocks Area') # OWG
         ]),
     0x2c: ([
-            ('Links House Mirror Spot', 'Links House Area')
+            ('Links House Mirror Spot', 'Links House Area'),
+            ('Links House Cliff Ledge Drop', 'Links House Area'), # OWG
+            ('Bomb Shop Cliff Ledge Drop', 'Big Bomb Shop Area') # OWG
         ], [
-            ('Big Bomb Shop Mirror Spot', 'Big Bomb Shop Area')
+            ('Big Bomb Shop Mirror Spot', 'Big Bomb Shop Area'),
+            ('Links House Cliff Ledge Drop', 'Big Bomb Shop Area'), # OWG
+            ('Bomb Shop Cliff Ledge Drop', 'Links House Area') # OWG
         ]),
     0x2d: ([
             ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
             ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
-            ('Hobo Mirror Spot', 'Stone Bridge Water')
+            ('Hobo Mirror Spot', 'Stone Bridge Water'),
+            ('Stone Bridge East Ledge Drop', 'Stone Bridge Area'), # OWG
+            ('Hammer Bridge North Ledge Drop', 'Hammer Bridge North Area'), # OWG
+            ('Stone Bridge Cliff Ledge Drop', 'Stone Bridge Area'), # OWG
+            ('Hammer Bridge South Cliff Ledge Drop', 'Hammer Bridge South Area') # OWG
         ], [
             ('Hammer Bridge North Mirror Spot', 'Hammer Bridge North Area'),
             ('Hammer Bridge South Mirror Spot', 'Hammer Bridge South Area'),
-            ('Dark Hobo Mirror Spot', 'Hammer Bridge Water')
+            ('Dark Hobo Mirror Spot', 'Hammer Bridge Water'),
+            ('Stone Bridge East Ledge Drop', 'Hammer Bridge North Area'), # OWG
+            ('Hammer Bridge North Ledge Drop', 'Stone Bridge Area'), # OWG
+            ('Stone Bridge Cliff Ledge Drop', 'Hammer Bridge South Area'), # OWG
+            ('Hammer Bridge South Cliff Ledge Drop', 'Stone Bridge Area') # OWG
         ]),
     0x2e: ([
-            ('Tree Line Mirror Spot', 'Tree Line Area')
+            ('Tree Line Mirror Spot', 'Tree Line Area'),
+            ('Tree Line Ledge Drop', 'Tree Line Area'), # OWG
+            ('Dark Tree Line Ledge Drop', 'Dark Tree Line Area') # OWG
         ], [
-            ('Dark Tree Line Mirror Spot', 'Dark Tree Line Area')
+            ('Dark Tree Line Mirror Spot', 'Dark Tree Line Area'),
+            ('Tree Line Ledge Drop', 'Dark Tree Line Area'), # OWG
+            ('Dark Tree Line Ledge Drop', 'Tree Line Area') # OWG
         ]),
     0x2f: ([
             ('Eastern Nook Mirror Spot', 'Eastern Nook Area'),
@@ -1671,7 +1660,10 @@ ow_connections = {
             ('DP Stairs Mirror Spot', 'Desert Palace Stairs'),
             ('DP Entrance (North) Mirror Spot', 'Desert Palace Entrance (North) Spot'),
             ('Bombos Tablet Ledge Mirror Spot', 'Bombos Tablet Ledge'),
-            ('Desert Teleporter', 'Misery Mire Teleporter Ledge')
+            ('Desert Teleporter', 'Misery Mire Teleporter Ledge'),
+            ('Desert Boss Cliff Ledge Drop', 'Desert Palace Entrance (North) Spot'), # OWG
+            ('Mire Cliff Ledge Drop', 'Misery Mire Area'), # OWG
+            ('Checkerboard Cliff Ledge Drop', 'Desert Checkerboard Ledge') # OWG
         ], [
             ('Checkerboard Ledge Approach', 'Desert Checkerboard Ledge'),
             ('Checkerboard Ledge Leave', 'Desert Area'),
@@ -1679,32 +1671,56 @@ ow_connections = {
             ('Misery Mire Ledge Mirror Spot', 'Misery Mire Area'),
             ('Misery Mire Blocked Mirror Spot', 'Misery Mire Area'),
             ('Misery Mire Main Mirror Spot', 'Misery Mire Area'),
-            ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge')
+            ('Misery Mire Teleporter', 'Desert Palace Teleporter Ledge'),
+            ('Desert Boss Cliff Ledge Drop', 'Misery Mire Area'), # OWG
+            ('Mire Cliff Ledge Drop', 'Desert Palace Entrance (North) Spot'), # OWG
+            ('Dark Checkerboard Cliff Ledge Drop', 'Desert Checkerboard Ledge') # OWG
         ]),
     0x32: ([
             ('Cave 45 Ledge Drop', 'Flute Boy Approach Area'),
             ('Flute Boy Entry Mirror Spot', 'Flute Boy Bush Entry'),
-            ('Cave 45 Mirror Spot', 'Cave 45 Ledge')
+            ('Cave 45 Mirror Spot', 'Cave 45 Ledge'),
+            ('Cave 45 Cliff Ledge Drop', 'Cave 45 Ledge'), # OWG
+            ('Stumpy Approach Cliff Ledge Drop', 'Stumpy Approach Area') # OWG
         ], [
             ('Cave 45 Inverted Leave', 'Flute Boy Approach Area'),
             ('Cave 45 Inverted Approach', 'Cave 45 Ledge'),
             ('Stumpy Approach Mirror Spot', 'Stumpy Approach Area'),
-            ('Stumpy Bush Entry Mirror Spot', 'Stumpy Approach Bush Entry')
+            ('Stumpy Bush Entry Mirror Spot', 'Stumpy Approach Bush Entry'),
+            ('Cave 45 Cliff Ledge Drop', 'Stumpy Approach Area'), # OWG
+            ('Stumpy Approach Cliff Ledge Drop', 'Cave 45 Ledge') # OWG
         ]),
     0x33: ([
             ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
             ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
-            ('South Hyrule Teleporter', 'Dark C Whirlpool Area')
+            ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
+            ('South Teleporter Cliff Ledge Drop', 'Dark Central Cliffs'), # OWG only, needs glove
+            ('C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
+            ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
+            ('C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
+            ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
+            ('Desert C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
+            ('Mire C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area') # OWG
         ], [
             ('Dark C Whirlpool Mirror Spot', 'Dark C Whirlpool Area'),
             ('Dark C Whirlpool Outer Mirror Spot', 'Dark C Whirlpool Outer Area'),
             ('South Dark World Teleporter', 'C Whirlpool Area'),
-            ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs') #OWG only, needs glove
+            ('Dark South Teleporter Cliff Ledge Drop', 'Central Cliffs'), # OWG, needs glove/pearl
+            ('C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
+            ('Dark C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
+            ('C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
+            ('Dark C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
+            ('Desert C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
+            ('Mire C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area') # OWG
         ]),
     0x34: ([
-            ('Statues Mirror Spot', 'Statues Area')
+            ('Statues Mirror Spot', 'Statues Area'),
+            ('Statues Cliff Ledge Drop', 'Statues Area'), # OWG
+            ('Hype Cliff Ledge Drop', 'Hype Cave Area') # OWG
         ], [
-            ('Hype Cave Mirror Spot', 'Hype Cave Area')
+            ('Hype Cave Mirror Spot', 'Hype Cave Area'),
+            ('Statues Cliff Ledge Drop', 'Hype Cave Area'), # OWG
+            ('Hype Cliff Ledge Drop', 'Statues Area') # OWG
         ]),
     0x35: ([
             ('Lake Hylia Mirror Spot', 'Lake Hylia Area'),
@@ -1715,7 +1731,12 @@ ow_connections = {
             ('Lake Hylia Central Island Mirror Spot', 'Lake Hylia Central Island'),
             ('Lake Hylia Water Mirror Spot', 'Lake Hylia Water'),
             ('Lake Hylia Water D Mirror Spot', 'Lake Hylia Water D'),
-            ('Lake Hylia Teleporter', 'Ice Palace Area')
+            ('Lake Hylia Teleporter', 'Ice Palace Area'),
+            #('Ice Palace Ledge Drop', 'Ice Lake Moat'),
+            ('Lake Hylia Area Cliff Ledge Drop', 'Lake Hylia Area'), # OWG
+            ('Ice Lake Area Cliff Ledge Drop', 'Ice Lake Area'), # OWG
+            ('Lake Hylia Island FAWT Ledge Drop', 'Lake Hylia Island'), # OWG
+            ('Ice Palace Island FAWT Ledge Drop', 'Ice Lake Moat') # OWG
         ], [
             ('Lake Hylia Island Pier', 'Lake Hylia Island'),
             ('Ice Lake Mirror Spot', 'Ice Lake Area'),
@@ -1724,7 +1745,11 @@ ow_connections = {
             ('Ice Lake Northeast Mirror Spot', 'Ice Lake Northeast Bank'),
             ('Ice Palace Mirror Spot', 'Ice Palace Area'),
             ('Ice Lake Moat Mirror Spot', 'Ice Lake Moat'),
-            ('Ice Palace Teleporter', 'Lake Hylia Water D')
+            ('Ice Palace Teleporter', 'Lake Hylia Water D'),
+            ('Lake Hylia Area Cliff Ledge Drop', 'Ice Lake Area'), # OWG
+            ('Ice Lake Area Cliff Ledge Drop', 'Lake Hylia Area'), # OWG
+            ('Lake Hylia Island FAWT Ledge Drop', 'Ice Lake Moat'), # OWG
+            ('Ice Palace Island FAWT Ledge Drop', 'Lake Hylia Island') # OWG
         ]),
     0x37: ([
             ('Ice Cave Mirror Spot', 'Ice Cave Area')
@@ -1733,18 +1758,26 @@ ow_connections = {
         ]),
     0x3a: ([
             ('Desert Pass Ledge Mirror Spot', 'Desert Pass Ledge'),
-            ('Desert Pass Mirror Spot', 'Desert Pass Area')
+            ('Desert Pass Mirror Spot', 'Desert Pass Area'),
+            ('Desert Pass Cliff Ledge Drop', 'Desert Pass Area'), # OWG
+            ('Swamp Nook Cliff Ledge Drop', 'Swamp Nook Area') # OWG
         ], [
             ('Desert Pass Ladder (North)', 'Desert Pass Area'),
             ('Desert Pass Ladder (South)', 'Desert Pass Ledge'),
             ('Swamp Nook Mirror Spot', 'Swamp Nook Area'),
             ('Swamp Nook Southeast Mirror Spot', 'Swamp Nook Area'),
-            ('Swamp Nook Pegs Mirror Spot', 'Swamp Nook Area')
+            ('Swamp Nook Pegs Mirror Spot', 'Swamp Nook Area'),
+            ('Desert Pass Cliff Ledge Drop', 'Swamp Nook Area'), # OWG
+            ('Swamp Nook Cliff Ledge Drop', 'Desert Pass Area') # OWG
         ]),
     0x3b: ([
-            ('Dam Mirror Spot', 'Dam Area')
+            ('Dam Mirror Spot', 'Dam Area'),
+            ('Dam Cliff Ledge Drop', 'Dam Area'), # OWG
+            ('Swamp Cliff Ledge Drop', 'Swamp Area') # OWG
         ], [
-            ('Swamp Mirror Spot', 'Swamp Area')
+            ('Swamp Mirror Spot', 'Swamp Area'),
+            ('Dam Cliff Ledge Drop', 'Swamp Area'), # OWG
+            ('Swamp Cliff Ledge Drop', 'Dam Area') # OWG
         ]),
     0x3c: ([
             ('South Pass Mirror Spot', 'South Pass Area')
