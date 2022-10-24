@@ -297,7 +297,12 @@ def overworld_glitches_rules(world, player):
     add_additional_rule(world.get_entrance('VoO To Dig Game Hook Clip', player), lambda state: state.has('Hookshot', player))
     add_additional_rule(world.get_entrance('Tree Line Water Clip', player), lambda state: state.has('Flippers', player))
     add_additional_rule(world.get_entrance('Dark Tree Line Water Clip', player), lambda state: state.has('Flippers', player))
-    
+    if not world.is_tile_swapped(0x33, player):
+        add_additional_rule(world.get_entrance('South Teleporter Cliff Ledge Drop', player), lambda state: state.can_lift_rocks(player) and state.has_Pearl(player))
+        world.get_entrance('Dark South Teleporter Cliff Ledge Drop', player).access_rule = lambda state: False
+    else:
+        add_additional_rule(world.get_entrance('Dark South Teleporter Cliff Ledge Drop', player), lambda state: state.can_lift_rocks(player) and state.has_Pearl(player))
+        world.get_entrance('South Teleporter Cliff Ledge Drop', player).access_rule = lambda state: False
 
 def add_alternate_rule(entrance, rule):
     old_rule = entrance.access_rule
@@ -314,6 +319,7 @@ def create_no_logic_connections(player, world, connections):
         parent = world.get_region(parent_region, player)
         target = world.get_region(target_region, player)
         connection = Entrance(player, entrance, parent)
+        connection.spot_type = 'Ledge'
         parent.exits.append(connection)
         connection.connect(target)
 
@@ -457,6 +463,7 @@ boots_clips = [
 
     (['C Whirlpool To Cliff Clip', 'Dark C Whirlpool To Cliff Clip'], ['C Whirlpool Area', 'Dark C Whirlpool Area'], ['Central Cliffs', 'Dark Central Cliffs']),
     (['C Whirlpool Outer To Cliff Clip', 'Dark C Whirlpool Outer To Cliff Clip'], ['C Whirlpool Outer Area', 'Dark C Whirlpool Outer Area'], ['Central Cliffs', 'Dark Central Cliffs']),
+    (['South Teleporter Cliff Ledge Drop', 'Dark South Teleporter Cliff Ledge Drop'], ['C Whirlpool Area', 'Dark C Whirlpool Area'], ['Dark Central Cliffs', 'Central Cliffs']), # glove/pearl
 
     (['Statues To Cliff Clip', 'Hype To Cliff Clip'], ['Statues Area', 'Hype Cave Area'], ['Central Cliffs', 'Dark Central Cliffs']),
 

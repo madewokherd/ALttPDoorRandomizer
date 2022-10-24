@@ -1508,7 +1508,8 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
     for region_name in inaccessible_regions.copy():
         region = world.get_region(region_name, player)
         if region.type not in [RegionType.LightWorld, RegionType.DarkWorld] or not any((not exit.connected_region and exit.spot_type == 'Entrance') for exit in region.exits) \
-                or (region_name == 'Pyramid Exit Ledge' and world.shuffle[player] != 'insanity' or world.is_tile_swapped(0x1b, player)):
+                or (region_name == 'Pyramid Exit Ledge' and world.shuffle[player] != 'insanity' or world.is_tile_swapped(0x1b, player)) \
+                or region_name in ['Hyrule Castle Water', 'Pyramid Water']:
             inaccessible_regions.remove(region_name)
         elif region.type == (RegionType.LightWorld if not invFlag else RegionType.DarkWorld):
             must_exit_regions.append(region_name)
