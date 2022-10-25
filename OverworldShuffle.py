@@ -4,6 +4,7 @@ from DungeonGenerator import GenerationException
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from Regions import mark_dark_world_regions, mark_light_world_regions
 from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitTypes, OpenStd, parallel_links, IsParallel
+from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
 version_number = '0.2.10.1'
