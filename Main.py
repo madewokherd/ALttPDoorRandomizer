@@ -187,8 +187,6 @@ def main(args, seed=None, fish=None):
         link_overworld(world, player)
         create_shops(world, player)
         update_world_regions(world, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(world, player)
         create_flute_exits(world, player)
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
@@ -462,13 +460,13 @@ def copy_world(world):
     for player in range(1, world.players + 1):
         create_regions(ret, player)
         update_world_regions(ret, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(ret, player)
         create_flute_exits(ret, player)
         create_dungeon_regions(ret, player)
         create_shops(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(ret, player)
 
     # there are region references here they must be migrated to preserve integrity
     # ret.exp_cache = world.exp_cache.copy()

@@ -176,6 +176,9 @@ def link_overworld(world, player):
                 connect_simple(world, exitname, regionname, player)
 
     categorize_world_regions(world, player)
+
+    if world.logic[player] in ('owglitches', 'nologic'):
+        create_owg_connections(world, player)
     
     # crossed shuffle
     logging.getLogger('').debug('Crossing overworld edges')
