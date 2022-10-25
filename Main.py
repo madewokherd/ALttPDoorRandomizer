@@ -554,6 +554,7 @@ def copy_world(world):
     from OverworldShuffle import categorize_world_regions
     for player in range(1, world.players + 1):
         categorize_world_regions(ret, player)
+        create_farm_locations(ret, player)
         set_rules(ret, player)
 
     return ret

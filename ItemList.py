@@ -552,19 +552,23 @@ def create_farm_locations(world, player):
     # and hopefully access to more permanent farm locations
 
     def create_and_fill_location(region_name, loc_description, item_name):
-        region = world.get_region(region_name, player)
-        loc = Location(player, f'{region_name} {loc_description}', 0, region)
-        loc.type = LocationType.Logical
-        loc.parent_region = region
-        loc.event = True
-        loc.locked = True
-        loc.address = None
-        
-        world.push_item(loc, ItemFactory(item_name, player), False)
-        
-        region.locations.append(loc)
-        world.dynamic_locations.append(loc)
+        loc = world.get_location_unsafe(f'{region_name} {loc_description}', player)
+        if loc:
+            loc.access_rule = lambda state: True
+            world.spoiler.suppress_spoiler_locations.append(loc.name)
+        else:
+            region = world.get_region(region_name, player)
+            loc = Location(player, f'{region_name} {loc_description}', 0, region)
+            loc.type = LocationType.Logical
+            loc.parent_region = region
+            loc.event = True
+            loc.locked = True
+            loc.address = None
 
+            world.push_item(loc, ItemFactory(item_name, player), False)
+        
+            region.locations.append(loc)
+            world.dynamic_locations.append(loc)
         return loc
 
     from Rules import set_rule, add_rule, add_bunny_rule
