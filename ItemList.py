@@ -555,7 +555,6 @@ def create_farm_locations(world, player):
         loc = world.get_location_unsafe(f'{region_name} {loc_description}', player)
         if loc:
             loc.access_rule = lambda state: True
-            world.spoiler.suppress_spoiler_locations.append(loc.name)
         else:
             region = world.get_region(region_name, player)
             loc = Location(player, f'{region_name} {loc_description}', 0, region)
