@@ -631,7 +631,12 @@ OWShuffle:
     ;look up transitions in current area in table OWEdgeOffsets
     ;offset is (8bytes * OW Slot ID) + (2bytes * direction)
     asl : rep #$20 : and.w #$00ff : pha : sep #$20 ;2 bytes per direction
-    lda $8a : and #$40 : !add $700 : rep #$30 : and #$00ff : asl #3
+
+    lda $8a : tax : lda.l OWTileWorldAssoc,X : eor.l CurrentWorld : beq +
+        ; fake world, will treat this OW area as opposite world
+        txa : eor.b #$40 : tax
+    + txa : and #$40 : !add $700 : rep #$30 : and #$00ff : asl #3
+
     adc 1,S : tax
     asl $700 : pla
     ;x = offset to edgeoffsets table
