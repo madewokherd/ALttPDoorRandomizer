@@ -818,8 +818,8 @@ def default_rules(world, player):
     # Underworld Logic
     set_rule(world.get_entrance('Old Man Cave Exit (West)', player), lambda state: False)  # drop cannot be climbed up
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has_Mirror(player))  # can erase block, overwritten in noglitches
-    set_rule(world.get_entrance('Bumper Cave Exit (Top)', player), lambda state: state.has('Cape', player))
-    set_rule(world.get_entrance('Bumper Cave Exit (Bottom)', player), lambda state: state.has('Cape', player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('Bumper Cave Bottom to Top', player), lambda state: state.has('Cape', player))
+    set_rule(world.get_entrance('Bumper Cave Top To Bottom', player), lambda state: state.has('Cape', player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('Superbunny Cave Exit (Bottom)', player), lambda state: False)  # Cannot get to bottom exit from top. Just exists for shuffling
     
     # Item Access
@@ -1801,8 +1801,8 @@ def set_bunny_rules(world, player, inverted):
 
     # regions for the exits of multi-entrace caves/drops that bunny cannot pass
     # Note spiral cave may be technically passible, but it would be too absurd to require since OHKO mode is a thing.
-    bunny_impassable_caves = ['Bumper Cave', 'Two Brothers House', 'Hookshot Cave (Middle)',
-                              'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
+    bunny_impassable_caves = ['Bumper Cave (top)', 'Bumper Cave (bottom)', 'Two Brothers House',
+                              'Hookshot Cave (Middle)', 'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
                                   'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge',
