@@ -395,21 +395,21 @@ def link_entrances(world, player):
         connector_entrances = [e for e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] if e in (dw_entrances if not invFlag else lw_entrances)]
         connect_inaccessible_regions(world, [], connector_entrances, caves, player)
         if invFlag:
-            lw_dungeons = list(OrderedDict.fromkeys(lw_dungeons + caves))
+            lw_dungeons = [e for e in lw_dungeons if e in caves]
         else:
-            dw_dungeons = list(OrderedDict.fromkeys(dw_dungeons + caves))
+            dw_dungeons = [e for e in dw_dungeons if e in caves]
         
-        caves = list(OrderedDict.fromkeys(Cave_Base + caves)) + (lw_dungeons if not invFlag else dw_dungeons)
+        caves = [e for e in caves if e not in (dw_dungeons if not invFlag else lw_dungeons)] + (lw_dungeons if not invFlag else dw_dungeons)
         connector_entrances = [e for e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] if e in (lw_entrances if not invFlag else dw_entrances)]
         connect_inaccessible_regions(world, connector_entrances, [], caves, player)
         if not invFlag:
-            lw_dungeons = list(OrderedDict.fromkeys(lw_dungeons + caves))
+            lw_dungeons = [e for e in lw_dungeons if e in caves]
         else:
-            dw_dungeons = list(OrderedDict.fromkeys(dw_dungeons + caves))
+            dw_dungeons = [e for e in dw_dungeons if e in caves]
         
+        caves = [e for e in caves if e not in (lw_dungeons if not invFlag else dw_dungeons)] + DW_Mid_Dungeon_Exits
         lw_dungeons = lw_dungeons + (Old_Man_House if not invFlag else [])
         dw_dungeons = dw_dungeons + ([] if not invFlag else Old_Man_House)
-        caves = list(OrderedDict.fromkeys(Cave_Base + caves)) + DW_Mid_Dungeon_Exits
         
         # place old man, has limited options
         lw_entrances = [e for e in lw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
