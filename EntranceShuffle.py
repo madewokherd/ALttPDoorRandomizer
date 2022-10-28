@@ -380,7 +380,7 @@ def link_entrances(world, player):
         place_blacksmith(world, links_house, player)
 
         # determine pools
-        Cave_Base = list(Cave_Exits + Cave_Three_Exits)
+        Cave_Base = list(Cave_Exits + Cave_Three_Exits + Old_Man_House)
         lw_entrances = list()
         dw_entrances = list()
         for e in entrance_pool:
@@ -408,8 +408,6 @@ def link_entrances(world, player):
             dw_dungeons = [e for e in dw_dungeons if e in caves]
         
         caves = [e for e in caves if e not in (lw_dungeons if not invFlag else dw_dungeons)] + DW_Mid_Dungeon_Exits
-        lw_dungeons = lw_dungeons + (Old_Man_House if not invFlag else [])
-        dw_dungeons = dw_dungeons + ([] if not invFlag else Old_Man_House)
         
         # place old man, has limited options
         lw_entrances = [e for e in lw_entrances if e in list(zip(*default_connector_connections + default_dungeon_connections + open_default_dungeon_connections))[0] and e in entrance_pool]
