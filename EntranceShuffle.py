@@ -1528,21 +1528,15 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player, ignore_list)
     
     # connect one connector at a time to ensure multiple connectors aren't assigned to the same inaccessible set of regions
-    if world.shuffle[player] in ['lean', 'crossed', 'insanity']:
-        combined_must_exit_regions = list(must_exit_regions + otherworld_must_exit_regions)
-        if len(combined_must_exit_regions) > 0:
-            random.shuffle(combined_must_exit_regions)
-            connect_one(combined_must_exit_regions[0], [e for e in lw_entrances if e in entrance_pool])
-    else:
-        pool = [e for e in dw_entrances if e in entrance_pool]
-        if len(otherworld_must_exit_regions) > 0 and len(pool):
-            random.shuffle(otherworld_must_exit_regions)
-            connect_one(otherworld_must_exit_regions[0], pool)
-        elif len(must_exit_regions) > 0:
-            pool = [e for e in lw_entrances if e in entrance_pool]
-            if len(pool):
-                random.shuffle(must_exit_regions)
-                connect_one(must_exit_regions[0], pool)
+    pool = [e for e in (lw_entrances if world.shuffle[player] in ['lean', 'crossed', 'insanity'] else dw_entrances) if e in entrance_pool]
+    if len(otherworld_must_exit_regions) > 0 and len(pool):
+        random.shuffle(otherworld_must_exit_regions)
+        connect_one(otherworld_must_exit_regions[0], pool)
+    elif len(must_exit_regions) > 0:
+        pool = [e for e in lw_entrances if e in entrance_pool]
+        if len(pool):
+            random.shuffle(must_exit_regions)
+            connect_one(must_exit_regions[0], pool)
 
 
 def unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_Exits):
