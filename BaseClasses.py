@@ -25,6 +25,7 @@ class World(object):
         self.players = players
         self.teams = 1
         self.owShuffle = owShuffle.copy()
+        self.owTerrain = {}
         self.owCrossed = owCrossed.copy()
         self.owKeepSimilar = {}
         self.owMixed = owMixed.copy()
@@ -1086,150 +1087,14 @@ class CollectionState(object):
         return self.has_Boots(player) or (self.has_sword(player) and self.has('Quake', player))
 
     def can_farm_rupees(self, player):
-        tree_pulls = ['Lost Woods East Area',
-                    'Snitch Lady (East)',
-                    'Turtle Rock Area',
-                    'Pyramid Area',
-                    'Hype Cave Area',
-                    'Dark South Pass Area',
-                    'Bumper Cave Area']
-        pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
-        post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
+        return self.has('Farmable Rupees', player)
 
-        rupee_farms = ['Archery Game', '50 Rupee Cave', '20 Rupee Cave']
-
-        bush_crabs = ['Lost Woods East Area', 'Mountain Entry Area']
-        pre_aga_bush_crabs = ['Lumberjack Area', 'South Pass Area']
-        rock_crabs = ['Desert Pass Area']
-
-        def can_reach_non_bunny(regionname):
-            region = self.world.get_region(regionname, player)
-            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
-
-        for region in rupee_farms if self.world.pottery[player] in ['none', 'keys', 'dungeon'] else ['Archery Game']:
-            if can_reach_non_bunny(region):
-                return True
-
-        # tree pulls
-        if self.can_kill_most_things(player) and any(i in [0xda, 0xdb] for i in self.world.prizes[player]['pull']):
-            for region in tree_pulls:
-                if can_reach_non_bunny(region):
-                    return True
-            if not self.has_beaten_aga(player):
-                for region in pre_aga_tree_pulls:
-                    if can_reach_non_bunny(region):
-                        return True
-            else:
-                for region in post_aga_tree_pulls:
-                    if can_reach_non_bunny(region):
-                        return True
-
-        # bush crabs (final item isn't considered)
-        if self.world.enemy_shuffle[player] == 'none':
-            if self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
-                for region in bush_crabs:
-                    if can_reach_non_bunny(region):
-                        return True
-                if not self.has_beaten_aga(player):
-                    for region in pre_aga_bush_crabs:
-                        if can_reach_non_bunny(region):
-                            return True
-            if self.can_lift_rocks(player) and self.world.prizes[player]['crab'][0] in [0xda, 0xdb]:
-                for region in rock_crabs:
-                    if can_reach_non_bunny(region):
-                        return True
-
-        return False
-    
     def can_farm_bombs(self, player):
         if self.world.mode[player] == 'standard' and not self.has('Zelda Delivered', player):
             return True
-        
-        bush_bombs = ['Flute Boy Approach Area',
-                    'Kakariko Area',
-                    'Village of Outcasts Area',
-                    'Forgotten Forest Area',
-                    'Bat Cave Ledge',
-                    'East Dark Death Mountain (Bottom)']
-        rock_bombs = ['Links House Area',
-                    'Dark Chapel Area',
-                    'Wooden Bridge Area',
-                    'Ice Cave Area',
-                    'Eastern Nook Area',
-                    'West Death Mountain (Bottom)',
-                    'Kakariko Fortune Area',
-                    'Skull Woods Forest',
-                    'Catfish Area',
-                    'Dark Fortune Area',
-                    'Qirn Jump Area',
-                    'Shield Shop Area',
-                    'Palace of Darkness Nook Area',
-                    'Swamp Nook Area',
-                    'Dark South Pass Area']
-        bonk_bombs = ['Kakariko Fortune Area', 'Dark Graveyard Area'] #TODO: Flute Boy Approach Area and Bonk Rock Ledge are available post-Aga
-        bomb_caves = ['Graveyard Cave', 'Light World Bomb Hut']
 
-        tree_pulls = ['Lost Woods East Area',
-                    'Snitch Lady (East)',
-                    'Turtle Rock Area',
-                    'Pyramid Area',
-                    'Hype Cave Area',
-                    'Dark South Pass Area',
-                    'Bumper Cave Area']
-        pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
-        post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
-
-        bush_crabs = ['Lost Woods East Area', 'Mountain Entry Area']
-        pre_aga_bush_crabs = ['Lumberjack Area', 'South Pass Area']
-        rock_crabs = ['Desert Pass Area']
-
-        def can_reach_non_bunny(regionname):
-            region = self.world.get_region(regionname, player)
-            return region.can_reach(self) and ((self.world.mode[player] != 'inverted' and region.is_light_world) or (self.world.mode[player] == 'inverted' and region.is_dark_world) or self.has('Pearl', player))
-
-        # bomb pickups
-        for region in bush_bombs + (bomb_caves if self.world.pottery[player] in ['none', 'keys', 'dungeon'] else []):
-            if can_reach_non_bunny(region):
-                return True
-
-        if self.can_lift_rocks(player):
-            for region in rock_bombs:
-                if can_reach_non_bunny(region):
-                    return True
-
-        if not self.world.shuffle_bonk_drops[player] and self.can_collect_bonkdrops(player):
-            for region in bonk_bombs:
-                if can_reach_non_bunny(region):
-                    return True
-
-        # tree pulls
-        if self.can_kill_most_things(player) and any(i in [0xdc, 0xdd, 0xde] for i in self.world.prizes[player]['pull']):
-            for region in tree_pulls:
-                if can_reach_non_bunny(region):
-                    return True
-            if not self.has_beaten_aga(player):
-                for region in pre_aga_tree_pulls:
-                    if can_reach_non_bunny(region):
-                        return True
-            else:
-                for region in post_aga_tree_pulls:
-                    if can_reach_non_bunny(region):
-                        return True
-
-        # bush crabs (final item isn't considered)
-        if self.world.enemy_shuffle[player] == 'none':
-            if self.world.prizes[player]['crab'][0] in [0xdc, 0xdd, 0xde]:
-                for region in bush_crabs:
-                    if can_reach_non_bunny(region):
-                        return True
-                if not self.has_beaten_aga(player):
-                    for region in pre_aga_bush_crabs:
-                        if can_reach_non_bunny(region):
-                            return True
-            if self.can_lift_rocks(player) and self.world.prizes[player]['crab'][0] in [0xdc, 0xdd, 0xde]:
-                for region in rock_crabs:
-                    if can_reach_non_bunny(region):
-                        return True
+        if self.has('Farmable Bombs', player):
+            return True
 
         # stun prize
         if self.can_stun_enemies(player) and self.world.prizes[player]['stun'] in [0xdc, 0xdd, 0xde]:
@@ -1238,6 +1103,7 @@ class CollectionState(object):
         # bomb purchases
         if self.can_farm_rupees(player) and (self.can_buy_unlimited('Bombs (10)', player) or self.can_reach('Big Bomb Shop', None, player)):
             return True
+
         return False
 
     def item_count(self, item, player):
@@ -1387,10 +1253,7 @@ class CollectionState(object):
         return self.has('Mirror Shield', player) or self.has('Cane of Byrna', player) or self.has('Cape', player)
 
     def is_not_bunny(self, region, player):
-        if self.has_Pearl(player):
-            return True
-
-        return region.is_light_world if self.world.mode[player] != 'inverted' else region.is_dark_world
+        return self.has_Pearl(player) or not region.can_cause_bunny(player)
 
     def can_reach_light_world(self, player):
         if True in [i.is_light_world for i in self.reachable_regions[player]]:
@@ -1608,7 +1471,7 @@ class Region(object):
     def can_reach(self, state):
         from Utils import stack_size3a
         from DungeonGenerator import GenerationException
-        if stack_size3a() > self.world.players * 500:
+        if stack_size3a() > self.world.players * 1000:
             raise GenerationException(f'Infinite loop detected for "{self.name}" located at \'Region.can_reach\'')
         
         if state.stale[self.player]:
@@ -1633,6 +1496,12 @@ class Region(object):
             return self.dungeon and self.dungeon.is_dungeon_item(item) and item.player == self.player
 
         return True
+
+    def can_cause_bunny(self, player):
+        if 'Moon Pearl' in list(map(str, [i for i in self.world.precollected_items if i.player == player])):
+            return False
+
+        return self.is_dark_world if self.world.mode[player] != 'inverted' else self.is_light_world
 
     def __str__(self):
         return str(self.__unicode__())
@@ -1828,6 +1697,9 @@ class Entrance(object):
                         state.path[self] = (self.name, path)
         
         return found
+
+    def can_cause_bunny(self, player):
+        return self.parent_region.can_cause_bunny(player)
 
     def connect(self, region, addresses=None, target=None, vanilla=None):
         self.connected_region = region
@@ -2680,6 +2552,9 @@ class Location(object):
             name += f' ({world.get_player_names(self.player)})'
         return name
 
+    def can_cause_bunny(self, player):
+        return self.parent_region.can_cause_bunny(player)
+
     def __str__(self):
         return str(self.__unicode__())
 
@@ -2912,6 +2787,7 @@ class Spoiler(object):
                          'weapons': self.world.swords,
                          'goal': self.world.goal,
                          'ow_shuffle': self.world.owShuffle,
+                         'ow_terrain': self.world.owTerrain,
                          'ow_crossed': self.world.owCrossed,
                          'ow_keepsimilar': self.world.owKeepSimilar,
                          'ow_mixed': self.world.owMixed,
@@ -3124,6 +3000,8 @@ class Spoiler(object):
                 outfile.write('Bombbag:'.ljust(line_width) + '%s\n' % yn(self.metadata['bombbag'][player]))
                 outfile.write('Pseudoboots:'.ljust(line_width) + '%s\n' % yn(self.metadata['pseudoboots'][player]))
                 outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
+                if self.metadata['ow_shuffle'][player] != 'vanilla':
+                    outfile.write('Free Terrain:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_terrain'][player]))
                 outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
                 if self.metadata['ow_shuffle'][player] != 'vanilla' or self.metadata['ow_crossed'][player] != 'none':
                     outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))

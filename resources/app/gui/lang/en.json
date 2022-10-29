@@ -131,10 +131,12 @@
     "randomizer.overworld.overworldshuffle.parallel": "Parallel",
     "randomizer.overworld.overworldshuffle.full": "Full",
 
+    "randomizer.overworld.terrain": "Free Terrain",
+
     "randomizer.overworld.crossed": "Crossed",
     "randomizer.overworld.crossed.none": "None",
-    "randomizer.overworld.crossed.polar": "Polar",
     "randomizer.overworld.crossed.grouped": "Grouped",
+    "randomizer.overworld.crossed.polar": "Polar",
     "randomizer.overworld.crossed.limited": "Limited",
     "randomizer.overworld.crossed.chaos": "Chaos",
 

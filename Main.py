@@ -26,7 +26,7 @@ from Rules import set_rules
 from Dungeons import create_dungeons
 from Fill import distribute_items_restrictive, promote_dungeon_items, fill_dungeons_restrictive, ensure_good_pots
 from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations, set_prize_drops
-from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops
+from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops, create_farm_locations
 from Utils import output_path, parse_player_names
 
 from source.item.FillUtil import create_item_pool_config, massage_item_pool, district_item_pool_config
@@ -88,6 +88,7 @@ def main(args, seed=None, fish=None):
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
     world.crystals_ganon_orig = args.crystals_ganon.copy()
     world.crystals_gt_orig = args.crystals_gt.copy()
+    world.owTerrain = args.ow_terrain.copy()
     world.owKeepSimilar = args.ow_keepsimilar.copy()
     world.owWhirlpoolShuffle = args.ow_whirlpool.copy()
     world.owFluteShuffle = args.ow_fluteshuffle.copy()
@@ -162,8 +163,6 @@ def main(args, seed=None, fish=None):
 
     for player in range(1, world.players + 1):
         create_regions(world, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(world, player)
         create_dungeon_regions(world, player)
         create_owedges(world, player)
         create_shops(world, player)
@@ -212,6 +211,10 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli", "cli", "generating.itempool"))
 
     for player in range(1, world.players + 1):
+        set_prize_drops(world, player)
+        create_farm_locations(world, player)
+
+    for player in range(1, world.players + 1):
         generate_itempool(world, player)
 
     logger.info(world.fish.translate("cli","cli","calc.access.rules"))
@@ -227,9 +230,6 @@ def main(args, seed=None, fish=None):
                 sell_keys(world, player)
         else:
             lock_shop_locations(world, player)
-
-    for player in range(1, world.players + 1):
-        set_prize_drops(world, player)
 
     massage_item_pool(world)
     logger.info(world.fish.translate("cli", "cli", "placing.dungeon.prizes"))
@@ -433,6 +433,7 @@ def copy_world(world):
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
     ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
     ret.crystals_gt_orig = world.crystals_gt_orig.copy()
+    ret.owTerrain = world.owTerrain.copy()
     ret.owKeepSimilar = world.owKeepSimilar.copy()
     ret.owWhirlpoolShuffle = world.owWhirlpoolShuffle.copy()
     ret.owFluteShuffle = world.owFluteShuffle.copy()
@@ -459,13 +460,13 @@ def copy_world(world):
     for player in range(1, world.players + 1):
         create_regions(ret, player)
         update_world_regions(ret, player)
+        if world.logic[player] in ('owglitches', 'nologic'):
+            create_owg_connections(ret, player)
         create_flute_exits(ret, player)
         create_dungeon_regions(ret, player)
         create_shops(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(ret, player)
 
     # there are region references here they must be migrated to preserve integrity
     # ret.exp_cache = world.exp_cache.copy()
@@ -551,6 +552,7 @@ def copy_world(world):
     from OverworldShuffle import categorize_world_regions
     for player in range(1, world.players + 1):
         categorize_world_regions(ret, player)
+        create_farm_locations(ret, player)
         set_rules(ret, player)
 
     return ret
@@ -593,6 +595,7 @@ def copy_world_limited(world):
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
     ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
     ret.crystals_gt_orig = world.crystals_gt_orig.copy()
+    ret.owTerrain = world.owTerrain.copy()
     ret.owKeepSimilar = world.owKeepSimilar.copy()
     ret.owWhirlpoolShuffle = world.owWhirlpoolShuffle.copy()
     ret.owFluteShuffle = world.owFluteShuffle.copy()
