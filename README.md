@@ -47,6 +47,36 @@ See the following link if you have additional trouble: https://github.com/codema
 - Run (or double-click) ```Gui.py``` for a simple graphical user interface.
 - Alternatively, you can generate thru the CLI, run ```DungeonRandomizer.py```.
 
+# Getting Started
+## "I heard about OWR and want to give it a try, what do I do?"
+This is a common sentiment among those who are unfamiliar with OWR's offerings. One might be tempted to simply turn on a bunch of the options and give it a go. I cannot express this enough:
+
+**^ DO NOT do this! ^**
+
+OWR definitely has a lot of options, and all of them by themselves are pretty simple to grasp, but combining multiple OWR options together increases the complexity and confusion in exponential fashion. Now, of course, some OWR options like Flute Shuffle can safely be combined at any level and isn't gonna make anything more complicated. But specifically, avoid combining these 3 options, at least when going for your first seed:
+- OW Layout Shuffle
+- OW Tile Swap (Mixed)
+- Crossed OW
+
+## "Any recommendations for a first-timer?"
+For a first (and second) seed... *and I say "second" because I feel like both of these recommendations I'm about to make have VERY different vibes, have different levels of challenge, but are both, of their own right, worthy of being tried at least once.* Your first OWR experience can be combined with any mode combination that you are already familiar with and have a lot of experience in playing. If you like Crosskeys and feel very comfortable running that, feel free to turn on all those settings in addition to ONE of these two options:
+1. `OW Tile Swap (Mixed)` - Overly, a pretty easy-breezy mode, it doesn't require too much big brain, and is pretty managable even without proper logic tracking, as long as you at least have a standard map tracker. This is actually my favorite way to run OWR today
+  - DO NOT turn on Layout or Whirlpool Shuffle, leave this on `Vanilla`
+  - DO NOT turn on Crossed OWR
+  - `Flute Shuffle` or `Bonk Drops` could be enabled if desired, altho I'd recommend against it, at least for a fresh viewpoint of Mixed OWR
+2. `OW Layout Shuffle` - Set to `Parallel`. This is the original spirit and vision of OWR from the time of its own founding. It's definitely much more complicated to run than OW Tile Swap, so keep that in mind.
+  - `Starting Boots` - Either actual boots or pseudoboots, you will be spending a lot of time navigating the OW, so it's best to do it with the ability to run fast.
+  - DO NOT turn on OW Tile Swap (Mixed)
+  - DO NOT turn on Crossed OWR
+  - Enable `Whirlpool Shuffle` - Recommended to always be enabled with Layout Shuffle
+  - Enable `Keep Similar Edges Together` - This just helps keep some of your sanity for a first experience
+  - Enable `Flute Shuffle` - I recommend setting this to `Balanced`, this helps space out the flute spots across the world. Being that the world itself is shuffled, the vanilla flute spots are likely NOT as conveniently located as they normally are.
+  - `Free Terrain` - Recommend to NOT turn this on for a first run, but definitely on a second run.
+  - `Bonk Drops` - Recommend to NOT turn this on, especially if you don't have starting boots, but you could enable this in future seeds if you've become more familiar with OWR, as you'll be visiting these screens anyways, you might as well grab the items on the way :)
+
+## "What tracker should I use?"
+I personally use 2 trackers together, at least if Layout Shuffle is enabled. Currently, DunkaTracker is the ONLY tracker that is useful for tracking Layout Shuffle, can highly recommend. However, I personally don't like the main portion of the tracker and ignore the main window completely. For tracking everything else, I use `CodeTracker`, a tracker pack that is installable within `EmoTracker`, this handles ALL OWR modes EXCEPT Layout Shuffle (and generally Crossed OW, but missing that doesn't make much of a difference). I am unaware of ANY trackers outside of these 2 that handle OWR modes, so my advice would be to familiarize yourself with both trackers and pick and choose the parts you find most useful for yourself.
+
 # Terminology
 
 ### OW / OWR
