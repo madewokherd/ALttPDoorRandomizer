@@ -219,6 +219,8 @@
     "ow_crossed": [
       "This allows cross-world connections to occur on the overworld.",
       "None:           No transitions are cross-world connections.",
+      "Grouped:        This ensures a two-plane separation so that you cannot", 
+      "                walk around and access the other plane version by walking.",
       "Polar:          Only used when Mixed is enabled. This retains original",
       "                connections even when overworld tiles are swapped.",
       "Limited:        Exactly nine transitions are randomly chosen as",

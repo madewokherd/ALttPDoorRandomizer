@@ -20,8 +20,8 @@
       "default": "vanilla",
       "options": [
         "none",
-        "polar",
         "grouped",
+        "polar",
         "limited",
         "chaos"
       ]
