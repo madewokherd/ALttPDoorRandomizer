@@ -1440,12 +1440,12 @@ def place_old_man(world, pool, player, ignore_list=[]):
 
 
 def junk_fill_inaccessible(world, player):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     find_inaccessible_regions(world, player)
 
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     base_world.override_bomb_check = True
     
     # remove regions that have a dungeon entrance
@@ -1602,12 +1602,12 @@ def unbias_dungeons(Dungeon_Exits):
 
 
 def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True, include_one_ways=False):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from Items import ItemFactory
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     base_world.override_bomb_check = True
     
     connect_simple(base_world, 'Links House S&Q', start_region, player)
@@ -1710,12 +1710,12 @@ def get_distant_entrances(world, start_entrance, player):
 
 
 def can_reach(world, entrance_name, region_name, player):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from Items import ItemFactory
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     base_world.override_bomb_check = True
     
     entrance = world.get_entrance(entrance_name, player)

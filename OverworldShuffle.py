@@ -904,13 +904,13 @@ def can_reach_smith(world, player):
     return found
 
 def build_sectors(world, player):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from OWEdges import OWTileRegions
     
     # perform accessibility check on duplicate world
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     
     # build lists of contiguous regions accessible with full inventory (excl portals/mirror/flute/entrances)
     regions = list(OWTileRegions.copy().keys())
@@ -970,7 +970,7 @@ def build_sectors(world, player):
 
 def build_accessible_region_list(world, start_region, player, build_copy_world=False, cross_world=False, region_rules=True, ignore_ledges = False):
     from BaseClasses import CollectionState
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from Items import ItemFactory
     from Utils import stack_size3a
     
@@ -997,7 +997,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
     if build_copy_world:
         for p in range(1, world.players + 1):
             world.key_logic[p] = {}
-        base_world = copy_world_limited(world)
+        base_world = copy_world_premature(world, player)
         base_world.override_bomb_check = True
     else:
         base_world = world
@@ -1040,7 +1040,7 @@ def validate_layout(world, player):
         'Pyramid Area':                       ['Pyramid Exit Ledge']
     }
 
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from Utils import stack_size3a
     from EntranceShuffle import default_dungeon_connections, default_connector_connections, default_item_connections, default_shop_connections, default_drop_connections, default_dropexit_connections
     
@@ -1073,7 +1073,7 @@ def validate_layout(world, player):
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     explored_regions = list()
 
     if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not world.shufflelinks[player]:

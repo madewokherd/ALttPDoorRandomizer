@@ -558,7 +558,7 @@ def copy_world(world):
     return ret
 
 
-def copy_world_limited(world):
+def copy_world_premature(world, player):
     # ToDo: Not good yet
     ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
@@ -621,63 +621,63 @@ def copy_world_limited(world):
 
     ret.is_copied_world = True
 
-    for player in range(1, world.players + 1):
-        create_regions(ret, player)
-        update_world_regions(ret, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
-            create_owg_connections(ret, player)
-        create_flute_exits(ret, player)
-        create_dungeon_regions(ret, player)
-        create_owedges(ret, player)
-        create_shops(ret, player)
-        create_doors(ret, player)
-        create_rooms(ret, player)
-        create_dungeons(ret, player)
+    create_regions(ret, player)
+    update_world_regions(ret, player)
+    if world.logic[player] in ('owglitches', 'nologic'):
+        create_owg_connections(ret, player)
+    create_flute_exits(ret, player)
+    create_dungeon_regions(ret, player)
+    create_owedges(ret, player)
+    create_shops(ret, player)
+    create_doors(ret, player)
+    create_rooms(ret, player)
+    create_dungeons(ret, player)
 
-    for player in range(1, world.players + 1):
-        if world.mode[player] == 'standard':
-            parent = ret.get_region('Menu', player)
-            target = ret.get_region('Hyrule Castle Secret Entrance', player)
-            connection = Entrance(player, 'Uncle S&Q', parent)
-            parent.exits.append(connection)
-            connection.connect(target)
+    if world.mode[player] == 'standard':
+        parent = ret.get_region('Menu', player)
+        target = ret.get_region('Hyrule Castle Secret Entrance', player)
+        connection = Entrance(player, 'Uncle S&Q', parent)
+        parent.exits.append(connection)
+        connection.connect(target)
 
     # connect copied world
     copied_locations = {(loc.name, loc.player): loc for loc in ret.get_locations()}  # caches all locations
     for region in world.regions:
-        copied_region = ret.get_region(region.name, region.player)
-        copied_region.is_light_world = region.is_light_world
-        copied_region.is_dark_world = region.is_dark_world
-        copied_region.dungeon = region.dungeon
-        copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations if (location.name, location.player) in copied_locations]
-        for location in copied_region.locations:
-            location.parent_region = copied_region
-        for entrance in region.entrances:
-            ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
+        if region.player == player:
+            copied_region = ret.get_region(region.name, region.player)
+            copied_region.is_light_world = region.is_light_world
+            copied_region.is_dark_world = region.is_dark_world
+            copied_region.dungeon = region.dungeon
+            copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations if (location.name, location.player) in copied_locations]
+            for location in copied_region.locations:
+                location.parent_region = copied_region
+            for entrance in region.entrances:
+                ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
 
     for item in world.precollected_items:
-        ret.push_precollected(ItemFactory(item.name, item.player))
+        if item.player == player:
+            ret.push_precollected(ItemFactory(item.name, item.player))
 
     for edge in world.owedges:
-        if edge.dest is not None:
+        if edge.player == player and edge.dest:
             copiededge = ret.check_for_owedge(edge.name, edge.player)
             if copiededge is not None:
                 copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
 
     for door in world.doors:
-        entrance = ret.check_for_entrance(door.name, door.player)
-        if entrance is not None:
-            destdoor = ret.check_for_door(entrance.door.name, entrance.door.player)
-            entrance.door = destdoor
-            if destdoor is not None:
-                destdoor.entrance = entrance
+        if door.player == player:
+            entrance = ret.check_for_entrance(door.name, door.player)
+            if entrance is not None:
+                destdoor = ret.check_for_door(entrance.door.name, entrance.door.player)
+                entrance.door = destdoor
+                if destdoor is not None:
+                    destdoor.entrance = entrance
 
     ret.key_logic = world.key_logic.copy()
 
     from OverworldShuffle import categorize_world_regions
-    for player in range(1, world.players + 1):
-        categorize_world_regions(ret, player)
-        set_rules(ret, player)
+    categorize_world_regions(ret, player)
+    set_rules(ret, player)
 
     return ret
 
