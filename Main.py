@@ -639,18 +639,24 @@ def copy_world_premature(world, player):
         connection.connect(target)
 
     # connect copied world
-    copied_locations = {(loc.name, loc.player): loc for loc in ret.get_locations()}  # caches all locations
+    copied_locations = {(loc.name, loc.player): loc for loc in ret.get_locations() if loc.player == player}  # caches all locations
     for region in world.regions:
         if region.player == player:
             copied_region = ret.get_region(region.name, region.player)
-            copied_region.is_light_world = region.is_light_world
-            copied_region.is_dark_world = region.is_dark_world
-            copied_region.dungeon = region.dungeon
+            if region.dungeon:
+                copied_region.dungeon = ret.get_dungeon(region.dungeon.name, region.player)
             copied_region.locations = [copied_locations[(location.name, location.player)] for location in region.locations if (location.name, location.player) in copied_locations]
             for location in copied_region.locations:
                 location.parent_region = copied_region
             for entrance in region.entrances:
-                ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
+                copied_region.entrances.append(ret.get_entrance(entrance.name, entrance.player))
+            for exit in region.exits:
+                if exit.connected_region:
+                    dest_region = ret.get_region(exit.connected_region.name, region.player)
+                    ret.get_entrance(exit.name, exit.player).connect(dest_region)
+
+    from OverworldShuffle import categorize_world_regions
+    categorize_world_regions(ret, player)
 
     for item in world.precollected_items:
         if item.player == player:
@@ -659,22 +665,19 @@ def copy_world_premature(world, player):
     for edge in world.owedges:
         if edge.player == player and edge.dest:
             copiededge = ret.check_for_owedge(edge.name, edge.player)
-            if copiededge is not None:
-                copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
+            copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
 
     for door in world.doors:
         if door.player == player:
-            entrance = ret.check_for_entrance(door.name, door.player)
-            if entrance is not None:
-                destdoor = ret.check_for_door(entrance.door.name, entrance.door.player)
-                entrance.door = destdoor
-                if destdoor is not None:
-                    destdoor.entrance = entrance
+            copied_door = ret.check_for_door(door.name, door.player)
+            copied_entrance = ret.check_for_entrance(door.name, door.player)
+            copied_door.entrance = copied_entrance
+            copied_entrance.door = copied_door
 
-    ret.key_logic = world.key_logic.copy()
+    for player, portals in world.dungeon_portals.items():
+        for portal in portals:
+            connect_portal(portal, ret, player)
 
-    from OverworldShuffle import categorize_world_regions
-    categorize_world_regions(ret, player)
     set_rules(ret, player)
 
     return ret
