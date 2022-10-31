@@ -1079,14 +1079,6 @@ def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None
 def mark_light_dark_world_regions(world, player):
     # cross world caves may have some sections marked as both in_light_world, and in_dark_work.
     # That is ok. the bunny logic will check for this case and incorporate special rules.
-    # Note: I don't see why the order would matter, but the original Inverted code reversed the order
-    if world.mode[player] != 'inverted':
-        mark_light()
-        mark_dark()
-    else:
-        mark_dark()
-        mark_light()
-
     def mark_light():
         queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.LightWorld)
         seen = set(queue)
@@ -1115,6 +1107,14 @@ def mark_light_dark_world_regions(world, player):
                     if exit.connected_region not in seen:
                         seen.add(exit.connected_region)
                         queue.append(exit.connected_region)
+
+    # Note: I don't see why the order would matter, but the original Inverted code reversed the order
+    if world.mode[player] != 'inverted':
+        mark_light()
+        mark_dark()
+    else:
+        mark_dark()
+        mark_light()
 
 
 def create_shops(world, player):
