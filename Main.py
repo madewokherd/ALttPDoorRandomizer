@@ -14,7 +14,7 @@ from Items import ItemFactory
 from KeyDoorShuffle import validate_key_placement
 from OverworldGlitchRules import create_owg_connections
 from PotShuffle import shuffle_pots, shuffle_pot_switches
-from Regions import create_regions, create_shops, mark_light_world_regions, mark_dark_world_regions, create_dungeon_regions, adjust_locations
+from Regions import create_regions, create_shops, mark_light_dark_world_regions, create_dungeon_regions, adjust_locations
 from OWEdges import create_owedges
 from OverworldShuffle import link_overworld, update_world_regions, create_flute_exits
 from EntranceShuffle import link_entrances
@@ -204,10 +204,7 @@ def main(args, seed=None, fish=None):
 
     for player in range(1, world.players + 1):
         link_doors(world, player)
-        if world.mode[player] != 'inverted':
-            mark_light_world_regions(world, player)
-        else:
-            mark_dark_world_regions(world, player)
+        mark_light_dark_world_regions(world, player)
     logger.info(world.fish.translate("cli", "cli", "generating.itempool"))
 
     for player in range(1, world.players + 1):

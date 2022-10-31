@@ -2,7 +2,7 @@ import RaceRandom as random, logging, copy
 from collections import OrderedDict, defaultdict
 from DungeonGenerator import GenerationException
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
-from Regions import mark_dark_world_regions, mark_light_world_regions
+from Regions import mark_light_dark_world_regions
 from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitTypes, OpenStd, parallel_links, IsParallel
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
@@ -843,8 +843,7 @@ def categorize_world_regions(world, player):
         for exitname in OWExitTypes[type]:
             world.get_entrance(exitname, player).spot_type = type
     
-    mark_light_world_regions(world, player)
-    mark_dark_world_regions(world, player)
+    mark_light_dark_world_regions(world, player)
 
 def update_world_regions(world, player):
     if world.owMixed[player]:

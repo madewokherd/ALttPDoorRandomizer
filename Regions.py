@@ -1076,66 +1076,45 @@ def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None
             ret.locations.append(Location(player, location, address, crystal, hint_text, ret, None, player_address))
     return ret
 
-def mark_light_world_regions(world, player):
+def mark_light_dark_world_regions(world, player):
     # cross world caves may have some sections marked as both in_light_world, and in_dark_work.
     # That is ok. the bunny logic will check for this case and incorporate special rules.
-    queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.LightWorld)
-    seen = set(queue)
-    while queue:
-        current = queue.popleft()
-        current.is_light_world = True
-        for exit in current.exits:
-            if exit.connected_region is None or exit.connected_region.type == RegionType.DarkWorld:  # todo: remove none check
-                # Don't venture into the dark world
-                continue
-            if exit.connected_region not in seen:
-                seen.add(exit.connected_region)
-                queue.append(exit.connected_region)
+    # Note: I don't see why the order would matter, but the original Inverted code reversed the order
+    if world.mode[player] != 'inverted':
+        mark_light()
+        mark_dark()
+    else:
+        mark_dark()
+        mark_light()
 
-    queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.DarkWorld)
-    seen = set(queue)
-    while queue:
-        current = queue.popleft()
-        current.is_dark_world = True
-        for exit in current.exits:
-            if exit.connected_region is not None:
-                if exit.connected_region.type == RegionType.LightWorld:
-                    # Don't venture into the light world
-                    continue
-                if exit.connected_region not in seen:
-                    seen.add(exit.connected_region)
-                    queue.append(exit.connected_region)
-
-
-def mark_dark_world_regions(world, player):
-    # cross world caves may have some sections marked as both in_light_world, and in_dark_work.
-    # That is ok. the bunny logic will check for this case and incorporate special rules.
-    queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.DarkWorld)
-    seen = set(queue)
-    while queue:
-        current = queue.popleft()
-        current.is_dark_world = True
-        for exit in current.exits:
-            if exit.connected_region is None or exit.connected_region.type == RegionType.LightWorld:  # todo: remove none check
-                # Don't venture into the light world
-                continue
-            if exit.connected_region not in seen:
-                seen.add(exit.connected_region)
-                queue.append(exit.connected_region)
-
-    queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.LightWorld)
-    seen = set(queue)
-    while queue:
-        current = queue.popleft()
-        current.is_light_world = True
-        for exit in current.exits:
-            if exit.connected_region is not None:
-                if exit.connected_region.type == RegionType.DarkWorld:
+    def mark_light():
+        queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.LightWorld)
+        seen = set(queue)
+        while queue:
+            current = queue.popleft()
+            current.is_light_world = True
+            for exit in current.exits:
+                if exit.connected_region is None or exit.connected_region.type == RegionType.DarkWorld:  # todo: remove none check
                     # Don't venture into the dark world
                     continue
                 if exit.connected_region not in seen:
                     seen.add(exit.connected_region)
                     queue.append(exit.connected_region)
+
+    def mark_dark():
+        queue = collections.deque(region for region in world.get_regions(player) if region.type == RegionType.DarkWorld)
+        seen = set(queue)
+        while queue:
+            current = queue.popleft()
+            current.is_dark_world = True
+            for exit in current.exits:
+                if exit.connected_region is not None:
+                    if exit.connected_region.type == RegionType.LightWorld:
+                        # Don't venture into the light world
+                        continue
+                    if exit.connected_region not in seen:
+                        seen.add(exit.connected_region)
+                        queue.append(exit.connected_region)
 
 
 def create_shops(world, player):
