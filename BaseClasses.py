@@ -757,7 +757,7 @@ class CollectionState(object):
                                 child_states.append(child_state)
                 else:
                     terminal_states.append(next_child)
-            common_regions, common_bc, common_doors, first = {}, {}, set(), True
+            common_regions, common_bc, common_doors, common_r_doors, first = {}, {}, set(), set(), True
             bc = self.blocked_connections[player]
             for term_state in terminal_states:
                 t_rrp = term_state.reachable_regions[player]
@@ -768,6 +768,8 @@ class CollectionState(object):
                     common_bc = {x: y for x, y in t_bc.items() if x not in bc}
                     common_doors = {x for x in term_state.opened_doors[player] - self.opened_doors[player]
                                     if valid_d_door(x)}
+                    common_r_doors = {x for x in term_state.reached_doors[player] - self.reached_doors[player]
+                                    if valid_d_door(x)}
                 else:
                     cm_rrp = {x: y for x, y in t_rrp.items() if x not in rrp or y != rrp[x]}
                     common_regions = {k: self.comb_crys(v, cm_rrp[k]) for k, v in common_regions.items()
@@ -775,15 +777,19 @@ class CollectionState(object):
                     common_bc.update({x: y for x, y in t_bc.items() if x not in bc and x not in common_bc})
                     common_doors &= {x for x in term_state.opened_doors[player] - self.opened_doors[player]
                                      if valid_d_door(x)}
+                    common_r_doors &= {x for x in term_state.reached_doors[player] - self.reached_doors[player]
+                                     if valid_d_door(x)}
 
             terminal_queue = deque()
-            for door in common_doors:
+            for door in common_r_doors:
                 pair = self.find_door_pair(player, dungeon_name, door)
                 if door not in self.reached_doors[player]:
                     self.door_counter[player][0][dungeon_name] += 1
                     self.reached_doors[player].add(door)
                     if pair not in self.reached_doors[player]:
                         self.reached_doors[player].add(pair)
+            for door in common_doors:
+                pair = self.find_door_pair(player, dungeon_name, door)
                 self.opened_doors[player].add(door)
                 if door in checklist:
                     terminal_queue.append(checklist[door])
@@ -813,8 +819,8 @@ class CollectionState(object):
                     missing_bc[blocked] = crystal
             for k in missing_bc:
                 bc[k] = missing_bc[k]
-            self.record_dungeon_exploration(player, dungeon_name, checklist,
-                                            common_doors, missing_regions, missing_bc, paths)
+            self.record_dungeon_exploration(player, dungeon_name, checklist, common_doors, common_r_doors,
+                                            missing_regions, missing_bc, paths)
             checklist.clear()
 
     @staticmethod
@@ -895,15 +901,17 @@ class CollectionState(object):
         exp_key = (prog_set, frozenset(checklist))
         if dungeon_name in ec and exp_key in ec[dungeon_name]:
             # apply
-            common_doors, missing_regions, missing_bc, paths = ec[dungeon_name][exp_key]
+            common_doors, common_r_doors, missing_regions, missing_bc, paths = ec[dungeon_name][exp_key]
             terminal_queue = deque()
-            for door in common_doors:
+            for door in common_r_doors:
                 pair = self.find_door_pair(player, dungeon_name, door)
                 if door not in self.reached_doors[player]:
                     self.door_counter[player][0][dungeon_name] += 1
                     self.reached_doors[player].add(door)
                     if pair not in self.reached_doors[player]:
                         self.reached_doors[player].add(pair)
+            for door in common_doors:
+                pair = self.find_door_pair(player, dungeon_name, door)
                 self.opened_doors[player].add(door)
                 if door in checklist:
                     terminal_queue.append(checklist[door])
@@ -930,11 +938,11 @@ class CollectionState(object):
         return False
 
     def record_dungeon_exploration(self, player, dungeon_name, checklist,
-                                   common_doors, missing_regions, missing_bc, paths):
+                                   common_doors, common_r_doors, missing_regions, missing_bc, paths):
         ec = self.world.exp_cache[player]
         prog_set = self.reduce_prog_items(player, dungeon_name)
         exp_key = (prog_set, frozenset(checklist))
-        ec[dungeon_name][exp_key] = (common_doors, missing_regions, missing_bc, paths)
+        ec[dungeon_name][exp_key] = (common_doors, common_r_doors, missing_regions, missing_bc, paths)
 
     def reduce_prog_items(self, player, dungeon_name):
         # todo: possibly could include an analysis of dungeon items req. like Hammer, Hookshot, etc
