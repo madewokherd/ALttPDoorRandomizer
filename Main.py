@@ -464,6 +464,7 @@ def copy_world(world):
             create_owg_connections(ret, player)
         create_flute_exits(ret, player)
         create_dungeon_regions(ret, player)
+        create_owedges(ret, player)
         create_shops(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
@@ -534,7 +535,11 @@ def copy_world(world):
     ret.state.prog_items = world.state.prog_items.copy()
     ret.state.stale = {player: True for player in range(1, world.players + 1)}
 
-    ret.owedges = world.owedges
+    for edge in world.owedges:
+        if edge.dest:
+            copiededge = ret.check_for_owedge(edge.name, edge.player)
+            copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
+    
     ret.doors = world.doors
     for door in ret.doors:
         entrance = ret.check_for_entrance(door.name, door.player)
