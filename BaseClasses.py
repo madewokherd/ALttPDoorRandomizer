@@ -1006,18 +1006,17 @@ class CollectionState(object):
         if locations is None:
             locations = self.world.get_filled_locations()
         new_locations = True
-        checked_locations = 0
         while new_locations:
             reachable_events = [location for location in locations if location.event and
                                 (not key_only or (not self.world.keyshuffle[location.item.player] and location.item.smallkey) or (not self.world.bigkeyshuffle[location.item.player] and location.item.bigkey))
                                 and location.can_reach(self)]
             reachable_events = self._do_not_flood_the_keys(reachable_events)
+            new_locations = False
             for event in reachable_events:
                 if (event.name, event.player) not in self.events:
                     self.events.append((event.name, event.player))
                     self.collect(event.item, True, event)
-            new_locations = len(reachable_events) > checked_locations
-            checked_locations = len(reachable_events)
+                    new_locations = True
 
 
     def can_reach_blue(self, region, player):
