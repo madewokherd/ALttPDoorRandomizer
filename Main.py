@@ -456,6 +456,7 @@ def copy_world(world):
     ret.owflutespots = world.owflutespots.copy()
     ret.prizes = world.prizes.copy()
     ret.restrict_boss_items = world.restrict_boss_items.copy()
+    ret.inaccessible_regions = world.inaccessible_regions.copy()
 
     for player in range(1, world.players + 1):
         create_regions(ret, player)
@@ -503,6 +504,10 @@ def copy_world(world):
             location.parent_region = copied_region
         for entrance in region.entrances:
             ret.get_entrance(entrance.name, entrance.player).connect(copied_region)
+        for exit in region.exits:
+            if exit.connected_region:
+                dest_region = ret.get_region(exit.connected_region.name, region.player)
+                ret.get_entrance(exit.name, exit.player).connect(dest_region)
 
     # fill locations
     for location in world.get_locations():
@@ -540,14 +545,16 @@ def copy_world(world):
             copiededge = ret.check_for_owedge(edge.name, edge.player)
             copiededge.dest = ret.check_for_owedge(edge.dest.name, edge.dest.player)
     
+    # everything below this line is changing the original object, seems to be complicated to replicate similar objects organically
     ret.doors = world.doors
     for door in ret.doors:
-        entrance = ret.check_for_entrance(door.name, door.player)
-        if entrance is not None:
-            entrance.door = door
+        copied_entrance = ret.check_for_entrance(door.entrance.name, door.player)
+        door.entrance = copied_entrance
+        if copied_entrance:
+            copied_entrance.door = door
+    
     ret.paired_doors = world.paired_doors
     ret.rooms = world.rooms
-    ret.inaccessible_regions = world.inaccessible_regions
     ret.dungeon_layouts = world.dungeon_layouts
     ret.key_logic = world.key_logic
     ret.dungeon_portals = world.dungeon_portals
