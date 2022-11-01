@@ -726,6 +726,8 @@ def create_playthrough(world):
     # get locations containing progress items
     prog_locations = [location for location in world.get_filled_locations() if location.item.advancement]
     optional_locations = ['Trench 1 Switch', 'Trench 2 Switch', 'Ice Block Drop', 'Skull Star Tile']
+    optional_locations.extend(['Hyrule Castle Courtyard Tree Pull', 'Mountain Entry Area Tree Pull']) # adding pre-aga tree pulls
+    optional_locations.extend(['Lumberjack Area Bush Crab', 'South Pass Area Bush Crab']) # adding pre-aga bush crabs
     state_cache = [None]
     collection_spheres = []
     state = CollectionState(world)
