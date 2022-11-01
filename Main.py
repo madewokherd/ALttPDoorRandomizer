@@ -437,6 +437,8 @@ def copy_world(world):
     ret.owFluteShuffle = world.owFluteShuffle.copy()
     ret.shuffle_bonk_drops = world.shuffle_bonk_drops.copy()
     ret.open_pyramid = world.open_pyramid.copy()
+    ret.shufflelinks = world.shufflelinks.copy()
+    ret.shuffle_ganon = world.shuffle_ganon.copy()
     ret.boss_shuffle = world.boss_shuffle.copy()
     ret.enemy_shuffle = world.enemy_shuffle.copy()
     ret.enemy_health = world.enemy_health.copy()
@@ -513,6 +515,8 @@ def copy_world(world):
             new_location.event = True
         if location.locked:
             new_location.locked = True
+        if location.skip:
+            new_location.skip = True
         # these need to be modified properly by set_rules
         new_location.access_rule = lambda state: True
         new_location.item_rule = lambda state: True
@@ -599,6 +603,8 @@ def copy_world_premature(world, player):
     ret.owFluteShuffle = world.owFluteShuffle.copy()
     ret.shuffle_bonk_drops = world.shuffle_bonk_drops.copy()
     ret.open_pyramid = world.open_pyramid.copy()
+    ret.shufflelinks = world.shufflelinks.copy()
+    ret.shuffle_ganon = world.shuffle_ganon.copy()
     ret.boss_shuffle = world.boss_shuffle.copy()
     ret.enemy_shuffle = world.enemy_shuffle.copy()
     ret.enemy_health = world.enemy_health.copy()
@@ -671,7 +677,7 @@ def copy_world_premature(world, player):
     for door in world.doors:
         if door.player == player:
             copied_door = ret.check_for_door(door.name, door.player)
-            copied_entrance = ret.check_for_entrance(door.name, door.player)
+            copied_entrance = ret.check_for_entrance(door.entrance.name, door.player)
             copied_door.entrance = copied_entrance
             copied_entrance.door = copied_door
 
