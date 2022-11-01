@@ -616,6 +616,7 @@ def copy_world_premature(world, player):
     ret.owflutespots = world.owflutespots.copy()
     ret.prizes = world.prizes.copy()
     ret.restrict_boss_items = world.restrict_boss_items.copy()
+    ret.key_logic = world.key_logic.copy()
 
     ret.is_copied_world = True
 
