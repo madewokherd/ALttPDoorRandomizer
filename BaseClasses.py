@@ -862,7 +862,21 @@ class CollectionState(object):
                         else:
                             door_candidates.append(door.name)
             return door_candidates
-        return None
+        door_candidates, skip = [], set()
+        if state.world.accessibility[player] != 'locations' and remaining_keys == 0:
+            key_logic = state.world.key_logic[player][dungeon_name]
+            for door, paired in key_logic.sm_doors.items():
+                if door.name in key_logic.door_rules:
+                    rule = key_logic.door_rules[door.name]
+                    key = KeyRuleType.AllowSmall
+                    if (key in rule.new_rules and key_total >= rule.new_rules[key] and door.name not in skip
+                       and door.name in state.reached_doors[player] and door.name not in state.opened_doors[player]):
+                        if paired:
+                            door_candidates.append((door.name, paired.name))
+                            skip.add(paired.name)
+                        else:
+                            door_candidates.append(door.name)
+        return door_candidates if door_candidates else None
 
     @staticmethod
     def print_rrp(rrp):
@@ -1003,11 +1017,13 @@ class CollectionState(object):
         checked_locations = set([l for l in locations if l in self.locations_checked])
         reachable_events = [location for location in locations if location.event and location.can_reach(self)]
         reachable_events = self._do_not_flood_the_keys(reachable_events)
+        found_new = False
         for event in reachable_events:
             if event not in checked_locations:
                 self.events.append((event.name, event.player))
                 self.collect(event.item, True, event)
-        return len(reachable_events) > len(checked_locations)
+                found_new = True
+        return found_new
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
