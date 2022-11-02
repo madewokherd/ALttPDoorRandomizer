@@ -206,6 +206,21 @@ During gameplay:
 
 Note: Tiles are put into Tile Groups (see `Terminology`) that must be shuffled together when certain settings are enabled. For instance, if ER is disabled, then any tiles that have a connector cave that leads to a different tile, then those tiles must flip together.
 
+## Tile Flip vs Crossed Explained
+The above OWR options are very difficult to describe. The above descriptions are written in a way that is most correct even when these options are combined with more complicated modes. But, this section aims to simplify the explanation by assuming the user chooses a normal 'Open 7/7 Defeat Ganon' seed but with just one OWR setting enabled.
+
+Both of these options are very similar and often confused from each other.
+- Tile Flip is a mode where some DW tiles are moved and BECOME part of the LW (and the LW counterparts become part of the DW). What does it mean to "become" part of a world? It means that it will inherit (NOT bring over) the properties of that world it is moving to (such as being able to flute, ability to use the mirror, or being susceptible to bunnying).
+- Crossed on the other hand doesn't change the properties of tiles, instead it transports Link *physically?* across worlds upon transitioning. This also means that Link can be transformed into a bunny moving from tile to tile.
+tldr: Tile Flip moves the tiles, Crossed moves Link
+
+So, let's run an example of 2 tiles, Link's House and the screen to the right of it. Transitioning right from Link's House: In vanilla, you get the Stone Bridge screen and Link stays his normal self and is just normal LW behavior. Now, let's assume Links House screen stays vanilla, but the tile to the right is getting Flipped or Crossed.
+- In Tile Flip, you'd get the Hammer Bridge screen and Link would stay as Link and you'd be able to flute away from this screen if you had a flute.
+- In Crossed, you'd get the same Hammer Bridge Screen, but this time Link would be transformed into a bunny, just like he'd normally be when on that tile.
+- In Polar Crossed (when both Mixed and Crossed effects are applied together), you get the normal Stone Bridge screen, but Link is transformed to a bunny (because the Stone Bridge screen has moved to the DW AND Link is also moving across worlds).
+
+As you can see, things get pretty complicated when mixing modes together. Doing this can definitely create a very unique and interesting experience, but one that is very hard to grasp. And then beyond that there is OW Layout Shuffle, which is where transition destinations are shuffled, so Link will get transported to a different tile entirely, but the same rules apply when you eventually find the Stone/Hammer Bridge screen, you just likely won't find that screen thru a transition on Link's House screen.
+
 ## Whirlpool Shuffle (--ow_whirlpool)
 
 When enabled, the whirlpool connections are shuffled. If Crossed OW is enabled, the whirlpools can also be cross-world as well. For Limited Crossed OW, this doesn't count towards the limited number of crossed edge transitions.
