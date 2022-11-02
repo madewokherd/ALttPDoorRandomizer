@@ -334,7 +334,7 @@ def set_owg_rules(player, world, connections, default_rule):
 glitch_regions = (['Central Cliffs', 'Eastern Cliff', 'Desert Northeast Cliffs'],
                   ['Dark Central Cliffs', 'Darkness Cliff', 'Mire Northeast Cliffs'])
 
-# same screen clips, no OWR tile swap implications
+# same screen clips, no Tile Flip OWR implications
 boots_clips_local = [ # (name, from_region, to_region)
     ('Hera Ascent Clip', 'West Death Mountain (Bottom)', 'West Death Mountain (Top)'), #cannot guarantee camera correction, but a bomb clip exists
     ('WDDM Bomb Clip', 'West Dark Death Mountain (Bottom)', 'West Dark Death Mountain (Top)'), #cannot guarantee camera correction, but a bomb clip exists
@@ -386,7 +386,7 @@ boots_clips_local = [ # (name, from_region, to_region)
 
 # Common structure for cross-screen connections:
 # (name, from_region, to_region) <- each three consists of [LW, DW]
-# This is so OWR Tile Swap can properly connect both connections, and simultaneously be aware of which one requires pearl
+# This is so Tile Flip OWR can properly connect both connections, and simultaneously be aware of which one requires pearl
 # Note: Some clips have no way to reach the OOB area, and others have no way to get from the OOB area
 # to a proper destination, these are marked with 'None'; these connections will not be made
 boots_clips = [

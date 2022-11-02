@@ -3020,7 +3020,7 @@ class Spoiler(object):
                 outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
                 if self.metadata['ow_shuffle'][player] != 'vanilla' or self.metadata['ow_crossed'][player] != 'none':
                     outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))
-                outfile.write('Swapped OW (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
+                outfile.write('OW Tile Flip (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
                 outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
                 outfile.write('Bonk Drops:'.ljust(line_width) + '%s\n' % yn(self.metadata['bonk_drops'][player]))
@@ -3112,10 +3112,10 @@ class Spoiler(object):
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
                         outfile.write(self.maps[('flute', player)]['text'] + '\n\n')
                 
-                # overworld tile swaps
+                # overworld tile flips
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
-                        outfile.write('OW Tile Swaps:\n')
+                        outfile.write('OW Tile Flips:\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:

@@ -73,7 +73,7 @@ def link_overworld(world, player):
                         raise Exception('Cannot move a parallel edge without the other')
                     new_mode = OpenStd.Open
                     if tuple((OpenStd.Open, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)) not in new_groups.keys():
-                        # when Links House tile is swapped, the DW edges need to get put into existing Standard group
+                        # when Links House tile is flipped, the DW edges need to get put into existing Standard group
                         new_mode = OpenStd.Standard
                     new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][0].append(forward_set)
                     new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][1].append(back_set)
@@ -103,7 +103,7 @@ def link_overworld(world, player):
                     else:
                         raise NotImplementedError('Cannot move one side of a non-parallel connection')
                 else:
-                    raise NotImplementedError('Invalid OW Edge swap scenario')
+                    raise NotImplementedError('Invalid OW Edge flip scenario')
         return new_groups
 
     tile_groups = define_tile_groups(world, player, False)
@@ -143,7 +143,7 @@ def link_overworld(world, player):
         trimmed_groups = reorganize_groups(world, trimmed_groups, player)
 
     # tile shuffle
-    logging.getLogger('').debug('Swapping overworld tiles')
+    logging.getLogger('').debug('Flipping overworld tiles')
     if world.owMixed[player]:
         swapped_edges = shuffle_tiles(world, tile_groups, world.owswaps[player], False, player)
         
@@ -199,8 +199,8 @@ def link_overworld(world, player):
     
     if world.owCrossed[player] in ['grouped', 'limited'] or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'chaos'):
         if world.owCrossed[player] == 'grouped':
-            # the idea is to XOR the new swaps with the ones from Mixed so that non-parallel edges still work
-            # Polar corresponds to Grouped with no swaps in ow_crossed_tiles_mask
+            # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
+            # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
             ow_crossed_tiles_mask = [[],[],[]]
             crossed_edges = shuffle_tiles(world, define_tile_groups(world, player, True), ow_crossed_tiles_mask, True, player)
             ow_crossed_tiles = [i for i in range(0x82) if (i in world.owswaps[player][0]) != (i in ow_crossed_tiles_mask[0])]
@@ -252,7 +252,7 @@ def link_overworld(world, player):
                 elif edge in parallel_links_new.inverse:
                     crossed_edges.append(parallel_links_new.inverse[edge][0])
 
-    # after tile swap and crossed, determine edges that need to swap
+    # after tile flip and crossed, determine edges that need to flip
     edges_to_swap = [e for e in swapped_edges+crossed_edges if (e not in swapped_edges) or (e not in crossed_edges)]
 
     # whirlpool shuffle
@@ -307,9 +307,9 @@ def link_overworld(world, player):
     logging.getLogger('').debug('Shuffling overworld layout')
 
     if world.owShuffle[player] == 'vanilla':
-        # apply outstanding swaps
+        # apply outstanding flips
         trimmed_groups = performSwap(trimmed_groups, edges_to_swap)
-        assert len(edges_to_swap) == 0, 'Not all edges were swapped successfully: ' + ', '.join(edges_to_swap)
+        assert len(edges_to_swap) == 0, 'Not all edges were flipped successfully: ' + ', '.join(edges_to_swap)
         
         # vanilla transitions
         groups = list(trimmed_groups.values())
@@ -619,8 +619,8 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
 
     attempts = 1000
     while True:
-        if attempts == 0: # expected to only occur with custom swaps
-            raise GenerationException('Could not find valid tile swaps')
+        if attempts == 0: # expected to only occur with custom flips
+            raise GenerationException('Could not find valid tile flips')
 
         # tile shuffle happens here
         removed = list()
@@ -702,7 +702,7 @@ def define_tile_groups(world, player, do_grouped):
         if world.mode[player] == 'standard' and (0x1b in group or 0x2b in group or 0x2c in group):
             return False
         
-        # sanctuary/chapel should not be swapped if S+Q guaranteed to output on that screen
+        # sanctuary/chapel should not be flipped if S+Q guaranteed to output on that screen
         if 0x13 in group and ((world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] \
                     and (world.mode[player] in ['standard', 'inverted'] or world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3)) \
                 or (world.shuffle[player] in ['lite', 'lean'] and world.mode[player] == 'inverted')):

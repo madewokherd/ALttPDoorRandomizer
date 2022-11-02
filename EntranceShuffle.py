@@ -182,7 +182,7 @@ def link_entrances(world, player):
         if 0x03 in world.owswaps[player][0] == 0x05 in world.owswaps[player][0]: # if WDM and EDM are in same world
             connect_caves(world, lw_wdm_entrances + lw_edm_entrances, [], caves, player)
         else:
-            # place Old Man House in WDM if not swapped
+            # place Old Man House in WDM if not flipped
             if not world.is_tile_swapped(0x03, player):
                 connect_caves(world, lw_wdm_entrances, [], list(Old_Man_House), player)
             else:
