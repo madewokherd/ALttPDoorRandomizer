@@ -217,7 +217,7 @@ tldr: Tile Flip moves the tiles, Crossed moves Link
 So, let's run an example of 2 tiles, Link's House and the screen to the right of it. Transitioning right from Link's House: In vanilla, you get the Stone Bridge screen and Link stays his normal self and is just normal LW behavior. Now, let's assume Links House screen stays vanilla, but the tile to the right is getting Flipped or Crossed.
 - In Tile Flip, you'd get the Hammer Bridge screen and Link would stay as Link and you'd be able to flute away from this screen if you had a flute.
 - In Crossed, you'd get the same Hammer Bridge Screen, but this time Link would be transformed into a bunny, just like he'd normally be when on that tile.
-- In Polar Crossed (when both Mixed and Crossed effects are applied together), you get the normal Stone Bridge screen, but Link is transformed to a bunny (because the Stone Bridge screen has moved to the DW AND Link is also moving across worlds).
+- In Polar Crossed (when both Tile Flip and Crossed effects are applied together), you get the normal Stone Bridge screen, but Link is transformed to a bunny (because the Stone Bridge screen has moved to the DW AND Link is also moving across worlds).
 
 As you can see, things get pretty complicated when mixing modes together. Doing this can definitely create a very unique and interesting experience, but one that is very hard to grasp. And then beyond that there is OW Layout Shuffle, which is where transition destinations are shuffled, so Link will get transported to a different tile entirely, but the same rules apply when you eventually find the Stone/Hammer Bridge screen, you just likely won't find that screen thru a transition on Link's House screen.
 
