@@ -688,11 +688,10 @@ def copy_world_premature(world, player):
 
     for door in world.doors:
         if door.player == player:
-            copied_door = ret.check_for_door(door.name, door.player)
             copied_entrance = ret.check_for_entrance(door.entrance.name, door.player)
-            copied_door.entrance = copied_entrance
-            copied_entrance.door = copied_door
-
+            door.entrance = copied_entrance
+            if copied_entrance:
+                copied_entrance.door = door
     for player, portals in world.dungeon_portals.items():
         for portal in portals:
             connect_portal(portal, ret, player)
