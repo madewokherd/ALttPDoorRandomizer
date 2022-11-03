@@ -182,7 +182,7 @@ def link_entrances(world, player):
         if 0x03 in world.owswaps[player][0] == 0x05 in world.owswaps[player][0]: # if WDM and EDM are in same world
             connect_caves(world, lw_wdm_entrances + lw_edm_entrances, [], caves, player)
         else:
-            # place Old Man House in WDM if not swapped
+            # place Old Man House in WDM if not flipped
             if not world.is_tile_swapped(0x03, player):
                 connect_caves(world, lw_wdm_entrances, [], list(Old_Man_House), player)
             else:
@@ -1440,12 +1440,12 @@ def place_old_man(world, pool, player, ignore_list=[]):
 
 
 def junk_fill_inaccessible(world, player):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     find_inaccessible_regions(world, player)
 
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     base_world.override_bomb_check = True
     
     # remove regions that have a dungeon entrance
@@ -1602,12 +1602,12 @@ def unbias_dungeons(Dungeon_Exits):
 
 
 def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True, include_one_ways=False):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from Items import ItemFactory
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     base_world.override_bomb_check = True
     
     connect_simple(base_world, 'Links House S&Q', start_region, player)
@@ -1710,12 +1710,12 @@ def get_distant_entrances(world, start_entrance, player):
 
 
 def can_reach(world, entrance_name, region_name, player):
-    from Main import copy_world_limited
+    from Main import copy_world_premature
     from Items import ItemFactory
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
-    base_world = copy_world_limited(world)
+    base_world = copy_world_premature(world, player)
     base_world.override_bomb_check = True
     
     entrance = world.get_entrance(entrance_name, player)
@@ -2138,8 +2138,8 @@ default_connector_connections = [('Old Man Cave (West)', 'Old Man Cave Exit (Wes
                                  ('Elder House (West)', 'Elder House Exit (West)'),
                                  ('Two Brothers House (East)', 'Two Brothers House Exit (East)'),
                                  ('Two Brothers House (West)', 'Two Brothers House Exit (West)'),
-                                 ('Bumper Cave (Top)', 'Bumper Cave (top)'),
-                                 ('Bumper Cave (Bottom)', 'Bumper Cave (bottom)'),
+                                 ('Bumper Cave (Top)', 'Bumper Cave Exit (Top)'),
+                                 ('Bumper Cave (Bottom)', 'Bumper Cave Exit (Bottom)'),
                                  ('Superbunny Cave (Top)', 'Superbunny Cave Exit (Top)'),
                                  ('Superbunny Cave (Bottom)', 'Superbunny Cave Exit (Bottom)'),
                                  ('Hookshot Cave', 'Hookshot Cave Front Exit'),

@@ -55,18 +55,18 @@ This is a common sentiment among those who are unfamiliar with OWR's offerings. 
 
 OWR definitely has a lot of options, and all of them by themselves are pretty simple to grasp, but combining multiple OWR options together increases the complexity and confusion in exponential fashion. Now, of course, some OWR options like Flute Shuffle can safely be combined at any level and isn't gonna make anything more complicated. But specifically, avoid combining these 3 options, at least when going for your first seed:
 - OW Layout Shuffle
-- OW Tile Swap (Mixed)
+- OW Tile Flip (Mixed)
 - Crossed OW
 
 ## "Any recommendations for a first-timer?"
 For a first (and second) seed... *and I say "second" because I feel like both of these recommendations I'm about to make have VERY different vibes, have different levels of challenge, but are both, of their own right, worthy of being tried at least once.* Your first OWR experience can be combined with any mode combination that you are already familiar with and have a lot of experience in playing. If you like Crosskeys and feel very comfortable running that, feel free to turn on all those settings in addition to ONE of these two options:
-1. `OW Tile Swap (Mixed)` - Overly, a pretty easy-breezy mode, it doesn't require too much big brain, and is pretty managable even without proper logic tracking, as long as you at least have a standard map tracker. This is actually my favorite way to run OWR today
+1. `OW Tile Flip (Mixed)` - Overly, a pretty easy-breezy mode, it doesn't require too much big brain, and is pretty managable even without proper logic tracking, as long as you at least have a standard map tracker. This is actually my favorite way to run OWR today
   - DO NOT turn on Layout or Whirlpool Shuffle, leave this on `Vanilla`
   - DO NOT turn on Crossed OWR
   - `Flute Shuffle` or `Bonk Drops` could be enabled if desired, altho I'd recommend against it, at least for a fresh viewpoint of Mixed OWR
-2. `OW Layout Shuffle` - Set to `Parallel`. This is the original spirit and vision of OWR from the time of its own founding. It's definitely much more complicated to run than OW Tile Swap, so keep that in mind.
+2. `OW Layout Shuffle` - Set to `Parallel`. This is the original spirit and vision of OWR from the time of its own founding. It's definitely much more complicated to run than OW Tile Flip, so keep that in mind.
   - `Starting Boots` - Either actual boots or pseudoboots, you will be spending a lot of time navigating the OW, so it's best to do it with the ability to run fast.
-  - DO NOT turn on OW Tile Swap (Mixed)
+  - DO NOT turn on OW Tile Flip (Mixed)
   - DO NOT turn on Crossed OWR
   - Enable `Whirlpool Shuffle` - Recommended to always be enabled with Layout Shuffle
   - Enable `Keep Similar Edges Together` - This just helps keep some of your sanity for a first experience
@@ -134,7 +134,7 @@ Note: These changes do impact the logic. If you use `CodeTracker`, these Inverte
 Only settings specifically added by this Overworld Shuffle fork are found here. All door and entrance randomizer settings are supported. See their [readme](https://github.com/Aerinon/ALttPDoorRandomizer/blob/master/README.md)
 
 ## Overworld Layout Shuffle (--ow_shuffle)
-OW Edge Transitions are shuffled to create new world layouts. A brief visual representation of this can be viewed [here](https://media.discordapp.net/attachments/783989090017738753/857299555183362078/ow-modes.gif). (This graphic also includes combinations of Crossed and Tile Swap)
+OW Edge Transitions are shuffled to create new world layouts. A brief visual representation of this can be viewed [here](https://media.discordapp.net/attachments/783989090017738753/857299555183362078/ow-modes.gif). (This graphic also includes combinations of Crossed and Tile Flip)
 
 ### Vanilla
 
@@ -168,11 +168,11 @@ Transitions will remain same-world.
 
 ### Grouped
 
-This option shuffles connections cross-world in the same manner as Tile Swap/Mixed, the connections coming in and going out of a Tile Group (see `Terminology` section above) are crossed (ie. meaning it is impossible to take a different path to a tile and end up in the opposite world, unlike Limited and Chaos). This is considered the simplest way to play Crossed OWR.
+This option shuffles connections cross-world in the same manner as Tile Flip (Mixed), the connections coming in and going out of a Tile Group (see `Terminology` section above) are crossed (ie. meaning it is impossible to take a different path to a tile and end up in the opposite world, unlike Limited and Chaos). This is considered the simplest way to play Crossed OWR.
 
 ### Polar
 
-Only effective if Mixed/Tile Swap is enabled. Polar follows the same principle as Grouped, except that it preserves the original/vanilla connections even when tiles are swapped/mixed. This results in a completely vanilla overworld, except that some tiles will transform Link to a Bunny. Even though these tiles give the appearance of your normal LW tile, due to how Mixed/Tile Swap works, those LW tiles give DW properties (such as bunnying, ability to mirror, and prevents flute usage). This offers an interesting twist on Mixed where you have a pre-conditioned knowledge of the terrain you will encounter, but not necessarily be able to do what you need to do there, due to bunny state. (see `Tile Swap/Mixed` section for more details)
+Only effective if Tile Flip (Mixed) is enabled. Polar follows the same principle as Grouped, except that it preserves the original/vanilla connections even when tiles are flipped/mixed. This results in a completely vanilla overworld, except that some tiles will transform Link to a Bunny. Even though these tiles give the appearance of your normal LW tile, due to how Tile Flip works, those LW tiles give DW properties (such as bunnying, ability to mirror, and prevents flute usage). This offers an interesting twist on Mixed where you have a pre-conditioned knowledge of the terrain you will encounter, but not necessarily be able to do what you need to do there, due to bunny state. (see `Tile Flip / Mixed` section for more details)
 
 ### Limited
 
@@ -194,17 +194,32 @@ This keeps similar edge transitions together. ie. The 2 west land edges of Potio
 
 Note: This affects OW Layout Shuffle mostly, but also affects Limited and Chaos modes in Crossed OW.
 
-## Tile Swap / Mixed Overworld (--ow_mixed)
+## Tile Flip / Mixed Overworld (--ow_mixed)
 
-Tile Swap (often referred to as Mixed OWR) can be thought of as a hybrid of Open and Inverted, where OW tiles are randomly chosen to be swapped to become a part of the opposite world. When this occurs, that tile will use the Inverted version of that tile. For instance, if the Cave 45 tile becomes swapped, that means while walking around in the LW, you will find the screen that's south of Stumpy instead, and Cave 45 will instead be found in the DW; but like Inverted, the Cave 45 tile is modified to not have a ledge, this ensures that it will be possible to access it.
+Tile Flip (often referred to as Mixed OWR) can be thought of as a hybrid of Open and Inverted, where OW tiles are randomly chosen to be flipped to become a part of the opposite world. When this occurs, that tile will use the Inverted version of that tile. For instance, if the Cave 45 tile becomes flipped, that means while walking around in the LW, you will find the screen that's south of Stumpy instead, and Cave 45 will instead be found in the DW; but like Inverted, the Cave 45 tile is modified to not have a ledge, this ensures that it will be possible to access it.
 
 Being that this uses concepts from Inverted, it will be important to review the OWR-exclusive changes that have been made to Inverted (often referred to as Inverted 2.0). See `Inverted Changes` for more details.
 
 During gameplay:
   - When on the OW, there will be an L or D in the upper left corner, indicating which world you are currently in. Mirroring still works the same, you must be in the DW to mirror to the LW.
-  - When doing a map check (pressing X while on the OW), the tiles shown will reflect the swapped tiles. This means that dungeon prizes will show the prizes for the dungeons that are now part of that world, beware of Desert/Mire and Eastern/PoD. Here is an image showing the difference of appearance when tiles are swapped on the [map check](https://media.discordapp.net/attachments/783989090017738753/970646558049714196/lttp-lw-mapcheck.gif) screen.
+  - When doing a map check (pressing X while on the OW), the tiles shown will reflect the flipped tiles. This means that dungeon prizes will show the prizes for the dungeons that are now part of that world, beware of Desert/Mire and Eastern/PoD. Here is an image showing the difference of appearance when tiles are flipped on the [map check](https://media.discordapp.net/attachments/783989090017738753/970646558049714196/lttp-lw-mapcheck.gif) screen.
 
-Note: Tiles are put into Tile Groups (see `Terminology`) that must be shuffled together when certain settings are enabled. For instance, if ER is disabled, then any tiles that have a connector cave that leads to a different tile, then those tiles must swap together.
+Note: Tiles are put into Tile Groups (see `Terminology`) that must be shuffled together when certain settings are enabled. For instance, if ER is disabled, then any tiles that have a connector cave that leads to a different tile, then those tiles must flip together.
+
+## Tile Flip vs Crossed Explained
+The above OWR options are very difficult to describe. The above descriptions are written in a way that is most correct even when these options are combined with more complicated modes. But, this section aims to simplify the explanation by assuming the user chooses a normal 'Open 7/7 Defeat Ganon' seed but with just one OWR setting enabled.
+
+Both of these options are very similar and often confused from each other.
+- Tile Flip is a mode where some DW tiles are moved and BECOME part of the LW (and the LW counterparts become part of the DW). What does it mean to "become" part of a world? It means that it will inherit (NOT bring over) the properties of that world it is moving to (such as being able to flute, ability to use the mirror, or being susceptible to bunnying).
+- Crossed on the other hand doesn't change the properties of tiles, instead it transports Link *physically?* across worlds upon transitioning. This also means that Link can be transformed into a bunny moving from tile to tile.
+tldr: Tile Flip moves the tiles, Crossed moves Link
+
+So, let's run an example of 2 tiles, Link's House and the screen to the right of it. Transitioning right from Link's House: In vanilla, you get the Stone Bridge screen and Link stays his normal self and is just normal LW behavior. Now, let's assume Links House screen stays vanilla, but the tile to the right is getting Flipped or Crossed.
+- In Tile Flip, you'd get the Hammer Bridge screen and Link would stay as Link and you'd be able to flute away from this screen if you had a flute.
+- In Crossed, you'd get the same Hammer Bridge Screen, but this time Link would be transformed into a bunny, just like he'd normally be when on that tile.
+- In Polar Crossed (when both Tile Flip and Crossed effects are applied together), you get the normal Stone Bridge screen, but Link is transformed to a bunny (because the Stone Bridge screen has moved to the DW AND Link is also moving across worlds).
+
+As you can see, things get pretty complicated when mixing modes together. Doing this can definitely create a very unique and interesting experience, but one that is very hard to grasp. And then beyond that there is OW Layout Shuffle, which is where transition destinations are shuffled, so Link will get transported to a different tile entirely, but the same rules apply when you eventually find the Stone/Hammer Bridge screen, you just likely won't find that screen thru a transition on Link's House screen.
 
 ## Whirlpool Shuffle (--ow_whirlpool)
 
@@ -350,7 +365,7 @@ This keeps similar edge transitions paired together with other pairs of transiti
 --ow_mixed
 ```
 
-This gives each OW tile a random chance to be swapped to the opposite world
+This gives each OW tile a random chance to be flipped to the opposite world
 
 ```
 --ow_fluteshuffle <mode>

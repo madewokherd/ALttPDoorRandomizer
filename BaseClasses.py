@@ -856,7 +856,21 @@ class CollectionState(object):
                         else:
                             door_candidates.append(door.name)
             return door_candidates
-        return None
+        door_candidates, skip = [], set()
+        if state.world.accessibility[player] != 'locations' and remaining_keys == 0 and dungeon_name in state.world.key_logic[player]:
+            key_logic = state.world.key_logic[player][dungeon_name]
+            for door, paired in key_logic.sm_doors.items():
+                if door.name in key_logic.door_rules:
+                    rule = key_logic.door_rules[door.name]
+                    key = KeyRuleType.AllowSmall
+                    if (key in rule.new_rules and key_total >= rule.new_rules[key] and door.name not in skip
+                       and door.name in state.reached_doors[player] and door.name not in state.opened_doors[player]):
+                        if paired:
+                            door_candidates.append((door.name, paired.name))
+                            skip.add(paired.name)
+                        else:
+                            door_candidates.append(door.name)
+        return door_candidates if door_candidates else None
 
     @staticmethod
     def print_rrp(rrp):
@@ -995,29 +1009,30 @@ class CollectionState(object):
         checked_locations = set([l for l in locations if l in self.locations_checked])
         reachable_events = [location for location in locations if location.event and location.can_reach(self)]
         reachable_events = self._do_not_flood_the_keys(reachable_events)
+        found_new = False
         for event in reachable_events:
             if event not in checked_locations:
                 self.events.append((event.name, event.player))
                 self.collect(event.item, True, event)
-        return len(reachable_events) > len(checked_locations)
+                found_new = True
+        return found_new
 
     def sweep_for_events(self, key_only=False, locations=None):
         # this may need improvement
         if locations is None:
             locations = self.world.get_filled_locations()
         new_locations = True
-        checked_locations = 0
         while new_locations:
             reachable_events = [location for location in locations if location.event and
                                 (not key_only or (not self.world.keyshuffle[location.item.player] and location.item.smallkey) or (not self.world.bigkeyshuffle[location.item.player] and location.item.bigkey))
                                 and location.can_reach(self)]
             reachable_events = self._do_not_flood_the_keys(reachable_events)
+            new_locations = False
             for event in reachable_events:
                 if (event.name, event.player) not in self.events:
                     self.events.append((event.name, event.player))
                     self.collect(event.item, True, event)
-            new_locations = len(reachable_events) > checked_locations
-            checked_locations = len(reachable_events)
+                    new_locations = True
 
 
     def can_reach_blue(self, region, player):
@@ -3005,7 +3020,7 @@ class Spoiler(object):
                 outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
                 if self.metadata['ow_shuffle'][player] != 'vanilla' or self.metadata['ow_crossed'][player] != 'none':
                     outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))
-                outfile.write('Swapped OW (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
+                outfile.write('OW Tile Flip (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
                 outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
                 outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
                 outfile.write('Bonk Drops:'.ljust(line_width) + '%s\n' % yn(self.metadata['bonk_drops'][player]))
@@ -3097,10 +3112,10 @@ class Spoiler(object):
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
                         outfile.write(self.maps[('flute', player)]['text'] + '\n\n')
                 
-                # overworld tile swaps
+                # overworld tile flips
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
-                        outfile.write('OW Tile Swaps:\n')
+                        outfile.write('OW Tile Flips:\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
