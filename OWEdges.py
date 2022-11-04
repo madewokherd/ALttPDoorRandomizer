@@ -1113,7 +1113,8 @@ OWTileRegions = bidict({
 
     'Links House Area': 0x2c,
 
-    'Stone Bridge Area': 0x2d,
+    'Stone Bridge North Area': 0x2d,
+    'Stone Bridge South Area': 0x2d,
     'Stone Bridge Water': 0x2d,
 
     'Tree Line Area': 0x2e,
@@ -1606,6 +1607,8 @@ OWExitTypes = {
                 'Bat Cave Ledge Peg',
                 'Bat Cave Ledge Peg (East)',
                 'Maze Race Game',
+                'Stone Bridge Northbound',
+                'Stone Bridge Southbound',
                 'Desert Palace Statue Move',
                 'Checkerboard Ledge Approach',
                 'Desert Ledge Outer Rocks',

@@ -447,13 +447,13 @@ boots_clips = [
     (['Suburb To Cliff Clip', 'Archery Game To Cliff Clip'], ['Kakariko Suburb Area', 'Archery Game Area'], ['Desert Northeast Cliffs', 'Mire Northeast Cliffs']),
     (['Central Bonk Rocks To Cliff Clip', 'Dark Bonk Rocks To Cliff Clip'], ['Central Bonk Rocks Area', 'Dark Bonk Rocks Area'], ['Central Cliffs', 'Dark Central Cliffs']),
     (['Links House To Cliff Clip', 'Bomb Shop To Cliff Clip'], ['Links House Area', 'Big Bomb Shop Area'], ['Central Cliffs', 'Dark Central Cliffs']),
-    (['Stone Bridge To Cliff Clip', 'Hammer Bridge To Cliff Clip'], ['Stone Bridge Area', 'Hammer Bridge South Area'], ['Central Cliffs', 'Dark Central Cliffs']),
+    (['Stone Bridge To Cliff Clip', 'Hammer Bridge To Cliff Clip'], ['Stone Bridge South Area', 'Hammer Bridge South Area'], ['Central Cliffs', 'Dark Central Cliffs']),
     (['Eastern Nook To Eastern Clip', None], ['Eastern Nook Area', None], ['Eastern Palace Area', 'Palace of Darkness Area']),
     (['Eastern Nook To Ice Cave FAWT Clip', 'PoD Nook To Shopping Mall FAWT Clip'], ['Eastern Nook Area', 'Palace of Darkness Nook Area'], ['Ice Cave Area', 'Shopping Mall Area']),
 
-    (['Links To Bridge FAWT Clip', 'Bomb Shop To Hammer Bridge FAWT Clip'], ['Links House Area', 'Big Bomb Shop Area'], ['Stone Bridge Area', 'Hammer Bridge North Area']), #fake flipper
+    (['Links To Bridge FAWT Clip', 'Bomb Shop To Hammer Bridge FAWT Clip'], ['Links House Area', 'Big Bomb Shop Area'], ['Stone Bridge North Area', 'Hammer Bridge North Area']), #fake flipper
 
-    (['Stone Bridge To Water Clip', 'Hammer Bridge To Water Clip'], ['Stone Bridge Area', 'Hammer Bridge North Area'], [None, 'Pyramid Water']), #fake flipper
+    (['Stone Bridge To Water Clip', 'Hammer Bridge To Water Clip'], ['Stone Bridge North Area', 'Hammer Bridge North Area'], [None, 'Pyramid Water']), #fake flipper
 
     (['Desert To Maze Race Clip', None], ['Desert Ledge', None], ['Maze Race Area', 'Dig Game Area']),
     (['Desert To Cliff Clip', 'Mire To Cliff Clip'], ['Desert Area', 'Misery Mire Area'], ['Desert Northeast Cliffs', 'Mire Northeast Cliffs']),
