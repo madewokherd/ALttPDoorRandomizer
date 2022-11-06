@@ -563,6 +563,7 @@ def create_farm_locations(world, player):
             loc.event = True
             loc.locked = True
             loc.address = None
+            loc.skip = True
 
             world.push_item(loc, ItemFactory(item_name, player), False)
         

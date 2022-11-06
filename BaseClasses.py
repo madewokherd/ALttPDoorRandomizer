@@ -2876,11 +2876,11 @@ class Spoiler(object):
         self.locations = OrderedDict()
         listed_locations = set()
 
-        lw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.LightWorld]
+        lw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.LightWorld and not loc.skip]
         self.locations['Light World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in lw_locations])
         listed_locations.update(lw_locations)
 
-        dw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.DarkWorld]
+        dw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.DarkWorld and not loc.skip]
         self.locations['Dark World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dw_locations])
         listed_locations.update(dw_locations)
 
