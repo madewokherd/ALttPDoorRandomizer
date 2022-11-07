@@ -563,6 +563,7 @@ def create_farm_locations(world, player):
             loc.event = True
             loc.locked = True
             loc.address = None
+            loc.skip = True
 
             world.push_item(loc, ItemFactory(item_name, player), False)
         
@@ -619,6 +620,7 @@ def create_dynamic_bonkdrop_locations(world, player):
         region = world.get_region(region_name, player)
         loc = Location(player, bonk_location, 0, region, hint_text)
         loc.type = LocationType.Bonk
+        loc.real = True
         loc.parent_region = region
         loc.address = 0x2abb00 + (bonk_prize_table[loc.name][0] * 6) + 3
 

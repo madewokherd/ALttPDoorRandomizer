@@ -7,7 +7,7 @@ from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitType
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
-version_number = '0.2.11.1'
+version_number = '0.2.11.2'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -1219,6 +1219,8 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Bat Cave Ledge Peg (East)', 'Blacksmith Area'), #hammer
                          ('Maze Race Game', 'Maze Race Prize'), #pearl
                          ('Maze Race Ledge Drop', 'Maze Race Area'),
+                         ('Stone Bridge Southbound', 'Stone Bridge South Area'),
+                         ('Stone Bridge Northbound', 'Stone Bridge North Area'),
                          ('Desert Palace Statue Move', 'Desert Palace Stairs'), #book
                          ('Desert Ledge Drop', 'Desert Area'),
                          ('Desert Ledge Outer Rocks', 'Desert Palace Entrance (North) Spot'), #glove
@@ -1611,21 +1613,21 @@ ow_connections = {
             ('Bomb Shop Cliff Ledge Drop', 'Links House Area') # OWG
         ]),
     0x2d: ([
-            ('Stone Bridge Mirror Spot', 'Stone Bridge Area'),
-            ('Stone Bridge South Mirror Spot', 'Stone Bridge Area'),
+            ('Stone Bridge Mirror Spot', 'Stone Bridge North Area'),
+            ('Stone Bridge South Mirror Spot', 'Stone Bridge South Area'),
             ('Hobo Mirror Spot', 'Stone Bridge Water'),
-            ('Stone Bridge East Ledge Drop', 'Stone Bridge Area'), # OWG
+            ('Stone Bridge East Ledge Drop', 'Stone Bridge North Area'), # OWG
             ('Hammer Bridge North Ledge Drop', 'Hammer Bridge North Area'), # OWG
-            ('Stone Bridge Cliff Ledge Drop', 'Stone Bridge Area'), # OWG
+            ('Stone Bridge Cliff Ledge Drop', 'Stone Bridge South Area'), # OWG
             ('Hammer Bridge South Cliff Ledge Drop', 'Hammer Bridge South Area') # OWG
         ], [
             ('Hammer Bridge North Mirror Spot', 'Hammer Bridge North Area'),
             ('Hammer Bridge South Mirror Spot', 'Hammer Bridge South Area'),
             ('Dark Hobo Mirror Spot', 'Hammer Bridge Water'),
             ('Stone Bridge East Ledge Drop', 'Hammer Bridge North Area'), # OWG
-            ('Hammer Bridge North Ledge Drop', 'Stone Bridge Area'), # OWG
+            ('Hammer Bridge North Ledge Drop', 'Stone Bridge North Area'), # OWG
             ('Stone Bridge Cliff Ledge Drop', 'Hammer Bridge South Area'), # OWG
-            ('Hammer Bridge South Cliff Ledge Drop', 'Stone Bridge Area') # OWG
+            ('Hammer Bridge South Cliff Ledge Drop', 'Stone Bridge South Area') # OWG
         ]),
     0x2e: ([
             ('Tree Line Mirror Spot', 'Tree Line Area'),
@@ -1976,7 +1978,7 @@ flute_data = {
     0x2a: (['Flute Boy Area',                 'Stumpy Area'],                       0x2a, 0x058e, 0x0aac, 0x046e, 0x0b10, 0x04e8, 0x0b1b, 0x04f3, 0x0002, 0x0002, 0x0b10, 0x04e8),
     0x2b: (['Central Bonk Rocks Area',        'Dark Bonk Rocks Area'],              0x2b, 0x0620, 0x0acc, 0x0700, 0x0b30, 0x0790, 0x0b3b, 0x0785, 0xfff2, 0x0000, 0x0b30, 0x0770),
     0x2c: (['Links House Area',               'Big Bomb Shop Area'],                0x2c, 0x0588, 0x0ab9, 0x0840, 0x0b17, 0x08b8, 0x0b26, 0x08bf, 0xfff7, 0x0000, 0x0b20, 0x08b8),
-    0x2d: (['Stone Bridge Area',              'Hammer Bridge South Area'],          0x2d, 0x0886, 0x0b1e, 0x0a2a, 0x0ba0, 0x0aa8, 0x0b8b, 0x0aaf, 0x0000, 0x0006, 0x0bc4, 0x0ad0),
+    0x2d: (['Stone Bridge South Area',        'Hammer Bridge South Area'],          0x2d, 0x0886, 0x0b1e, 0x0a2a, 0x0ba0, 0x0aa8, 0x0b8b, 0x0aaf, 0x0000, 0x0006, 0x0bc4, 0x0ad0),
     0x2e: (['Tree Line Area',                 'Dark Tree Line Area'],               0x2e, 0x0100, 0x0a1a, 0x0c00, 0x0a78, 0x0c30, 0x0a87, 0x0c7d, 0x0006, 0x0000, 0x0a78, 0x0c58),
     0x2f: (['Eastern Nook Area',              'Palace of Darkness Nook Area'],      0x2f, 0x0798, 0x0afa, 0x0eb2, 0x0b58, 0x0f30, 0x0b67, 0x0f37, 0xfff6, 0x000e, 0x0b50, 0x0f30),
     0x38: (['Desert Palace Teleporter Ledge', 'Misery Mire Teleporter Ledge'],      0x30, 0x1880, 0x0f1e, 0x0000, 0x0fa8, 0x0078, 0x0f8d, 0x008d, 0x0000, 0x0000, 0x0fb0, 0x0070),

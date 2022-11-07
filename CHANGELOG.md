@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.11.2
+- Implemented proper Districting with Mixed OWR, affecting Hints and District modes
+- Suppressed item locations in spoiler log that are junk or logical
+
 ## 0.2.11.1
 - Renamed mode: Tile Swap (Mixed) is now called Tile Flip (Mixed)
 - Fixed generation errors due to issue with new Farmable item locations
