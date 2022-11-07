@@ -1154,6 +1154,7 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Lost Woods Bush (East)', 'Lost Woods West Area'), #pearl
                          ('West Death Mountain Drop', 'West Death Mountain (Bottom)'),
                          ('Spectacle Rock Drop', 'West Death Mountain (Top)'),
+                         ('Old Man Drop Off', 'Old Man Drop Off'),
                          ('DM Hammer Bridge (West)', 'East Death Mountain (Top East)'), #hammer
                          ('DM Hammer Bridge (East)', 'East Death Mountain (Top West)'), #hammer
                          ('East Death Mountain Spiral Ledge Drop', 'Spiral Cave Ledge'),

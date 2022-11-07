@@ -2317,6 +2317,7 @@ indirect_connections = {
     #'Blacksmith Area': 'Pyramid Fairy', # Hammerpegs
     #'Forgotten Forest Area': 'Pyramid Fairy', # Shield Shop
     #'Desert Area': 'Pyramid Fairy', # Mire Area
+    'Old Man Drop Off': 'Old Man S&Q',
     'Old Man Cave': 'Old Man S&Q'
 }
 # format:

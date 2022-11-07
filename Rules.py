@@ -180,7 +180,7 @@ def global_rules(world, player):
     #for exit in world.get_region('Flute Sky', player).exits:
     #    exit.hide_path = True
 
-    set_rule(world.get_entrance('Old Man S&Q', player), lambda state: state.can_reach('Old Man', 'Location', player))
+    set_rule(world.get_entrance('Old Man S&Q', player), lambda state: state.has('Return Old Man', player))
 
     set_rule(world.get_entrance('Flute Spot 1', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Flute Spot 2', player), lambda state: state.can_flute(player))
@@ -193,6 +193,8 @@ def global_rules(world, player):
     
     set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
     set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
+    set_rule(world.get_location('Old Man', player), lambda state: state.has('Return Old Man', player))
+    set_rule(world.get_location('Old Man Drop Off', player), lambda state: state.has('Escort Old Man', player))
     set_rule(world.get_location('Middle Aged Man', player), lambda state: state.has('Pick Up Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Deliver Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Big Bomb', player), lambda state: state.has('Crystal 5', player) and state.has('Crystal 6', player))
