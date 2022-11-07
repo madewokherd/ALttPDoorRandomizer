@@ -1547,7 +1547,7 @@ class Entrance(object):
         multi_step_locations = { 'Pyramid Crack':    ('Big Bomb',              True,    True,      False,   True),
                                  'Missing Smith':    ('Frog',                  True,    False,     True,    True),
                                  'Middle Aged Man':  ('Dark Blacksmith Ruins', True,    False,     True,    True),
-                                 'Old Man Drop Off': ('Lost Old Man',          True,    False,     False,   True),
+                                 'Old Man Drop Off': ('Lost Old Man',          True,    False,     False,   False),
                                  #'Revealing Light':  ('Suspicious Maiden',     False,   False,     False,   False) }
         }
 
