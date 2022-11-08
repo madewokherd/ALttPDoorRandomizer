@@ -1807,7 +1807,7 @@ def set_bunny_rules(world, player, inverted):
                               'Hookshot Cave (Middle)', 'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
-                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge',
+                                  'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Old Man',
                                   'Frog', 'Missing Smith', 'Dark Blacksmith Ruins', 'Purple Chest', 'Pyramid Crack', 'Big Bomb',
                                   'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Blacksmith',
                                   'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
