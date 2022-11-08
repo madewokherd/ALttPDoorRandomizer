@@ -2753,7 +2753,7 @@ class Spoiler(object):
         self.shops = []
         self.bosses = OrderedDict()
 
-        self.suppress_spoiler_locations = ['Big Bomb', 'Dark Blacksmith Ruins', 'Frog', 'Middle Aged Man', 'Lost Old Man']
+        self.suppress_spoiler_locations = ['Big Bomb', 'Frog', 'Dark Blacksmith Ruins', 'Middle Aged Man', 'Lost Old Man', 'Old Man Drop Off']
 
     def set_overworld(self, entrance, exit, direction, player):
         if self.world.players == 1:
