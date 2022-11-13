@@ -2204,7 +2204,10 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] not in ['simple', 'restricted', 'restricted_legacy']:
             entrances_to_hint.update(ConnectorEntrances)
             entrances_to_hint.update(DungeonEntrances)
-            if world.is_atgt_swapped(player):
+            if world.shuffle_ganon[player]:
+                entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
+                entrances_to_hint.update({'Ganons Tower': 'The dark mountain tower'})
+            elif world.is_atgt_swapped(player):
                 entrances_to_hint.update({'Ganons Tower': 'The dark mountain tower'})
             else:
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
