@@ -2220,7 +2220,10 @@ def write_strings(rom, world, player, team):
         elif world.shopsanity[player]:
             entrances_to_hint.update(ShopEntrances)
         if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            if not world.is_bombshop_start(player):
+            if world.shufflelinks[player]:
+                entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
+                entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
+            elif not world.is_bombshop_start(player):
                 entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
             else:
                 entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
