@@ -613,7 +613,7 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
                 parity[5] += 1
         if 0x1b in group and world.mode[player] != 'standard':
             parity[5] += 1
-        if 0x1b in group and world.shuffle_ganon:
+        if 0x1b in group and world.shuffle_ganon[player]:
             parity[5] -= 1
         group_parity[group[0]] = parity
 

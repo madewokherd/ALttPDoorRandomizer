@@ -2170,7 +2170,7 @@ def write_strings(rom, world, player, team):
         # First we take care of the one inconvenient dungeon in the appropriately simple shuffles.
         entrances_to_hint = {}
         entrances_to_hint.update(InconvenientDungeonEntrances)
-        if world.shuffle_ganon:
+        if world.shuffle_ganon[player]:
             if world.is_atgt_swapped(player):
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
             else:
@@ -2230,7 +2230,7 @@ def write_strings(rom, world, player, team):
         entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
-            if world.shuffle_ganon:
+            if world.shuffle_ganon[player]:
                 if world.is_tile_swapped(0x1b, player):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
