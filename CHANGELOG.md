@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.11.3
+- Fixed error during multiworld generation
+- Added proper Old Man pathing to the logic and spoiler playthru
+- Removed the delay in spawning sprites when bonking items out of bonk locations
+- Removed useless hints in Lite/Lean ER that are already categorically assumed
+- Added GT and Links House entrance hints when either are shuffled in the pool
+
 ## 0.2.11.2
 - Implemented proper Districting with Mixed OWR, affecting Hints and District modes
 - Suppressed item locations in spoiler log that are junk or logical

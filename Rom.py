@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'ff9c003ee6c1277437a4480d583282fd'
+RANDOMIZERBASEHASH = '3954c4e449c908a9e086a1fd5797c98b'
 
 
 class JsonRom(object):
@@ -2170,7 +2170,7 @@ def write_strings(rom, world, player, team):
         # First we take care of the one inconvenient dungeon in the appropriately simple shuffles.
         entrances_to_hint = {}
         entrances_to_hint.update(InconvenientDungeonEntrances)
-        if world.shuffle_ganon:
+        if world.shuffle_ganon[player]:
             if world.is_atgt_swapped(player):
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
             else:
@@ -2183,8 +2183,9 @@ def write_strings(rom, world, player, team):
                     entrances_to_hint = {}
                     break
         # Now we write inconvenient locations for most shuffles and finish taking care of the less chaotic ones.
-        entrances_to_hint.update(InconvenientOtherEntrances)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+        if world.shuffle[player] not in ['lite', 'lean']:
+            entrances_to_hint.update(InconvenientOtherEntrances)
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean']:
             hint_count = 0
         elif world.shuffle[player] in ['simple', 'restricted', 'restricted_legacy']:
             hint_count = 2
@@ -2204,27 +2205,37 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] not in ['simple', 'restricted', 'restricted_legacy']:
             entrances_to_hint.update(ConnectorEntrances)
             entrances_to_hint.update(DungeonEntrances)
-            if world.is_atgt_swapped(player):
+            if world.shuffle_ganon[player]:
+                entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
+                entrances_to_hint.update({'Ganons Tower': 'The dark mountain tower'})
+            elif world.is_atgt_swapped(player):
                 entrances_to_hint.update({'Ganons Tower': 'The dark mountain tower'})
             else:
                 entrances_to_hint.update({'Agahnims Tower': 'The sealed castle door'})
         elif world.shuffle[player] == 'restricted':
             entrances_to_hint.update(ConnectorEntrances)
-        entrances_to_hint.update(ItemEntrances)
-        if world.shuffle[player] not in ['lite', 'lean']:
+        if world.shuffle[player] in ['lite', 'lean']:
+            # all inconvenient dungeons + AT/GT stay in hint pool, but the remaining should exclude non-specific connector hints
+            for entrance in all_entrances:
+                if entrance.spot_type == 'Entrance' and entrance.connected_region \
+                        and entrance.connected_region.type != RegionType.Dungeon and entrance.name in list(ConnectorEntrances) + list(DungeonEntrances):
+                    entrances_to_hint.pop(entrance.name)
+        else:
+            entrances_to_hint.update(ItemEntrances)
             entrances_to_hint.update(ShopEntrances)
             entrances_to_hint.update(OtherEntrances)
-        elif world.shopsanity[player]:
-            entrances_to_hint.update(ShopEntrances)
-        if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            if not world.is_bombshop_start(player):
+        if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean']:
+            if world.shufflelinks[player]:
+                entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
+                entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
+            elif not world.is_bombshop_start(player):
                 entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
             else:
                 entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
         entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
         if world.shuffle[player] in ['insanity', 'madness_legacy', 'insanity_legacy']:
             entrances_to_hint.update(InsanityEntrances)
-            if world.shuffle_ganon:
+            if world.shuffle_ganon[player]:
                 if world.is_tile_swapped(0x1b, player):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
