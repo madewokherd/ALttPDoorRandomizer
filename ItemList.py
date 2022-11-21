@@ -252,6 +252,9 @@ def generate_itempool(world, player):
     world.push_item(world.get_location('Swamp Drain', player), ItemFactory('Drained Swamp', player), False)
     world.get_location('Swamp Drain', player).event = True
     world.get_location('Swamp Drain', player).locked = True
+    world.push_item(world.get_location('Turtle Medallion Pad', player), ItemFactory('Turtle Opened', player), False)
+    world.get_location('Turtle Medallion Pad', player).event = True
+    world.get_location('Turtle Medallion Pad', player).locked = True
     world.push_item(world.get_location('Attic Cracked Floor', player), ItemFactory('Shining Light', player), False)
     world.get_location('Attic Cracked Floor', player).event = True
     world.get_location('Attic Cracked Floor', player).locked = True

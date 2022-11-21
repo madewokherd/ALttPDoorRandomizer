@@ -191,6 +191,7 @@ item_table = {'Bow': (True, False, None, 0x0B, 200, 'You have\nchosen the\narche
               'Trench 1 Filled': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Trench 2 Filled': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Drained Swamp': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
+              'Turtle Opened': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Shining Light': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Maiden Rescued': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Maiden Unmasked': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
