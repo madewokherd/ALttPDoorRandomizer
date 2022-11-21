@@ -830,6 +830,7 @@ def default_rules(world, player):
     set_rule(world.get_location('Flute Spot', player), lambda state: state.has('Shovel', player))
     set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
+    set_rule(world.get_location('Turtle Medallion Pad', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player))  # sword required to cast magic (!)
     
     # Bonk Item Access
     if world.shuffle_bonk_drops[player]:
@@ -854,7 +855,7 @@ def default_rules(world, player):
     set_rule(world.get_entrance('20 Rupee Cave', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Final Section', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('Hookshot Cave', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player) and state.has('Turtle Opened', player))  # sword required to cast magic (!)
+    set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has('Turtle Opened', player))
     set_rule(world.get_entrance('Dark World Hammer Peg Cave', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Bonk Fairy (Dark)', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_sword(player) and state.has_misery_mire_medallion(player))  # sword required to cast magic (!)
@@ -1656,9 +1657,9 @@ def swordless_rules(world, player):
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has('Hammer', player) or state.has_beaten_aga(player))  # barrier gets removed after killing agahnim, relevant for entrance shuffle
 
     set_rule(world.get_entrance('Misery Mire', player), lambda state: state.has_misery_mire_medallion(player))   # sword not required to use medallion for opening in swordless (!)
-    set_rule(world.get_entrance('Turtle Rock', player), lambda state: state.has_turtle_rock_medallion(player) and state.has('Turtle Opened', player))   # sword not required to use medallion for opening in swordless (!)
+    set_rule(world.get_location('Turtle Medallion Pad', player), lambda state: state.has_turtle_rock_medallion(player))   # sword not required to use medallion for opening in swordless (!)
     add_bunny_rule(world.get_entrance('Misery Mire', player), player)
-    add_bunny_rule(world.get_entrance('Turtle Rock', player), player)
+    add_bunny_rule(world.get_location('Turtle Medallion Pad', player), player)
 
 std_kill_rooms = {
     'Hyrule Dungeon Armory Main': ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES'], # One green guard
