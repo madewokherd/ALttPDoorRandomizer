@@ -1554,25 +1554,13 @@ def forbid_bomb_jump_requirements(world, player):
         add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Bomb Jump', player), lambda state: False)
 
-# Light cones in standard depend on which world we actually are in, not which one the location would normally be
-# We add Lamp requirements only to those locations which lie in the dark world (or everything if open
-DW_Entrances = ['Bumper Cave (Bottom)', 'Superbunny Cave (Top)', 'Superbunny Cave (Bottom)', 'Hookshot Cave', 'Bumper Cave (Top)', 'Hookshot Cave Back Entrance', 'Dark Death Mountain Ledge (East)',
-                'Turtle Rock Isolated Ledge Entrance', 'Thieves Town', 'Skull Woods Final Section', 'Ice Palace', 'Misery Mire', 'Palace of Darkness', 'Swamp Palace', 'Turtle Rock', 'Dark Death Mountain Ledge (West)']
-
-def check_is_dark_world(region):
-    for entrance in region.entrances:
-        if entrance.name in DW_Entrances:
-            return True
-    return False
-
 def add_conditional_lamps(world, player):
-    def add_conditional_lamp(spot, region, spottype='Location'):
+    def add_conditional_lamp(spot, spottype='Location'):
         if spottype == 'Location':
             spot = world.get_location(spot, player)
         else:
             spot = world.get_entrance(spot, player)
-        if (not world.dark_world_light_cone and check_is_dark_world(world.get_region(region, player))) or (not world.light_world_light_cone and not check_is_dark_world(world.get_region(region, player))):
-            add_lamp_requirement(spot, player)
+        add_lamp_requirement(spot, player)
 
     dark_rooms = {
         'TR Dark Ride': {'sewer': False, 'entrances': ['TR Dark Ride Up Stairs', 'TR Dark Ride SW', 'TR Dark Ride Path'], 'locations': []},
@@ -1628,10 +1616,10 @@ def add_conditional_lamps(world, player):
         if is_dark:
             dark_debug_set.add(region)
             for ent in info['entrances']:
-                add_conditional_lamp(ent, region, 'Entrance')
+                add_conditional_lamp(ent, 'Entrance')
             r = world.get_region(region, player)
             for loc in r.locations:
-                add_conditional_lamp(loc, region, 'Location')
+                add_conditional_lamp(loc, 'Location')
     logging.getLogger('').debug('Non Dark Regions: ' + ', '.join(set(dark_rooms.keys()).difference(dark_debug_set)))
 
     add_conditional_lamp('Old Man House Front to Back', 'Old Man House', 'Entrance')
