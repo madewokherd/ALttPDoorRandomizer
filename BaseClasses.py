@@ -641,15 +641,6 @@ class CollectionState(object):
                         queue.append((conn, new_crystal_state))
 
                 self.path[new_region] = (new_region.name, self.path.get(connection, None))
-
-                # Retry connections if the new region can unblock them
-                from EntranceShuffle import indirect_connections
-                if new_region.name in indirect_connections:
-                    new_entrance = self.world.get_entrance(indirect_connections[new_region.name], player)
-                    if new_entrance in bc and new_entrance.parent_region in rrp:
-                        new_crystal_state = rrp[new_entrance.parent_region]
-                        if (new_entrance, new_crystal_state) not in queue:
-                            queue.append((new_entrance, new_crystal_state))
             # else those connections that are not accessible yet
             if self.is_small_door(connection):
                 door = connection.door if connection.door.smallKey else connection.door.controller

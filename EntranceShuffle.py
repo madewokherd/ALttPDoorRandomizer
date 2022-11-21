@@ -2296,30 +2296,6 @@ one_way_ledges = {
                                           'Ice Lake Ledge (West)',
                                           'Ice Lake Ledge (East)'}
 }
-
-indirect_connections = {
-    'Turtle Rock Ledge': 'Turtle Rock',
-    'Big Bomb Shop': 'Pyramid Crack',
-    #'East Dark World': 'Pyramid Fairy',
-    'Pyramid Area': 'Pyramid Crack', # HC Ledge/Courtyard
-    #'Dark Desert': 'Pyramid Fairy',
-    #'Misery Mire Area': 'Pyramid Fairy', # Desert/Checkerboard Ledge
-    #'West Dark World': 'Pyramid Fairy',
-    #'Dark Chapel Area': 'Pyramid Fairy', # Bonk Rocks
-    #'Dark Graveyard North': 'Pyramid Fairy', # Graveyard Ledge/Kings Tomb
-    #'South Dark World': 'Pyramid Fairy',
-    #'Dig Game Ledge': 'Pyramid Fairy', # Brother House Left
-    #'Stumpy Approach Area': 'Pyramid Fairy', # Cave 45
-    # Inverted Cases
-    #'Light World': 'Pyramid Fairy',
-    #'Lost Woods West Area': 'Pyramid Fairy', # Skull Woods Back
-    #'East Death Mountain (Top East)': 'Pyramid Fairy', # Floating Island
-    #'Blacksmith Area': 'Pyramid Fairy', # Hammerpegs
-    #'Forgotten Forest Area': 'Pyramid Fairy', # Shield Shop
-    #'Desert Area': 'Pyramid Fairy', # Mire Area
-    'Old Man Drop Off': 'Old Man S&Q',
-    'Old Man Cave': 'Old Man S&Q'
-}
 # format:
 # Key=Name
 # addr = (door_index, exitdata, ow_flag) # multiexit
