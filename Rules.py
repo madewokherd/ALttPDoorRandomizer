@@ -1622,7 +1622,7 @@ def add_conditional_lamps(world, player):
                 add_conditional_lamp(loc, 'Location')
     logging.getLogger('').debug('Non Dark Regions: ' + ', '.join(set(dark_rooms.keys()).difference(dark_debug_set)))
 
-    add_conditional_lamp('Old Man House Front to Back', 'Old Man House', 'Entrance')
+    add_conditional_lamp('Old Man House Front to Back', 'Entrance')
 
 def open_rules(world, player):
     # softlock protection as you can reach the sewers small key door with a guard drop key
