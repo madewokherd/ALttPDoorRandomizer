@@ -891,6 +891,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Desert Ledge Inner Rocks', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('C Whirlpool Rock (Bottom)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('C Whirlpool Rock (Top)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('C Whirlpool Pegs (Left)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('C Whirlpool Pegs (Right)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Desert Pass Rocks (North)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Desert Pass Rocks (South)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Bush Rock (West)', player), lambda state: state.can_lift_rocks(player))
@@ -918,6 +920,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Hammer Bridge Pegs (South)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Bottom)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Dark C Whirlpool Pegs (Left)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Dark C Whirlpool Pegs (Right)', player), lambda state: state.has('Hammer', player))
     
     set_rule(world.get_entrance('Zora Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Zora Waterfall Water Entry', player), lambda state: state.has('Flippers', player))
@@ -1262,11 +1266,11 @@ def ow_inverted_rules(world, player):
     if not world.is_tile_swapped(0x33, player):
         set_rule(world.get_entrance('C Whirlpool Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('C Whirlpool Outer Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('South Hyrule Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player)) # bunny cannot use hammer
+        set_rule(world.get_entrance('South Hyrule Teleporter', player), lambda state: state.can_lift_rocks(player))
     else:
         set_rule(world.get_entrance('Dark C Whirlpool Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Dark C Whirlpool Outer Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('South Dark World Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player))
+        set_rule(world.get_entrance('South Dark World Teleporter', player), lambda state: state.can_lift_rocks(player))
         
     if not world.is_tile_swapped(0x34, player):
         set_rule(world.get_entrance('Statues Mirror Spot', player), lambda state: state.has_Mirror(player))
@@ -1398,6 +1402,8 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Flute Boy Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('C Whirlpool Rock (Bottom)', player), player)
     add_bunny_rule(world.get_entrance('C Whirlpool Rock (Top)', player), player)
+    add_bunny_rule(world.get_entrance('C Whirlpool Pegs (Left)', player), player)
+    add_bunny_rule(world.get_entrance('C Whirlpool Pegs (Right)', player), player)
     add_bunny_rule(world.get_entrance('Desert Pass Rocks (North)', player), player)
     add_bunny_rule(world.get_entrance('Desert Pass Rocks (South)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Bush Rock (West)', player), player)
@@ -1436,6 +1442,8 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Stumpy Approach Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('Dark C Whirlpool Rock (Bottom)', player), player)
     add_bunny_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), player)
+    add_bunny_rule(world.get_entrance('Dark C Whirlpool Pegs (Left)', player), player)
+    add_bunny_rule(world.get_entrance('Dark C Whirlpool Pegs (Right)', player), player)
 
     add_bunny_rule(world.get_entrance('Zora Waterfall Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Zora Waterfall Water Entry', player), player)

@@ -1236,6 +1236,8 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('C Whirlpool Landing', 'C Whirlpool Area'),
                          ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'), #glove
                          ('C Whirlpool Rock (Top)', 'C Whirlpool Area'), #glove
+                         ('C Whirlpool Pegs (Right)', 'C Whirlpool Portal Area'), #hammer
+                         ('C Whirlpool Pegs (Left)', 'C Whirlpool Area'), #hammer
                          ('Statues Water Entry', 'Statues Water'), #flippers
                          ('Statues Landing', 'Statues Area'),
                          ('Lake Hylia Water Drop', 'Lake Hylia Water'), #flippers
@@ -1321,6 +1323,8 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Dark C Whirlpool Landing', 'Dark C Whirlpool Area'),
                          ('Dark C Whirlpool Rock (Bottom)', 'Dark C Whirlpool Outer Area'), #glove
                          ('Dark C Whirlpool Rock (Top)', 'Dark C Whirlpool Area'), #glove
+                         ('Dark C Whirlpool Pegs (Right)', 'Dark C Whirlpool Portal Area'), #hammer
+                         ('Dark C Whirlpool Pegs (Left)', 'Dark C Whirlpool Area'), #hammer
                          ('Hype Cave Water Entry', 'Hype Cave Water'), #flippers
                          ('Hype Cave Landing', 'Hype Cave Area'),
                          ('Ice Lake Water Drop', 'Ice Lake Water'), #flippers
@@ -1691,6 +1695,8 @@ ow_connections = {
             ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
             ('C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
             ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
+            ('C Whirlpool Portal Cliff Ledge Drop', 'C Whirlpool Portal Area'), #OWG
+            ('Dark C Whirlpool Portal Cliff Ledge Drop', 'Dark C Whirlpool Portal Area'), #OWG
             ('Desert C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
             ('Mire C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area') # OWG
         ], [
@@ -1701,6 +1707,8 @@ ow_connections = {
             ('Dark C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
             ('C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
             ('Dark C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
+            ('C Whirlpool Portal Cliff Ledge Drop', 'Dark C Whirlpool Portal Area'), #OWG
+            ('Dark C Whirlpool Portal Cliff Ledge Drop', 'C Whirlpool Portal Area'), #OWG
             ('Desert C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
             ('Mire C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area') # OWG
         ]),
