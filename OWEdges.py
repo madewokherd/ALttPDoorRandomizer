@@ -1137,6 +1137,7 @@ OWTileRegions = bidict({
     'Cave 45 Ledge': 0x32,
 
     'C Whirlpool Area': 0x33,
+    'C Whirlpool Portal Area': 0x33,
     'C Whirlpool Water': 0x33,
     'C Whirlpool Outer Area': 0x33,
 
@@ -1274,6 +1275,7 @@ OWTileRegions = bidict({
     'Stumpy Approach Bush Entry': 0x72,
 
     'Dark C Whirlpool Area': 0x73,
+    'Dark C Whirlpool Portal Area': 0x73,
     'Dark C Whirlpool Water': 0x73,
     'Dark C Whirlpool Outer Area': 0x73,
 

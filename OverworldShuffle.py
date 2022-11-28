@@ -1690,7 +1690,7 @@ ow_connections = {
     0x33: ([
             ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
             ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
-            ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
+            ('South Hyrule Teleporter', 'Dark C Whirlpool Portal Area'),
             ('C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
             ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
             ('C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
@@ -1702,7 +1702,7 @@ ow_connections = {
         ], [
             ('Dark C Whirlpool Mirror Spot', 'Dark C Whirlpool Area'),
             ('Dark C Whirlpool Outer Mirror Spot', 'Dark C Whirlpool Outer Area'),
-            ('South Dark World Teleporter', 'C Whirlpool Area'),
+            ('South Dark World Teleporter', 'C Whirlpool Portal Area'),
             ('C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
             ('Dark C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
             ('C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG

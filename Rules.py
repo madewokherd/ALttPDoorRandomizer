@@ -199,7 +199,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Deliver Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Big Bomb', player), lambda state: state.has('Crystal 5', player) and state.has('Crystal 6', player))
     set_rule(world.get_location('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
-    set_rule(world.get_entrance('Pyramid Fairy', player), lambda state: state.has('Detonate Big Bomb', player))
+    set_rule(world.get_entrance('Pyramid Crack', player), lambda state: state.has('Detonate Big Bomb', player))
     set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
 
     set_rule(world.get_location('Missing Smith', player), lambda state: state.has('Get Frog', player))
