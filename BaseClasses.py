@@ -1538,7 +1538,7 @@ class Entrance(object):
 
     def can_reach(self, state):
                                 # Destination         Pickup                   OW Only  No Ledges  Can S&Q  Allow Mirror
-        multi_step_locations = { 'Pyramid Crack':    ('Big Bomb',              True,    True,      False,   True),
+        multi_step_locations = { 'Pyramid Area':     ('Big Bomb',              True,    True,      False,   True),
                                  'Missing Smith':    ('Frog',                  True,    False,     True,    True),
                                  'Middle Aged Man':  ('Dark Blacksmith Ruins', True,    False,     True,    True),
                                  'Old Man Drop Off': ('Lost Old Man',          True,    False,     False,   False),
