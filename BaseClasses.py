@@ -316,6 +316,9 @@ class World(object):
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
+    def is_tile_lw_like(self, owid, player):
+        return (owid >= 0x40 and owid < 0x80) == self.is_tile_swapped(owid, player)
+
     def is_atgt_swapped(self, player):
         return self.is_tile_swapped(0x03, player) and self.is_tile_swapped(0x1b, player)
 
