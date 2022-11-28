@@ -255,8 +255,12 @@ def get_region_pairs(world, player, names, parent_regions, target_regions, path_
 
 def get_world_pair(world, player, region_pairs, get_light_world):
     # this chooses the region pair that is in the right world
-    if ((region_pairs[0] and world.is_tile_lw_like(OWTileRegions[region_pairs[0][1]], player)) \
-            or not world.is_tile_lw_like(OWTileRegions[region_pairs[1][1]], player)) == get_light_world:
+    if region_pairs[0]:
+        is_lw = world.is_tile_lw_like(OWTileRegions[region_pairs[0][1]], player)
+    else:
+        is_lw = not world.is_tile_lw_like(OWTileRegions[region_pairs[1][1]], player)
+    
+    if is_lw == get_light_world:
         return region_pairs[0]
     else:
         return region_pairs[1]
