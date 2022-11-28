@@ -7,7 +7,7 @@ from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitType
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
-version_number = '0.2.11.3'
+version_number = '0.2.11.4'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -1236,6 +1236,8 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('C Whirlpool Landing', 'C Whirlpool Area'),
                          ('C Whirlpool Rock (Bottom)', 'C Whirlpool Outer Area'), #glove
                          ('C Whirlpool Rock (Top)', 'C Whirlpool Area'), #glove
+                         ('C Whirlpool Pegs (Right)', 'C Whirlpool Portal Area'), #hammer
+                         ('C Whirlpool Pegs (Left)', 'C Whirlpool Area'), #hammer
                          ('Statues Water Entry', 'Statues Water'), #flippers
                          ('Statues Landing', 'Statues Area'),
                          ('Lake Hylia Water Drop', 'Lake Hylia Water'), #flippers
@@ -1321,6 +1323,8 @@ mandatory_connections = [# Intra-tile OW Connections
                          ('Dark C Whirlpool Landing', 'Dark C Whirlpool Area'),
                          ('Dark C Whirlpool Rock (Bottom)', 'Dark C Whirlpool Outer Area'), #glove
                          ('Dark C Whirlpool Rock (Top)', 'Dark C Whirlpool Area'), #glove
+                         ('Dark C Whirlpool Pegs (Right)', 'Dark C Whirlpool Portal Area'), #hammer
+                         ('Dark C Whirlpool Pegs (Left)', 'Dark C Whirlpool Area'), #hammer
                          ('Hype Cave Water Entry', 'Hype Cave Water'), #flippers
                          ('Hype Cave Landing', 'Hype Cave Area'),
                          ('Ice Lake Water Drop', 'Ice Lake Water'), #flippers
@@ -1686,21 +1690,25 @@ ow_connections = {
     0x33: ([
             ('C Whirlpool Mirror Spot', 'C Whirlpool Area'),
             ('C Whirlpool Outer Mirror Spot', 'C Whirlpool Outer Area'),
-            ('South Hyrule Teleporter', 'Dark C Whirlpool Area'),
+            ('South Hyrule Teleporter', 'Dark C Whirlpool Portal Area'),
             ('C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
             ('Dark C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
             ('C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
             ('Dark C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
+            ('C Whirlpool Portal Cliff Ledge Drop', 'C Whirlpool Portal Area'), #OWG
+            ('Dark C Whirlpool Portal Cliff Ledge Drop', 'Dark C Whirlpool Portal Area'), #OWG
             ('Desert C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
             ('Mire C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area') # OWG
         ], [
             ('Dark C Whirlpool Mirror Spot', 'Dark C Whirlpool Area'),
             ('Dark C Whirlpool Outer Mirror Spot', 'Dark C Whirlpool Outer Area'),
-            ('South Dark World Teleporter', 'C Whirlpool Area'),
+            ('South Dark World Teleporter', 'C Whirlpool Portal Area'),
             ('C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Area'), # OWG
             ('Dark C Whirlpool Cliff Ledge Drop', 'C Whirlpool Area'), # OWG
             ('C Whirlpool Outer Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
             ('Dark C Whirlpool Outer Cliff Ledge Drop', 'C Whirlpool Outer Area'), # OWG
+            ('C Whirlpool Portal Cliff Ledge Drop', 'Dark C Whirlpool Portal Area'), #OWG
+            ('Dark C Whirlpool Portal Cliff Ledge Drop', 'C Whirlpool Portal Area'), #OWG
             ('Desert C Whirlpool Cliff Ledge Drop', 'Dark C Whirlpool Outer Area'), # OWG
             ('Mire C Whirlpool Cliff Ledge Drop', 'C Whirlpool Outer Area') # OWG
         ]),

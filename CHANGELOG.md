@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.11.4
+- Fixed broken OWG logic issues
+- Gave chickens a base price for shopsanity
+- Modeled TR entrance opening to use a logical pseudo-item
+
 ## 0.2.11.3
 - Fixed error during multiworld generation
 - Added proper Old Man pathing to the logic and spoiler playthru

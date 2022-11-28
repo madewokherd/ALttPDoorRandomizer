@@ -316,6 +316,9 @@ class World(object):
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
+    def is_tile_lw_like(self, owid, player):
+        return (owid >= 0x40 and owid < 0x80) == self.is_tile_swapped(owid, player)
+
     def is_atgt_swapped(self, player):
         return self.is_tile_swapped(0x03, player) and self.is_tile_swapped(0x1b, player)
 
@@ -641,15 +644,6 @@ class CollectionState(object):
                         queue.append((conn, new_crystal_state))
 
                 self.path[new_region] = (new_region.name, self.path.get(connection, None))
-
-                # Retry connections if the new region can unblock them
-                from EntranceShuffle import indirect_connections
-                if new_region.name in indirect_connections:
-                    new_entrance = self.world.get_entrance(indirect_connections[new_region.name], player)
-                    if new_entrance in bc and new_entrance.parent_region in rrp:
-                        new_crystal_state = rrp[new_entrance.parent_region]
-                        if (new_entrance, new_crystal_state) not in queue:
-                            queue.append((new_entrance, new_crystal_state))
             # else those connections that are not accessible yet
             if self.is_small_door(connection):
                 door = connection.door if connection.door.smallKey else connection.door.controller
@@ -1544,7 +1538,7 @@ class Entrance(object):
 
     def can_reach(self, state):
                                 # Destination         Pickup                   OW Only  No Ledges  Can S&Q  Allow Mirror
-        multi_step_locations = { 'Pyramid Crack':    ('Big Bomb',              True,    True,      False,   True),
+        multi_step_locations = { 'Pyramid Area':     ('Big Bomb',              True,    True,      False,   True),
                                  'Missing Smith':    ('Frog',                  True,    False,     True,    True),
                                  'Middle Aged Man':  ('Dark Blacksmith Ruins', True,    False,     True,    True),
                                  'Old Man Drop Off': ('Lost Old Man',          True,    False,     False,   False),
