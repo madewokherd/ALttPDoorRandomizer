@@ -34,7 +34,8 @@ All feedback and dev conversation happens in the #ow-rando channel on the [ALTTP
     - Use [GitHub Desktop](https://desktop.github.com) to clone this repository to a folder on your computer. Once a repository is established, you can click `Fetch origin` or `Pull` to re-download whenever you want to grab the latest version. This is the best option for a simple one-click solution.
     - Download the [source code](https://github.com/codemann8/ALttPDoorRandomizer/archive/refs/heads/OverworldShuffle.zip) from GitHub manually.
 
-2. You must have Python installed (version 3.7 - 3.10 supported), and ensure PATH is included during the installation.
+2. You must have [Python](https://www.python.org/downloads) installed (version 3.7 - 3.10 supported), and ensure PATH is included during the installation.
+    - A common issue with users is that there are multiple instances of Python installed on the same computer. This causes the computer to be confused with which Python instance it uses. Ensure that any older Python installations have been removed.
 
 3. This program requires all python dependencies that are necessary to run OW Randomizer. There are multiple ways to install them:
     - Try running ```pip install missingdependency``` or ```python -m pip install missingdependency``` on the command line (replace ```missingdependency``` with the specific package that is missing) to install the dependency.
