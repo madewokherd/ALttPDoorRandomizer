@@ -30,7 +30,9 @@ All feedback and dev conversation happens in the #ow-rando channel on the [ALTTP
 
 # Installation from Source
 
-1. Download the source code from the repository directly and put it in a folder of your choosing.
+1. Download the source code from the repository directly and put it in a folder of your choosing. Any method of grabbing the source code is fine, but due to some changes on GitHub's site, some of the other alternatives might be better options for some people.
+    - Use [GitHub Desktop](https://desktop.github.com) to clone this repository to a folder on your computer. Once a repository is established, you can click `Fetch origin` or `Pull` to re-download whenever you want to grab the latest version. This is the best option for a simple one-click solution.
+    - Download the [source code](https://github.com/codemann8/ALttPDoorRandomizer/archive/refs/heads/OverworldShuffle.zip) from GitHub manually.
 
 2. You must have Python installed (version 3.7 - 3.10 supported), and ensure PATH is included during the installation.
 
