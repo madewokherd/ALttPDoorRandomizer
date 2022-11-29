@@ -239,7 +239,7 @@ def get_region_pairs(world, player, names, parent_regions, target_regions, path_
         else:
             region_pairs[0].append(target_regions[1])
             if path_regions:
-                region_pairs[0][3] = path_regions[1]
+                region_pairs[0].append(path_regions[1])
     if parent_regions[1]:
         region_pairs[1] = [names[1], parent_regions[1]]
         if parent_swapped == target_swapped:
