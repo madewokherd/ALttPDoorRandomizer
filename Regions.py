@@ -1260,7 +1260,7 @@ bonk_prize_table = {
     'Mountain Entry Southeast Tree':    (0x03, 0x08, False, '', 'Mountain Entry Area',            'in a tree'),
     'Lost Woods Pass West Tree':        (0x04, 0x10, False, '', 'Lost Woods Pass West Area',      'in a tree'),
     'Kakariko Portal Tree':             (0x05, 0x08, False, '', 'Lost Woods Pass East Top Area',  'in a tree'),
-    'Fortune Bonk Rocks':               (0x06, 0x10, False, '', 'Kakariko Fortune Area',          'in a tree'),
+    'Fortune Bonk Rocks':               (0x06, 0x10, False, '', 'Kakariko Fortune Area',          'encased in stone'),
     'Kakariko Pond Tree':               (0x07, 0x10, True,  '', 'Kakariko Pond Area',             'in a tree'),
     'Bonk Rocks Tree':                  (0x08, 0x10, True,  '', 'Bonk Rock Ledge',                'in a tree'),
     'Sanctuary Tree':                   (0x09, 0x08, False, '', 'Sanctuary Area',                 'in a tree'),
