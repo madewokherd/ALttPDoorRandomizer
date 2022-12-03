@@ -25,14 +25,17 @@ from RoomData import create_rooms
 from Rules import set_rules
 from Dungeons import create_dungeons
 from Fill import distribute_items_restrictive, promote_dungeon_items, fill_dungeons_restrictive, ensure_good_pots
+from Fill import dungeon_tracking
 from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations, set_prize_drops
-from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops, create_farm_locations
+from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops, fill_specific_items, create_farm_locations
 from Utils import output_path, parse_player_names
 
 from source.item.FillUtil import create_item_pool_config, massage_item_pool, district_item_pool_config
+from source.overworld.EntranceShuffle2 import link_entrances_new
 from source.tools.BPS import create_bps_from_data
+from source.classes.CustomSettings import CustomSettings
 
-__version__ = '1.0.1.3-u'
+__version__ = '1.2.0.0-u'
 
 from source.classes.BabelFish import BabelFish
 
@@ -58,32 +61,44 @@ def main(args, seed=None, fish=None):
 
     if args.securerandom:
         random.use_secure()
-
+    seeded = False
     # initialize the world
     if args.code:
         for player, code in args.code.items():
             if code:
                 Settings.adjust_args_from_code(code, player, args)
+    customized = None
+    if args.customizer:
+        customized = CustomSettings()
+        customized.load_yaml(args.customizer)
+        seed = customized.determine_seed(seed)
+        seeded = True
+        customized.adjust_args(args)
     world = World(args.multi, args.ow_shuffle, args.ow_crossed, args.ow_mixed, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
                   args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
-                  args.accessibility, args.shuffleganon, args.retro, args.custom, args.customitemarray, args.hints)
+                  args.accessibility, args.shuffleganon, args.custom, args.customitemarray, args.hints)
+    world.customizer = customized if customized else None
     logger = logging.getLogger('')
     if seed is None:
         random.seed(None)
         world.seed = random.randint(0, 999999999)
     else:
         world.seed = int(seed)
-    random.seed(world.seed)
+    if not seeded:
+        random.seed(world.seed)
 
     if args.securerandom:
         world.seed = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(9))
 
+    world.boots_hint = args.boots_hint.copy()
     world.remote_items = args.remote_items.copy()
     world.mapshuffle = args.mapshuffle.copy()
     world.compassshuffle = args.compassshuffle.copy()
     world.keyshuffle = args.keyshuffle.copy()
     world.bigkeyshuffle = args.bigkeyshuffle.copy()
     world.bombbag = args.bombbag.copy()
+    world.flute_mode = args.flute_mode.copy()
+    world.bow_mode = args.bow_mode.copy()
     world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
     world.crystals_ganon_orig = args.crystals_ganon.copy()
@@ -100,6 +115,8 @@ def main(args, seed=None, fish=None):
     world.enemy_damage = args.enemy_damage.copy()
     world.beemizer = args.beemizer.copy()
     world.intensity = {player: random.randint(1, 3) if args.intensity[player] == 'random' else int(args.intensity[player]) for player in range(1, world.players + 1)}
+    world.door_type_mode = args.door_type_mode.copy()
+    world.decoupledoors = args.decoupledoors.copy()
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
     world.fish = fish
@@ -112,13 +129,16 @@ def main(args, seed=None, fish=None):
     world.treasure_hunt_count = {k: int(v) for k, v in args.triforce_goal.items()}
     world.treasure_hunt_total = {k: int(v) for k, v in args.triforce_pool.items()}
     world.shufflelinks = args.shufflelinks.copy()
+    world.shuffletavern = args.shuffletavern.copy()
     world.pseudoboots = args.pseudoboots.copy()
     world.overworld_map = args.overworld_map.copy()
+    world.take_any = args.take_any.copy()
     world.restrict_boss_items = args.restrict_boss_items.copy()
     world.collection_rate = args.collection_rate.copy()
     world.colorizepots = args.colorizepots.copy()
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
+    world.finish_init()
 
     from OverworldShuffle import __version__ as ORVersion
     logger.info(
@@ -139,7 +159,9 @@ def main(args, seed=None, fish=None):
         for player, name in enumerate(team, 1):
             world.player_names[player].append(name)
     logger.info('')
-    
+    world.settings = CustomSettings()
+    world.settings.create_from_world(world)
+
     outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
 
     for player in range(1, world.players + 1):
@@ -151,7 +173,9 @@ def main(args, seed=None, fish=None):
 
         if args.usestartinventory[player]:
             for tok in filter(None, args.startinventory[player].split(',')):
-                item = ItemFactory(tok.strip(), player)
+                name = tok.strip()
+                name = name if name != 'Ocarina' or world.flute_mode[player] != 'active' else 'Ocarina (Activated)'
+                item = ItemFactory(name, player)
                 if item:
                     world.push_precollected(item)
 
@@ -171,6 +195,25 @@ def main(args, seed=None, fish=None):
         create_dungeons(world, player)
         adjust_locations(world, player)
         place_bosses(world, player)
+
+    if world.customizer and world.customizer.get_start_inventory():
+        for p, inv_list in world.customizer.get_start_inventory().items():
+            for inv_item in inv_list:
+                item = ItemFactory(inv_item.strip(), p)
+                if item:
+                    world.push_precollected(item)
+                    if item.dungeon:
+                        d = world.get_dungeon(item.dungeon, item.player)
+                        match = next((i for i in d.all_items if i.name == item.name), None)
+                        if match:
+                            if match.map or match.compass:
+                                d.dungeon_items.remove(match)
+                            elif match.smallkey:
+                                d.small_keys.remove(match)
+                            elif match.bigkey:
+                                d.big_key.remove(match)
+    if args.print_custom_yaml:
+        world.settings.record_info(world)
 
     if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
@@ -196,9 +239,12 @@ def main(args, seed=None, fish=None):
         link_entrances(world, player)
 
     logger.info(world.fish.translate("cli", "cli", "shuffling.prep"))
+
     for player in range(1, world.players + 1):
         link_doors_prep(world, player)
 
+    if args.print_custom_yaml:
+        world.settings.record_entrances(world)
     create_item_pool_config(world)
 
     logger.info(world.fish.translate("cli", "cli", "shuffling.dungeons"))
@@ -206,6 +252,9 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         link_doors(world, player)
         mark_light_dark_world_regions(world, player)
+    if args.print_custom_yaml:
+        world.settings.record_doors(world)
+
     logger.info(world.fish.translate("cli", "cli", "generating.itempool"))
 
     for player in range(1, world.players + 1):
@@ -224,18 +273,20 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         if world.shopsanity[player]:
             sell_potions(world, player)
-            if world.retro[player]:
+            if world.keyshuffle[player] == 'universal':
                 sell_keys(world, player)
         else:
             lock_shop_locations(world, player)
 
     massage_item_pool(world)
+    if args.print_custom_yaml:
+        world.settings.record_item_pool(world)
+    dungeon_tracking(world)
+    fill_specific_items(world)
+
     logger.info(world.fish.translate("cli", "cli", "placing.dungeon.prizes"))
 
     fill_prizes(world)
-
-    # used for debugging
-    # fill_specific_items(world)
 
     logger.info(world.fish.translate("cli","cli","placing.dungeon.items"))
 
@@ -270,6 +321,7 @@ def main(args, seed=None, fish=None):
             balance_multiworld_progression(world)
 
     # if we only check for beatable, we can do this sanity check first before creating the rom
+    world.clear_exp_cache()
     if not world.can_beat_game(log_error=True):
         raise RuntimeError(world.fish.translate("cli", "cli", "cannot.beat.game"))
 
@@ -279,6 +331,10 @@ def main(args, seed=None, fish=None):
     if args.algorithm in ['balanced', 'equitable']:
         balance_money_progression(world)
     ensure_good_pots(world, True)
+
+    if args.print_custom_yaml:
+        world.settings.record_item_placements(world)
+        world.settings.write_to_file(output_path(f'{outfilebase}_custom.yaml'))
 
     rom_names = []
     jsonout = {}
@@ -398,7 +454,7 @@ def copy_world(world):
     # ToDo: Not good yet
     ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
-                world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
+                world.accessibility, world.shuffle_ganon, world.custom, world.customitemarray, world.hints)
     ret.teams = world.teams
     ret.player_names = copy.deepcopy(world.player_names)
     ret.remote_items = world.remote_items.copy()
@@ -427,6 +483,7 @@ def copy_world(world):
     ret.keyshuffle = world.keyshuffle.copy()
     ret.bigkeyshuffle = world.bigkeyshuffle.copy()
     ret.bombbag = world.bombbag.copy()
+    ret.flute_mode = world.flute_mode.copy()
     ret.crystals_needed_for_ganon = world.crystals_needed_for_ganon.copy()
     ret.crystals_needed_for_gt = world.crystals_needed_for_gt.copy()
     ret.crystals_ganon_orig = world.crystals_ganon_orig.copy()
@@ -445,6 +502,7 @@ def copy_world(world):
     ret.enemy_damage = world.enemy_damage.copy()
     ret.beemizer = world.beemizer.copy()
     ret.intensity = world.intensity.copy()
+    ret.decoupledoors = world.decoupledoors.copy()
     ret.experimental = world.experimental.copy()
     ret.shopsanity = world.shopsanity.copy()
     ret.dropshuffle = world.dropshuffle.copy()
@@ -517,12 +575,9 @@ def copy_world(world):
             new_location.item = item
             item.location = new_location
             item.world = ret
-        if location.event:
-            new_location.event = True
-        if location.locked:
-            new_location.locked = True
-        if location.skip:
-            new_location.skip = True
+        new_location.event = location.event
+        new_location.locked = location.locked
+        new_location.skip = location.skip
         # these need to be modified properly by set_rules
         new_location.access_rule = lambda state: True
         new_location.item_rule = lambda state: True
@@ -576,7 +631,7 @@ def copy_world_premature(world, player):
     # ToDo: Not good yet
     ret = World(world.players, world.owShuffle, world.owCrossed, world.owMixed, world.shuffle, world.doorShuffle, world.logic, world.mode, world.swords,
                 world.difficulty, world.difficulty_adjustments, world.timer, world.progressive, world.goal, world.algorithm,
-                world.accessibility, world.shuffle_ganon, world.retro, world.custom, world.customitemarray, world.hints)
+                world.accessibility, world.shuffle_ganon, world.custom, world.customitemarray, world.hints)
     ret.teams = world.teams
     ret.player_names = copy.deepcopy(world.player_names)
     ret.remote_items = world.remote_items.copy()
@@ -775,8 +830,8 @@ def create_playthrough(world):
             old_item = location.item
             location.item = None
             # todo: this is not very efficient, but I'm not sure how else to do it for this backwards logic
-            # world.clear_exp_cache()
-            if world.can_beat_game(state_cache[num]):
+            world.clear_exp_cache()
+            if world.can_beat_game(state_cache[max(num-1, 0)]):
                 logging.getLogger('').debug(f'{old_item.name} (Player {old_item.player}) is not required')
                 to_delete.add(location)
             else:

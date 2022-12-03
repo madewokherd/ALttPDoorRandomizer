@@ -76,7 +76,7 @@ class InitialSram:
         if startingstate.has('Bow', player):
             equip[0x340] = 3 if startingstate.has('Silver Arrows', player) else 1
             equip[0x38E] |= 0x20  # progressive flag to get the correct hint in all cases
-            if not world.retro[player]:
+            if not world.bow_mode[player].startswith('retro'):
                 equip[0x38E] |= 0x80
         if startingstate.has('Silver Arrows', player):
             equip[0x38E] |= 0x40
@@ -147,6 +147,7 @@ class InitialSram:
                         'Big Key (Ganons Tower)': (0x366, 0x04), 'Compass (Ganons Tower)': (0x364, 0x04), 'Map (Ganons Tower)': (0x368, 0x04)}
             set_or_table = {'Flippers': (0x356, 1, 0x379, 0x02),'Pegasus Boots': (0x355, 1, 0x379, 0x04),
                             'Shovel': (0x34C, 1, 0x38C, 0x04), 'Ocarina': (0x34C, 3, 0x38C, 0x01),
+                            'Ocarina (Activated)': (0x34C, 3, 0x38C, 0x01),
                             'Mushroom': (0x344, 1, 0x38C, 0x20 | 0x08), 'Magic Powder': (0x344, 2, 0x38C, 0x10),
                             'Blue Boomerang': (0x341, 1, 0x38C, 0x80), 'Red Boomerang': (0x341, 2, 0x38C, 0x40)}
             keys = {'Small Key (Eastern Palace)': [0x37E], 'Small Key (Desert Palace)': [0x37F],
@@ -190,7 +191,7 @@ class InitialSram:
             elif item.name in bombs:
                 starting_bombs += bombs[item.name]
             elif item.name in arrows:
-                if world.retro[player]:
+                if world.bow_mode[player].startswith('retro'):
                     equip[0x38E] |= 0x80
                     starting_arrows = 1
                 else:

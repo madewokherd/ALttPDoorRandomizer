@@ -355,7 +355,8 @@ def global_rules(world, player):
 
     set_rule(world.get_entrance('Mire Lobby Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire Post-Gap Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
-    set_rule(world.get_entrance('Mire Falling Bridge WN', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))  # this is due to the fact the the door opposite is blocked
+    set_rule(world.get_entrance('Mire Falling Bridge Hook Path', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
+    set_rule(world.get_entrance('Mire Falling Bridge Hook Only Path', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire 2 NE', player), lambda state: state.has_sword(player) or
              (state.has('Fire Rod', player) and (state.can_use_bombs(player) or state.can_extend_magic(player, 9))) or  # 9 fr shots or 8 with some bombs
              (state.has('Ice Rod', player) and state.can_use_bombs(player)) or  # freeze popo and throw, bomb to finish
@@ -425,7 +426,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('GT Mimics 1 ES', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('GT Mimics 2 WS', player), lambda state: state.can_shoot_arrows(player))
     set_rule(world.get_entrance('GT Mimics 2 NE', player), lambda state: state.can_shoot_arrows(player))
-    # consider access to refill room
+    # consider access to refill room - interior doors would need a change
+    set_rule(world.get_entrance('GT Cannonball Bridge SE', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('GT Gauntlet 1 WN', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Gauntlet 2 EN', player), lambda state: state.can_kill_most_things(player))
     set_rule(world.get_entrance('GT Gauntlet 2 SW', player), lambda state: state.can_kill_most_things(player))
@@ -1604,7 +1606,8 @@ def add_conditional_lamps(world, player):
         'Sewers Behind Tapestry': {'sewer': True, 'entrances': ['Sewers Behind Tapestry S', 'Sewers Behind Tapestry Down Stairs'], 'locations': []},
         'Sewers Rope Room': {'sewer': True, 'entrances': ['Sewers Rope Room Up Stairs', 'Sewers Rope Room North Stairs'], 'locations': []},
         'Sewers Water': {'sewer': True, 'entrances': ['Sewers Water S', 'Sewers Water W'], 'locations': []},
-        'Sewers Key Rat': {'sewer': True, 'entrances': ['Sewers Key Rat E', 'Sewers Key Rat Key Door N'], 'locations': ['Hyrule Castle - Key Rat Key Drop']},
+        'Sewers Dark Aquabats': {'sewer': True, 'entrances': ['Sewers Dark Aquabats N', 'Sewers Dark Aquabats ES'], 'locations': []},
+        'Sewers Key Rat': {'sewer': True, 'entrances': ['Sewers Key Rat S', 'Sewers Key Rat NE'], 'locations': ['Hyrule Castle - Key Rat Key Drop']},
         'Old Man Cave': {'sewer': False, 'entrances': ['Old Man Cave Exit (East)']},
         'Old Man House Back': {'sewer': False, 'entrances': ['Old Man House Back to Front', 'Old Man House Exit (Top)']},
         'Death Mountain Return Cave (left)': {'sewer': False, 'entrances': ['Death Mountain Return Cave E', 'Death Mountain Return Cave Exit (West)']},
@@ -2041,9 +2044,9 @@ bunny_impassible_doors = {
     'Ice Backwards Room Hole', 'Ice Switch Room SE', 'Ice Antechamber NE', 'Ice Antechamber Hole', 'Mire Lobby Gap',
     'Mire Post-Gap Gap', 'Mire 2 NE', 'Mire Hub Upper Blue Barrier', 'Mire Hub Lower Blue Barrier',
     'Mire Hub Right Blue Barrier', 'Mire Hub Top Blue Barrier', 'Mire Hub Switch Blue Barrier N',
-    'Mire Hub Switch Blue Barrier S', 'Mire Falling Bridge WN', 'Mire Map Spike Side Blue Barrier',
-    'Mire Map Spot Blue Barrier', 'Mire Crystal Dead End Left Barrier', 'Mire Crystal Dead End Right Barrier',
-    'Mire Cross ES', 'Mire Left Bridge Hook Path', 'Mire Fishbone Blue Barrier',
+    'Mire Hub Switch Blue Barrier S', 'Mire Falling Bridge Hook Path', 'Mire Falling Bridge Hook Only Path',
+    'Mire Map Spike Side Blue Barrier', 'Mire Map Spot Blue Barrier', 'Mire Crystal Dead End Left Barrier',
+    'Mire Crystal Dead End Right Barrier', 'Mire Cross ES', 'Mire Left Bridge Hook Path', 'Mire Fishbone Blue Barrier',
     'Mire South Fish Blue Barrier', 'Mire Tile Room NW', 'Mire Compass Blue Barrier', 'Mire Attic Hint Hole',
     'Mire Dark Shooters SW', 'Mire Crystal Mid Blue Barrier', 'Mire Crystal Left Blue Barrier', 'TR Main Lobby Gap',
     'TR Lobby Ledge Gap', 'TR Hub SW', 'TR Hub SE', 'TR Hub ES', 'TR Hub EN', 'TR Hub NW', 'TR Hub NE', 'TR Hub Path',
@@ -2089,7 +2092,7 @@ def add_key_logic_rules(world, player):
             add_rule(big_chest, create_rule(d_logic.bk_name, player))
             if len(d_logic.bk_doors) == 0 and len(d_logic.bk_chests) <= 1:
                 set_always_allow(big_chest, allow_big_key_in_big_chest(d_logic.bk_name, player))
-    if world.retro[player]:
+    if world.keyshuffle[player] == 'universal':
         for d_name, layout in world.key_layout[player].items():
             for door in layout.flat_prop:
                 if world.mode[player] != 'standard' or not retro_in_hc(door.entrance):
@@ -2108,8 +2111,8 @@ def eval_small_key_door_main(state, door_name, dungeon, player):
         if ruleType == KeyRuleType.WorstCase:
             door_openable |= state.has_sm_key(key_logic.small_key_name, player, number)
         elif ruleType == KeyRuleType.AllowSmall:
-            if (door_rule.small_location.item and door_rule.small_location.item.name == key_logic.small_key_name
-               and door_rule.small_location.item.player == player):
+            small_loc_item = door_rule.small_location.item
+            if small_loc_item and small_loc_item.name == key_logic.small_key_name and small_loc_item.player == player:
                 door_openable |= state.has_sm_key(key_logic.small_key_name, player, number)
         elif isinstance(ruleType, tuple):
             lock, lock_item = ruleType

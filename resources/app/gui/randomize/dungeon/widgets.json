@@ -1,11 +1,20 @@
 {
   "widgets": {
+    "smallkeyshuffle": {
+      "type": "selectbox",
+      "options": [
+        "none",
+        "wild",
+        "universal"
+      ]
+    },
     "dungeondoorshuffle": {
       "type": "selectbox",
       "default": "vanilla",
       "options": [
         "vanilla",
         "basic",
+        "partitioned",
         "crossed"
       ]
     },
@@ -22,6 +31,20 @@
         "width": 45
       }
     },
+    "door_type_mode": {
+      "type": "selectbox",
+      "default": "basic",
+      "options": [
+        "original",
+        "big",
+        "all",
+        "chaos"
+      ],
+      "config": {
+        "width": 45
+      }
+    },
+    "decoupledoors": { "type": "checkbox" },
     "keydropshuffle": { "type": "checkbox" },
     "pottery": {
       "type": "selectbox",

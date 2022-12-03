@@ -421,7 +421,10 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Sewers Rope Room', 'Hyrule Castle', None, ['Sewers Rope Room Up Stairs', 'Sewers Rope Room North Stairs']),
         create_dungeon_region(player, 'Sewers Dark Cross', 'Hyrule Castle', ['Sewers - Dark Cross'], ['Sewers Dark Cross Key Door N', 'Sewers Dark Cross South Stairs']),
         create_dungeon_region(player, 'Sewers Water', 'Hyrule Castle', None, ['Sewers Water S', 'Sewers Water W']),
-        create_dungeon_region(player, 'Sewers Key Rat', 'Hyrule Castle', ['Hyrule Castle - Key Rat Key Drop'], ['Sewers Key Rat E', 'Sewers Key Rat Key Door N']),
+        create_dungeon_region(player, 'Sewers Dark Aquabats', 'Hyrule Castle', None,
+                              ['Sewers Dark Aquabats ES', 'Sewers Dark Aquabats N']),
+        create_dungeon_region(player, 'Sewers Key Rat', 'Hyrule Castle', ['Hyrule Castle - Key Rat Key Drop'],
+                              ['Sewers Key Rat S', 'Sewers Key Rat NE']),
         create_dungeon_region(player, 'Sewers Secret Room Blocked Path', 'Hyrule Castle', None, ['Sewers Secret Room Up Stairs']),
         create_dungeon_region(player, 'Sewers Rat Path', 'Hyrule Castle', None, ['Sewers Secret Room Key Door S', 'Sewers Secret Room Push Block', 'Sewers Rat Path WS', 'Sewers Rat Path WN']),
         create_dungeon_region(player, 'Sewers Secret Room', 'Hyrule Castle', ['Sewers - Secret Room - Left', 'Sewers - Secret Room - Middle', 'Sewers - Secret Room - Right'],
@@ -770,7 +773,12 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Mire Hub Switch', 'Misery Mire', ['Misery Mire - Main Lobby'], ['Mire Hub Switch Blue Barrier N', 'Mire Hub Switch Blue Barrier S']),
         create_dungeon_region(player, 'Mire Lone Shooter', 'Misery Mire', None, ['Mire Lone Shooter WS', 'Mire Lone Shooter ES']),
         create_dungeon_region(player, 'Mire Failure Bridge', 'Misery Mire', None, ['Mire Failure Bridge W', 'Mire Failure Bridge E']),
-        create_dungeon_region(player, 'Mire Falling Bridge', 'Misery Mire', ['Misery Mire - Big Chest'], ['Mire Falling Bridge WS', 'Mire Falling Bridge W', 'Mire Falling Bridge WN']),
+        create_dungeon_region(player, 'Mire Falling Bridge - Failure', 'Misery Mire', None,
+                              ['Mire Falling Bridge W', 'Mire Falling Bridge Hook Only Path', 'Mire Falling Bridge Primary Path']),
+        create_dungeon_region(player, 'Mire Falling Bridge - Primary', 'Misery Mire', None,
+                              ['Mire Falling Bridge WS', 'Mire Falling Bridge Hook Path', 'Mire Falling Bridge Failure Path']),
+        create_dungeon_region(player, 'Mire Falling Bridge - Chest', 'Misery Mire', ['Misery Mire - Big Chest'],
+                              ['Mire Falling Bridge WN']),
         create_dungeon_region(player, 'Mire Map Spike Side', 'Misery Mire', None, ['Mire Map Spike Side EN', 'Mire Map Spike Side Drop Down', 'Mire Map Spike Side Blue Barrier']),
         create_dungeon_region(player, 'Mire Map Spot', 'Misery Mire', ['Misery Mire - Map Chest'], ['Mire Map Spot WN', 'Mire Map Spot Blue Barrier']),
         create_dungeon_region(player, 'Mire Crystal Dead End', 'Misery Mire', None, ['Mire Crystal Dead End Left Barrier', 'Mire Crystal Dead End Right Barrier', 'Mire Crystal Dead End NW']),
@@ -1174,7 +1182,7 @@ def adjust_locations(world, player):
             loc.event = False
             item_dungeon = key_item.dungeon
             dungeon = world.get_dungeon(item_dungeon, player)
-            if key_item.smallkey and not world.retro[player]:
+            if key_item.smallkey and world.keyshuffle[player] != 'universal':
                 dungeon.small_keys.append(key_item)
             elif key_item.bigkey:
                 dungeon.big_key = key_item

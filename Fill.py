@@ -13,7 +13,7 @@ from source.item.FillUtil import filter_pot_locations, valid_pot_items
 
 
 def get_dungeon_item_pool(world):
-    return [item for dungeon in world.dungeons for item in dungeon.all_items]
+    return [item for dungeon in world.dungeons for item in dungeon.all_items if item.location is None]
 
 
 def promote_dungeon_items(world):
@@ -24,7 +24,6 @@ def promote_dungeon_items(world):
             item.advancement = True
         elif item.map or item.compass:
             item.priority = True
-    dungeon_tracking(world)
 
 
 def dungeon_tracking(world):
@@ -35,11 +34,11 @@ def dungeon_tracking(world):
 
 
 def fill_dungeons_restrictive(world, shuffled_locations):
-    dungeon_tracking(world)
 
     # with shuffled dungeon items they are distributed as part of the normal item pool
     for item in world.get_items():
-        if (item.smallkey and world.keyshuffle[item.player]) or (item.bigkey and world.bigkeyshuffle[item.player]):
+        if ((item.smallkey and world.keyshuffle[item.player] != 'none')
+           or (item.bigkey and world.bigkeyshuffle[item.player])):
             item.advancement = True
         elif (item.map and world.mapshuffle[item.player]) or (item.compass and world.compassshuffle[item.player]):
             item.priority = True
@@ -50,7 +49,7 @@ def fill_dungeons_restrictive(world, shuffled_locations):
         (bigs if i.bigkey else smalls if i.smallkey else others).append(i)
     unplaced_smalls = list(smalls)
     for i in world.itempool:
-        if i.smallkey and world.keyshuffle[i.player]:
+        if i.smallkey and world.keyshuffle[i.player] != 'none':
             unplaced_smalls.append(i)
 
     def fill(base_state, items, key_pool):
@@ -72,11 +71,13 @@ def fill_dungeons_restrictive(world, shuffled_locations):
 
 def fill_restrictive(world, base_state, locations, itempool, key_pool=None, single_player_placement=False,
                      vanilla=False):
-    def sweep_from_pool():
+    def sweep_from_pool(placing_item=None):
         new_state = base_state.copy()
         for item in itempool:
             new_state.collect(item, True)
+        new_state.placing_item = placing_item
         new_state.sweep_for_events()
+        new_state.placing_item = None
         return new_state
 
     unplaced_items = []
@@ -93,7 +94,7 @@ def fill_restrictive(world, base_state, locations, itempool, key_pool=None, sing
         while any(player_items.values()) and locations:
             items_to_place = [[itempool.remove(items[-1]), items.pop()][-1] for items in player_items.values() if items]
 
-            maximum_exploration_state = sweep_from_pool()
+            maximum_exploration_state = sweep_from_pool(placing_item=items_to_place[0])
             has_beaten_game = world.has_beaten_game(maximum_exploration_state)
 
             for item_to_place in items_to_place:
@@ -160,7 +161,7 @@ def valid_key_placement(item, location, key_pool, world):
     if not valid_reserved_placement(item, location, world):
         return False
     if ((not item.smallkey and not item.bigkey) or item.player != location.player
-       or world.retro[item.player] or world.logic[item.player] == 'nologic'):
+       or world.keyshuffle[item.player] == 'universal' or world.logic[item.player] == 'nologic'):
         return True
     dungeon = location.parent_region.dungeon
     if dungeon:
@@ -172,7 +173,7 @@ def valid_key_placement(item, location, key_pool, world):
         if key_logic.prize_location:
             prize_loc = world.get_location(key_logic.prize_location, location.player)
         cr_count = world.crystals_needed_for_gt[location.player]
-        wild_keys = world.keyshuffle[item.player]
+        wild_keys = world.keyshuffle[item.player] != 'none'
         return key_logic.check_placement(unplaced_keys, wild_keys, location if item.bigkey else None, prize_loc, cr_count)
     else:
         return not item.is_inside_dungeon_item(world)
@@ -216,7 +217,7 @@ def track_dungeon_items(item, location, world):
 
 
 def is_dungeon_item(item, world):
-    return ((item.smallkey and not world.keyshuffle[item.player])
+    return ((item.smallkey and world.keyshuffle[item.player] == 'none')
             or (item.bigkey and not world.bigkeyshuffle[item.player])
             or (item.compass and not world.compassshuffle[item.player])
             or (item.map and not world.mapshuffle[item.player]))
@@ -288,7 +289,7 @@ def last_ditch_placement(item_to_place, locations, world, state, base_state, ite
         possible_swaps = [x for x in state.locations_checked if x.item.type == 'Crystal']
     else:
         possible_swaps = [x for x in state.locations_checked
-                          if x.item.type not in ['Event', 'Crystal'] and not x.forced_item]
+                          if x.item.type not in ['Event', 'Crystal'] and not x.forced_item and not x.locked]
     swap_locations = sorted(possible_swaps, key=location_preference)
     return try_possible_swaps(swap_locations, item_to_place, locations, world, base_state, itempool,
                               key_pool, single_player_placement)
@@ -426,7 +427,8 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
 
     # Make sure the escape small key is placed first in standard with key shuffle to prevent running out of spots
     # todo: crossed
-    progitempool.sort(key=lambda item: 1 if item.name == 'Small Key (Escape)' and world.keyshuffle[item.player] and world.mode[item.player] == 'standard' else 0)
+    progitempool.sort(key=lambda item: 1 if item.name == 'Small Key (Escape)'
+                      and world.keyshuffle[item.player] != 'none' and world.mode[item.player] == 'standard' else 0)
     key_pool = [x for x in progitempool if x.smallkey]
 
     # sort maps and compasses to the back -- this may not be viable in equitable & ambrosia
@@ -490,13 +492,14 @@ def calc_trash_locations(world, player):
 
 def ensure_good_pots(world, write_skips=False):
     for loc in world.get_locations():
-        # # convert Arrows 5 when necessary
-        # if (loc.item.name in {'Arrows (5)'}
-        #    and loc.type not in [LocationType.Pot, LocationType.Bonk]):
-        #     loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
-        # convert Nothing when necessary
+        if loc.item is None:
+            loc.item = ItemFactory('Nothing', loc.player)
+        # convert Arrows 5 and Nothing when necessary
         if (loc.item.name in {'Nothing'}
            and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
+            loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
+        if (loc.item.name in {'Arrows (5)'}
+           and (loc.type not in [LocationType.Pot, LocationType.Bonk] or loc.item.player != loc.player)):
             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
         # # can be placed here by multiworld balancing or shop balancing
         # # change it to something normal for the player it got swapped to
@@ -507,7 +510,7 @@ def ensure_good_pots(world, write_skips=False):
         #         else:
         #             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
         # do the arrow retro check
-        if world.retro[loc.item.player] and loc.item.name in {'Arrows (5)', 'Arrows (10)'}:
+        if world.bow_mode[loc.item.player].startswith('retro') and loc.item.name in {'Arrows (5)', 'Arrows (10)'}:
             loc.item = ItemFactory('Rupees (5)', loc.item.player)
         # don't write out all pots to spoiler
         if write_skips:
@@ -528,10 +531,17 @@ def fast_fill_helper(world, item_pool, fill_locations):
 
 
 def fast_fill(world, item_pool, fill_locations):
-    while item_pool and fill_locations:
+    config = world.item_pool_config
+    fast_pool = [x for x in item_pool if (x.name, x.player) not in config.restricted]
+    filtered_pool = [x for x in item_pool if (x.name, x.player) in config.restricted]
+    filtered_fill(world, filtered_pool, fill_locations)
+    while fast_pool and fill_locations:
         spot_to_fill = fill_locations.pop()
-        item_to_place = item_pool.pop()
+        item_to_place = fast_pool.pop()
         world.push_item(spot_to_fill, item_to_place, False)
+    item_pool.clear()
+    item_pool.extend(filtered_pool)
+    item_pool.extend(fast_pool)
 
 
 def fast_fill_pot_for_multiworld(world, item_pool, fill_locations):
@@ -672,7 +682,7 @@ def balance_multiworld_progression(world):
                 candidate_items = collections.defaultdict(set)
                 while True:
                     for location in balancing_sphere:
-                        if location.event and (world.keyshuffle[location.item.player] or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
+                        if location.event and (world.keyshuffle[location.item.player] != 'none' or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
                             balancing_state.collect(location.item, True, location)
                             player = location.item.player
                             if player in balancing_players and not location.locked and location.player != player:
@@ -747,7 +757,7 @@ def balance_multiworld_progression(world):
                         sphere_locations.add(location)
 
         for location in sphere_locations:
-            if location.event and (world.keyshuffle[location.item.player] or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
+            if location.event and (world.keyshuffle[location.item.player] != 'none' or not location.item.smallkey) and (world.bigkeyshuffle[location.item.player] or not location.item.bigkey):
                 state.collect(location.item, True, location)
         checked_locations |= sphere_locations
 
@@ -823,7 +833,9 @@ def balance_money_progression(world):
             return True
         if item.name in ['Progressive Armor', 'Blue Mail', 'Red Mail']:
             return True
-        if world.retro[player] and (item.name in ['Single Arrow', 'Small Key (Universal)']):
+        if world.keyshuffle[player] == 'universal' and item.name == 'Small Key (Universal)':
+            return True
+        if world.bow_mode[player].startswith('retro') and item.name == 'Single Arrow':
             return True
         if location.name in pay_for_locations:
             return True
@@ -963,31 +975,85 @@ def balance_money_progression(world):
                             wallet[location.item.player] += rupee_chart[location.item.name]
 
 def set_prize_drops(world, player):
-    prizes = [0xD8, 0xD8, 0xD8, 0xD8, 0xD9, 0xD8, 0xD8, 0xD9, 0xDA, 0xD9, 0xDA, 0xDB, 0xDA, 0xD9, 0xDA, 0xDA, 0xE0, 0xDF, 0xDF, 0xDA, 0xE0, 0xDF, 0xD8, 0xDF,
-              0xDC, 0xDC, 0xDC, 0xDD, 0xDC, 0xDC, 0xDE, 0xDC, 0xE1, 0xD8, 0xE1, 0xE2, 0xE1, 0xD8, 0xE1, 0xE2, 0xDF, 0xD9, 0xD8, 0xE1, 0xDF, 0xDC, 0xD9, 0xD8,
-              0xD8, 0xE3, 0xE0, 0xDB, 0xDE, 0xD8, 0xDB, 0xE2, 0xD9, 0xDA, 0xDB, 0xD9, 0xDB, 0xD9, 0xDB]
-    
-    # randomize last 7 slots
-    new_prizes = random.sample(prizes, 7)
+    prizes = [0xD8, 0xD8, 0xD8, 0xD8, 0xD9, 0xD8, 0xD8, 0xD9,
+              0xDA, 0xD9, 0xDA, 0xDB, 0xDA, 0xD9, 0xDA, 0xDA,
+              0xE0, 0xDF, 0xDF, 0xDA, 0xE0, 0xDF, 0xD8, 0xDF,
+              0xDC, 0xDC, 0xDC, 0xDD, 0xDC, 0xDC, 0xDE, 0xDC,
+              0xE1, 0xD8, 0xE1, 0xE2, 0xE1, 0xD8, 0xE1, 0xE2,
+              0xDF, 0xD9, 0xD8, 0xE1, 0xDF, 0xDC, 0xD9, 0xD8,
+              0xD8, 0xE3, 0xE0, 0xDB, 0xDE, 0xD8, 0xDB, 0xE2,
+              0xD9, 0xDA, 0xDB, 0xD9, 0xDB, 0xD9, 0xDB]
+    dig_prizes = [0xB2, 0xD8, 0xD8, 0xD8, 0xD8, 0xD8, 0xD8, 0xD8, 0xD8,
+                  0xD9, 0xD9, 0xD9, 0xD9, 0xD9, 0xDA, 0xDA, 0xDA, 0xDA, 0xDA,
+                  0xDB, 0xDB, 0xDB, 0xDB, 0xDB, 0xDC, 0xDC, 0xDC, 0xDC, 0xDC,
+                  0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDE, 0xDE, 0xDE, 0xDE, 0xDE,
+                  0xDF, 0xDF, 0xDF, 0xDF, 0xDF, 0xE0, 0xE0, 0xE0, 0xE0, 0xE0,
+                  0xE1, 0xE1, 0xE1, 0xE1, 0xE1, 0xE2, 0xE2, 0xE2, 0xE2, 0xE2,
+                  0xE3, 0xE3, 0xE3, 0xE3, 0xE3]
+
+    def chunk(l,n):
+        return [l[i:i+n] for i in range(0, len(l), n)]
+
+    possible_prizes = {
+        'Small Heart': 0xD8, 'Fairy': 0xE3,
+        'Rupee (1)': 0xD9, 'Rupees (5)': 0xDA, 'Rupees (20)': 0xDB,
+        'Big Magic': 0xE0, 'Small Magic': 0xDF,
+        'Single Bomb': 0xDC, 'Bombs (4)': 0xDD,
+        'Bombs (8)': 0xDE, 'Arrows (5)': 0xE1, 'Arrows (10)': 0xE2
+    }  #weights, if desired 13, 1, 9, 7, 6, 3, 6, 7, 1, 2, 5, 3
+    uniform_prizes = list(possible_prizes.values())
+    prizes[-7:] = random.sample(prizes, 7)
+
+    #shuffle order of 7 main packs
+    packs = chunk(prizes[:56], 8)
+    random.shuffle(packs)
+    prizes[:56] = [drop for pack in packs for drop in pack]
+
+    if world.customizer:
+        drops = world.customizer.get_drops()
+        if drops:
+            for player, drop_config in drops.items():
+                for pack_num in range(1, 8):
+                    if f'Pack {pack_num}' in drop_config:
+                        for prize, idx in enumerate(drop_config[f'Pack {pack_num}']):
+                            chosen = random.choice(uniform_prizes) if prize == 'Random' else possible_prizes[prize]
+                            prizes[(pack_num-1)*8 + idx] = chosen
+                for tree_pull_tier in range(1, 4):
+                    if f'Tree Pull Tier {tree_pull_tier}' in drop_config:
+                        prize = drop_config[f'Tree Pull Tier {tree_pull_tier}']
+                        chosen = random.choice(uniform_prizes) if prize == 'Random' else possible_prizes[prize]
+                        prizes[63-tree_pull_tier] = chosen  # (62 through 60 in reverse)
+                for key, pos in {'Crab Normal': 59, 'Crab Special': 58, 'Stun Prize': 57, 'Fish': 56}.items():
+                    if key in drop_config:
+                        prize = drop_config[key]
+                        chosen = random.choice(uniform_prizes) if prize == 'Random' else possible_prizes[prize]
+                        prizes[pos] = chosen
 
     if world.difficulty_adjustments[player] in ['hard', 'expert']:
         prize_replacements = {0xE0: 0xDF, # Fairy -> heart
                               0xE3: 0xD8} # Big magic -> small magic
-        new_prizes = [prize_replacements.get(prize, prize) for prize in new_prizes]
+        prizes = [prize_replacements.get(prize, prize) for prize in prizes]
+        dig_prizes = [prize_replacements.get(prize, prize) for prize in dig_prizes]
 
-    if world.retro[player]:
+    if world.bow_mode[player].startswith('retro'):
         prize_replacements = {0xE1: 0xDA, #5 Arrows -> Blue Rupee
                               0xE2: 0xDB} #10 Arrows -> Red Rupee
-        new_prizes = [prize_replacements.get(prize, prize) for prize in new_prizes]
+        prizes = [prize_replacements.get(prize, prize) for prize in prizes]
+        dig_prizes = [prize_replacements.get(prize, prize) for prize in dig_prizes]
 
     # write tree pull prizes
-    world.prizes[player]['pull'] = [ new_prizes.pop(), new_prizes.pop(), new_prizes.pop() ]
+    world.prizes[player]['dig'] = dig_prizes
+
+    # write tree pull prizes
+    world.prizes[player]['pull'] = [ prizes.pop(), prizes.pop(), prizes.pop() ]
 
     # rupee crab prizes
-    world.prizes[player]['crab'] = [ new_prizes.pop(), new_prizes.pop() ]
+    world.prizes[player]['crab'] = [ prizes.pop(), prizes.pop() ]
 
     # stunned enemy prize
-    world.prizes[player]['stun'] = new_prizes.pop()
+    world.prizes[player]['stun'] = prizes.pop()
 
     # saved fish prize
-    world.prizes[player]['fish'] = new_prizes.pop()
+    world.prizes[player]['fish'] = prizes.pop()
+
+    world.prizes[player]['enemies'] = prizes
