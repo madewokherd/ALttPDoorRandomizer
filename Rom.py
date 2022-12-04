@@ -2193,6 +2193,8 @@ def write_strings(rom, world, player, team):
             entrances_to_hint.update(ItemEntrances)
             entrances_to_hint.update(ShopEntrances)
             entrances_to_hint.update(OtherEntrances)
+            if world.mode[player] != 'inverted':
+                entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
         if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean']:
             if world.shufflelinks[player]:
                 entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
@@ -2203,7 +2205,6 @@ def write_strings(rom, world, player, team):
                 entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
             if world.shuffletavern[player]:
                 entrances_to_hint.update({'Tavern North': 'A backdoor'})
-        entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
         if world.shuffle[player] in ['insanity']:
             entrances_to_hint.update(InsanityEntrances)
             if world.shuffle_ganon[player]:
