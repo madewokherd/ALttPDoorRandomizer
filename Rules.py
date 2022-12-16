@@ -1809,7 +1809,7 @@ def set_bunny_rules(world, player, inverted):
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid',
                                   'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Old Man',
                                   'Frog', 'Missing Smith', 'Dark Blacksmith Ruins', 'Purple Chest', 'Pyramid Crack', 'Big Bomb',
-                                  'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Blacksmith',
+                                  'Spectacle Rock', 'Bombos Tablet', 'Ether Tablet', 'Blacksmith', 'Stumpy',
                                   'Master Sword Pedestal', 'Bottle Merchant', 'Sunken Treasure', 'Desert Ledge',
                                   'Kakariko Shop - Left', 'Kakariko Shop - Middle', 'Kakariko Shop - Right',
                                   'Lake Hylia Shop - Left', 'Lake Hylia Shop - Middle', 'Lake Hylia Shop - Right',
