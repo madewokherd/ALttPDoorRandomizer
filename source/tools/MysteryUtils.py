@@ -122,7 +122,9 @@ def roll_settings(weights):
                     'dungeons': 'dungeons',
                     'pedestal': 'pedestal',
                     'triforce-hunt': 'triforcehunt',
-                    'trinity': 'trinity'
+                    'trinity': 'trinity',
+                    'ganonhunt': 'ganonhunt',
+                    'completionist': 'completionist'
                     }[goal]
 
     ret.openpyramid = get_choice('open_pyramid') if 'open_pyramid' in weights else 'auto'
@@ -215,5 +217,6 @@ def roll_settings(weights):
         ret.ow_palettes = get_choice('ow_palettes', romweights)
         ret.uw_palettes = get_choice('uw_palettes', romweights)
         ret.shuffle_sfx = get_choice('shuffle_sfx', romweights) == 'on'
+        ret.msu_resume = get_choice('msu_resume', romweights) == 'on'
 
     return ret

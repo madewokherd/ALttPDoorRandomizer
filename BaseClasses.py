@@ -128,7 +128,8 @@ class World(object):
             set_player_attr('can_access_trock_front', None)
             set_player_attr('can_access_trock_big_chest', None)
             set_player_attr('can_access_trock_middle', None)
-            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic'] or shuffle[player] in ['lean', 'crossed', 'insanity'])
+            set_player_attr('fix_fake_world', logic[player] not in ['owglitches', 'nologic']
+                            or shuffle[player] in ['lean', 'crossed', 'insanity'])
             set_player_attr('mapshuffle', False)
             set_player_attr('compassshuffle', False)
             set_player_attr('keyshuffle', 'none')
@@ -174,7 +175,9 @@ class World(object):
     def finish_init(self):
         for player in range(1, self.players + 1):
             if self.mode[player] == 'retro':
-                self.mode[player] == 'open'
+                self.mode[player] = 'open'
+            if self.goal[player] == 'completionist':
+                self.accessibility[player] = 'locations'
 
     def get_name_string_for_object(self, obj):
         return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_names(obj.player)})'
@@ -547,7 +550,10 @@ class World(object):
         if self.has_beaten_game(state):
             return True
 
-        prog_locations = [location for location in self.get_locations() if location.item is not None and (location.item.advancement or location.event) and location not in state.locations_checked]
+        prog_locations = [location for location in self.get_locations() if location.item is not None
+                          and (location.item.advancement or location.event
+                               or self.goal[location.player] == 'completionist')
+                          and location not in state.locations_checked]
 
         while prog_locations:
             sphere = []
@@ -1129,6 +1135,12 @@ class CollectionState(object):
     def item_count(self, item, player):
         return self.prog_items[item, player]
 
+    def everything(self, player):
+        all_locations = self.world.get_filled_locations(player)
+        all_locations.remove(self.world.get_location('Ganon', player))
+        return (len([x for x in self.locations_checked if x.player == player])
+                >= len(all_locations))
+
     def has_crystals(self, count, player):
         crystals = ['Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 5', 'Crystal 6', 'Crystal 7']
         return len([crystal for crystal in crystals if self.has(crystal, player)]) >= count
@@ -1260,7 +1272,7 @@ class CollectionState(object):
 
     def can_flute(self, player):
         if self.world.mode[player] == 'standard' and not self.has('Zelda Delivered', player):
-            return False
+            return False  # can't flute in rain state
         if any(map(lambda i: i.name in ['Ocarina', 'Ocarina (Activated)'], self.world.precollected_items)):
             return True
         lw = self.world.get_region('Kakariko Area', player)
@@ -3014,7 +3026,7 @@ class Spoiler(object):
                 outfile.write('Mode:'.ljust(line_width) + '%s\n' % self.metadata['mode'][player])
                 outfile.write('Swords:'.ljust(line_width) + '%s\n' % self.metadata['weapons'][player])
                 outfile.write('Goal:'.ljust(line_width) + '%s\n' % self.metadata['goal'][player])
-                if self.metadata['goal'][player] in ['triforcehunt', 'trinity']:
+                if self.metadata['goal'][player] in ['triforcehunt', 'trinity', 'ganonhunt']:
                     outfile.write('Triforce Pieces Required:'.ljust(line_width) + '%s\n' % self.metadata['triforcegoal'][player])
                     outfile.write('Triforce Pieces Total:'.ljust(line_width) + '%s\n' % self.metadata['triforcepool'][player])
                 outfile.write('Crystals Required for GT:'.ljust(line_width) + '%s\n' % str(self.world.crystals_gt_orig[player]))
@@ -3343,7 +3355,8 @@ world_mode = {"open": 0, "standard": 1, "inverted": 2}
 sword_mode = {"random": 0,  "assured": 1, "swordless": 2, "vanilla": 3}
 
 # byte 2: GGGD DFFH (goal, diff, item_func, hints)
-goal_mode = {"ganon": 0, "pedestal": 1, "dungeons": 2, "triforcehunt": 3, "crystals": 4, "trinity": 5}
+goal_mode = {'ganon': 0, 'pedestal': 1, 'dungeons': 2, 'triforcehunt': 3, 'crystals': 4, 'trinity': 5,
+             'ganonhunt': 6, 'completionist': 7}
 diff_mode = {"normal": 0, "hard": 1, "expert": 2}
 func_mode = {"normal": 0, "hard": 1, "expert": 2}
 
@@ -3391,7 +3404,7 @@ flutespot_mode = {"vanilla": 0, "balanced": 1, "random": 2}
 flute_mode = {'normal': 0, 'active': 1}
 keyshuffle_mode = {'none': 0, 'wild': 1, 'universal': 2}  # reserved 8 modes?
 take_any_mode = {'none': 0, 'random': 1, 'fixed': 2}
-bow_mode = {'progressive': 0, 'silvers': 1, 'retro': 2, 'retro_silver': 3}
+bow_mode = {'progressive': 0, 'silvers': 1, 'retro': 2, 'retro_silvers': 3}
 
 # additions
 # psuedoboots does not effect code
