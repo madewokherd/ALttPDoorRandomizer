@@ -1489,7 +1489,7 @@ ow_connections = {
             ('East Dark World Teleporter', 'Eastern Nook Area')
         ]),
     0x30: ([
-            ('Bombos Tablet Ledge Mirror Spot', 'Bombos Tablet Ledge'), # OWG
+            ('Mirror To Bombos Tablet Ledge', 'Bombos Tablet Ledge'), # OWG
             ('Desert Teleporter', 'Misery Mire Teleporter Ledge'),
             ('Desert Boss Cliff Ledge Drop', 'Desert Palace Entrance (North) Spot'), # OWG
             ('Mire Cliff Ledge Drop', 'Misery Mire Area'), # OWG

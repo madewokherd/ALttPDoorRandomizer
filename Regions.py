@@ -207,7 +207,7 @@ def create_regions(world, player):
         create_dw_region(player, 'Palace of Darkness Nook Area', None, ['East Dark World Hint', 'East Dark World Teleporter', 'Palace of Darkness Nook NE']),
         create_dw_region(player, 'Misery Mire Area', None, ['Mire Shed', 'Misery Mire', 'Dark Desert Fairy', 'Dark Desert Hint']),
         create_dw_region(player, 'Misery Mire Teleporter Ledge', None, ['Misery Mire Teleporter Ledge Drop', 'Misery Mire Teleporter']),
-        create_dw_region(player, 'Mire Northeast Cliffs', None, ['Mire Cliff Ledge Drop', 'Dark Checkerboard Cliff Ledge Drop', 'Archery Game Cliff Ledge Drop', 'Stumpy Approach Cliff Ledge Drop', 'Mire C Whirlpool Cliff Ledge Drop', 'Swamp Nook Cliff Ledge Drop', 'Swamp Cliff Ledge Drop', 'Bombos Tablet Ledge Mirror Spot']),
+        create_dw_region(player, 'Mire Northeast Cliffs', None, ['Mire Cliff Ledge Drop', 'Dark Checkerboard Cliff Ledge Drop', 'Archery Game Cliff Ledge Drop', 'Stumpy Approach Cliff Ledge Drop', 'Mire C Whirlpool Cliff Ledge Drop', 'Swamp Nook Cliff Ledge Drop', 'Swamp Cliff Ledge Drop', 'Mirror To Bombos Tablet Ledge']),
         create_dw_region(player, 'Stumpy Approach Area', None, ['Stumpy Approach Bush (South)', 'Stumpy Approach NW', 'Stumpy Approach EC']),
         create_dw_region(player, 'Stumpy Approach Bush Entry', None, ['Stumpy Approach Bush (North)', 'Stumpy Approach NC']),
         create_dw_region(player, 'Dark C Whirlpool Area', None, ['Dark C Whirlpool Rock (Bottom)', 'Dark C Whirlpool Pegs (Right)', 'Dark C Whirlpool Water Entry', 'Dark C Whirlpool EN', 'Dark C Whirlpool ES', 'Dark C Whirlpool SC']),

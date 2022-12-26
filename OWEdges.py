@@ -1734,7 +1734,7 @@ OWExitTypes = {
                 'Qirn Jump Whirlpool',
                 'Bomber Corner Whirlpool'
             ],
-    'Mirror': ['Bombos Tablet Ledge Mirror Spot'
+    'Mirror': ['Mirror To Bombos Tablet Ledge'
             ]
 }
 

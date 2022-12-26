@@ -1027,7 +1027,7 @@ def ow_inverted_rules(world, player):
         set_rule(world.get_entrance('East Dark World Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player))
         
     if not world.is_tile_swapped(0x30, player):
-        set_rule(world.get_entrance('Bombos Tablet Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
+        set_rule(world.get_entrance('Mirror To Bombos Tablet Ledge', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Desert Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
         set_rule(world.get_entrance('Misery Mire Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
