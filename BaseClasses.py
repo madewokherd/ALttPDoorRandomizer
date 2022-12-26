@@ -3451,9 +3451,11 @@ class Settings(object):
 
             settings_version,
 
-            (or_mode[w.owShuffle[p]] << 5) | (0x10 if w.owTerrain[p] else 0) | (0x08 if w.owWhirlpoolShuffle[p] else 0) | orcrossed_mode[w.owCrossed[p]],
+            (or_mode[w.owShuffle[p]] << 5) | (0x10 if w.owTerrain[p] else 0)
+            | (0x08 if w.owWhirlpoolShuffle[p] else 0) | orcrossed_mode[w.owCrossed[p]],
 
-            (0x80 if w.owKeepSimilar[p] else 0) | (0x40 if w.owMixed[p] else 0) | (0x20 if w.shuffle_bonk_drops[p] else 0) | (flutespot_mode[w.owFluteShuffle[p]] << 4),
+            (0x80 if w.owKeepSimilar[p] else 0) | (0x40 if w.owMixed[p] else 0)
+            | (0x20 if w.shuffle_bonk_drops[p] else 0) | (flutespot_mode[w.owFluteShuffle[p]] << 4),
 
             (flute_mode[w.flute_mode[p]] << 7 | bow_mode[w.bow_mode[p]] << 4
             | take_any_mode[w.take_any[p]] << 2 | keyshuffle_mode[w.keyshuffle[p]])
