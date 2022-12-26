@@ -1138,6 +1138,7 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Skull Woods Forgotten Bush (West)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Forgotten Bush (East)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Second Section Hole', player), player)
+    add_bunny_rule(world.get_entrance('East Dark Death Mountain Bushes', player), player)
     add_bunny_rule(world.get_entrance('Bumper Cave Entrance Rock', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (West)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (East)', player), player)

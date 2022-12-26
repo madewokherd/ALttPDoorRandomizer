@@ -1655,6 +1655,7 @@ OWExitTypes = {
                 'Skull Woods Forgotten Bush (East)',
                 'GT Entry Approach',
                 'GT Entry Leave',
+                'East Dark Death Mountain Bushes',
                 'Bumper Cave Entrance Rock',
                 'Skull Woods Pass Bush Row (West)',
                 'Skull Woods Pass Bush Row (East)',
