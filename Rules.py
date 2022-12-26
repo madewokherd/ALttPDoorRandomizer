@@ -983,169 +983,33 @@ def ow_inverted_rules(world, player):
         set_rule(world.get_entrance('GT Entry Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
         set_rule(world.get_entrance('GT Entry Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'))
 
-    if not world.is_tile_swapped(0x00, player):
-        set_rule(world.get_entrance('Lost Woods East Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods Pedestal Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods Southwest Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods East (Forgotten) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods West (Forgotten) Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Skull Woods Back Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Forgotten (West) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Forgotten (East) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Portal Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Forgotten (Middle) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Front Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x02, player):
-        set_rule(world.get_entrance('Lumberjack Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark Lumberjack Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x03, player):
-        set_rule(world.get_entrance('West Death Mountain (Top) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Spectacle Rock Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('West Dark Death Mountain (Top) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Bubble Boy Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('West Dark Death Mountain (Bottom) Mirror Spot', player), lambda state: state.has_Mirror(player))
+    if world.is_tile_swapped(0x03, player):
         set_rule(world.get_entrance('Spectacle Rock Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))
         set_rule(world.get_entrance('Spectacle Rock Leave', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))
         
     if not world.is_tile_swapped(0x05, player):
-        set_rule(world.get_entrance('East Death Mountain (Top West) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('East Death Mountain (Top East) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Mimic Cave Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Spiral Cave Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Fairy Ascension Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player))  # need to lift flowers
-        set_rule(world.get_entrance('Isolated Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Death Mountain Bridge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Floating Island Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('East Death Mountain Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
-        set_rule(world.get_entrance('East Dark Death Mountain (Top West) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('East Dark Death Mountain (Top East) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('TR Ledge (West) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('TR Ledge (East) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('TR Isolated Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('East Dark Death Mountain (Bottom Plateau) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('East Dark Death Mountain (Bottom Left) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('East Dark Death Mountain (Bottom) Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark Floating Island Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Dark Death Mountain Teleporter (East)', player), lambda state: state.can_lift_heavy_rocks(player))
         
     if not world.is_tile_swapped(0x07, player):
-        set_rule(world.get_entrance('TR Pegs Area Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('TR Pegs Teleporter', player), lambda state: state.has('Hammer', player))
     else:
-        set_rule(world.get_entrance('Turtle Rock Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Turtle Rock Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
         set_rule(world.get_entrance('TR Pegs Ledge Drop', player), lambda state: False)
         set_rule(world.get_entrance('TR Pegs Ledge Leave', player), lambda state: state.has('Hammer', player) and state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
         set_rule(world.get_entrance('Turtle Rock Tail Ledge Drop', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
-    if not world.is_tile_swapped(0x0a, player):
-        set_rule(world.get_entrance('Mountain Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Mountain Entry Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Mountain Entry Entrance Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Bumper Cave Area Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Bumper Cave Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Bumper Cave Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x0f, player):
-        set_rule(world.get_entrance('Zora Waterfall Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Catfish Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
     if not world.is_tile_swapped(0x10, player):
-        set_rule(world.get_entrance('Lost Woods Pass West Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods Pass East Top Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods Pass Portal Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lost Woods Pass East Bottom Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Kakariko Teleporter', player), lambda state: state.can_lift_rocks(player))
     else:
-        set_rule(world.get_entrance('Skull Woods Pass West Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Pass East Top Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Pass Portal Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Skull Woods Pass East Bottom Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('West Dark World Teleporter', player), lambda state: state.can_lift_rocks(player))
-        
-    if not world.is_tile_swapped(0x11, player):
-        set_rule(world.get_entrance('Kakariko Fortune Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Outcast Fortune Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x12, player):
-        set_rule(world.get_entrance('Kakariko Pond Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Outcast Pond Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x13, player):
-        set_rule(world.get_entrance('Sanctuary Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Bonk Rock Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark Chapel Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark Chapel Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x14, player):
-        set_rule(world.get_entrance('Graveyard Ledge Mirror Spot', player), lambda state: state.has_Pearl(player) and state.has_Mirror(player))
-        set_rule(world.get_entrance('Kings Grave Mirror Spot', player), lambda state: state.has_Pearl(player) and state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Graveyard Ladder (Top)', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))
-        set_rule(world.get_entrance('Graveyard Ladder (Bottom)', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))
-        set_rule(world.get_entrance('Dark Graveyard Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark Graveyard Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark Graveyard Grave Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x15, player):
-        set_rule(world.get_entrance('River Bend Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('River Bend East Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Qirn Jump Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Qirn Jump East Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x16, player):
-        set_rule(world.get_entrance('Potion Shop Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Potion Shop Northeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark Witch Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark Witch Northeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x17, player):
-        set_rule(world.get_entrance('Zora Approach Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Zora Approach Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Catfish Approach Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Catfish Approach Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x18, player):
-        set_rule(world.get_entrance('Kakariko Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Kakariko Grass Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Village of Outcasts Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Village of Outcasts Southwest Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Hammer House Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x1a, player):
-        set_rule(world.get_entrance('Forgotton Forest Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Forgotton Forest Fence Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Shield Shop Mirror Spot', player), lambda state: state.has_Mirror(player))
         
     if not world.is_tile_swapped(0x1b, player):
         set_rule(world.get_entrance('Inverted Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Inverted Pyramid Entrance', player), lambda state: False)
         set_rule(world.get_entrance('Pyramid Hole', player), lambda state: world.is_pyramid_open(player) or state.has('Beat Agahnim 2', player))
         
-        set_rule(world.get_entrance('HC Area Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('HC Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('HC Courtyard Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('HC East Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('HC Courtyard Left Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('HC Area South Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Hyrule Castle Main Gate (South)', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Top of Pyramid', player), lambda state: state.has_beaten_aga(player))
@@ -1155,182 +1019,39 @@ def ow_inverted_rules(world, player):
         set_rule(world.get_entrance('Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Pyramid Entrance', player), lambda state: False)
         
-        set_rule(world.get_entrance('Pyramid Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Pyramid Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Pyramid Courtyard Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Pyramid Uncle Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Pyramid From Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Pyramid Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Post Aga Inverted Teleporter', player), lambda state: state.has_beaten_aga(player))
         
-    if not world.is_tile_swapped(0x1d, player):
-        set_rule(world.get_entrance('Wooden Bridge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Wooden Bridge Northeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Wooden Bridge West Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Broken Bridge West Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Broken Bridge East Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Broken Bridge Northeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x1e, player):
-        set_rule(world.get_entrance('Eastern Palace Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Palace of Darkness Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x22, player):
-        set_rule(world.get_entrance('Blacksmith Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Blacksmith Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Bat Cave Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Hammer Pegs Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Hammer Pegs Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x25, player):
-        set_rule(world.get_entrance('Sand Dunes Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark Dunes Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x28, player):
-        set_rule(world.get_entrance('Maze Race Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Maze Race Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dig Game Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dig Game Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x29, player):
-        set_rule(world.get_entrance('Kakariko Suburb Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Kakariko Suburb South Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Frog Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Frog Prison Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Archery Game Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x2a, player):
-        set_rule(world.get_entrance('Flute Boy Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Flute Boy Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Stumpy Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Stumpy Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x2b, player):
-        set_rule(world.get_entrance('Central Bonk Rocks Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark Bonk Rocks Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x2c, player):
-        set_rule(world.get_entrance('Links House Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Big Bomb Shop Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x2d, player):
-        set_rule(world.get_entrance('Stone Bridge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Stone Bridge South Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Hobo Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player) and state.has('Flippers', player))
-    else:
-        set_rule(world.get_entrance('Hammer Bridge North Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Hammer Bridge South Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark Hobo Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player) and state.has('Flippers', player))
-        
-    if not world.is_tile_swapped(0x2e, player):
-        set_rule(world.get_entrance('Tree Line Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark Tree Line Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
     if not world.is_tile_swapped(0x2f, player):
-        set_rule(world.get_entrance('Eastern Nook Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('East Hyrule Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player)) # bunny cannot use hammer
     else:
-        set_rule(world.get_entrance('Darkness Nook Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('East Dark World Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player))
         
     if not world.is_tile_swapped(0x30, player):
-        set_rule(world.get_entrance('Checkerboard Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Desert Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Desert Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('DP Stairs Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('DP Entrance (North) Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Bombos Tablet Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Desert Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
-        set_rule(world.get_entrance('Misery Mire Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Misery Mire Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Misery Mire Blocked Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Misery Mire Main Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Misery Mire Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
         set_rule(world.get_entrance('Checkerboard Ledge Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         set_rule(world.get_entrance('Checkerboard Ledge Leave', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
-    if not world.is_tile_swapped(0x32, player):
-        set_rule(world.get_entrance('Cave 45 Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Flute Boy Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Stumpy Approach Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Stumpy Bush Entry Mirror Spot', player), lambda state: state.has_Mirror(player))
+    if world.is_tile_swapped(0x32, player):
         set_rule(world.get_entrance('Cave 45 Inverted Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         set_rule(world.get_entrance('Cave 45 Inverted Leave', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
     if not world.is_tile_swapped(0x33, player):
-        set_rule(world.get_entrance('C Whirlpool Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('C Whirlpool Outer Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('South Hyrule Teleporter', player), lambda state: state.can_lift_rocks(player))
     else:
-        set_rule(world.get_entrance('Dark C Whirlpool Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Dark C Whirlpool Outer Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('South Dark World Teleporter', player), lambda state: state.can_lift_rocks(player))
         
-    if not world.is_tile_swapped(0x34, player):
-        set_rule(world.get_entrance('Statues Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Hype Cave Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
     if not world.is_tile_swapped(0x35, player):
-        set_rule(world.get_entrance('Lake Hylia Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lake Hylia Northeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lake Hylia Island Mirror Spot', player), lambda state: state.has_Mirror(player) and state.has_Pearl(player) and state.has('Flippers', player))
-        set_rule(world.get_entrance('Lake Hylia Central Island Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lake Hylia Water Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Lake Hylia Water D Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('South Shore Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('South Shore East Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Lake Hylia Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
-        set_rule(world.get_entrance('Ice Lake Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Ice Lake Southwest Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Ice Lake Southeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Ice Lake Northeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Ice Palace Mirror Spot', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Ice Palace Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
         set_rule(world.get_entrance('Lake Hylia Island Pier', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
-    if not world.is_tile_swapped(0x37, player):
-        set_rule(world.get_entrance('Ice Cave Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Shopping Mall Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x3a, player):
-        set_rule(world.get_entrance('Desert Pass Ledge Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Desert Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Swamp Nook Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Swamp Nook Southeast Mirror Spot', player), lambda state: state.has_Mirror(player))
-        set_rule(world.get_entrance('Swamp Nook Pegs Mirror Spot', player), lambda state: state.has_Mirror(player))
+    if world.is_tile_swapped(0x3a, player):
         set_rule(world.get_entrance('Desert Pass Ladder (South)', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         set_rule(world.get_entrance('Desert Pass Ladder (North)', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
-        
-    if not world.is_tile_swapped(0x3b, player):
-        set_rule(world.get_entrance('Dam Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Swamp Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x3c, player):
-        set_rule(world.get_entrance('South Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Dark South Pass Mirror Spot', player), lambda state: state.has_Mirror(player))
-        
-    if not world.is_tile_swapped(0x3f, player):
-        set_rule(world.get_entrance('Octoballoon Mirror Spot', player), lambda state: state.has_Mirror(player))
-    else:
-        set_rule(world.get_entrance('Bomber Corner Mirror Spot', player), lambda state: state.has_Mirror(player))
 
 
 def ow_bunny_rules(world, player):

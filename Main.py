@@ -16,7 +16,7 @@ from OverworldGlitchRules import create_owg_connections
 from PotShuffle import shuffle_pots, shuffle_pot_switches
 from Regions import create_regions, create_shops, mark_light_dark_world_regions, create_dungeon_regions, adjust_locations
 from OWEdges import create_owedges
-from OverworldShuffle import link_overworld, update_world_regions, create_flute_exits
+from OverworldShuffle import link_overworld, update_world_regions, create_flute_exits, create_mirror_exits
 from EntranceShuffle import link_entrances
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
@@ -232,6 +232,8 @@ def main(args, seed=None, fish=None):
         update_world_regions(world, player)
         mark_light_dark_world_regions(world, player)
         create_flute_exits(world, player)
+        create_mirror_exits(world, player)
+    world.initialize_regions()
 
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
@@ -522,11 +524,14 @@ def copy_world(world):
         if world.logic[player] in ('owglitches', 'nologic'):
             create_owg_connections(ret, player)
         create_flute_exits(ret, player)
+        create_mirror_exits(ret, player)
         create_dungeon_regions(ret, player)
         create_owedges(ret, player)
         create_shops(ret, player)
+        #create_doors(ret, player)
         create_rooms(ret, player)
         create_dungeons(ret, player)
+    world.initialize_regions()
 
     # there are region references here they must be migrated to preserve integrity
     # ret.exp_cache = world.exp_cache.copy()
@@ -698,6 +703,8 @@ def copy_world_premature(world, player):
     if world.logic[player] in ('owglitches', 'nologic'):
         create_owg_connections(ret, player)
     create_flute_exits(ret, player)
+    create_mirror_exits(ret, player)
+    world.initialize_regions()
     create_dungeon_regions(ret, player)
     create_owedges(ret, player)
     create_shops(ret, player)
