@@ -864,6 +864,11 @@ def create_mirror_exits(world, player):
             elif region.terrain == Terrain.Land:
                 logging.getLogger('').debug(f'Region has no mirror exit: {region.name}')
 
+def create_dynamic_exits(world, player):
+    create_flute_exits(world, player)
+    create_mirror_exits(world, player)
+    world.initialize_regions()
+
 def categorize_world_regions(world, player):
     for type in OWExitTypes:
         for exitname in OWExitTypes[type]:
