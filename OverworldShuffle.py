@@ -837,22 +837,44 @@ def create_flute_exits(world, player):
             exit.connect(world.get_region('Flute Sky', player))
             region.exits.append(exit)
 
+def get_mirror_exit_name(from_region, to_region):
+    if from_region in mirror_connections and to_region in mirror_connections[from_region]:
+        if len(mirror_connections[from_region]) == 1:
+            return f'Mirror From {from_region}'
+        else:
+            return f'Mirror To {to_region}'
+    return None
+
+def get_mirror_edges(world, region, player):
+    mirror_exits = list()
+    if (world.mode[player] != 'inverted') == (region.type == RegionType.DarkWorld):
+        # get mirror edges leaving the region
+        if region.name in mirror_connections:
+            for dest_region_name in mirror_connections[region.name]:
+                mirror_exits.append(tuple([get_mirror_exit_name(region.name, dest_region_name), dest_region_name]))
+    else:
+        # get mirror edges leading into the region
+        owid = OWTileRegions[region.name]
+        for other_world_region_name in OWTileRegions.inverse[(owid + 0x40) % 0x80]:
+            if other_world_region_name in mirror_connections:
+                for dest_region_name in mirror_connections[other_world_region_name]:
+                    if dest_region_name == region.name:
+                        mirror_exits.append(tuple([get_mirror_exit_name(other_world_region_name, region.name), region.name]))
+    return mirror_exits
+
 def create_mirror_exits(world, player):
     mirror_exits = set()
     for region in (r for r in world.regions if r.player == player and r.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']):
         if region.type == (RegionType.DarkWorld if world.mode[player] != 'inverted' else RegionType.LightWorld):
             if region.name in mirror_connections:
                 for region_dest_name in mirror_connections[region.name]:
-                    to_region = world.get_region(region_dest_name, player)
-                    if len(mirror_connections[region.name]) == 1:
-                        exitname = 'Mirror From ' + region.name
-                    else:
-                        exitname = 'Mirror To ' + region_dest_name
+                    exitname = get_mirror_exit_name(region.name, region_dest_name)
                     
-                    assert(exitname not in mirror_exits, f'Mirror Exit with name already exists: {exitname}')
+                    assert exitname not in mirror_exits, f'Mirror Exit with name already exists: {exitname}'
 
                     exit = Entrance(region.player, exitname, region)
                     exit.spot_type = 'Mirror'
+                    to_region = world.get_region(region_dest_name, player)
                     if region.terrain == Terrain.Water or to_region.terrain == Terrain.Water:
                         exit.access_rule = lambda state: state.has('Flippers', player) and state.has_Pearl(player) and state.has_Mirror(player)
                     else:
@@ -862,7 +884,7 @@ def create_mirror_exits(world, player):
 
                     mirror_exits.add(exitname)
             elif region.terrain == Terrain.Land:
-                logging.getLogger('').debug(f'Region has no mirror exit: {region.name}')
+                pass
 
 def create_dynamic_exits(world, player):
     create_flute_exits(world, player)

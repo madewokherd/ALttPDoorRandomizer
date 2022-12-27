@@ -1562,7 +1562,7 @@ class Entrance(object):
 
     def can_reach(self, state):
                                 # Destination         Pickup                   OW Only  No Ledges  Can S&Q  Allow Mirror
-        multi_step_locations = { 'Pyramid Area':     ('Big Bomb',              True,    True,      False,   True),
+        multi_step_locations = { 'Pyramid Crack':    ('Big Bomb',              True,    True,      False,   True),
                                  'Missing Smith':    ('Frog',                  True,    False,     True,    True),
                                  'Middle Aged Man':  ('Dark Blacksmith Ruins', True,    False,     True,    True),
                                  'Old Man Drop Off': ('Lost Old Man',          True,    False,     False,   False),
@@ -1581,7 +1581,13 @@ class Entrance(object):
                         while len(self.temp_path):
                             exit = self.temp_path.pop(0)
                             path = (exit.name, (exit.parent_region.name, path))
-                        item_name = self.connected_region.locations[0].item.name if self.connected_region.locations[0].item else 'Deliver Item'
+                        item_name = 'Deliver Item'
+                        if len(self.connected_region.locations) > 0 and self.connected_region.locations[0].item:
+                            item_name = self.connected_region.locations[0].item.name
+                        for loc in self.parent_region.locations:
+                            if loc.event and not loc.real and loc.item.name.find('Farmable') < 0:
+                                item_name = loc.item.name
+                                break
                         path = (item_name, (self.parent_region.name, path))
                         state.path[self] = (self.name, path)
                     return True
@@ -1626,45 +1632,39 @@ class Entrance(object):
         exits_to_traverse = list()
         found = False
         
-        if not found and allow_mirror_reentry and state.has('Magic Mirror', self.player):
+        if not found and allow_mirror_reentry and state.has_Mirror(self.player):
             # check for path using mirror portal re-entry at location of the follower pickup
             # this is checked first as this often the shortest path
             follower_region = start_region
             if follower_region.type not in [RegionType.LightWorld, RegionType.DarkWorld]:
                 follower_region = [i for i in start_region.entrances if i.parent_region.name != 'Menu'][0].parent_region
             if (follower_region.world.mode[self.player] != 'inverted') == (follower_region.type == RegionType.LightWorld):
-                from OWEdges import OWTileRegions
-                from OverworldShuffle import ow_connections
-                owid = OWTileRegions[follower_region.name]
-                (mirror_map_orig, other_world) = ow_connections[owid % 0x40]
-                mirror_map = list(mirror_map_orig).copy()
-                mirror_map.extend(other_world)
-                mirror_exit = None
-                while len(mirror_map):
+                from OverworldShuffle import get_mirror_edges
+                mirror_map = get_mirror_edges(follower_region.world, follower_region, self.player)
+                while len(mirror_map) and not found:
                     if mirror_map[0][1] == follower_region.name:
                         mirror_exit = mirror_map[0][0]
-                        break
+                        mirror_region = follower_region.world.get_entrance(mirror_exit, self.player).parent_region
+                        if mirror_exit and mirror_region:
+                            if mirror_region.can_reach(state):
+                                traverse_paths(mirror_region, self.parent_region)
+                                break # no need to continue if there is no path from the mirror re-entry to dest
                     mirror_map.pop(0)
-                if mirror_exit:
-                    mirror_region = follower_region.world.get_entrance(mirror_exit, self.player).parent_region
-                    if mirror_region.can_reach(state):
-                        traverse_paths(mirror_region, self.parent_region)
-                        if found:
-                            path = state.path.get(mirror_region, (mirror_region.name, None))
-                            path = (follower_region.name, (mirror_exit, path))
-                            item_name = step_location.item.name if step_location.item else 'Pick Up Item'
-                            if start_region.name != follower_region.name:
-                                path = (start_region.name, (start_region.entrances[0].name, path))
-                                path = (f'{step_location.parent_region.name} Exit', ('Leave Item Area', (item_name, path)))
-                            else:
-                                path = (item_name, path)
-                            path = ('Use Mirror Portal', (follower_region.name, path))
-                            while len(self.temp_path):
-                                exit = self.temp_path.pop(0)
-                                path = (exit.name, (exit.parent_region.name, path))
-                            item_name = self.connected_region.locations[0].item.name if self.connected_region.locations[0].item else 'Deliver Item'
-                            path = (self.parent_region.name, path)
-                            state.path[self] = (self.name, path)
+                if found:
+                    path = state.path.get(mirror_region, (mirror_region.name, None))
+                    path = (follower_region.name, (mirror_exit, path))
+                    item_name = step_location.item.name if step_location.item else 'Pick Up Item'
+                    if start_region.name != follower_region.name:
+                        path = (start_region.name, (start_region.entrances[0].name, path))
+                        path = (f'{step_location.parent_region.name} Exit', ('Leave Item Area', (item_name, path)))
+                    else:
+                        path = (item_name, path)
+                    path = ('Use Mirror Portal', (follower_region.name, path))
+                    while len(self.temp_path):
+                        exit = self.temp_path.pop(0)
+                        path = (exit.name, (exit.parent_region.name, path))
+                    path = (self.parent_region.name, path)
+                    state.path[self] = (self.name, path)
         
         if not found:
             # check normal paths
@@ -1675,7 +1675,7 @@ class Entrance(object):
             exit = self.parent_region.world.get_entrance('Links House S&Q', self.player)
             traverse_paths(exit.connected_region, self.parent_region, [exit])
         
-        if not found and allow_mirror_reentry and state.has('Magic Mirror', self.player):
+        if not found and allow_mirror_reentry and state.has_Mirror(self.player):
             # check for paths using mirror portal re-entry at location of final destination
             # this is checked last as this is the most complicated/exhaustive check
             follower_region = start_region
@@ -1686,14 +1686,9 @@ class Entrance(object):
                 if dest_region.type not in [RegionType.LightWorld, RegionType.DarkWorld]:
                     dest_region = start_region.entrances[0].parent_region
                 if (dest_region.world.mode[self.player] != 'inverted') != (dest_region.type == RegionType.LightWorld):
-                    from OWEdges import OWTileRegions
-                    from OverworldShuffle import ow_connections
-                    owid = OWTileRegions[dest_region.name]
-                    (mirror_map_orig, other_world) = ow_connections.copy()[owid % 0x40]
-                    mirror_map = list(mirror_map_orig).copy()
-                    mirror_map.extend(other_world)
-                    mirror_map = [(x, d) for (x, d) in mirror_map if x in [e.name for e in dest_region.exits]]
                     # loop thru potential places to leave a mirror portal
+                    from OverworldShuffle import get_mirror_edges
+                    mirror_map = get_mirror_edges(dest_region.world, dest_region, self.player)
                     while len(mirror_map) and not found:
                         mirror_exit = dest_region.world.get_entrance(mirror_map[0][0], self.player)
                         if mirror_exit.connected_region.type != dest_region.type:
