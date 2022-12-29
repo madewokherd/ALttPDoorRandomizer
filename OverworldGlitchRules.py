@@ -508,6 +508,6 @@ mirror_clips = [
 ]
 
 mirror_offsets = [
-    (['DM Offset Mirror', 'DDM Offset Mirror'], ['West Death Mountain (Bottom)', 'West Dark Death Mountain (Bottom)'], ['Hyrule Castle Ledge', 'Pyramid Crack'], ['Pyramid Area', 'Hyrule Castle Courtyard'])
-    #(['DM To HC Ledge Offset Mirror', 'DDM To HC Ledge Offset Mirror'], ['West Death Mountain (Bottom)', 'West Dark Death Mountain (Bottom)'], ['Hyrule Castle Ledge', None], ['Pyramid Area', None])
+    (['DM Offset Mirror', 'DDM Offset Mirror'], ['West Death Mountain (Bottom)', 'West Dark Death Mountain (Bottom)'], ['Hyrule Castle Courtyard Northeast', 'Pyramid Crack'], ['Pyramid Area', 'Hyrule Castle Courtyard']),
+    (['DM To HC Ledge Offset Mirror', 'DDM To HC Ledge Offset Mirror'], ['West Death Mountain (Bottom)', 'West Dark Death Mountain (Bottom)'], ['Hyrule Castle Ledge', None], ['Pyramid Area', None])
 ]
