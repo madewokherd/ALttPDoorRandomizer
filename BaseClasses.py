@@ -1585,7 +1585,7 @@ class Entrance(object):
                         if len(self.connected_region.locations) > 0 and self.connected_region.locations[0].item:
                             item_name = self.connected_region.locations[0].item.name
                         for loc in self.parent_region.locations:
-                            if loc.event and not loc.real and loc.item.name.find('Farmable') < 0:
+                            if loc.event and not loc.real and loc.item and loc.item.name.find('Farmable') < 0:
                                 item_name = loc.item.name
                                 break
                         path = (item_name, (self.parent_region.name, path))
