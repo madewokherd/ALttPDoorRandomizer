@@ -39,7 +39,6 @@ def link_entrances(world, player):
     if not world.is_tile_swapped(0x1b, player):
         drop_connections.append(tuple(('Pyramid Hole', 'Pyramid')))
         dropexit_connections.append(tuple(('Pyramid Entrance', 'Pyramid Exit')))
-        connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
     else:
         entrance_pool.remove('Pyramid Hole')
         entrance_pool.append('Inverted Pyramid Hole')
@@ -47,7 +46,6 @@ def link_entrances(world, player):
         entrance_pool.append('Inverted Pyramid Entrance')
         drop_connections.append(tuple(('Inverted Pyramid Hole', 'Pyramid')))
         dropexit_connections.append(tuple(('Inverted Pyramid Entrance', 'Pyramid Exit')))
-        connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
         
     unbias_some_entrances(Dungeon_Exits, Cave_Exits, Old_Man_House, Cave_Three_Exits)
     Cave_Exits.extend(Cave_Exits_Directional)
@@ -55,16 +53,6 @@ def link_entrances(world, player):
     # setup mandatory connections
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
-
-    if not world.is_bombshop_start(player):
-        connect_simple(world, 'Links House S&Q', 'Links House', player)
-    else:
-        connect_simple(world, 'Links House S&Q', 'Big Bomb Shop', player)
-    
-    if not invFlag:
-        connect_simple(world, 'Sanctuary S&Q', 'Sanctuary', player)
-    else:
-        connect_simple(world, 'Sanctuary S&Q', 'Dark Sanctuary Hint', player)
 
     connect_simple(world, 'Tavern North', 'Tavern', player)
     
@@ -2040,11 +2028,8 @@ Exit_Pool_Base = ['Links House Exit',
                 'Pyramid']
 
 # these are connections that cannot be shuffled and always exist.
-# They link together separate parts of the world we need to divide into regions
-mandatory_connections = [('Old Man S&Q', 'Old Man House'),
-
-                         # UW Connections
-                         ('Lost Woods Hideout (top to bottom)', 'Lost Woods Hideout (bottom)'),
+# They link together underworld regions
+mandatory_connections = [('Lost Woods Hideout (top to bottom)', 'Lost Woods Hideout (bottom)'),
                          ('Lumberjack Tree (top to bottom)', 'Lumberjack Tree (bottom)'),
                          ('Kakariko Well (top to bottom)', 'Kakariko Well (bottom)'),
                          ('Kakariko Well (top to back)', 'Kakariko Well (back)'),

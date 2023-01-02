@@ -14,6 +14,21 @@ version_branch = '-u'
 __version__ = '%s%s' % (version_number, version_branch)
 
 def link_overworld(world, player):
+    if not world.is_bombshop_start(player):
+        connect_simple(world, 'Links House S&Q', 'Links House', player)
+    else:
+        connect_simple(world, 'Links House S&Q', 'Big Bomb Shop', player)
+    
+    if not world.mode[player] != 'inverted':
+        connect_simple(world, 'Sanctuary S&Q', 'Sanctuary', player)
+    else:
+        connect_simple(world, 'Sanctuary S&Q', 'Dark Sanctuary Hint', player)
+
+    if not world.is_tile_swapped(0x1b, player):
+        connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
+    else:
+        connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
+
     # setup mandatory connections
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
@@ -1202,7 +1217,9 @@ test_connections = [
                     ]
 
 # these are connections that cannot be shuffled and always exist. They link together separate parts of the world we need to divide into regions
-mandatory_connections = [# Intra-tile OW Connections
+mandatory_connections = [('Old Man S&Q', 'Old Man House'),
+
+                         # Intra-tile OW Connections
                          ('Lost Woods Bush (West)', 'Lost Woods East Area'), #pearl
                          ('Lost Woods Bush (East)', 'Lost Woods West Area'), #pearl
                          ('West Death Mountain Drop', 'West Death Mountain (Bottom)'),
