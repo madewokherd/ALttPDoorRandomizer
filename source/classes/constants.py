@@ -141,6 +141,7 @@ SETTINGSTOPROCESS = {
       "print_custom_yaml": "print_custom_yaml",
       "usestartinventory": "usestartinventory",
       "usecustompool": "custom",
+      "race": "race",
       "saveonexit": "saveonexit"
     }
   },
