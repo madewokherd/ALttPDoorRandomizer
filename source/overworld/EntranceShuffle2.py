@@ -775,6 +775,9 @@ def do_vanilla_connect(pool_def, avail):
     elif pool_def['condition'] == 'pottery':  # this condition involves whether caves with pots are shuffled or not
         if avail.world.pottery[avail.player] not in ['none', 'keys', 'dungeon']:
             return
+    elif pool_def['condition'] == 'takeany':
+        if avail.world.take_any[avail.player] == 'fixed':
+            return
     defaults = inverted_default_connections if avail.inverted else default_connections
     if avail.inverted:
         if 'Dark Death Mountain Fairy' in pool_def['entrances']:
@@ -1200,13 +1203,11 @@ modes = {
             'fixed_non_items': {
                 'special': 'vanilla',
                 'condition': '',
-                'entrances': ['Dark Death Mountain Fairy', 'Dark Desert Fairy', 'Archery Game',
-                              'Fortune Teller (Dark)', 'Dark Sanctuary Hint', 'Bonk Fairy (Dark)',
-                              'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Fairy',
-                              'Dark Lake Hylia Shop', 'East Dark World Hint', 'Kakariko Gamble Game', 'Good Bee Cave',
-                              'Long Fairy Cave', 'Bush Covered House',  'Fortune Teller (Light)', 'Lost Woods Gamble',
-                              'Desert Fairy', 'Light Hype Fairy', 'Lake Hylia Fortune Teller', 'Lake Hylia Fairy',
-                              'Bonk Fairy (Light)', 'Inverted Dark Sanctuary'],
+                'entrances': ['Dark Desert Fairy', 'Archery Game', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint',
+                              'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Fairy', 'Dark Lake Hylia Shop',
+                              'East Dark World Hint', 'Kakariko Gamble Game', 'Good Bee Cave', 'Long Fairy Cave',
+                              'Bush Covered House',  'Fortune Teller (Light)', 'Lost Woods Gamble',
+                              'Lake Hylia Fortune Teller', 'Lake Hylia Fairy', 'Bonk Fairy (Light)', 'Inverted Dark Sanctuary'],
             },
             'fixed_shops': {
                 'special': 'vanilla',
@@ -1214,6 +1215,12 @@ modes = {
                 'entrances': ['Cave Shop (Dark Death Mountain)', 'Dark World Potion Shop', 'Dark World Lumberjack Shop',
                               'Dark World Shop', 'Red Shield Shop', 'Kakariko Shop', 'Capacity Upgrade',
                               'Cave Shop (Lake Hylia)'],
+            },
+            'fixed_takeanys': {
+                'special': 'vanilla',
+                'condition': 'takeany',
+                'entrances': ['Desert Fairy', 'Light Hype Fairy', 'Dark Death Mountain Fairy',
+                              'Dark Lake Hylia Ledge Fairy', 'Bonk Fairy (Dark)'],
             },
             'fixed_pottery': {
                 'special': 'vanilla',
@@ -1276,13 +1283,11 @@ modes = {
             'fixed_non_items': {
                 'special': 'vanilla',
                 'condition': '',
-                'entrances': ['Dark Death Mountain Fairy', 'Dark Desert Fairy', 'Archery Game',
-                              'Fortune Teller (Dark)', 'Dark Sanctuary Hint', 'Bonk Fairy (Dark)',
-                              'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Fairy',
-                              'Dark Lake Hylia Shop', 'East Dark World Hint', 'Kakariko Gamble Game', 'Good Bee Cave',
-                              'Long Fairy Cave', 'Bush Covered House',  'Fortune Teller (Light)', 'Lost Woods Gamble',
-                              'Desert Fairy', 'Light Hype Fairy', 'Lake Hylia Fortune Teller', 'Lake Hylia Fairy',
-                              'Bonk Fairy (Light)', 'Inverted Dark Sanctuary'],
+                'entrances': ['Dark Desert Fairy', 'Archery Game', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint',
+                              'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Fairy', 'Dark Lake Hylia Shop',
+                              'East Dark World Hint', 'Kakariko Gamble Game', 'Good Bee Cave', 'Long Fairy Cave',
+                              'Bush Covered House',  'Fortune Teller (Light)', 'Lost Woods Gamble',
+                              'Lake Hylia Fortune Teller', 'Lake Hylia Fairy', 'Bonk Fairy (Light)', 'Inverted Dark Sanctuary'],
             },
             'fixed_shops': {
                 'special': 'vanilla',
@@ -1290,6 +1295,12 @@ modes = {
                 'entrances': ['Cave Shop (Dark Death Mountain)', 'Dark World Potion Shop', 'Dark World Lumberjack Shop',
                               'Dark World Shop', 'Red Shield Shop', 'Kakariko Shop', 'Capacity Upgrade',
                               'Cave Shop (Lake Hylia)'],
+            },
+            'fixed_takeanys': {
+                'special': 'vanilla',
+                'condition': 'takeany',
+                'entrances': ['Desert Fairy', 'Light Hype Fairy', 'Dark Death Mountain Fairy',
+                              'Dark Lake Hylia Ledge Fairy', 'Bonk Fairy (Dark)'],
             },
             'fixed_pottery': {
                 'special': 'vanilla',
