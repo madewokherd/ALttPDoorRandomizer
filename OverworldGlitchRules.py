@@ -312,7 +312,7 @@ def overworld_glitches_rules(world, player):
     #add_alternate_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has_Boots(player)) #revisit when we can guarantee water walk
 
     # Adding additional item requirements to OWG Clips
-    if world.is_tile_swapped(0x18, player):
+    if world.is_tile_swapped(0x18, player) != world.is_tile_swapped(0x28, player):
         add_additional_rule(world.get_entrance('Kakariko To Dig Game Hook Clip', player), lambda state: state.has('Hookshot', player))
     else:
         add_additional_rule(world.get_entrance('VoO To Dig Game Hook Clip', player), lambda state: state.has('Hookshot', player))
