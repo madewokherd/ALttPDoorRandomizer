@@ -19,7 +19,7 @@ def link_overworld(world, player):
     else:
         connect_simple(world, 'Links House S&Q', 'Big Bomb Shop', player)
     
-    if not world.mode[player] != 'inverted':
+    if not world.mode[player] == 'inverted':
         connect_simple(world, 'Sanctuary S&Q', 'Sanctuary', player)
     else:
         connect_simple(world, 'Sanctuary S&Q', 'Dark Sanctuary Hint', player)
