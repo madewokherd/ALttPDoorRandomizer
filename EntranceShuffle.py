@@ -10,7 +10,7 @@ from Utils import stack_size3a
 entrance_pool = list()
 exit_pool = list()
 entrance_exits = list()
-ignore_pool = False
+ignore_pool = True
 suppress_spoiler = True
 
 def link_entrances(world, player):
@@ -699,9 +699,9 @@ def connect_logical(world, entrancename, exitname, player, isTwoWay = False):
 def connect_entrance(world, entrancename, exitname, player, mark_two_way=True):
     if not ignore_pool:
         logging.getLogger('').debug('Connecting %s -> %s', entrancename, exitname)
-        assert entrancename in entrance_pool, 'Entrance not in pool: ' + entrancename
+        assert entrancename in entrance_pool, f'Entrance not in pool: {entrancename}'
         if mark_two_way:
-            assert exitname in exit_pool, 'Exit not in pool: ' + exitname
+            assert exitname in exit_pool, f'Exit not in pool: {exitname}'
     
     entrance = world.get_entrance(entrancename, player)
     # check if we got an entrance or a region to connect to
