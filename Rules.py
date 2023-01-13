@@ -147,6 +147,10 @@ def or_rule(rule1, rule2):
     return lambda state: rule1(state) or rule2(state)
 
 
+def and_rule(rule1, rule2):
+    return lambda state: rule1(state) and rule2(state)
+
+
 def add_lamp_requirement(spot, player):
     add_rule(spot, lambda state: state.has('Lamp', player, state.world.lamps_needed_for_dark_rooms))
 
@@ -318,8 +322,22 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Skull Big Chest Hookpath', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Skull Torch Room WN', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('Skull Vines NW', player), lambda state: state.has_sword(player))
-    set_rule(world.get_entrance('Skull 2 West Lobby Pits', player), lambda state: state.has_Boots(player) or state.has('Hidden Pits', player))
-    set_rule(world.get_entrance('Skull 2 West Lobby Ledge Pits', player), lambda state: state.has('Hidden Pits', player))
+
+    hidden_pits_door = world.get_door('Skull Small Hall WS', player)
+
+    def hidden_pits_rule(state):
+        return state.has('Hidden Pits', player)
+
+    if hidden_pits_door.bigKey:
+        key_logic = world.key_logic[player][hidden_pits_door.entrance.parent_region.dungeon.name]
+        hidden_pits_rule = and_rule(hidden_pits_rule, create_rule(key_logic.bk_name, player))
+    elif hidden_pits_door.smallKey:
+        d_name = hidden_pits_door.entrance.parent_region.dungeon.name
+        hidden_pits_rule = and_rule(hidden_pits_rule, eval_small_key_door('Skull Small Hall WS', d_name, player))
+
+    set_rule(world.get_entrance('Skull 2 West Lobby Pits', player), lambda state: state.has_Boots(player)
+             or hidden_pits_rule(state))
+    set_rule(world.get_entrance('Skull 2 West Lobby Ledge Pits', player), hidden_pits_rule)
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Boss', player))
     set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))
 
@@ -696,7 +714,7 @@ def bomb_rules(world, player):
         ('Hyrule Dungeon Armory S', True), # One green guard
         ('Hyrule Dungeon Armory ES', True), # One green guard
         ('Hyrule Dungeon Armory Boomerang WS', True), # One blue guard
-        ('Desert Compass NW', True), # Three popos
+        ('Desert Compass NE', True), # Three popos
         ('Desert Four Statues NW', True), # Four popos
         ('Desert Four Statues ES', True), # Four popos
         ('Hera Beetles WS', False), # Three blue beetles and only two pots, and bombs don't work.
@@ -1390,7 +1408,7 @@ std_kill_rooms = {
     'Hyrule Dungeon Armory Main': ['Hyrule Dungeon Armory S', 'Hyrule Dungeon Armory ES'], # One green guard
     'Hyrule Dungeon Armory Boomerang': ['Hyrule Dungeon Armory Boomerang WS'], # One blue guard
     'Eastern Stalfos Spawn': ['Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW'], # Can use pots
-    'Desert Compass Room': ['Desert Compass NW'], # Three popos
+    'Desert Compass Room': ['Desert Compass NE'], # Three popos
     'Desert Four Statues': ['Desert Four Statues NW', 'Desert Four Statues ES'], # Four popos
     'Hera Beetles': ['Hera Beetles WS'], # Three blue beetles and only two pots, and bombs don't work.
     'Tower Gold Knights': ['Tower Gold Knights SW', 'Tower Gold Knights EN'], # Two ball and chain 
@@ -1735,7 +1753,7 @@ bunny_impassible_doors = {
     'Eastern Map Balcony Hook Path', 'Eastern Stalfos Spawn ES', 'Eastern Stalfos Spawn NW',
     'Eastern Darkness S', 'Eastern Darkness NE', 'Eastern Darkness Up Stairs',
     'Eastern Attic Start WS', 'Eastern Single Eyegore NE', 'Eastern Duo Eyegores NE', 'Desert Main Lobby Left Path',
-    'Desert Main Lobby Right Path', 'Desert Left Alcove Path', 'Desert Right Alcove Path', 'Desert Compass NW',
+    'Desert Main Lobby Right Path', 'Desert Left Alcove Path', 'Desert Right Alcove Path', 'Desert Compass NE',
     'Desert West Lobby NW', 'Desert Back Lobby NW', 'Desert Four Statues NW',  'Desert Four Statues ES',
     'Desert Beamos Hall WS', 'Desert Beamos Hall NE', 'Desert Wall Slide NW',
     'Hera Lobby to Front Barrier - Blue', 'Hera Front to Lobby Barrier - Blue', 'Hera Front to Down Stairs Barrier - Blue',

@@ -2108,7 +2108,7 @@ def find_trappable_candidates(builder, world, player):
                           if ext.door and ext.door.type in [DoorType.Interior, DoorType.Normal]]
         for d in filtered_doors:
             # I only support the first 3 due to the trapFlag right now
-            if 0 <= d.doorListPos < 3 and not d.entranceFlag:
+            if 0 <= d.doorListPos < 3 and not d.entranceFlag and d.name != 'Skull Small Hall WS':
                 room = world.get_room(d.roomIndex, player)
                 kind = room.kind(d)
                 if d.type == DoorType.Interior:
@@ -4250,7 +4250,7 @@ default_door_connections = [
     ('Eastern Map Valley SW', 'Eastern Dark Square NW'),
     ('Eastern Attic Start WS', 'Eastern False Switches ES'),
     ('Eastern Cannonball Hell WS', 'Eastern Single Eyegore ES'),
-    ('Desert Compass NW', 'Desert Cannonball S'),
+    ('Desert Compass NE', 'Desert Cannonball S'),
     ('Desert Beamos Hall NE', 'Desert Tiles 2 SE'),
     ('PoD Middle Cage N', 'PoD Pit Room S'),
     ('PoD Pit Room NW', 'PoD Arena Main SW'),
