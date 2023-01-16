@@ -1471,7 +1471,8 @@ def junk_fill_inaccessible(world, player):
                     inaccessible_entrances.append(exit.name)
 
     junk_locations = [e for e in list(zip(*(default_connections +
-                       ([] if world.pottery[player] not in ['none', 'keys', 'dungeon'] else default_pot_connections))))[1] if e in exit_pool]
+                       ([] if world.pottery[player] not in ['none', 'keys', 'dungeon'] else default_pot_connections) +
+                       ([] if world.take_any[player] == 'fixed' else default_takeany_connections))))[1] if e in exit_pool]
     random.shuffle(junk_locations)
     for entrance in inaccessible_entrances:
         connect_entrance(world, entrance, junk_locations.pop(), player)
