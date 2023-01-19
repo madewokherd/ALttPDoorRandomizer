@@ -1479,8 +1479,6 @@ def junk_fill_inaccessible(world, player):
 
 
 def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, player, ignore_list=[]):
-    resolved_regions = list()
-    inaccessible_regions = list()
     def find_inacessible_ow_regions():
         nonlocal inaccessible_regions
         find_inaccessible_regions(world, player)
@@ -1496,10 +1494,9 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
             'Turtle Rock Main Portal', 'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Eye Bridge Portal'
         }
         for region_name in world.inaccessible_regions[player]:
-            if region_name in resolved_regions \
+            if (world.logic[player] in ['noglitches', 'minorglitches'] and region_name in glitch_regions) \
                     or (region_name == 'Pyramid Exit Ledge' and (world.shuffle[player] != 'insanity' or world.is_tile_swapped(0x1b, player))) \
-                    or (region_name == 'Spiral Mimic Ledge Extend' and not world.is_tile_swapped(0x05, player)) \
-                    or (world.logic[player] in ['noglitches', 'minorglitches'] and region_name in glitch_regions):
+                    or (region_name == 'Spiral Mimic Ledge Extend' and not world.is_tile_swapped(0x05, player)):
                 # removing irrelevant and resolved regions
                 inaccessible_regions.remove(region_name)
                 continue
@@ -1510,11 +1507,12 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
             if world.shuffle[player] != 'insanity':
                 for exit in region.exits:
                     # because dungeon regions haven't been connected yet, the inaccessibility check won't be able to know it's reachable yet
-                    # TODO: Should also cascade to other regions and remove them as inaccessibles
                     if exit.connected_region and exit.connected_region.name in multi_dungeon_exits:
-                        inaccessible_regions.remove(region_name)
+                        resolved_regions.append(region_name)
                         break
 
+    inaccessible_regions = list()
+    resolved_regions = list()
     find_inacessible_ow_regions()
 
     # keep track of neighboring regions for later consolidation
@@ -1585,12 +1583,15 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
                     process_group(find_group(from_region)) # process the parent region group
             if regions[0] not in ignored_regions:
                 # this is the top level region
-                if len(entrances):
-                    # we will fulfill must exit here and cascade access to children
-                    must_exit_regions.append(group)
+                if any(r in resolved_regions for r in regions):
                     cascade_ignore(group)
                 else:
-                    ignored_regions = ignored_regions + regions
+                    if len(entrances):
+                        # we will fulfill must exit here and cascade access to children
+                        must_exit_regions.append(group)
+                        cascade_ignore(group)
+                    else:
+                        ignored_regions = ignored_regions + regions
 
     processed_regions = list()
     ignored_regions = list()
@@ -1611,16 +1612,21 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         else:
             must_exits_dw.append(random.choice(entrances))
     if world.shuffle[player] in ['lean', 'crossed', 'insanity']: # cross world
-        pool = [e for e in lw_entrances + dw_entrances if e in entrance_pool]
+        pool = [e for e in lw_entrances + dw_entrances if e in entrance_pool and e not in must_exits_lw + must_exits_dw]
         connect_mandatory_exits(world, pool, caves, must_exits_lw + must_exits_dw, player)
     else:
-        pool = [e for e in lw_entrances if e in entrance_pool]
-        connect_mandatory_exits(world, pool, caves, must_exits_lw, player)
-        pool = [e for e in dw_entrances if e in entrance_pool]
-        connect_mandatory_exits(world, pool, caves, must_exits_dw, player)
+        pool = [e for e in lw_entrances if e in entrance_pool and e not in must_exits_lw]
+        if len(pool):
+            connect_mandatory_exits(world, pool, caves, must_exits_lw, player)
+        pool = [e for e in dw_entrances if e in entrance_pool and e not in must_exits_dw]
+        if len(pool):
+            connect_mandatory_exits(world, pool, caves, must_exits_dw, player)
 
     # check accessibility afterwards
+    resolved_regions = list()
     find_inacessible_ow_regions()
+    inaccessible_regions = [e for e in inaccessible_regions if e not in resolved_regions]
+    # TODO: Instead of line above, this should cascade from the resolved regions down to regions it can access
     if len(inaccessible_regions) > 0:
         logging.getLogger('').debug(f'Could not resolve inaccessible regions: [{", ".join(inaccessible_regions)}]')
         logging.getLogger('').debug(f'^ This is most often a false positive because Dungeon regions aren\'t connected yet')
