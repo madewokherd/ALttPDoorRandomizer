@@ -1368,7 +1368,7 @@ def place_links_house(world, player, ignore_list=[]):
 
 def place_dark_sanc(world, player, ignore_list=[]):
     if not world.shufflelinks[player]:
-        sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop', player) if i in entrance_pool]
+        sanc_doors = [i for i in get_distant_entrances(world, 'Big Bomb Shop' if world.is_bombshop_start(player) else 'Links House', player) if i in entrance_pool]
     else:
         sanc_doors = [i for i in get_starting_entrances(world, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
     if world.shuffle[player] in ['lite', 'lean']:
