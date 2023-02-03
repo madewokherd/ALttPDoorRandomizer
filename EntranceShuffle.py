@@ -210,6 +210,8 @@ def link_entrances(world, player):
             bomb_shop_doors = list(entrance_pool)
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             bomb_shop = random.choice(bomb_shop_doors)
             connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
@@ -256,6 +258,8 @@ def link_entrances(world, player):
             bomb_shop_doors = list(entrance_pool)
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             bomb_shop = random.choice(bomb_shop_doors)
             connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
@@ -314,6 +318,8 @@ def link_entrances(world, player):
             bomb_shop_doors = [e for e in entrance_pool if e not in list(zip(*drop_connections + dropexit_connections))[0]]
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in bomb_shop_doors if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             bomb_shop = random.choice(bomb_shop_doors)
             connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
@@ -418,6 +424,8 @@ def link_entrances(world, player):
             bomb_shop_doors = list(entrance_pool)
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             bomb_shop = random.choice(bomb_shop_doors)
             connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
@@ -476,6 +484,8 @@ def link_entrances(world, player):
             bomb_shop_doors = list(entrance_pool)
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             bomb_shop = random.choice(bomb_shop_doors)
             connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
@@ -526,6 +536,8 @@ def link_entrances(world, player):
             bomb_shop_doors = list(entrance_pool)
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             bomb_shop = random.choice(bomb_shop_doors)
             connect_entrance(world, bomb_shop, 'Big Bomb Shop', player)
             
@@ -610,6 +622,8 @@ def link_entrances(world, player):
             bomb_shop_doors = list(entrance_pool)
             if world.logic[player] in ['noglitches', 'minorglitches'] or world.is_tile_swapped(0x1b, player):
                 bomb_shop_doors = [e for e in entrance_pool if e not in ['Pyramid Fairy']]
+            if world.is_tile_swapped(0x03, player):
+                bomb_shop_doors = [x for x in bomb_shop_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             random.shuffle(bomb_shop_doors)
             bomb_shop = bomb_shop_doors.pop()
             pool.remove(bomb_shop)
@@ -1348,6 +1362,8 @@ def place_links_house(world, player, ignore_list=[]):
             links_house_doors = [i for i in get_distant_entrances(world, dark_sanc, player) if i in entrance_pool]
         else:
             links_house_doors = [i for i in get_starting_entrances(world, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
+        if world.is_bombshop_start(player) and world.is_tile_swapped(0x03, player):
+            links_house_doors = [x for x in links_house_doors if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
         if world.shuffle[player] in ['lite', 'lean']:
             links_house_doors = [e for e in links_house_doors if e in list(zip(*(default_item_connections +
                (default_shop_connections if world.shopsanity[player] else []) +
