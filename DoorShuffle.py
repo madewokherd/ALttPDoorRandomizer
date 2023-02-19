@@ -3346,7 +3346,8 @@ def create_doors_for_inaccessible_region(inaccessible_region, world, player):
     for ext in region.exits:
         create_door(world, player, ext.name, region.name)
         if ext.connected_region is None:
-            logging.getLogger('').warning('Exit not connected to any region: %s', ext.name)
+            # TODO: Since Open/Inverted regions are merged into one world model, some exits are left disconnected intentionally
+            logging.getLogger('').debug('Exit not connected to any region: %s', ext.name)
         elif ext.connected_region.name.endswith(' Portal'):
             for more_exts in ext.connected_region.exits:
                 create_door(world, player, more_exts.name, ext.connected_region.name)
