@@ -816,7 +816,7 @@ def connect_mandatory_exits(world, entrances, caves, must_be_exits, player, must
 
     # if world.logic[player] in ['owglitches', 'nologic']:
     #     import OverworldGlitchRules
-    #     for entrance in OverworldGlitchRules.get_non_mandatory_exits(world.mode[player] == 'inverted'):
+    #     for entrance in OverworldGlitchRules.get_non_mandatory_exits(world, player):
     #         if entrance in must_be_exits:
     #             must_be_exits.remove(entrance)
     #             entrances.append(entrance)
@@ -1437,6 +1437,7 @@ def place_old_man(world, pool, player, ignore_list=[]):
     old_man_entrances = [e for e in old_man_entrances if e != 'Old Man House (Bottom)' and e not in ignore_list]
     if world.shuffle[player] in ['lite', 'lean']:
         old_man_entrances = [e for e in old_man_entrances if e in pool]
+    assert len(old_man_entrances), 'No available entrances left to place Old Man Cave'
     random.shuffle(old_man_entrances)
     old_man_exit = None
     while not old_man_exit:
