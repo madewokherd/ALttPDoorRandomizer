@@ -632,7 +632,7 @@ def do_fixed_shuffle(avail, entrance_list):
         rules = Restrictions()
         rules.size = size
         if ('Hyrule Castle Entrance (South)' in entrances and
-           avail.world.doorShuffle[avail.player] in ['basic', 'crossed']):
+           avail.world.doorShuffle[avail.player] != 'vanilla'):
             rules.must_exit_to_lw = True
         if 'Inverted Ganons Tower' in entrances and not avail.world.shuffle_ganon:
             rules.fixed = True
@@ -1025,12 +1025,15 @@ def connect_custom(avail_pool, world, player):
     if world.customizer and world.customizer.get_entrances():
         custom_entrances = world.customizer.get_entrances()
         player_key = player
-        for ent_name, exit_name in custom_entrances[player_key]['two-way'].items():
-            connect_two_way(ent_name, exit_name, avail_pool)
-        for ent_name, exit_name in custom_entrances[player_key]['entrances'].items():
-            connect_entrance(ent_name, exit_name, avail_pool)
-        for ent_name, exit_name in custom_entrances[player_key]['exits'].items():
-            connect_exit(exit_name, ent_name, avail_pool)
+        if 'two-way' in custom_entrances[player_key]:
+            for ent_name, exit_name in custom_entrances[player_key]['two-way'].items():
+                connect_two_way(ent_name, exit_name, avail_pool)
+        if 'entrances' in custom_entrances[player_key]:
+            for ent_name, exit_name in custom_entrances[player_key]['entrances'].items():
+                connect_entrance(ent_name, exit_name, avail_pool)
+        if 'exits' in custom_entrances[player_key]:
+            for ent_name, exit_name in custom_entrances[player_key]['exits'].items():
+                connect_exit(exit_name, ent_name, avail_pool)
 
 
 def connect_simple(world, exit_name, region_name, player):

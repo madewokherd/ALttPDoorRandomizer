@@ -108,6 +108,15 @@ These are now independent of retro mode and have three options: None, Random, an
 * Bonk Fairy (Dark)
 
 # Bug Fixes and Notes
+* 1.2.0.7-u
+  * Fix for some misery mire key logic
+  * Minor standard generation fix
+  * Fix for inactive flute start
+  * Settingsfile for multiworld generation support
+  * Fix for duped HC/AT Maps/Compasses
+* 1.2.0.6-u
+  * Fix for light cone in Escape when entering from Dark World post-zelda
+  * Fix for light cone in Escape when lighting a torch with fire rod
 * 1.2.0.5.u
   * Logic fix for Sanctuary mirror (it wasn't resetting the crystal state) 
   * Minor bugfixes for customizer

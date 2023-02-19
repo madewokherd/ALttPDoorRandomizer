@@ -814,6 +814,15 @@ class CollectionState(object):
                 rrp[k] = missing_regions[k]
                 possible_path = terminal_states[0].path[k]
                 self.path[k] = paths[k] = possible_path
+                for conn in k.exits:
+                    if self.is_small_door(conn):
+                        door = conn.door if conn.door.smallKey else conn.door.controller
+                        key_logic = self.world.key_logic[player][dungeon_name]
+                        if door.name not in self.reached_doors[player]:
+                            self.door_counter[player][0][dungeon_name] += 1
+                            self.reached_doors[player].add(door.name)
+                            if key_logic.sm_doors[door]:
+                                self.reached_doors[player].add(key_logic.sm_doors[door].name)
             missing_bc = {}
             for blocked, crystal in common_bc.items():
                 if (blocked not in bc and blocked.parent_region in rrp
@@ -3076,6 +3085,7 @@ class Spoiler(object):
                 outfile.write('Enemy Health:'.ljust(line_width) + '%s\n' % self.metadata['enemy_health'][player])
                 outfile.write('Enemy Damage:'.ljust(line_width) + '%s\n' % self.metadata['enemy_damage'][player])
                 outfile.write('Hints:'.ljust(line_width) + '%s\n' % yn(self.metadata['hints'][player]))
+                outfile.write('Race:'.ljust(line_width) + '%s\n' % yn(self.world.settings.world_rep['meta']['race']))
             
             if self.startinventory:
                 outfile.write('Starting Inventory:'.ljust(line_width))

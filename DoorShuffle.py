@@ -477,14 +477,14 @@ def choose_portals(world, player):
                 info.required_passage = {x: y for x, y in info.required_passage.items() if len(y) > 0}
             for target_region, possible_portals in info.required_passage.items():
                 candidates = find_portal_candidates(master_door_list, dungeon, custom, allowed, need_passage=True,
-                                                    bk_shuffle=bk_shuffle, rupee_bow=rupee_bow_flag)
+                                                    bk_shuffle=bk_shuffle, standard=std_flag, rupee_bow=rupee_bow_flag)
                 choice, portal = assign_portal(candidates, possible_portals, custom, world, player)
                 portal.destination = True
                 clean_up_portal_assignment(portal_assignment, dungeon, portal, master_door_list, outstanding_portals)
             dead_end_choices = info.total - 1 - len(portal_assignment[dungeon])
             for i in range(0, dead_end_choices):
                 candidates = find_portal_candidates(master_door_list, dungeon, custom, allowed, dead_end_allowed=True,
-                                                    bk_shuffle=bk_shuffle, rupee_bow=rupee_bow_flag)
+                                                    bk_shuffle=bk_shuffle, standard=std_flag, rupee_bow=rupee_bow_flag)
                 possible_portals = outstanding_portals if not info.sole_entrance else [x for x in outstanding_portals if x != info.sole_entrance]
                 choice, portal = assign_portal(candidates, possible_portals, custom, world, player)
                 if choice.deadEnd:
@@ -796,15 +796,18 @@ def main_dungeon_pool(dungeon_pool, world, player):
                 hc = world.get_dungeon('Hyrule Castle', player)
                 hc_compass = ItemFactory('Compass (Escape)', player)
                 hc_compass.advancement = world.restrict_boss_items[player] != 'none'
-                hc.dungeon_items.append(hc_compass)
+                if hc.dungeon_items.count(hc_compass) < 1:
+                    hc.dungeon_items.append(hc_compass)
             if 'Agahnims Tower' in pool:
                 at = world.get_dungeon('Agahnims Tower', player)
                 at_compass = ItemFactory('Compass (Agahnims Tower)', player)
                 at_compass.advancement = world.restrict_boss_items[player] != 'none'
-                at.dungeon_items.append(at_compass)
+                if at.dungeon_items.count(at_compass) < 1:
+                    at.dungeon_items.append(at_compass)
                 at_map = ItemFactory('Map (Agahnims Tower)', player)
                 at_map.advancement = world.restrict_boss_items[player] != 'none'
-                at.dungeon_items.append(at_map)
+                if at.dungeon_items.count(at_map) < 1:
+                    at.dungeon_items.append(at_map)
             sector_pool = convert_to_sectors(region_list, world, player)
             merge_sectors(sector_pool, world, player)
             # todo: which dungeon to create
@@ -1238,10 +1241,13 @@ def cross_dungeon(world, player):
     if world.restrict_boss_items[player] != 'none':
         hc_compass.advancement = at_compass.advancement = at_map.advancement = True
     hc = world.get_dungeon('Hyrule Castle', player)
-    hc.dungeon_items.append(hc_compass)
+    if hc.dungeon_items.count(hc_compass) < 1:
+        hc.dungeon_items.append(hc_compass)
     at = world.get_dungeon('Agahnims Tower', player)
-    at.dungeon_items.append(at_compass)
-    at.dungeon_items.append(at_map)
+    if at.dungeon_items.count(at_compass) < 1:
+        at.dungeon_items.append(at_compass)
+    if at.dungeon_items.count(at_map) < 1:
+        at.dungeon_items.append(at_map)
 
     setup_custom_door_types(world, player)
     assign_cross_keys(dungeon_builders, world, player)
