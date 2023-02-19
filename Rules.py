@@ -1459,7 +1459,7 @@ def standard_rules(world, player):
     # zelda should be saved before agahnim is in play
     add_rule(world.get_location('Agahnim 1', player), lambda state: state.has('Zelda Delivered', player))
 
-    # too restrictive for crossed?
+    # uncle can't have keys generally because unplaced items aren't used here
     def uncle_item_rule(item):
         copy_state = CollectionState(world)
         copy_state.collect(item)
@@ -1817,13 +1817,16 @@ bunny_impassible_doors = {
 
 def add_key_logic_rules(world, player):
     key_logic = world.key_logic[player]
+    eval_func = eval_small_key_door
+    if world.key_logic_algorithm[player] == 'strict' and world.keyshuffle[player] == 'wild':
+         eval_func = eval_small_key_door_strict
     for d_name, d_logic in key_logic.items():
         for door_name, rule in d_logic.door_rules.items():
             door_entrance = world.get_entrance(door_name, player)
-            add_rule(door_entrance, eval_small_key_door(door_name, d_name, player))
+            add_rule(door_entrance, eval_func(door_name, d_name, player))
             if door_entrance.door.dependents:
                 for dep in door_entrance.door.dependents:
-                    add_rule(dep.entrance, eval_small_key_door(door_name, d_name, player))
+                    add_rule(dep.entrance, eval_func(door_name, d_name, player))
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)
@@ -1870,8 +1873,22 @@ def eval_small_key_door_main(state, door_name, dungeon, player):
     return door_openable
 
 
+def eval_small_key_door_strict_main(state, door_name, dungeon, player):
+    if state.is_door_open(door_name, player):
+        return True
+    key_layout = state.world.key_layout[player][dungeon]
+    number = key_layout.max_chests
+    if number <= 0:
+        return True
+    return state.has_sm_key_strict(key_layout.key_logic.small_key_name, player, number)
+
+
 def eval_small_key_door(door_name, dungeon, player):
     return lambda state: eval_small_key_door_main(state, door_name, dungeon, player)
+
+
+def eval_small_key_door_strict(door_name, dungeon, player):
+    return lambda state: eval_small_key_door_strict_main(state, door_name, dungeon, player)
 
 
 def allow_big_key_in_big_chest(bk_name, player):
