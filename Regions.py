@@ -16,7 +16,7 @@ def create_regions(world, player):
         create_lw_region(player, 'West Death Mountain (Top)', ['Ether Tablet'], ['Spectacle Rock Approach', 'West Death Mountain Drop', 'Tower of Hera', 'West Death Mountain EN']),
         create_lw_region(player, 'Spectacle Rock Ledge', ['Spectacle Rock'], ['Spectacle Rock Leave', 'Spectacle Rock Drop']),
         create_lw_region(player, 'West Death Mountain (Bottom)', ['Old Man Drop Off'], ['Old Man Drop Off', 'Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)', 'Death Mountain Return Cave (East)', 'Spectacle Rock Cave', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'West Death Mountain Teleporter', 'West Death Mountain ES']),
-        create_dw_region(player, 'Old Man Drop Off', ['Old Man'], None),
+        create_lw_region(player, 'Old Man Drop Off', ['Old Man'], None),
         create_lw_region(player, 'East Death Mountain (Top West)', None, ['DM Hammer Bridge (West)', 'East Death Mountain WN']),
         create_lw_region(player, 'East Death Mountain (Top East)', None, ['DM Hammer Bridge (East)', 'Floating Island Bridge (East)', 'East Death Mountain Spiral Ledge Drop', 'East Death Mountain Fairy Ledge Drop', 'East Death Mountain Mimic Ledge Drop', 'Paradox Cave (Top)', 'East Death Mountain EN']),
         create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Ledge Drop', 'Spiral Mimic Bridge (West)', 'Spiral Cave']),
