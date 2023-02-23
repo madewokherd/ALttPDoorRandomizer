@@ -1716,6 +1716,7 @@ def unbias_dungeons(Dungeon_Exits):
 def build_accessible_entrance_list(world, start_region, player, assumed_inventory=[], cross_world=False, region_rules=True, exit_rules=True, include_one_ways=False):
     from Main import copy_world_premature
     from Items import ItemFactory
+    from OverworldShuffle import one_way_ledges
     
     for p in range(1, world.players + 1):
         world.key_logic[p] = {}
@@ -1784,6 +1785,8 @@ def get_starting_entrances(world, player, force_starting_world=True):
 
 
 def get_distant_entrances(world, start_entrance, player):
+    from OverworldShuffle import one_way_ledges
+    
     # get walkable sector in which initial entrance was placed
     start_region = world.get_entrance(start_entrance, player).parent_region.name
     regions = next(s for s in world.owsectors[player] if any(start_region in w for w in s))
@@ -2361,52 +2364,6 @@ open_default_dungeon_connections = [('Ganons Tower', 'Ganons Tower Exit'),
 inverted_default_dungeon_connections = [('Ganons Tower', 'Agahnims Tower Exit'),
                                         ('Agahnims Tower', 'Ganons Tower Exit')
                                     ]
-
-one_way_ledges = {
-    'West Death Mountain (Bottom)':      {'West Death Mountain (Top)',
-                                          'Spectacle Rock Ledge'},
-    'East Death Mountain (Bottom)':      {'East Death Mountain (Top East)',
-                                          'Spiral Cave Ledge'},
-    'Fairy Ascension Plateau':           {'Fairy Ascension Ledge'},
-    'Mountain Entry Area':               {'Mountain Entry Ledge'},
-    'Sanctuary Area':                    {'Bonk Rock Ledge'},
-    'Graveyard Area':                    {'Graveyard Ledge'},
-    'Potion Shop Water':                 {'Potion Shop Area',
-                                          'Potion Shop Northeast'},
-    'Zora Approach Water':               {'Zora Approach Area'},
-    'Hyrule Castle Area':                {'Hyrule Castle Ledge'},
-    'Hyrule Castle Courtyard':           {'Hyrule Castle Ledge'},
-    'Wooden Bridge Water':               {'Wooden Bridge Area',
-                                          'Wooden Bridge Northeast'},
-    'Maze Race Area':                    {'Maze Race Ledge',
-                                          'Maze Race Prize'},
-    'Flute Boy Approach Area':           {'Cave 45 Ledge'},
-    'Desert Area':                       {'Desert Ledge',
-                                          'Desert Checkerboard Ledge',
-                                          'Desert Palace Mouth',
-                                          'Bombos Tablet Ledge',
-                                          'Desert Palace Teleporter Ledge'},
-    'Desert Pass Area':                  {'Desert Pass Ledge'},
-    'Lake Hylia Water':                  {'Lake Hylia South Shore',
-                                          'Lake Hylia Island'},
-    'West Dark Death Mountain (Bottom)': {'West Dark Death Mountain (Top)'},
-    'East Dark Death Mountain (Top)':    {'Dark Death Mountain Floating Island'},
-    'East Dark Death Mountain (Bottom)': {'East Dark Death Mountain (Top)'},
-    'Turtle Rock Area':                  {'Turtle Rock Ledge'},
-    'Bumper Cave Area':                  {'Bumper Cave Ledge'},
-    'Qirn Jump Water':                   {'Qirn Jump Area'},
-    'Dark Witch Water':                  {'Dark Witch Area',
-                                          'Dark Witch Northeast'},
-    'Catfish Approach Water':            {'Catfish Approach Area'},
-    'Pyramid Area':                      {'Pyramid Exit Ledge'},
-    'Broken Bridge Water':               {'Broken Bridge West',
-                                          'Broken Bridge Area',
-                                          'Broken Bridge Northeast'},
-    'Misery Mire Area':                  {'Misery Mire Teleporter Ledge'},
-    'Ice Lake Water':                    {'Ice Lake Area',
-                                          'Ice Lake Ledge (West)',
-                                          'Ice Lake Ledge (East)'}
-}
 # format:
 # Key=Name
 # addr = (door_index, exitdata, ow_flag) # multiexit
