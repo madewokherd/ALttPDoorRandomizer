@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '1694ba41bf6ab7086f05e914e8d08433'
+RANDOMIZERBASEHASH = 'e9a22882bb59523c19845274d76b3761'
 
 
 class JsonRom(object):
@@ -573,7 +573,7 @@ class Sprite(object):
 
 def handle_native_dungeon(location, itemid):
     # Keys in their native dungeon should use the original item code for keys
-    if location.parent_region.dungeon:
+    if location.parent_region.dungeon and location.player == location.item.player:
         if location.parent_region.dungeon.name == location.item.dungeon:
             if location.item.bigkey:
                 return 0x32
