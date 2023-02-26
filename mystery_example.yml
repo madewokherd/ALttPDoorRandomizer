@@ -31,6 +31,7 @@
   door_shuffle:
     vanilla: 0
     basic: 2
+    partitioned: 1
     crossed: 2
   intensity:
     1: 2
@@ -42,7 +43,8 @@
     all: 1
     chaos: 1
   trap_door_mode:
-    vanilla: 1
+    vanilla: 0
+    optional: 1
     boss: 0
     oneway: 0
   key_logic_algorithm:
@@ -101,6 +103,9 @@
   shuffleganon:
     on: 1
     off: 1
+  shuffletavern:
+    on: 1
+    off: 1
   overworld_map: # control how the overworld map operates when entrance shuffle is on
     default: 1
     compass: 10
@@ -144,11 +149,20 @@
     mcs: 2
     full: 5
     mcu: 1  # map, compass, universal smalls
-# for use when you aren't using the dungeon_items above
-#  smallkey_shuffle:
-#    none: 5
-#    wild: 1
-#    universal: 1
+  # for use when you aren't using the dungeon_items above
+  # map_shuffle:
+  #   on: 1
+  #   off: 1
+  # compass_shuffle:
+  #   on: 1
+  #   off: 1
+  # smallkey_shuffle:
+  #   none: 5
+  #   wild: 1
+  #   universal: 1
+  # bigkey_shuffle:
+  #   on: 1
+  #   off: 1
   dungeon_counters:
     on: 5
     off: 0
@@ -225,6 +239,10 @@
   startinventory:
     Pegasus Boots: on
   rom:
+    sprite:
+      'Link': 1
+      random: 0
+      randomonhit: 0
     quickswap: on
     heartcolor:
       red: 1
