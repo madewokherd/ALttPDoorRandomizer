@@ -1402,8 +1402,7 @@ def place_blacksmith(world, links_house, player):
     invFlag = world.mode[player] == 'inverted'
     
     assumed_inventory = list()
-    region = world.get_region('Frog Prison', player)
-    if world.logic[player] in ['noglitches', 'minorglitches'] and region.type == (RegionType.DarkWorld if not invFlag else RegionType.LightWorld):
+    if world.logic[player] in ['noglitches', 'minorglitches'] and (world.is_tile_swapped(0x29, player) == invFlag):
         assumed_inventory.append('Titans Mitts')
     
     links_region = world.get_entrance(links_house, player).parent_region.name

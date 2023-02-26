@@ -14,21 +14,6 @@ version_branch = '-u'
 __version__ = '%s%s' % (version_number, version_branch)
 
 def link_overworld(world, player):
-    if not world.is_bombshop_start(player):
-        connect_simple(world, 'Links House S&Q', 'Links House', player)
-    else:
-        connect_simple(world, 'Links House S&Q', 'Big Bomb Shop', player)
-    
-    if not world.mode[player] == 'inverted':
-        connect_simple(world, 'Sanctuary S&Q', 'Sanctuary', player)
-    else:
-        connect_simple(world, 'Sanctuary S&Q', 'Dark Sanctuary Hint', player)
-
-    if not world.is_tile_swapped(0x1b, player):
-        connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
-    else:
-        connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
-
     # setup mandatory connections
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
@@ -183,6 +168,21 @@ def link_overworld(world, player):
         world.spoiler.set_map('swaps', text_output, world.owswaps[player][0], player)
     
     # apply tile logical connections
+    if not world.is_bombshop_start(player):
+        connect_simple(world, 'Links House S&Q', 'Links House', player)
+    else:
+        connect_simple(world, 'Links House S&Q', 'Big Bomb Shop', player)
+    
+    if not world.mode[player] == 'inverted':
+        connect_simple(world, 'Sanctuary S&Q', 'Sanctuary', player)
+    else:
+        connect_simple(world, 'Sanctuary S&Q', 'Dark Sanctuary Hint', player)
+
+    if not world.is_tile_swapped(0x1b, player):
+        connect_simple(world, 'Other World S&Q', 'Pyramid Area', player)
+    else:
+        connect_simple(world, 'Other World S&Q', 'Hyrule Castle Ledge', player)
+
     for owid in ow_connections.keys():
         if not world.is_tile_swapped(owid, player):
             for (exitname, regionname) in ow_connections[owid][0]:
