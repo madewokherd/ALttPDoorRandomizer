@@ -2703,6 +2703,8 @@ class Item(object):
         return self.world.get_name_string_for_object(self) if self.world else f'{self.name} (Player {self.player})'
 
     def __eq__(self, other):
+        if type(other) is str:
+            return self.name == other
         return self.name == other.name and self.player == other.player
 
 
