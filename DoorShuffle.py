@@ -3273,6 +3273,10 @@ def find_inaccessible_regions(world, player):
     world.inaccessible_regions[player] = []
     start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
     regs = convert_regions(start_regions, world, player)
+    if all(all(not e.connected_region for e in r.exits) for r in regs):
+        # if attempting to find inaccessible regions before any connections made above, assume eventual access to Pyramid S&Q
+        start_regions = ['Pyramid Area' if not world.is_tile_swapped(0x1b, player) else 'Hyrule Castle Ledge']
+        regs = convert_regions(start_regions, world, player)
     all_regions = [r for r in world.regions if r.player == player and r.type is not RegionType.Dungeon]
     visited_regions = set()
     queue = deque(regs)

@@ -231,7 +231,7 @@ def main(args, seed=None, fish=None):
     logger.info(world.fish.translate("cli","cli","shuffling.world"))
 
     for player in range(1, world.players + 1):
-        link_entrances(world, player)
+        link_entrances_new(world, player)
 
     logger.info(world.fish.translate("cli", "cli", "shuffling.prep"))
 
