@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '695fe1ac7794b8fc2383454eb15cbdd5'
+RANDOMIZERBASEHASH = '7043e64e74b2452367de7cc146873524'
 
 
 class JsonRom(object):
@@ -1586,7 +1586,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x1800A3, 0x01)  # enable correct world setting behaviour after agahnim kills
     rom.write_byte(0x1800A4, 0x01 if world.logic[player] != 'nologic' else 0x00)  # enable POD EG fix
     rom.write_byte(0x180042, 0x01 if world.save_and_quit_from_boss else 0x00)  # Allow Save and Quit after boss kill
-    rom.write_byte(0x180358, 0x01 if world.logic[player] in ['owglitches', 'nologic'] else 0x00)
+    rom.write_byte(0x180358, 0x01 if (world.logic[player] in ['owglitches', 'nologic']) else 0x00)
 
     # remove shield from uncle
     rom.write_bytes(0x6D253, [0x00, 0x00, 0xf6, 0xff, 0x00, 0x0E])
@@ -1689,9 +1689,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         Room0127.write_to_rom(snes_to_pc(0x2B8000), rom)
 
     if world.pot_contents[player]:
-        colorize_pots = is_mystery or (world.pottery[player] not in ['vanilla', 'lottery']
-                                       and (world.colorizepots[player]
-                                            or world.pottery[player] in ['reduced', 'clustered']))
+        colorize_pots = (world.pottery[player] != 'vanilla'
+                         and (world.colorizepots[player] or world.pottery[player] in ['reduced', 'clustered']))
         if world.pot_contents[player].size() > 0x2800:
             raise Exception('Pot table is too big for current area')
         world.pot_contents[player].write_pot_data_to_rom(rom, colorize_pots)
