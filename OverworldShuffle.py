@@ -632,17 +632,56 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
             parity[5] -= 1
         group_parity[group[0]] = parity
 
-    attempts = 1000
+    # customizer adjustments
+    undefined_chance = 50
+    flipped_groups = list()
+    always_removed = list()
+    if world.customizer:
+        if not do_grouped:
+            custom_flips = world.customizer.get_owtileflips()
+        if custom_flips:
+            nonflipped_groups = list()
+            forced_flips = list()
+            forced_nonflips = list()
+            player_key = player
+            if 'undefined_chance' in custom_flips[player_key]:
+                undefined_chance = custom_flips[player_key]['undefined_chance']
+            if 'force_flip' in custom_flips[player_key]:
+                forced_flips = custom_flips[player_key]['force_flip']
+            if 'force_no_flip' in custom_flips[player_key]:
+                forced_nonflips = custom_flips[player_key]['force_no_flip']
+
+            for group in groups:
+                if any(owid in group[0] for owid in forced_nonflips):
+                    nonflipped_groups.append(group)
+                if any(owid in group[0] for owid in forced_flips):
+                    flipped_groups.append(group)
+
+            # Check if there are any groups that appear in both sets
+            if any(group in flipped_groups for group in nonflipped_groups):
+                raise GenerationException('Conflict found when flipping tiles')
+            
+            for g in nonflipped_groups:
+                always_removed.append(g)
+            if undefined_chance == 0:
+                for g in [g for g in groups if g not in flipped_groups + always_removed]:
+                    always_removed.append(g)
+    
+    attempts = 1
+    if 0 < undefined_chance < 100:
+        # do roughly 1000 attempts at a full list
+        attempts = len(groups) - len(always_removed)
+        attempts = (attempts ** 1.9) + (attempts * 10) + 1
     while True:
         if attempts == 0: # expected to only occur with custom flips
             raise GenerationException('Could not find valid tile flips')
 
         # tile shuffle happens here
-        removed = list()
-        for group in groups:
-            #if 0x1b in group[0] or 0x13 in group[0] or (0x1a in group[0] and world.owCrossed[player] == 'none'): # TODO: Standard + Inverted
-            if random.randint(0, 1):
-                removed.append(group)
+        removed = copy.deepcopy(always_removed)
+        if 0 < undefined_chance < 100:
+            for group in [g for g in groups if g not in always_removed]:
+                if group not in flipped_groups and random.randint(1, 100) > undefined_chance:
+                    removed.append(group)
 
         # save shuffled tiles to list
         new_results = [[],[],[]]

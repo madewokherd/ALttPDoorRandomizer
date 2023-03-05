@@ -72,6 +72,7 @@ class CustomSettings(object):
                     args.mystery = True
                 else:
                     settings = defaultdict(lambda: None, player_setting)
+                args.ow_mixed[p] = get_setting(settings['ow_mixed'], args.ow_mixed[p])
                 args.shuffle[p] = get_setting(settings['shuffle'], args.shuffle[p])
                 args.door_shuffle[p] = get_setting(settings['door_shuffle'], args.door_shuffle[p])
                 args.logic[p] = get_setting(settings['logic'], args.logic[p])
@@ -174,6 +175,11 @@ class CustomSettings(object):
     def get_advanced_placements(self):
         if 'advanced_placements' in self.file_source:
             return self.file_source['advanced_placements']
+        return None
+
+    def get_owtileflips(self):
+        if 'ow-tileflips' in self.file_source:
+            return self.file_source['ow-tileflips']
         return None
 
     def get_entrances(self):

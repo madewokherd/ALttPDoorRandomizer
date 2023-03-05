@@ -1,0 +1,10 @@
+meta:
+  players: 1
+settings:
+  1:
+    mode: standard
+    ow_mixed: true
+ow-tileflips:
+  1:
+    undefined_chance: 100
+
