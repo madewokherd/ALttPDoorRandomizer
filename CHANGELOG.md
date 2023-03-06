@@ -1,7 +1,14 @@
 # Changelog
 
+## 0.3.0.1
+- \~Merged in DR v1.2.0.10~
+  - Fixed some door landing issues
+- Added Customizer support for OWR Tile Flips
+  - Added 'Standard+Inverted' template customizer yaml
+- Fixed some ER issues with placing Sanc Drop in non-crossed ER
+
 ## 0.3.0.0
-- Merged in all DR Customizer features since its initial release up to v1.2.0.9
+- \~Merged in all DR Customizer features since its initial release up to v1.2.0.9~
 - Major revamp of Aerinon's ER 2.0 to better support OWR modes
 - Fixed various incorrect logic issues (Inverted flute spots, Bomb Shop start, etc)
 - Flute is disabled in rain state except glitched modes
