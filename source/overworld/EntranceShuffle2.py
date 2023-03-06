@@ -444,17 +444,19 @@ def do_holes_and_linked_drops(entrances, exits, avail, cross_world, keep_togethe
     random.shuffle(hole_entrances)
     if not cross_world and 'Sanctuary Grave' in holes_to_shuffle:
         hc = avail.world.get_entrance('Hyrule Castle Exit (South)', avail.player)
+        chosen_entrance = None
         if hc.connected_region and hc.connected_region.type == RegionType.DarkWorld:
             chosen_entrance = next(entrance for entrance in hole_entrances if entrance[0] in DW_Entrances)
         if not chosen_entrance:
             chosen_entrance = next(entrance for entrance in hole_entrances if entrance[0] in LW_Entrances)
-        hole_entrances.remove(chosen_entrance)
-        sanc_interior = next(target for target in hole_targets if target[0] == 'Sanctuary Exit')
-        hole_targets.remove(sanc_interior)
-        connect_two_way(chosen_entrance[0], sanc_interior[0], avail)  # two-way exit
-        connect_entrance(chosen_entrance[1], sanc_interior[1], avail)  # hole
-        remove_from_list(entrances, [chosen_entrance[0], chosen_entrance[1]])
-        remove_from_list(exits, [sanc_interior[0], sanc_interior[1]])
+        if chosen_entrance:
+            hole_entrances.remove(chosen_entrance)
+            sanc_interior = next(target for target in hole_targets if target[0] == 'Sanctuary Exit')
+            hole_targets.remove(sanc_interior)
+            connect_two_way(chosen_entrance[0], sanc_interior[0], avail)  # two-way exit
+            connect_entrance(chosen_entrance[1], sanc_interior[1], avail)  # hole
+            remove_from_list(entrances, [chosen_entrance[0], chosen_entrance[1]])
+            remove_from_list(exits, [sanc_interior[0], sanc_interior[1]])
 
     random.shuffle(hole_targets)
     for entrance, drop in hole_entrances:
