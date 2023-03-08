@@ -72,7 +72,13 @@ class CustomSettings(object):
                     args.mystery = True
                 else:
                     settings = defaultdict(lambda: None, player_setting)
+                args.ow_shuffle[p] = get_setting(settings['ow_shuffle'], args.ow_shuffle[p])
+                args.ow_terrain[p] = get_setting(settings['ow_terrain'], args.ow_terrain[p])
+                args.ow_crossed[p] = get_setting(settings['ow_crossed'], args.ow_crossed[p])
+                args.ow_keepsimilar[p] = get_setting(settings['ow_keepsimilar'], args.ow_keepsimilar[p])
                 args.ow_mixed[p] = get_setting(settings['ow_mixed'], args.ow_mixed[p])
+                args.ow_whirlpool[p] = get_setting(settings['ow_whirlpool'], args.ow_whirlpool[p])
+                args.ow_fluteshuffle[p] = get_setting(settings['ow_fluteshuffle'], args.ow_fluteshuffle[p])
                 args.shuffle[p] = get_setting(settings['shuffle'], args.shuffle[p])
                 args.door_shuffle[p] = get_setting(settings['door_shuffle'], args.door_shuffle[p])
                 args.logic[p] = get_setting(settings['logic'], args.logic[p])
