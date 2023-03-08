@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9ea9fca9e2c9a2cc37287368a860105b'
+RANDOMIZERBASEHASH = '2b14cd0bbab8a7fb943c8bc1ca75ed1f'
 
 
 class JsonRom(object):
@@ -1788,8 +1788,8 @@ def write_custom_shops(rom, world, player):
 
 def write_enemizer_tweaks(rom, world, player):
     if world.enemy_shuffle[player] != 'none':
-        rom.write_byte(snes_to_pc(0x1DF6D8, 0))  # lets enemies walk on water instead of clipping into infinity?
-        rom.write_byte(snes_to_pc(0x0DB6B3, 0x82))  # hovers don't need water necessarily?
+        rom.write_byte(snes_to_pc(0x1DF6D8), 0)  # lets enemies walk on water instead of clipping into infinity?
+        rom.write_byte(snes_to_pc(0x0DB6B3), 0x82)  # hovers don't need water necessarily?
 
 def hud_format_text(text):
     output = bytes()
