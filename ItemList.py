@@ -1104,6 +1104,8 @@ def get_pool_core(world, player, progressive, shuffle, difficulty, treasure_hunt
                 pool.remove('Fighter Sword')
             pool.extend(['Rupees (50)'])
 
+    #TODO: Remove test placements
+    #place_item('Purple Chest', 'Magic Mirror')
     if timer in ['timed', 'timed-countdown']:
         pool.extend(diff.timedother)
         clock_mode = 'stopwatch' if timer == 'timed' else 'countdown'
