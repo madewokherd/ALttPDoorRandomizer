@@ -1134,6 +1134,9 @@ def do_vanilla_connect(pool_def, avail):
     elif pool_def['condition'] == 'takeany':
         if avail.world.take_any[avail.player] == 'fixed':
             return
+    elif pool_def['condition'] == 'bonk':
+        if avail.world.shuffle_bonk_drops[avail.player]:
+            return
     defaults = {**default_connections, **(inverted_default_connections if avail.inverted != avail.world.is_tile_swapped(0x1b, avail.player) else open_default_connections)}
     for entrance in pool_def['entrances']:
         if entrance in avail.entrances:
@@ -1550,7 +1553,7 @@ modes = {
                 'condition': '',
                 'entrances': ['Dark Desert Fairy', 'Archery Game', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint',
                               'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Fairy', 'Dark Lake Hylia Shop',
-                              'East Dark World Hint', 'Kakariko Gamble Game', 'Good Bee Cave', 'Long Fairy Cave',
+                              'East Dark World Hint', 'Kakariko Gamble Game', 'Long Fairy Cave',
                               'Bush Covered House',  'Fortune Teller (Light)', 'Lost Woods Gamble',
                               'Lake Hylia Fortune Teller', 'Lake Hylia Fairy', 'Bonk Fairy (Light)', 'Inverted Dark Sanctuary'],
             },
@@ -1574,7 +1577,11 @@ modes = {
                               'Light World Bomb Hut', '20 Rupee Cave', '50 Rupee Cave', 'Hookshot Fairy',
                               'Palace of Darkness Hint', 'Dark Lake Hylia Ledge Spike Cave',
                               'Dark Desert Hint']
-
+            },
+            'fixed_bonk': {
+                'special': 'vanilla',
+                'condition': 'bonk',
+                'entrances': ['Good Bee Cave']
             },
             'item_caves': {  # shuffles shops/pottery if they weren't fixed in the last steps
                 'entrances': ['Mimic Cave', 'Spike Cave', 'Mire Shed', 'Dark World Hammer Peg Cave', 'Chest Game',
@@ -1582,7 +1589,7 @@ modes = {
                               'Ice Rod Cave', 'Dam', 'Bonk Rock Cave', 'Library', 'Potion Shop', 'Mini Moldorm Cave',
                               'Checkerboard Cave', 'Graveyard Cave', 'Cave 45', 'Sick Kids House', 'Blacksmiths Hut',
                               'Sahasrahlas Hut', 'Aginahs Cave', 'Chicken House', 'Kings Grave', 'Blinds Hideout',
-                              'Waterfall of Wishing', 'Cave Shop (Dark Death Mountain)',
+                              'Waterfall of Wishing', 'Cave Shop (Dark Death Mountain)', 'Good Bee Cave',
                               'Dark World Potion Shop', 'Dark World Lumberjack Shop', 'Dark World Shop',
                               'Red Shield Shop', 'Kakariko Shop', 'Capacity Upgrade', 'Cave Shop (Lake Hylia)',
                               'Lumberjack House', 'Snitch Lady (West)', 'Snitch Lady (East)', 'Tavern (Front)',
@@ -1637,7 +1644,7 @@ modes = {
                 'condition': '',
                 'entrances': ['Dark Desert Fairy', 'Archery Game', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint',
                               'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Fairy', 'Dark Lake Hylia Shop',
-                              'East Dark World Hint', 'Kakariko Gamble Game', 'Good Bee Cave', 'Long Fairy Cave',
+                              'East Dark World Hint', 'Kakariko Gamble Game', 'Long Fairy Cave',
                               'Bush Covered House',  'Fortune Teller (Light)', 'Lost Woods Gamble',
                               'Lake Hylia Fortune Teller', 'Lake Hylia Fairy', 'Bonk Fairy (Light)', 'Inverted Dark Sanctuary'],
             },
@@ -1661,7 +1668,11 @@ modes = {
                               'Light World Bomb Hut', '20 Rupee Cave', '50 Rupee Cave', 'Hookshot Fairy',
                               'Palace of Darkness Hint', 'Dark Lake Hylia Ledge Spike Cave',
                               'Dark Desert Hint']
-
+            },
+            'fixed_bonk': {
+                'special': 'vanilla',
+                'condition': 'bonk',
+                'entrances': ['Good Bee Cave']
             },
             'item_caves': {  # shuffles shops/pottery if they weren't fixed in the last steps
                 'entrances': ['Mimic Cave', 'Spike Cave', 'Mire Shed', 'Dark World Hammer Peg Cave', 'Chest Game',
@@ -1669,7 +1680,7 @@ modes = {
                               'Ice Rod Cave', 'Dam', 'Bonk Rock Cave', 'Library', 'Potion Shop', 'Mini Moldorm Cave',
                               'Checkerboard Cave', 'Graveyard Cave', 'Cave 45', 'Sick Kids House', 'Blacksmiths Hut',
                               'Sahasrahlas Hut', 'Aginahs Cave', 'Chicken House', 'Kings Grave', 'Blinds Hideout',
-                              'Waterfall of Wishing', 'Cave Shop (Dark Death Mountain)',
+                              'Waterfall of Wishing', 'Cave Shop (Dark Death Mountain)', 'Good Bee Cave',
                               'Dark World Potion Shop', 'Dark World Lumberjack Shop', 'Dark World Shop',
                               'Red Shield Shop', 'Kakariko Shop', 'Capacity Upgrade', 'Cave Shop (Lake Hylia)',
                               'Lumberjack House', 'Snitch Lady (West)', 'Snitch Lady (East)', 'Tavern (Front)',
