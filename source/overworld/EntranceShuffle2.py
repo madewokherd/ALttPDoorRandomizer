@@ -1134,6 +1134,9 @@ def do_vanilla_connect(pool_def, avail):
     elif pool_def['condition'] == 'takeany':
         if avail.world.take_any[avail.player] == 'fixed':
             return
+    elif pool_def['condition'] == 'bonk':
+        if avail.world.shuffle_bonk_drops[avail.player]:
+            return
     defaults = {**default_connections, **(inverted_default_connections if avail.inverted != avail.world.is_tile_swapped(0x1b, avail.player) else open_default_connections)}
     for entrance in pool_def['entrances']:
         if entrance in avail.entrances:
@@ -1574,7 +1577,11 @@ modes = {
                               'Light World Bomb Hut', '20 Rupee Cave', '50 Rupee Cave', 'Hookshot Fairy',
                               'Palace of Darkness Hint', 'Dark Lake Hylia Ledge Spike Cave',
                               'Dark Desert Hint']
-
+            },
+            'fixed_bonk': {
+                'special': 'vanilla',
+                'condition': 'bonk',
+                'entrances': ['Good Bee Cave']
             },
             'item_caves': {  # shuffles shops/pottery if they weren't fixed in the last steps
                 'entrances': ['Mimic Cave', 'Spike Cave', 'Mire Shed', 'Dark World Hammer Peg Cave', 'Chest Game',
@@ -1661,7 +1668,11 @@ modes = {
                               'Light World Bomb Hut', '20 Rupee Cave', '50 Rupee Cave', 'Hookshot Fairy',
                               'Palace of Darkness Hint', 'Dark Lake Hylia Ledge Spike Cave',
                               'Dark Desert Hint']
-
+            },
+            'fixed_bonk': {
+                'special': 'vanilla',
+                'condition': 'bonk',
+                'entrances': ['Good Bee Cave']
             },
             'item_caves': {  # shuffles shops/pottery if they weren't fixed in the last steps
                 'entrances': ['Mimic Cave', 'Spike Cave', 'Mire Shed', 'Dark World Hammer Peg Cave', 'Chest Game',
