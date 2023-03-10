@@ -688,6 +688,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Thieves Big Chest Nook', 'Thieves\' Town', ['Thieves\' Town - Big Key Chest'], ['Thieves Big Chest Nook ES Edge']),
         create_dungeon_region(player, 'Thieves Hallway', 'Thieves\' Town', ['Thieves\' Town - Hallway Pot Key'], ['Thieves Hallway SE', 'Thieves Hallway NE', 'Thieves Hallway WN', 'Thieves Hallway WS']),
         create_dungeon_region(player, 'Thieves Boss', 'Thieves\' Town', ['Revealing Light', 'Thieves\' Town - Boss', 'Thieves\' Town - Prize'], ['Thieves Boss SE']),
+        #create_dungeon_region(player, 'Thieves Boss', 'Thieves\' Town', ['Thieves\' Town - Boss', 'Thieves\' Town - Prize'], ['Revealing Light', 'Thieves Boss SE']),
+        #create_dungeon_region(player, 'Thieves Revealing Light', 'Thieves\' Town', ['Revealing Light'], ['Thieves Boss Room']),
         create_dungeon_region(player, 'Thieves Pot Alcove Mid', 'Thieves\' Town', None, ['Thieves Pot Alcove Mid ES', 'Thieves Pot Alcove Mid WS']),
         create_dungeon_region(player, 'Thieves Pot Alcove Bottom', 'Thieves\' Town', None, ['Thieves Pot Alcove Bottom SW']),
         create_dungeon_region(player, 'Thieves Pot Alcove Top', 'Thieves\' Town', None, ['Thieves Pot Alcove Top NW']),
@@ -1304,7 +1306,8 @@ bonk_prize_table = {
     'Dark Tree Line Tree 2':            (0x26, 0x10, False, '', 'Dark Tree Line Area',            'in a tree'),
     'Dark Tree Line Tree 3':            (0x27, 0x08, False, '', 'Dark Tree Line Area',            'in a tree'),
     'Dark Tree Line Tree 4':            (0x28, 0x04, False, '', 'Dark Tree Line Area',            'in a tree'),
-    'Hype Cave Statue':                 (0x29, 0x10, False, '', 'Hype Cave Area',                 'encased in stone')
+    'Hype Cave Statue':                 (0x29, 0x10, False, '', 'Hype Cave Area',                 'encased in stone'),
+    'Cold Fairy Statue':                (0x2a, 0x02, False, '', 'Good Bee Cave',                  'encased in stone')
 }
 
 bonk_table_by_location_id = {0x2ABB00+(data[0]*6)+3: name for name, data in bonk_prize_table.items()}

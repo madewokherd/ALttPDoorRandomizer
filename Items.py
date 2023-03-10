@@ -175,6 +175,7 @@ item_table = {'Bow': (True, False, None, 0x0B, 200, 'You have\nchosen the\narche
               'Green Potion': (False, False, None, 0x2F, 60, 'Refreshing green goop!', 'and the green goo', 'the liquid kid', 'potion for sale', 'free samples', 'bottle boy has green goo again', 'a green potion'),
               'Blue Potion': (False, False, None, 0x30, 160, 'Delicious blue goop!', 'and the blue goo', 'the liquid kid', 'potion for sale', 'free samples', 'bottle boy has blue goo again', 'a blue potion'),
               'Bee': (False, False, None, 0x0E, 10, 'I will sting your foes a few times', 'and the sting buddy', 'the beekeeper kid', 'insect for sale', 'shroom pollenation', 'bottle boy has mad bee again', 'a bee'),
+              'Good Bee': (False, False, None, 0xB5, 10, 'I will sting your foes a lot', 'and the cold buddy', 'the beekeeper kid', 'cold insect for sale', 'shroom pollenation', 'bottle boy has cold bee again', 'a good bee'),
               'Small Heart': (False, False, None, 0x42, 10, 'Just a little\npiece of love!', 'and the heart', 'the life-giving kid', 'little love for sale', 'fungus for life', 'life boy feels some love again', 'a heart'),
               'Apples': (False, False, None, 0xB1, 30, 'Just a few pieces of fruit!', 'and the juicy fruit', 'the fruity kid', 'the fruit stand', 'expired fruit', 'bottle boy has fruit again', 'an apple hoard'),
               'Fairy': (False, False, None, 0xB2, 50, 'Just a pixie!', 'and the pixie', 'the pixie kid', 'pixie for sale', 'pixie fungus', 'bottle boy has pixie again', 'a pixie'),

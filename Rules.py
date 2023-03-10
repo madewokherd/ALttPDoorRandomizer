@@ -862,7 +862,9 @@ def default_rules(world, player):
             from Regions import bonk_prize_table
             for location_name, (_, _, aga_required, _, _, _) in bonk_prize_table.items():
                 loc = world.get_location(location_name, player)
-                if not aga_required:
+                if location_name == 'Cold Fairy Statue':
+                    set_rule(loc, lambda state: state.can_use_bombs(player) and state.can_collect_bonkdrops(player))
+                elif not aga_required:
                     set_rule(loc, lambda state: state.can_collect_bonkdrops(player))
                 else:
                     set_rule(loc, lambda state: state.can_collect_bonkdrops(player) and state.has_beaten_aga(player))

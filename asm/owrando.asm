@@ -157,6 +157,14 @@ and #$7f : eor #$40 : nop #2
 
 org $06AD4C
 jsl.l OWBonkDrops : nop #4
+org $1EDE6F
+jsl.l OWBonkGoodBeeDrop : bra +
+GoldBee_SpawnSelf_SetProperties:
+phb : lda.b #$1E : pha : plb ; switch to bank 1E
+    jsr GoldBee_SpawnSelf+12
+plb : rtl
+nop #3
++
 
 ;Code
 org $aa8800
@@ -395,6 +403,112 @@ LoadMapDarkOrMixed:
     dw $0400+$0210 ; bottom right
 }
 
+OWBonkGoodBeeDrop:
+{
+    LDA.l OWFlags+1 : AND.b #$02 : BNE .shuffled
+        .vanilla ; what we wrote over
+        STZ.w $0DD0,X
+        LDA.l BottleContentsOne : ORA.l BottleContentsTwo
+            ORA.l BottleContentsThree : ORA.l BottleContentsFour
+        RTL
+    .shuffled
+    PHY : TXY
+    LDA.l RoomDataWRAM[$0120].high : AND.b #$02 : PHA : BNE + ; check if collected
+        LDA.b #$1B : STA $12F ; JSL Sound_SetSfx3PanLong ; seems that when you bonk, there is a pending bonk sfx, so we clear that out and replace with reveal secret sfx
+    +
+    LDA.l OWBonkPrizeData+(42*6+4) : BEQ + ; multiworld item
+        LDA.l OWBonkPrizeData+(42*6+3)
+        JMP .spawn_item
+    +
+
+    .determine_type ; S = Collected, FlagBitmask, X (row + 2)
+    LDA.l OWBonkPrizeData+(42*6+3) ; A = item id
+    CMP.b #$B0 : BNE +
+        LDA.b #$79 : JMP .sprite_transform ; transform to bees
+    + CMP.b #$42 : BNE +
+        JSL.l Sprite_TransmuteToBomb ; transform a heart to bomb, vanilla behavior
+        JMP .mark_collected
+    + CMP.b #$34 : BNE +
+        LDA.b #$D9 : JMP .sprite_transform ; transform to single rupee
+    + CMP.b #$35 : BNE +
+        LDA.b #$DA : JMP .sprite_transform ; transform to blue rupee
+    + CMP.b #$36 : BNE +
+        LDA.b #$DB : BRA .sprite_transform ; transform to red rupee
+    + CMP.b #$27 : BNE +
+        LDA.b #$DC : BRA .sprite_transform ; transform to 1 bomb
+    + CMP.b #$28 : BNE +
+        LDA.b #$DD : BRA .sprite_transform ; transform to 4 bombs
+    + CMP.b #$31 : BNE +
+        LDA.b #$DE : BRA .sprite_transform ; transform to 8 bombs
+    + CMP.b #$45 : BNE +
+        LDA.b #$DF : BRA .sprite_transform ; transform to small magic
+    + CMP.b #$B4 : BNE +
+        LDA.b #$E0 : BRA .sprite_transform ; transform to big magic
+    + CMP.b #$B5 : BNE +
+        LDA.b #$79 : JSL.l OWBonkSpritePrep
+        JSL.l GoldBee_SpawnSelf_SetProperties ; transform to good bee
+        BRA .mark_collected
+    + CMP.b #$44 : BNE +
+        LDA.b #$E2 : BRA .sprite_transform ; transform to 10 arrows
+    + CMP.b #$B1 : BNE +
+        LDA.b #$AC : BRA .sprite_transform ; transform to apples
+    + CMP.b #$B2 : BNE +
+        LDA.b #$E3 : BRA .sprite_transform ; transform to fairy
+    + CMP.b #$B3 : BNE .spawn_item
+        INX : INX : LDA.l OWBonkPrizeData+(42*6+5)
+        CLC : ADC.b #$08 : PHA
+        LDA.w $0D00,Y : SEC : SBC.b 1,S : STA.w $0D00,Y
+            LDA.w $0D20,Y : SBC.b #$00 : STA.w $0D20,Y : PLX
+        LDA.b #$0B : SEC ; BRA .sprite_transform ; transform to chicken
+    
+    .sprite_transform
+    JSL.l OWBonkSpritePrep
+
+    .mark_collected ; S = Collected
+    PLA : BNE .return
+        LDA.l RoomDataWRAM[$0120].high : ORA.b #$02 : STA.l RoomDataWRAM[$0120].high
+        
+        REP #$20
+			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
+        SEP #$20
+    BRA .return
+
+    ; spawn itemget item
+    .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected
+    PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : BRA .return
+        + LDA.l OWBonkPrizeData+(42*6+4) : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+
+        LDA.b #$01 : STA !REDRAW
+
+        LDA.b #$EB : STA.l $7FFE00
+        JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
+
+        ; affects the rate the item moves in the Y/X direction
+        LDA.b #$00 : STA.w $0D40,Y
+        LDA.b #$0A : STA.w $0D50,Y
+
+        LDA.b #$20 : STA.w $0F80,Y ; amount of force (gives height to the arch)
+        LDA.b #$FF : STA.w $0B58,Y ; stun timer
+        LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
+
+        LDA.b #$00 : STA.w $0F20,Y ; layer the sprite is on
+
+        ; sets OW event bitmask flag, uses free RAM
+        LDA.l OWBonkPrizeData+(42*6+2) : STA.w $0ED0,Y
+        
+        ; determines the initial spawn point of item
+        LDA.w $0D00,Y : SEC : SBC.l OWBonkPrizeData+(42*6+5) : STA.w $0D00,Y
+            LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
+
+        LDA.b #$01 : STA !REDRAW : STA !FORCE_HEART_SPAWN
+
+    .return
+    PLY
+    LDA #$08 ; makes original good bee not spawn
+    RTL
+    nop #20
+}
+
 ; Y = sprite slot index of bonk sprite
 OWBonkDrops:
 {
@@ -439,7 +553,7 @@ OWBonkDrops:
     + CMP.b #$34 : BNE +
         LDA.b #$D9 : CLC : JMP .sprite_transform ; transform to single rupee
     + CMP.b #$35 : BNE +
-        LDA.b #$DA : CLC : BRA .sprite_transform ; transform to blue rupee
+        LDA.b #$DA : CLC : JMP .sprite_transform ; transform to blue rupee
     + CMP.b #$36 : BNE +
         LDA.b #$DB : CLC : BRA .sprite_transform ; transform to red rupee
     + CMP.b #$27 : BNE +
@@ -453,7 +567,9 @@ OWBonkDrops:
     + CMP.b #$B4 : BNE +
         LDA.b #$E0 : CLC : BRA .sprite_transform ; transform to big magic
     + CMP.b #$B5 : BNE +
-        LDA.b #$E1 : CLC : BRA .sprite_transform ; transform to 5 arrows
+        LDA.b #$79 : JSL.l OWBonkSpritePrep
+        JSL.l GoldBee_SpawnSelf_SetProperties ; transform to good bee
+        BRA .mark_collected
     + CMP.b #$44 : BNE +
         LDA.b #$E2 : CLC : BRA .sprite_transform ; transform to 10 arrows
     + CMP.b #$B1 : BNE +
@@ -468,14 +584,7 @@ OWBonkDrops:
         LDA.b #$0B : SEC ; BRA .sprite_transform ; transform to chicken
     
     .sprite_transform
-    STA.w $0E20,Y
-    TYX : JSL.l Sprite_LoadProperties
-    BEQ +
-        ; these are sprite properties that make it fall out of the tree to the east 
-        LDA #$30 : STA $0F80,Y ; amount of force (related to speed)
-        LDA #$10 : STA $0D50,Y ; eastward rate of speed
-        LDA #$FF : STA $0B58,Y ; expiration timer
-    +
+    JSL.l OWBonkSpritePrep
 
     .mark_collected ; S = Collected, FlagBitmask, X (row + 2)
     PLA : BNE + ; S = FlagBitmask, X (row + 2)
@@ -495,8 +604,7 @@ OWBonkDrops:
 
         LDA.b #$01 : STA !REDRAW
 
-        LDA.b #$EB
-        STA.l $7FFE00
+        LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
 
         ; affects the rate the item moves in the Y/X direction
@@ -523,6 +631,19 @@ OWBonkDrops:
 
     .return
     PLA : PLA : PLB : RTL
+}
+
+; A = SpriteID, Y = Sprite Slot Index, X = free/overwritten
+OWBonkSpritePrep:
+{
+    STA.w $0E20,Y
+    TYX : JSL.l Sprite_LoadProperties
+    BEQ +
+        ; these are sprite properties that make it fall out of the tree to the east 
+        LDA #$30 : STA $0F80,Y ; amount of force (related to speed)
+        LDA #$10 : STA $0D50,Y ; eastward rate of speed
+        LDA #$FF : STA $0B58,Y ; expiration timer
+    + RTL
 }
 
 org $aa9000
@@ -1539,6 +1660,7 @@ db $6e, $8c, $10, $35, $00, $10
 db $6e, $90, $08, $b0, $00, $10
 db $6e, $a4, $04, $b1, $00, $10
 db $74, $4e, $10, $b1, $00, $1c
+db $ff, $00, $02, $b5, $00, $08
 
 ; temporary fix - murahdahla replaces one of the bonk tree prizes
 ;    so we copy the sprite table here and update the pointer

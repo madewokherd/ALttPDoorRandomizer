@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '2b14cd0bbab8a7fb943c8bc1ca75ed1f'
+RANDOMIZERBASEHASH = '4458a348e3040d79d0e28d572579fcb5'
 
 
 class JsonRom(object):
@@ -686,7 +686,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         flute_spots = default_flute_connections
     else:
         flute_spots = world.owflutespots[player]
-        owFlags |= 0x100
+        owFlags |= 0x0100
 
     for o in range(0, len(flute_spots)):
         owslot = flute_spots[o]
@@ -740,12 +740,12 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
             owMode = 2
 
         if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player] in ['limited', 'chaos']):
-            owMode |= 0x100
+            owMode |= 0x0100
         if world.owCrossed[player] != 'none' and (world.owCrossed[player] != 'polar' or world.owMixed[player]):
-            owMode |= 0x200
+            owMode |= 0x0200
             world.fix_fake_world[player] = True
         if world.owMixed[player]:
-            owMode |= 0x400
+            owMode |= 0x0400
 
         # patches map data specific for OW Shuffle
         #inverted_buffer[0x03] = inverted_buffer[0x03] | 0x2  # convenient portal on WDM
@@ -793,7 +793,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # for prize, address in zip(bonk_prizes, bonk_addresses):
         #     rom.write_byte(address, prize)
 
-        owFlags |= 0x200
+        owFlags |= 0x0200
 
         # setting spriteID to D8, a placeholder sprite we use to inform ROM to spawn a dynamic item
         #for address in bonk_addresses:
@@ -802,6 +802,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # temporary fix for screen 1A
         rom.write_byte(snes_to_pc(0x09AE32), 0xD8)
         rom.write_byte(snes_to_pc(0x09AE35), 0xD8)
+
+        rom.write_byte(snes_to_pc(0x06918E), 0x80) # skip good bee bottle check
 
     write_int16(rom, 0x150002, owMode)
     write_int16(rom, 0x150004, owFlags)
@@ -1649,6 +1651,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if world.shuffle_bonk_drops[player]:
         # warning, this temporary patch might cause fairies to respawn differently?, limiting this to bonk drop mode only
         rom.write_byte(snes_to_pc(0x0DB808), 0x03) # patch fairies sprites to not permadeath like enemies
+        rom.write_byte(snes_to_pc(0x1DF6D8), 0) # allows sprites to travel across water / same flag as write_enemizer_tweaks
 
     # allow smith into multi-entrance caves in appropriate shuffles
     if world.shuffle[player] in ['restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
