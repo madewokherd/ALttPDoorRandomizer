@@ -426,7 +426,8 @@ def filter_locations(item_to_place, locations, world, vanilla_skip=False, potion
             return filtered if len(filtered) > 0 else locations
     if world.algorithm == 'district':
         config = world.item_pool_config
-        if item_to_place == 'Placeholder' or item_to_place.name in config.item_pool[item_to_place.player]:
+        if ((isinstance(item_to_place,str) and item_to_place == 'Placeholder')
+           or item_to_place.name in config.item_pool[item_to_place.player]):
             restricted = config.location_groups[0].locations
             filtered = [l for l in locations if l.name in restricted and l.player in restricted[l.name]]
             return filtered if len(filtered) > 0 else locations
@@ -820,7 +821,7 @@ trash_items = {
     'Nothing': -1,
     'Bee Trap': 0,
     'Rupee (1)': 1, 'Rupees (5)': 1, 'Small Heart': 1, 'Bee': 1, 'Arrows (5)': 1, 'Chicken': 1,  'Single Bomb': 1,
-    'Rupees (20)': 2,  'Small Magic': 2,
+    'Rupees (20)': 2,  'Small Magic': 2, 'Good Bee': 2,
     'Bombs (3)': 3, 'Arrows (10)': 3, 'Bombs (10)': 3, 'Apples': 3,
     'Fairy': 4, 'Big Magic': 4, 'Red Potion': 4, 'Blue Shield': 4, 'Rupees (50)': 4, 'Rupees (100)': 4,
     'Rupees (300)': 5,

@@ -538,7 +538,7 @@ def ensure_good_pots(world, write_skips=False):
            and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
         if (loc.item.name in {'Arrows (5)'}
-           and (loc.type not in [LocationType.Pot, LocationType.Bonk] or loc.item.player != loc.player)):
+           and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
         # # can be placed here by multiworld balancing or shop balancing
         # # change it to something normal for the player it got swapped to

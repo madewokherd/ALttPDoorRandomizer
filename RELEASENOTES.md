@@ -108,6 +108,16 @@ These are now independent of retro mode and have three options: None, Random, an
 * Bonk Fairy (Dark)
 
 # Bug Fixes and Notes
+* 1.2.0.12u
+  * Fix for mirror portal in inverted
+  * Yet another fix for blocked door in Standard ER
+* 1.2.0.11u
+  * Fixed an issue with lower layer doors in Standard
+  * Fix for doors in cave state (will no longer be vanilla)
+  * Added a logic rule for th murderdactyl near bumper ledge for OHKO purposes
+  * Enemizer alteration for Hovers and normal enemies in shallow water
+  * Fix for beemizer including modes with an increased item pool 
+  * Fix for district algorithm
 * 1.2.0.10u
   * Fixed overrun issues with edge transitions
   * Better support for customized start_inventory with dungeon items

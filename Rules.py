@@ -862,7 +862,9 @@ def default_rules(world, player):
             from Regions import bonk_prize_table
             for location_name, (_, _, aga_required, _, _, _) in bonk_prize_table.items():
                 loc = world.get_location(location_name, player)
-                if not aga_required:
+                if location_name == 'Cold Fairy Statue':
+                    set_rule(loc, lambda state: state.can_use_bombs(player) and state.can_collect_bonkdrops(player))
+                elif not aga_required:
                     set_rule(loc, lambda state: state.can_collect_bonkdrops(player))
                 else:
                     set_rule(loc, lambda state: state.can_collect_bonkdrops(player) and state.has_beaten_aga(player))
@@ -921,6 +923,8 @@ def default_rules(world, player):
     set_rule(world.get_entrance('Desert Pass Rocks (South)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Bush Rock (West)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Bush Rock (East)', player), lambda state: state.can_lift_rocks(player))
+     # this more like an ohko rule - dependent on bird being present too - so enemizer could turn this off?
+    set_rule(world.get_entrance('Bumper Cave Ledge Drop', player), lambda state: (state.has('Cape', player) or state.has('Cane of Byrna', player) or state.has_sword(player)))
     set_rule(world.get_entrance('Bumper Cave Entrance Rock', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Pass Rock (North)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Skull Woods Pass Rock (South)', player), lambda state: state.can_lift_heavy_rocks(player))
@@ -1157,6 +1161,7 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Skull Woods Forgotten Bush (East)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Second Section Hole', player), player)
     add_bunny_rule(world.get_entrance('East Dark Death Mountain Bushes', player), player)
+    add_bunny_rule(world.get_entrance('Bumper Cave Ledge Drop', player), player)
     add_bunny_rule(world.get_entrance('Bumper Cave Entrance Rock', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (West)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (East)', player), player)
