@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0.2
+- \~Merged in DR v1.2.0.12~
+  - Fixed some door landing issues
+- Added Cold Fairy Statue as a new Bonk Location in Bonk Drop Shuffle
+- Added Customizer support for enabling OWR Options
+- Removed `Arrows (5)` item from Item Table, replaces with `Arrows (10)`
+
 ## 0.3.0.1
 - \~Merged in DR v1.2.0.10~
   - Fixed some door landing issues
