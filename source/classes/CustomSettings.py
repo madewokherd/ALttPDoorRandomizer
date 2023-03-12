@@ -79,6 +79,7 @@ class CustomSettings(object):
                 args.ow_mixed[p] = get_setting(settings['ow_mixed'], args.ow_mixed[p])
                 args.ow_whirlpool[p] = get_setting(settings['ow_whirlpool'], args.ow_whirlpool[p])
                 args.ow_fluteshuffle[p] = get_setting(settings['ow_fluteshuffle'], args.ow_fluteshuffle[p])
+                args.bonk_drops[p] = get_setting(settings['bonk_drops'], args.bonk_drops[p])
                 args.shuffle[p] = get_setting(settings['shuffle'], args.shuffle[p])
                 args.door_shuffle[p] = get_setting(settings['door_shuffle'], args.door_shuffle[p])
                 args.logic[p] = get_setting(settings['logic'], args.logic[p])
