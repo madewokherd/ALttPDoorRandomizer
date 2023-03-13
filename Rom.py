@@ -1651,7 +1651,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     if world.shuffle_bonk_drops[player]:
         # warning, this temporary patch might cause fairies to respawn differently?, limiting this to bonk drop mode only
         rom.write_byte(snes_to_pc(0x0DB808), 0x03) # patch fairies sprites to not permadeath like enemies
-        rom.write_byte(snes_to_pc(0x1DF6D8), 0) # allows sprites to travel across water / same flag as write_enemizer_tweaks
+        rom.write_byte(snes_to_pc(0x0DB810), 0x8A) # allows heart pieces to travel across water
+        rom.write_byte(snes_to_pc(0x0DB730), 0x08) # allows chickens to travel across water
 
     # allow smith into multi-entrance caves in appropriate shuffles
     if world.shuffle[player] in ['restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
