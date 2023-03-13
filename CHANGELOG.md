@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0.3
+- Fixed issue with new Cold Fairy Statue location not dropping correct item
+- Fixed issue with Multiworld due to new Cold Fairy Statue location
+- Improved water collision to only target Heart Piece sprites (rando items)
+
 ## 0.3.0.2
 - \~Merged in DR v1.2.0.12~
   - Fixed some door landing issues

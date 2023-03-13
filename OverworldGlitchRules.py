@@ -148,7 +148,7 @@ def get_boots_clip_exits_lw(world, player):
     for names, parent_regions, target_regions in boots_clips:
         region_pair = get_world_pair(world, player, get_region_pairs(world, player, names, parent_regions, target_regions), True)
         if region_pair and region_pair[2]:
-            assert(region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}')
+            assert region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}'
             yield(region_pair[0], region_pair[1], region_pair[2])
 
 
@@ -164,7 +164,7 @@ def get_boots_clip_exits_dw(world, player):
     for names, parent_regions, target_regions in boots_clips:
         region_pair = get_world_pair(world, player, get_region_pairs(world, player, names, parent_regions, target_regions), False)
         if region_pair and region_pair[2]:
-            assert(region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}')
+            assert region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}'
             yield(region_pair[0], region_pair[1], region_pair[2])
 
 
@@ -191,7 +191,7 @@ def get_mirror_clip_spots(world, player):
     for names, parent_regions, target_regions in mirror_clips:
         region_pair = get_world_pair(world, player, get_region_pairs(world, player, names, parent_regions, target_regions), False)
         if region_pair and region_pair[2] and not world.is_tile_lw_like(OWTileRegions[region_pair[1]], player):
-            assert(region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}')
+            assert region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}'
             yield(region_pair[0], region_pair[1], region_pair[2])
 
 
@@ -205,7 +205,7 @@ def get_mirror_offset_spots(world, player):
     for names, parent_regions, target_regions, path_to in mirror_offsets:
         region_pair = get_world_pair(world, player, get_region_pairs(world, player, names, parent_regions, target_regions, path_to), False)
         if region_pair and region_pair[2] and not world.is_tile_lw_like(OWTileRegions[region_pair[1]], player):
-            assert(region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}')
+            assert region_pair[0], f'Exit name missing in OWG pairing from {region_pair[1]} to {region_pair[2]}'
             yield(region_pair[0], region_pair[1], region_pair[2], region_pair[3])
 
 

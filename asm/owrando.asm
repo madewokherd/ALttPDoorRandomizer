@@ -416,13 +416,13 @@ OWBonkGoodBeeDrop:
     LDA.l RoomDataWRAM[$0120].high : AND.b #$02 : PHA : BNE + ; check if collected
         LDA.b #$1B : STA $12F ; JSL Sound_SetSfx3PanLong ; seems that when you bonk, there is a pending bonk sfx, so we clear that out and replace with reveal secret sfx
     +
-    LDA.l OWBonkPrizeData+(42*6+4) : BEQ + ; multiworld item
-        LDA.l OWBonkPrizeData+(42*6+3)
+    LDA.l OWBonkPrizeTable[42].mw_player : BEQ + ; multiworld item
+        LDA.l OWBonkPrizeTable[42].loot
         JMP .spawn_item
     +
 
     .determine_type ; S = Collected, FlagBitmask, X (row + 2)
-    LDA.l OWBonkPrizeData+(42*6+3) ; A = item id
+    LDA.l OWBonkPrizeTable[42].loot ; A = item id
     CMP.b #$B0 : BNE +
         LDA.b #$79 : JMP .sprite_transform ; transform to bees
     + CMP.b #$42 : BNE +
@@ -455,7 +455,7 @@ OWBonkGoodBeeDrop:
     + CMP.b #$B2 : BNE +
         LDA.b #$E3 : BRA .sprite_transform ; transform to fairy
     + CMP.b #$B3 : BNE .spawn_item
-        INX : INX : LDA.l OWBonkPrizeData+(42*6+5)
+        INX : INX : LDA.l OWBonkPrizeTable[42].vert_offset
         CLC : ADC.b #$08 : PHA
         LDA.w $0D00,Y : SEC : SBC.b 1,S : STA.w $0D00,Y
             LDA.w $0D20,Y : SBC.b #$00 : STA.w $0D20,Y : PLX
@@ -469,14 +469,14 @@ OWBonkGoodBeeDrop:
         LDA.l RoomDataWRAM[$0120].high : ORA.b #$02 : STA.l RoomDataWRAM[$0120].high
         
         REP #$20
-			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
+            LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
         SEP #$20
     BRA .return
 
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : BRA .return
-        + LDA.l OWBonkPrizeData+(42*6+4) : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
+        + LDA.l OWBonkPrizeTable[42].mw_player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
 
         LDA.b #$01 : STA !REDRAW
 
@@ -494,10 +494,10 @@ OWBonkGoodBeeDrop:
         LDA.b #$00 : STA.w $0F20,Y ; layer the sprite is on
 
         ; sets OW event bitmask flag, uses free RAM
-        LDA.l OWBonkPrizeData+(42*6+2) : STA.w $0ED0,Y
+        LDA.l OWBonkPrizeTable[42].flag : STA.w $0ED0,Y
         
         ; determines the initial spawn point of item
-        LDA.w $0D00,Y : SEC : SBC.l OWBonkPrizeData+(42*6+5) : STA.w $0D00,Y
+        LDA.w $0D00,Y : SEC : SBC.l OWBonkPrizeTable[42].vert_offset : STA.w $0D00,Y
             LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
 
         LDA.b #$01 : STA !REDRAW : STA !FORCE_HEART_SPAWN
@@ -506,7 +506,6 @@ OWBonkGoodBeeDrop:
     PLY
     LDA #$08 ; makes original good bee not spawn
     RTL
-    nop #20
 }
 
 ; Y = sprite slot index of bonk sprite
@@ -591,7 +590,7 @@ OWBonkDrops:
         LDX.b $8A : LDA.l OverworldEventDataWRAM,X : ORA 1,S : STA.l OverworldEventDataWRAM,X
         
         REP #$20
-			LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
+            LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
         SEP #$20
     + JMP .return
 

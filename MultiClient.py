@@ -144,6 +144,7 @@ location_table_uw = {"Blind's Hideout - Top": (0x11d, 0x10),
                      'Mini Moldorm Cave - Far Right': (0x123, 0x80),
                      'Mini Moldorm Cave - Generous Guy': (0x123, 0x400),
                      'Ice Rod Cave': (0x120, 0x10),
+                     'Cold Fairy Statue': (0x120, 0x200),
                      'Bonk Rock Cave': (0x124, 0x10),
                      'Desert Palace - Big Chest': (0x73, 0x10),
                      'Desert Palace - Torch': (0x73, 0x400),
@@ -936,10 +937,11 @@ async def track_locations(ctx : Context, roomid, roomdata):
     from OWEdges import OWTileRegions
     for location, (_, flag, _, _, region_name, _) in bonk_prize_table.items():
         if location not in ctx.locations_checked:
-            screenid = OWTileRegions[region_name]
-            ow_unchecked[location] = (screenid, flag)
-            ow_begin = min(ow_begin, screenid)
-            ow_end = max(ow_end, screenid + 1)
+            if region_name in OWTileRegions:
+                screenid = OWTileRegions[region_name]
+                ow_unchecked[location] = (screenid, flag)
+                ow_begin = min(ow_begin, screenid)
+                ow_end = max(ow_end, screenid + 1)
     if ow_begin < ow_end:
         ow_data = await snes_read(ctx, SAVEDATA_START + 0x280 + ow_begin, ow_end - ow_begin)
         if ow_data is not None:
