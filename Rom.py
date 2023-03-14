@@ -1710,6 +1710,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # set rom name
     # 21 bytes
     from Main import __version__
+    from OverworldShuffle import __version__ as ORVersion
     seedstring = f'{world.seed:09}' if isinstance(world.seed, int) else world.seed
     # todo: change to DR when Enemizer is okay with DR
     rom.name = bytearray(f'ER{__version__.split("-")[0].replace(".","")[0:3]}_{team+1}_{player}_{seedstring}O\0', 'utf8')[:21]
@@ -1717,6 +1718,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_bytes(0x7FC0, rom.name)
 
     rom.write_bytes(0x138010, bytearray(__version__, 'utf8'))
+    rom.write_bytes(0x150010, bytearray(ORVersion, 'utf8'))
 
     # set player names
     for p in range(1, min(world.players, 255) + 1):
