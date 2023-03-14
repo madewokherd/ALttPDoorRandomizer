@@ -11,9 +11,11 @@ OWMode:
 dw 0
 OWFlags:
 dw 0
-org $aa8010
 OWReserved:
 dw 0
+org $aa8010
+OWVersionInfo:
+dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 
 ;Hooks
 org $02a929
@@ -39,10 +41,6 @@ JSL OWAdjustExitPosition
 
 org $02c1a9
 JSL OWEndScrollTransition
-
-; org $09AFFB
-; jsl OWDestroyDuplicateSprites : nop #2 ; LDA.w $0C9A,X : CMP.w $040A
-; db $B0 ; changing following opcode to BCS
 
 org $04E881
 Overworld_LoadSpecialOverworld_RoomId:
@@ -244,25 +242,16 @@ OWWhirlpoolEnd:
 
 OWDestroyItemSprites:
 {
-    LDX.b #$0F
+    PHX : LDX.b #$0F
     .nextSprite
     LDA.w $0E20,X
-    CPY.b #$D8 : BCC .continue
-    CPY.b #$EC : BCS .continue
+    CMP.b #$D8 : BCC .continue
+    CMP.b #$EC : BCS .continue
     .killSprite ; need to kill sprites from D8 to EB on screen transition
     STZ.w $0DD0,X
     .continue
     DEX : BPL .nextSprite
-    RTL
-    ; LDA.w $0C9A,X : CMP.w $040A ; what we wrote over
-    ; BNE .killSprite
-    ; ; need to kill sprites from D8 to EB
-    ; CPY.b #$D8 : BCC .keepSprite
-    ; CPY.b #$EC : BCS .keepSprite
-    ; .killSprite
-    ; CLC : RTL
-    ; .keepSprite
-    ; SEC : RTL
+    PLX : RTL
 }
 OWMirrorSpriteOnMap:
 {
@@ -674,10 +663,7 @@ OWBonkSpritePrep:
 org $aa9000
 OWDetectEdgeTransition:
 {
-    PHY : PHX
     JSL OWDestroyItemSprites
-    PLX : PLY
-
     STZ.w $06FC
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
         JSR OWShuffle
