@@ -436,7 +436,7 @@ OWBonkGoodBeeDrop:
         JMP .spawn_item
     +
 
-    .determine_type ; S = Collected, FlagBitmask, X (row + 2)
+    .determine_type ; S = Collected
     LDA.l OWBonkPrizeTable[42].loot ; A = item id
     CMP.b #$B0 : BNE +
         LDA.b #$79 : JMP .sprite_transform ; transform to bees
@@ -480,13 +480,13 @@ OWBonkGoodBeeDrop:
     JSL.l OWBonkSpritePrep
 
     .mark_collected ; S = Collected
-    PLA : BNE .return
+    PLA : BNE +
         LDA.l RoomDataWRAM[$0120].high : ORA.b #$02 : STA.l RoomDataWRAM[$0120].high
         
         REP #$20
             LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
         SEP #$20
-    BRA .return
+    + BRA .return
 
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected
@@ -498,15 +498,18 @@ OWBonkGoodBeeDrop:
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
 
+        TYX : STZ.w $0F20,X ; layer the sprite is on
+        
         ; affects the rate the item moves in the Y/X direction
-        LDA.b #$00 : STA.w $0D40,Y
+        STZ.w $0D40,X
         LDA.b #$0A : STA.w $0D50,Y
 
-        LDA.b #$20 : STA.w $0F80,Y ; amount of force (gives height to the arch)
+        LDA.b #$1A : STA.w $0F80,Y ; amount of force (gives height to the arch)
         LDA.b #$FF : STA.w $0B58,Y ; stun timer
         LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
 
-        LDA.b #$00 : STA.w $0F20,Y ; layer the sprite is on
+        ; sets the tile type that is underneath the sprite, water
+        LDA.b #$09 : STA.l $7FF9C2,X ; TODO: Figure out how to get the game to set this
 
         ; sets OW event bitmask flag, uses free RAM
         LDA.l OWBonkPrizeTable[42].flag : STA.w $0ED0,Y
@@ -625,7 +628,7 @@ OWBonkDrops:
         LDA.b #$00 : STA.w $0D40,Y
         LDA.b #$0A : STA.w $0D50,Y
 
-        LDA.b #$20 : STA.w $0F80,Y ; amount of force (gives height to the arch)
+        LDA.b #$1A : STA.w $0F80,Y ; amount of force (gives height to the arch)
         LDA.b #$FF : STA.w $0B58,Y ; stun timer
         LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
 
