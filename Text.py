@@ -1309,6 +1309,7 @@ class GoldCreditMapper(CharTextMapper):
 
 class GreenCreditMapper(CharTextMapper):
     char_map = {' ': 0x9F,
+                '.': 0x52,
                 '·': 0x52}
     alpha_offset = -0x29
     alpha_lower_offset = -0x29
