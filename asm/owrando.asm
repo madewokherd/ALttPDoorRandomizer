@@ -985,17 +985,17 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
 
         ; toggle bunny mode
-        lda MoonPearlEquipment : bne .nobunny
-        lda.l InvertedMode : bne .inverted
+        lda MoonPearlEquipment : beq + : jmp .nobunny
+        + lda.l InvertedMode : bne .inverted
             lda CurrentWorld : bra +
             .inverted lda CurrentWorld : eor #$40
         + and #$40 : beq .nobunny
-
             LDA.w $0703 : BEQ + ; check if forced transition
-                CPY.b #$03 : BEQ .end_forced_whirlpool
-                LDA.b #$17 : STA.b $5D
-                LDA.b #$01 : STA.w $02E0 : STA.b $56
-                LDA.w $0703 : BRA .end_forced_edge
+                CPY.b #$03 : BEQ ++
+                    LDA.b #$17 : STA.b $5D
+                    LDA.b #$01 : STA.w $02E0 : STA.b $56
+                    LDA.w $0703 : JSR OWLoadGearPalettes : BRA .end_forced_edge
+                ++ JSR OWLoadGearPalettes : BRA .end_forced_whirlpool
             +
             CPY.b #$01 : BEQ .auto ; check if going from land to water
             CPY.b #$02 : BEQ .to_bunny_reset_swim ; bunny state if swimming to land
@@ -1014,8 +1014,8 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
                     STZ.b $5D
                     PLX
                     BRA .to_pseudo_bunny
-                .whirlpool
-                    PLX : RTS
+                    .whirlpool
+                    PLX : JMP OWLoadGearPalettes
             .to_bunny_reset_swim
             LDA.b $5D : CMP.b #$04 : BNE .to_bunny ; check if swimming
                 JSL Link_ResetSwimmingState
@@ -1024,7 +1024,7 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
             LDA.b #$17 : STA.b $5D
             .to_pseudo_bunny
             LDA.b #$01 : STA.w $02E0 : STA.b $56
-            RTS
+            JMP OWLoadGearPalettes
 
         .nobunny
         lda $5d : cmp #$17 : bne + ; retain current state unless bunny
@@ -1071,6 +1071,18 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
                 LDA.b #$03 : STA.w $0703
                 STZ.b $5D
     .return
+    RTS
+}
+OWLoadGearPalettes:
+{
+    PHX : PHY : LDA $00 : PHA
+    LDA.w $02E0 : BEQ +
+        JSL LoadGearPalettes_bunny
+        BRA .return
+    +
+    JSL LoadGearPalettes_link
+    .return
+    PLA : STA $00 : PLY : PLX
     RTS
 }
 OWAdjustExitPosition:
