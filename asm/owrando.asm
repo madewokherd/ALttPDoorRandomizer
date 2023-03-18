@@ -47,6 +47,9 @@ Overworld_LoadSpecialOverworld_RoomId:
 org $04E8B4
 Overworld_LoadSpecialOverworld:
 
+org $02A9DA
+JSL OWSkipMosiac
+
 org $07982A
 Link_ResetSwimmingState:
 
@@ -945,7 +948,20 @@ OWNewDestination:
     ; crossed OW shuffle and terrain
     ldx $05 : ldy $08 : jsr OWWorldTerrainUpdate
 
-    lda $05 : sta $8a
+    lda $8a : JSR OWDetermineScreensPaletteSet : STX $04
+    lda $05 : sta $8a : JSR OWDetermineScreensPaletteSet
+
+    ;PLA : AND.b #$3F : BEQ .leaving_woods
+    ;LDA $8A : AND.b #$3F : BEQ .entering_woods
+    CPX $04 : BEQ .skip_palette ; check if next screen's palette is different
+        LDA $00 : PHA
+        JSL OverworldLoadScreensPaletteSet_long ; loading correct OW palette
+        PLA : STA $00
+    ;.leaving_woods
+    ;.entering_woods
+    .skip_palette
+    lda $8a
+    
     rep #$30 : rts
 }
 OWLoadSpecialArea:
@@ -1084,6 +1100,30 @@ OWLoadGearPalettes:
     .return
     PLA : STA $00 : PLY : PLX
     RTS
+}
+OWDetermineScreensPaletteSet: ; A = OWID to check
+{
+    LDX.b #$02
+    PHA : AND.b #$3F
+    CMP.b #$03 : BEQ .death_mountain
+    CMP.b #$05 : BEQ .death_mountain
+    CMP.b #$07 : BEQ .death_mountain
+        LDX.b #$00
+    .death_mountain
+    PLA : PHX : TAX : LDA.l OWTileWorldAssoc,x : BEQ +
+        PLX : INX : RTS
+    + PLX : RTS
+}
+OWSkipMosiac:
+{
+    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
+        PLA : PLA : PEA $A9F2
+        RTL
+    .vanilla
+    LDA.b $8A : AND.b #$3F : BNE + ; what we wrote over, kinda
+        PLA : PLA : PEA $A9E3
+    +
+    RTL
 }
 OWAdjustExitPosition:
 {
