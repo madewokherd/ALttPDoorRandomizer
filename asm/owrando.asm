@@ -494,9 +494,7 @@ OWBonkGoodBeeDrop:
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : BRA .return
-        + LDA.l OWBonkPrizeTable[42].mw_player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-
-        LDA.b #$01 : STA !REDRAW
+        + LDA.b #$01 : STA !REDRAW
 
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
@@ -618,9 +616,7 @@ OWBonkDrops:
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = tree sprite slot ; S = Collected, FlagBitmask, X (row + 2)
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : JMP .return ; S = FlagBitmask, X (row + 2)
-        + LDA 2,S : TAX : INX : INX
-        LDA.w OWBonkPrizeData,X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-        DEX
+        + LDA 2,S : TAX : INX
 
         LDA.b #$01 : STA !REDRAW
 
@@ -948,12 +944,11 @@ OWNewDestination:
     ; crossed OW shuffle and terrain
     ldx $05 : ldy $08 : jsr OWWorldTerrainUpdate
 
-    lda $8a : JSR OWDetermineScreensPaletteSet : STX $04
     lda $05 : sta $8a : JSR OWDetermineScreensPaletteSet
 
     ;PLA : AND.b #$3F : BEQ .leaving_woods
     ;LDA $8A : AND.b #$3F : BEQ .entering_woods
-    CPX $04 : BEQ .skip_palette ; check if next screen's palette is different
+    CPX.w $0AB3 : BEQ .skip_palette ; check if next screen's palette is different
         LDA $00 : PHA
         JSL OverworldLoadScreensPaletteSet_long ; loading correct OW palette
         PLA : STA $00
