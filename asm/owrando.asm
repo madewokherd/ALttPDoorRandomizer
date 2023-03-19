@@ -1111,11 +1111,12 @@ OWDetermineScreensPaletteSet: ; A = OWID to check
 }
 OWSkipMosiac:
 {
+    PHA
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
-        PLA : PLA : PEA $A9F2
+        PLA : PLA : PLA : PEA $A9F2
         RTL
     .vanilla
-    LDA.b $8A : AND.b #$3F : BNE + ; what we wrote over, kinda
+    PLA : AND.b #$3F : BNE + ; what we wrote over, kinda
         PLA : PLA : PEA $A9E3
     +
     RTL
