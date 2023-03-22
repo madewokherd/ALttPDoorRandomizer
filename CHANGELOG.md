@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0.4
+- \~Merged in DR v1.2.0.14~
+  - Fixed issue with enemy drops on OW enemies
+  - Fixed issue with magically opened doors
+- Inverted + Vanilla ER can now generate
+- Fixed issue with Multiworld bonk items not sending to correct player
+- Minor improvements to OW Palettes on screen transition
+
 ## 0.3.0.3
 - Fixed issue with new Cold Fairy Statue location not dropping correct item
 - Fixed issue with Multiworld due to new Cold Fairy Statue location
