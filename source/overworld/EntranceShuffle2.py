@@ -171,6 +171,9 @@ def do_vanilla_connections(avail_pool):
             connect_vanilla_two_way(ent, avail_pool.default_map[ent], avail_pool)
         if ent in avail_pool.one_way_map and avail_pool.one_way_map[ent] in avail_pool.exits:
             connect_vanilla(ent, avail_pool.one_way_map[ent], avail_pool)
+        if avail_pool.inverted:
+            ext = avail_pool.world.get_entrance('Dark Sanctuary Hint Exit', avail_pool.player)
+            ext.connect(avail_pool.world.get_region('Dark Chapel Area', avail_pool.player))
 
 
 def do_main_shuffle(entrances, exits, avail, mode_def):
