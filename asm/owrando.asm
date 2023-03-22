@@ -48,7 +48,8 @@ org $04E8B4
 Overworld_LoadSpecialOverworld:
 
 org $02A9DA
-JSL OWSkipMosiac
+JSL OWSkipPalettes
+BCC OverworldHandleTransitions_change_palettes : NOP #4
 
 org $07982A
 Link_ResetSwimmingState:
@@ -943,20 +944,12 @@ OWNewDestination:
     
     ; crossed OW shuffle and terrain
     ldx $05 : ldy $08 : jsr OWWorldTerrainUpdate
-
-    lda $05 : sta $8a : JSR OWDetermineScreensPaletteSet
-
-    ;PLA : AND.b #$3F : BEQ .leaving_woods
-    ;LDA $8A : AND.b #$3F : BEQ .entering_woods
-    CPX.w $0AB3 : BEQ .skip_palette ; check if next screen's palette is different
-        LDA $00 : PHA
-        JSL OverworldLoadScreensPaletteSet_long ; loading correct OW palette
-        PLA : STA $00
-    ;.leaving_woods
-    ;.entering_woods
-    .skip_palette
-    lda $8a
     
+    ldx $8a : lda $05 : sta $8a : stx $05 ; $05 is prev screen id, $8a is dest screen
+
+    jsr OWGfxUpdate
+
+    lda $8a
     rep #$30 : rts
 }
 OWLoadSpecialArea:
@@ -1084,6 +1077,23 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
     .return
     RTS
 }
+OWGfxUpdate:
+{
+    REP #$20 : LDA.l OWMode : AND.w #$0207 : BEQ .is_only_mixed : SEP #$20
+        ;;;;PLA : AND.b #$3F : BEQ .leaving_woods
+        LDA.b $8A : AND.b #$3F : BEQ .entering_woods
+        ;LDA.b $05 : JSL OWSkipPalettes : BCS .skip_palettes
+            LDA.b $8A : JSR OWDetermineScreensPaletteSet
+            CPX.w $0AB3 : BEQ .skip_palettes ; check if next screen's palette is different
+                LDA $00 : PHA
+                JSL OverworldLoadScreensPaletteSet_long ; loading correct OW palette
+                PLA : STA $00
+    .leaving_woods
+    .entering_woods
+    .is_only_mixed
+    .skip_palettes
+    SEP #$20
+}
 OWLoadGearPalettes:
 {
     PHX : PHY : LDA $00 : PHA
@@ -1105,21 +1115,29 @@ OWDetermineScreensPaletteSet: ; A = OWID to check
     CMP.b #$07 : BEQ .death_mountain
         LDX.b #$00
     .death_mountain
-    PLA : PHX : TAX : LDA.l OWTileWorldAssoc,x : BEQ +
+    PLA : PHX : TAX : LDA.l OWTileWorldAssoc,X : BEQ +
         PLX : INX : RTS
     + PLX : RTS
 }
-OWSkipMosiac:
+OWSkipPalettes:
 {
-    PHA
-    LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
-        PLA : PLA : PLA : PEA $A9F2
-        RTL
+    STA.b $05 ; A = previous screen, also stored in $05
+    ; only skip mosaic if OWR Layout or Crossed
+    PHP : REP #$20 : LDA.l OWMode : AND.w #$0207 : BEQ .vanilla : PLP
+        ; checks to see if going to from any DM screens
+        ;LDA.b $05 : JSR OWDetermineScreensPaletteSet : TXA : AND.b #$FE : STA $04
+        ;LDA.b $8A : JSR OWDetermineScreensPaletteSet : TXA : AND.b #$FE
+        ;CMP.b $04 : BNE .skip_palettes
+        BRA .vanilla+1
+
     .vanilla
-    PLA : AND.b #$3F : BNE + ; what we wrote over, kinda
-        PLA : PLA : PEA $A9E3
-    +
-    RTL
+    PLP
+    LDA.b $05 : AND.b #$3F : BEQ .skip_palettes ; what we
+    LDA.b $8A : AND.b #$BF : BNE .change_palettes ; wrote over, kinda
+    .skip_palettes
+    SEC : RTL ; mosaic transition occurs
+    .change_palettes
+    CLC : RTL
 }
 OWAdjustExitPosition:
 {
