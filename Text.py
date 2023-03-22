@@ -113,7 +113,7 @@ Triforce_texts = [
     "    Cool seed,\n\n      right?",
     "\n    We did it!",
     "    Spam those\n      emotes in\n      wilds chat",
-    "\n       O  M  G",
+    "\n     O  M  G",
     " Hello.  Will you\n you be my friend?",
     "     Beetorp\n       was\n         here!",
     "   The Wind Fish\n  will wake soon.\n             Hoot!",
@@ -1309,6 +1309,7 @@ class GoldCreditMapper(CharTextMapper):
 
 class GreenCreditMapper(CharTextMapper):
     char_map = {' ': 0x9F,
+                '.': 0x52,
                 '·': 0x52}
     alpha_offset = -0x29
     alpha_lower_offset = -0x29

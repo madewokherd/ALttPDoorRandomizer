@@ -11,9 +11,11 @@ OWMode:
 dw 0
 OWFlags:
 dw 0
-org $aa8010
 OWReserved:
 dw 0
+org $aa8010
+OWVersionInfo:
+dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
 
 ;Hooks
 org $02a929
@@ -44,6 +46,10 @@ org $04E881
 Overworld_LoadSpecialOverworld_RoomId:
 org $04E8B4
 Overworld_LoadSpecialOverworld:
+
+org $02A9DA
+JSL OWSkipPalettes
+BCC OverworldHandleTransitions_change_palettes : NOP #4
 
 org $07982A
 Link_ResetSwimmingState:
@@ -238,6 +244,19 @@ OWWhirlpoolEnd:
     RTL
 }
 
+OWDestroyItemSprites:
+{
+    PHX : LDX.b #$0F
+    .nextSprite
+    LDA.w $0E20,X
+    CMP.b #$D8 : BCC .continue
+    CMP.b #$EC : BCS .continue
+    .killSprite ; need to kill sprites from D8 to EB on screen transition
+    STZ.w $0DD0,X
+    .continue
+    DEX : BPL .nextSprite
+    PLX : RTL
+}
 OWMirrorSpriteOnMap:
 {
     lda.w $1ac0,x : bit.b #$f0 : beq .continue
@@ -421,7 +440,7 @@ OWBonkGoodBeeDrop:
         JMP .spawn_item
     +
 
-    .determine_type ; S = Collected, FlagBitmask, X (row + 2)
+    .determine_type ; S = Collected
     LDA.l OWBonkPrizeTable[42].loot ; A = item id
     CMP.b #$B0 : BNE +
         LDA.b #$79 : JMP .sprite_transform ; transform to bees
@@ -465,33 +484,34 @@ OWBonkGoodBeeDrop:
     JSL.l OWBonkSpritePrep
 
     .mark_collected ; S = Collected
-    PLA : BNE .return
+    PLA : BNE +
         LDA.l RoomDataWRAM[$0120].high : ORA.b #$02 : STA.l RoomDataWRAM[$0120].high
         
         REP #$20
             LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
         SEP #$20
-    BRA .return
+    + BRA .return
 
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = bonk sprite slot ; S = Collected
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : BRA .return
-        + LDA.l OWBonkPrizeTable[42].mw_player : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-
-        LDA.b #$01 : STA !REDRAW
+        + LDA.b #$01 : STA !REDRAW
 
         LDA.b #$EB : STA.l $7FFE00
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
 
+        TYX : STZ.w $0F20,X ; layer the sprite is on
+        
         ; affects the rate the item moves in the Y/X direction
-        LDA.b #$00 : STA.w $0D40,Y
+        STZ.w $0D40,X
         LDA.b #$0A : STA.w $0D50,Y
 
-        LDA.b #$20 : STA.w $0F80,Y ; amount of force (gives height to the arch)
+        LDA.b #$1A : STA.w $0F80,Y ; amount of force (gives height to the arch)
         LDA.b #$FF : STA.w $0B58,Y ; stun timer
         LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
 
-        LDA.b #$00 : STA.w $0F20,Y ; layer the sprite is on
+        ; sets the tile type that is underneath the sprite, water
+        LDA.b #$09 : STA.l $7FF9C2,X ; TODO: Figure out how to get the game to set this
 
         ; sets OW event bitmask flag, uses free RAM
         LDA.l OWBonkPrizeTable[42].flag : STA.w $0ED0,Y
@@ -597,9 +617,7 @@ OWBonkDrops:
     ; spawn itemget item
     .spawn_item ; A = item id ; Y = tree sprite slot ; S = Collected, FlagBitmask, X (row + 2)
     PLX : BEQ + : LDA.b #$00 : STA.w $0DD0,Y : JMP .return ; S = FlagBitmask, X (row + 2)
-        + LDA 2,S : TAX : INX : INX
-        LDA.w OWBonkPrizeData,X : STA.l !MULTIWORLD_SPRITEITEM_PLAYER_ID
-        DEX
+        + LDA 2,S : TAX : INX
 
         LDA.b #$01 : STA !REDRAW
 
@@ -610,7 +628,7 @@ OWBonkDrops:
         LDA.b #$00 : STA.w $0D40,Y
         LDA.b #$0A : STA.w $0D50,Y
 
-        LDA.b #$20 : STA.w $0F80,Y ; amount of force (gives height to the arch)
+        LDA.b #$1A : STA.w $0F80,Y ; amount of force (gives height to the arch)
         LDA.b #$FF : STA.w $0B58,Y ; stun timer
         LDA.b #$30 : STA.w $0F10,Y ; aux delay timer 4 ?? dunno what that means
 
@@ -648,6 +666,7 @@ OWBonkSpritePrep:
 org $aa9000
 OWDetectEdgeTransition:
 {
+    JSL OWDestroyItemSprites
     STZ.w $06FC
     LDA.l OWMode : ORA.l OWMode+1 : BEQ .vanilla
         JSR OWShuffle
@@ -925,8 +944,12 @@ OWNewDestination:
     
     ; crossed OW shuffle and terrain
     ldx $05 : ldy $08 : jsr OWWorldTerrainUpdate
+    
+    ldx $8a : lda $05 : sta $8a : stx $05 ; $05 is prev screen id, $8a is dest screen
 
-    lda $05 : sta $8a
+    jsr OWGfxUpdate
+
+    lda $8a
     rep #$30 : rts
 }
 OWLoadSpecialArea:
@@ -966,17 +989,17 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
         lda #$38 : sta $012f ; play sfx - #$3b is an alternative
 
         ; toggle bunny mode
-        lda MoonPearlEquipment : bne .nobunny
-        lda.l InvertedMode : bne .inverted
+        lda MoonPearlEquipment : beq + : jmp .nobunny
+        + lda.l InvertedMode : bne .inverted
             lda CurrentWorld : bra +
             .inverted lda CurrentWorld : eor #$40
         + and #$40 : beq .nobunny
-
             LDA.w $0703 : BEQ + ; check if forced transition
-                CPY.b #$03 : BEQ .end_forced_whirlpool
-                LDA.b #$17 : STA.b $5D
-                LDA.b #$01 : STA.w $02E0 : STA.b $56
-                LDA.w $0703 : BRA .end_forced_edge
+                CPY.b #$03 : BEQ ++
+                    LDA.b #$17 : STA.b $5D
+                    LDA.b #$01 : STA.w $02E0 : STA.b $56
+                    LDA.w $0703 : JSR OWLoadGearPalettes : BRA .end_forced_edge
+                ++ JSR OWLoadGearPalettes : BRA .end_forced_whirlpool
             +
             CPY.b #$01 : BEQ .auto ; check if going from land to water
             CPY.b #$02 : BEQ .to_bunny_reset_swim ; bunny state if swimming to land
@@ -995,8 +1018,8 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
                     STZ.b $5D
                     PLX
                     BRA .to_pseudo_bunny
-                .whirlpool
-                    PLX : RTS
+                    .whirlpool
+                    PLX : JMP OWLoadGearPalettes
             .to_bunny_reset_swim
             LDA.b $5D : CMP.b #$04 : BNE .to_bunny ; check if swimming
                 JSL Link_ResetSwimmingState
@@ -1005,7 +1028,7 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
             LDA.b #$17 : STA.b $5D
             .to_pseudo_bunny
             LDA.b #$01 : STA.w $02E0 : STA.b $56
-            RTS
+            JMP OWLoadGearPalettes
 
         .nobunny
         lda $5d : cmp #$17 : bne + ; retain current state unless bunny
@@ -1053,6 +1076,68 @@ OWWorldTerrainUpdate: ; x = owid of destination screen, y = 1 for land to water,
                 STZ.b $5D
     .return
     RTS
+}
+OWGfxUpdate:
+{
+    REP #$20 : LDA.l OWMode : AND.w #$0207 : BEQ .is_only_mixed : SEP #$20
+        ;;;;PLA : AND.b #$3F : BEQ .leaving_woods
+        LDA.b $8A : AND.b #$3F : BEQ .entering_woods
+        ;LDA.b $05 : JSL OWSkipPalettes : BCS .skip_palettes
+            LDA.b $8A : JSR OWDetermineScreensPaletteSet
+            CPX.w $0AB3 : BEQ .skip_palettes ; check if next screen's palette is different
+                LDA $00 : PHA
+                JSL OverworldLoadScreensPaletteSet_long ; loading correct OW palette
+                PLA : STA $00
+    .leaving_woods
+    .entering_woods
+    .is_only_mixed
+    .skip_palettes
+    SEP #$20
+}
+OWLoadGearPalettes:
+{
+    PHX : PHY : LDA $00 : PHA
+    LDA.w $02E0 : BEQ +
+        JSL LoadGearPalettes_bunny
+        BRA .return
+    +
+    JSL LoadGearPalettes_link
+    .return
+    PLA : STA $00 : PLY : PLX
+    RTS
+}
+OWDetermineScreensPaletteSet: ; A = OWID to check
+{
+    LDX.b #$02
+    PHA : AND.b #$3F
+    CMP.b #$03 : BEQ .death_mountain
+    CMP.b #$05 : BEQ .death_mountain
+    CMP.b #$07 : BEQ .death_mountain
+        LDX.b #$00
+    .death_mountain
+    PLA : PHX : TAX : LDA.l OWTileWorldAssoc,X : BEQ +
+        PLX : INX : RTS
+    + PLX : RTS
+}
+OWSkipPalettes:
+{
+    STA.b $05 ; A = previous screen, also stored in $05
+    ; only skip mosaic if OWR Layout or Crossed
+    PHP : REP #$20 : LDA.l OWMode : AND.w #$0207 : BEQ .vanilla : PLP
+        ; checks to see if going to from any DM screens
+        ;LDA.b $05 : JSR OWDetermineScreensPaletteSet : TXA : AND.b #$FE : STA $04
+        ;LDA.b $8A : JSR OWDetermineScreensPaletteSet : TXA : AND.b #$FE
+        ;CMP.b $04 : BNE .skip_palettes
+        BRA .vanilla+1
+
+    .vanilla
+    PLP
+    LDA.b $05 : AND.b #$3F : BEQ .skip_palettes ; what we
+    LDA.b $8A : AND.b #$BF : BNE .change_palettes ; wrote over, kinda
+    .skip_palettes
+    SEC : RTL ; mosaic transition occurs
+    .change_palettes
+    CLC : RTL
 }
 OWAdjustExitPosition:
 {
@@ -1407,7 +1492,7 @@ dw $0c78, $0ce3, $006b, $0cad, $3434, $0000, $0000, $001b
 dw $0ce4, $0d33, $004f, $0d0b, $3434, $0000, $0001, $001c
 dw $0d34, $0db8, $0084, $0d76, $3434, $0000, $0000, $001d
 dw $0ea8, $0f20, $0078, $0ee4, $3a3a, $0000, $0000, $001e
-dw $0f70, $0fa8, $0038, $0f8c, $3a3a, $0000, $0000, $001f
+dw $0f78, $0fa8, $0030, $0f90, $3a3a, $0000, $0000, $001f
 dw $0f18, $0f18, $0000, $0f18, $3b3b, $0000, $0000, $0020
 dw $0fc8, $0fc8, $0000, $0fc8, $3b3b, $0000, $0000, $0021
 dw $0e28, $0fb8, $0190, $0ef0, $3c3c, $0000, $0000, $0022
@@ -1482,7 +1567,7 @@ dw $0c78, $0ce3, $006b, $0cad, $3333, $0000, $0000, $001c
 dw $0ce4, $0d33, $004f, $0d0b, $3333, $0000, $0001, $001d
 dw $0d34, $0db8, $0084, $0d76, $3333, $0000, $0000, $001e
 dw $0ea8, $0f20, $0078, $0ee4, $3039, $0000, $0000, $001f
-dw $0f70, $0fa8, $0038, $0f8c, $3039, $0000, $0000, $0020
+dw $0f78, $0fa8, $0030, $0f90, $3039, $0000, $0000, $0020
 dw $0f18, $0f18, $0000, $0f18, $3a3a, $0000, $0000, $0021
 dw $0fc8, $0fc8, $0000, $0fc8, $3a3a, $0000, $0000, $0022
 dw $0e28, $0fb8, $0190, $0ef0, $3b3b, $0000, $0000, $0023

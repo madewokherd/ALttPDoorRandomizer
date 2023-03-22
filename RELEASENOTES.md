@@ -108,6 +108,17 @@ These are now independent of retro mode and have three options: None, Random, an
 * Bonk Fairy (Dark)
 
 # Bug Fixes and Notes
+
+* 1.2.0.14u
+  * Small fix for key logic validation (got rid of a false negative)
+  * Customized doors in ice cross work properly now
+* 1.2.0.13u
+  * Allow green/blue potion refills to be customized
+  * OW Map showing dungeon entrance at Snitch Lady (West) fixed (instead of @ HC Courtyard)
+  * Standing item data is cleared on transition to overworld (enemy drops won't bleed to overworld sprites)
+  * Escape assist won't give you a free quiver in retro bow mode 
+  * Fixed an issue where a door would be opened magically (due to original pairing)
+  * MultiServer can now disable forfeits if desired
 * 1.2.0.12u
   * Fix for mirror portal in inverted
   * Yet another fix for blocked door in Standard ER
