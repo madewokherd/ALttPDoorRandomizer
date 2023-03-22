@@ -26,9 +26,10 @@ class World(object):
         self.teams = 1
         self.owShuffle = owShuffle.copy()
         self.owTerrain = {}
-        self.owCrossed = owCrossed.copy()
         self.owKeepSimilar = {}
         self.owMixed = owMixed.copy()
+        self.owCrossed = owCrossed.copy()
+        self.owCrossed = self.owCrossed if self.owCrossed != 'polar' or self.owMixed else 'none'
         self.owWhirlpoolShuffle = {}
         self.owFluteShuffle = {}
         self.shuffle = shuffle.copy()
