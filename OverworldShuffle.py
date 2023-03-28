@@ -973,27 +973,26 @@ def can_reach_smith(world, player):
                 region = world.get_region(region_name, player)
             for exit in region.exits:
                 if not found and exit.connected_region is not None:
-                    if any(map(lambda i: i.name in ['Ocarina', 'Ocarina (Activated)'], world.precollected_items)) and exit.spot_type == 'Flute':
-                        fluteregion = exit.connected_region
-                        for flutespot in fluteregion.exits:
-                            if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
-                                explore_region(flutespot.connected_region.name, flutespot.connected_region)
-                    elif exit.connected_region.name not in explored_regions \
-                            and exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
-                            and exit.access_rule(blank_state):
-                        explore_region(exit.connected_region.name, exit.connected_region)
-                    elif exit.name == 'Sanctuary S':
-                        sanc_region = exit.connected_region
-                        if len(sanc_region.exits) and sanc_region.exits[0].name == 'Sanctuary Exit':
-                            explore_region(sanc_region.exits[0].connected_region.name, sanc_region.exits[0].connected_region)
+                    if exit.spot_type == 'Flute':
+                        if any(map(lambda i: i.name == 'Ocarina (Activated)', world.precollected_items)):
+                            for flutespot in exit.connected_region.exits:
+                                if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
+                                    explore_region(flutespot.connected_region.name, flutespot.connected_region)
                     elif exit.connected_region.name == 'Blacksmiths Hut' and exit.access_rule(blank_state):
                         found = True
+                        return
+                    elif exit.connected_region.name not in explored_regions:
+                        if (region.type == RegionType.Dungeon and exit.connected_region.name.endswith(' Portal')) \
+                            or (exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
+                                and exit.access_rule(blank_state)):
+                            explore_region(exit.connected_region.name, exit.connected_region)
     
     blank_state = CollectionState(world)
     if world.mode[player] == 'standard':
         blank_state.collect(ItemFactory('Zelda Delivered', player), True)
-    if world.logic[player] in ['noglitches', 'minorglitches'] and world.get_region('Frog Prison', player).type == (RegionType.DarkWorld if not invFlag else RegionType.LightWorld):
+    if world.logic[player] in ['noglitches', 'minorglitches'] and not world.is_tile_swapped(0x29, player):
         blank_state.collect(ItemFactory('Titans Mitts', player), True)
+        blank_state.collect(ItemFactory('Moon Pearl', player), True)
     
     found = False
     explored_regions = list()
@@ -1004,7 +1003,11 @@ def can_reach_smith(world, player):
     explore_region(start_region)
     if not found:
         if not invFlag:
-            explore_region('Sanctuary')
+            if world.intensity[player] >= 3 and world.doorShuffle[player] != 'vanilla':
+                sanc_mirror = world.get_entrance('Sanctuary Mirror Route', player)
+                explore_region(sanc_mirror.connected_region.name, sanc_mirror.connected_region)
+            else:
+                explore_region('Sanctuary')
         else:
             explore_region('Dark Sanctuary Hint')
     return found
