@@ -1214,6 +1214,7 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Lake Hylia Central Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Lake Hylia Island Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Water D Leave', player), player)
     add_bunny_rule(world.get_entrance('Ice Cave SW', player), player)
     add_bunny_rule(world.get_entrance('Octoballoon Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), player)
