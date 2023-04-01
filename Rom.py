@@ -2308,10 +2308,9 @@ def write_strings(rom, world, player, team):
         # of how many exist. This supports many settings well.
         items_to_hint = RelevantItems.copy()
         flute_item = 'Ocarina'
-        if world.is_tile_swapped(0x18, player):
+        if world.is_tile_swapped(0x18, player) or world.flute_mode[player] == 'active':
             items_to_hint.remove(flute_item)
             flute_item = 'Ocarina (Activated)'
-            items_to_hint.append(flute_item)
         if world.owShuffle[player] != 'vanilla' or world.owMixed[player]:
             # Adding a guaranteed hint for the Flute in overworld shuffle.
             this_location = world.find_items_not_key_only(flute_item, player)

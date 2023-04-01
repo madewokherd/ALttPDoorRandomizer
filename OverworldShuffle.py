@@ -1092,7 +1092,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
             region = base_world.get_region(region_name, player)
         for exit in region.exits:
             if exit.connected_region is not None:
-                if any(map(lambda i: i.name in ['Ocarina', 'Ocarina (Activated)'], base_world.precollected_items)) and exit.spot_type == 'Flute':
+                if any(map(lambda i: i.name == 'Ocarina (Activated)', base_world.precollected_items)) and exit.spot_type == 'Flute':
                     fluteregion = exit.connected_region
                     for flutespot in fluteregion.exits:
                         if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:

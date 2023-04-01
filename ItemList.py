@@ -212,6 +212,20 @@ def generate_itempool(world, player):
         loc.locked = True
         loc.forced_item = loc.item
 
+    if not world.is_tile_swapped(0x18, player):
+        region = world.get_region('Kakariko Area',player)
+
+        loc = Location(player, "Flute Activation", parent=region)
+        region.locations.append(loc)
+        world.dynamic_locations.append(loc)
+
+        world.clear_location_cache()
+
+        world.push_item(loc, ItemFactory('Ocarina (Activated)', player), False)
+        loc.event = True
+        loc.locked = True
+        loc.forced_item = loc.item
+
     world.get_location('Ganon', player).event = True
     world.get_location('Ganon', player).locked = True
     world.push_item(world.get_location('Agahnim 1', player), ItemFactory('Beat Agahnim 1', player), False)
@@ -1433,6 +1447,9 @@ def make_customizer_pool(world, player):
         place_item('Master Sword Pedestal', 'Triforce')
 
     guaranteed_items = alwaysitems + ['Magic Mirror', 'Moon Pearl']
+    if world.is_tile_swapped(0x18, player) or world.flute_mode[player] == 'active':
+        guaranteed_items.remove('Ocarina')
+        guaranteed_items.append('Ocarina (Activated)')
     missing_items = []
     if world.shopsanity[player]:
         guaranteed_items.extend(['Blue Potion', 'Green Potion', 'Red Potion'])
