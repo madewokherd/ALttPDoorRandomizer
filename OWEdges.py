@@ -1182,6 +1182,7 @@ OWTileRegions = bidict({
     'East Dark Death Mountain (Top)': 0x45,
     'East Dark Death Mountain (Bottom Left)': 0x45,
     'East Dark Death Mountain (Bottom)': 0x45,
+    'East Dark Death Mountain (Bushes)': 0x45,
     'Dark Death Mountain Ledge': 0x45,
     'Dark Death Mountain Isolated Ledge': 0x45,
     'Dark Death Mountain Floating Island': 0x45,
