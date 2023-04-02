@@ -1451,11 +1451,6 @@ mandatory_connections = [('Old Man S&Q', 'Old Man House'),
                          ('Bomber Corner Pier', 'Bomber Corner Area'),
 
                          # OWG In-Bounds Connections
-                         ('Stone Bridge EC Cliff Water Drop', 'Stone Bridge Water'), #fake flipper
-                         ('Tree Line WC Cliff Water Drop', 'Tree Line Water'), #fake flipper,
-
-                         ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), #fake flipper
-                         ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water'), #fake flipper
                          ('Ice Lake Northeast Pier Hop', 'Ice Lake Northeast Bank'),
                          ('Ice Lake Moat Bomb Jump', 'Ice Lake Moat')
                         ]
@@ -1470,7 +1465,7 @@ default_whirlpool_connections = [
 default_flute_connections = [
     0x0b, 0x16, 0x18, 0x2c, 0x2f, 0x38, 0x3b, 0x3f
 ]
-                         
+
 ow_connections = {
     0x03: ([
             ('West Death Mountain Teleporter', 'West Dark Death Mountain (Bottom)')
@@ -1555,12 +1550,20 @@ ow_connections = {
             ('Stone Bridge East Ledge Drop', 'Stone Bridge North Area'), # OWG
             ('Hammer Bridge North Ledge Drop', 'Hammer Bridge North Area'), # OWG
             ('Stone Bridge Cliff Ledge Drop', 'Stone Bridge South Area'), # OWG
-            ('Hammer Bridge South Cliff Ledge Drop', 'Hammer Bridge South Area') # OWG
+            ('Hammer Bridge South Cliff Ledge Drop', 'Hammer Bridge South Area'), # OWG
+            ('Stone Bridge EC Cliff Water Drop', 'Stone Bridge Water'), # fake flipper
+            ('Hammer Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), # fake flipper
+            ('Tree Line WC Cliff Water Drop', 'Tree Line Water'), # fake flipper
+            ('Dark Tree Line WC Cliff Water Drop', 'Dark Tree Line Water') # fake flipper
         ], [
             ('Stone Bridge East Ledge Drop', 'Hammer Bridge North Area'), # OWG
             ('Hammer Bridge North Ledge Drop', 'Stone Bridge North Area'), # OWG
             ('Stone Bridge Cliff Ledge Drop', 'Hammer Bridge South Area'), # OWG
-            ('Hammer Bridge South Cliff Ledge Drop', 'Stone Bridge South Area') # OWG
+            ('Hammer Bridge South Cliff Ledge Drop', 'Stone Bridge South Area'), # OWG
+            ('Stone Bridge EC Cliff Water Drop', 'Hammer Bridge Water'), # fake flipper
+            ('Hammer Bridge EC Cliff Water Drop', 'Stone Bridge Water'), # fake flipper
+            ('Tree Line WC Cliff Water Drop', 'Dark Tree Line Water'), # fake flipper
+            ('Dark Tree Line WC Cliff Water Drop', 'Tree Line Water') # fake flipper
         ]),
     0x2e: ([
             ('Tree Line Ledge Drop', 'Tree Line Area'), # OWG
