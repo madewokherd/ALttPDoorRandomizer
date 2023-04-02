@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '0a3d1d4bbec659013be5ed876c2658bd'
+RANDOMIZERBASEHASH = '0dd61456cc38a4792d99d23047163660'
 
 
 class JsonRom(object):
@@ -935,6 +935,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     old_man_house = world.get_region('Old Man House', player)
     if should_be_bunny(old_man_house, world.mode[player]):
         rom.write_bytes(0x13fff4, [0xe4, 0x00])
+    
+    old_man_cave = world.get_entrance('Old Man Cave Exit (East)', player)
+    if old_man_cave.connected_region.type == RegionType.DarkWorld:
+        rom.write_byte(0x13fff6, 0x40)
 
     # patch doors
     if world.doorShuffle[player] not in ['vanilla', 'basic']:
