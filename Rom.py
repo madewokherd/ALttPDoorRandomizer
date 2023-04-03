@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '0a3d1d4bbec659013be5ed876c2658bd'
+RANDOMIZERBASEHASH = '92c16c60f26218c9aec838ce204c0b1e'
 
 
 class JsonRom(object):
@@ -935,6 +935,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     old_man_house = world.get_region('Old Man House', player)
     if should_be_bunny(old_man_house, world.mode[player]):
         rom.write_bytes(0x13fff4, [0xe4, 0x00])
+    
+    old_man_cave = world.get_entrance('Old Man Cave Exit (East)', player)
+    if old_man_cave.connected_region.type == RegionType.DarkWorld:
+        rom.write_byte(0x13fff6, 0x40)
 
     # patch doors
     if world.doorShuffle[player] not in ['vanilla', 'basic']:
@@ -1364,7 +1368,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180212, warningflags)  # Warning flags
 
     # assorted fixes
-    rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
+    rom.write_byte(0x1800A2, 0x01 if world.fix_fake_world[player] else 0x00)  # remain in real dark world when dying in dark world dungeon before killing aga1
     rom.write_byte(0x180169, 0x01 if world.lock_aga_door_in_escape else 0x00)  # Lock or unlock aga tower door during escape sequence.
     if world.is_atgt_swapped(player):
         rom.write_byte(0x180169, 0x02)  # lock aga/ganon tower door with crystals in inverted
@@ -2308,10 +2312,9 @@ def write_strings(rom, world, player, team):
         # of how many exist. This supports many settings well.
         items_to_hint = RelevantItems.copy()
         flute_item = 'Ocarina'
-        if world.is_tile_swapped(0x18, player):
+        if world.is_tile_swapped(0x18, player) or world.flute_mode[player] == 'active':
             items_to_hint.remove(flute_item)
             flute_item = 'Ocarina (Activated)'
-            items_to_hint.append(flute_item)
         if world.owShuffle[player] != 'vanilla' or world.owMixed[player]:
             # Adding a guaranteed hint for the Flute in overworld shuffle.
             this_location = world.find_items_not_key_only(flute_item, player)

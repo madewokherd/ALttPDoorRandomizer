@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0.5
+- Major reorganization to GUI Options
+- Corrected various fake world behavior in glitched modes
+- Fixed various issues with glitched mode logic
+- Various minor logic fixes
+
 ## 0.3.0.4
 - \~Merged in DR v1.2.0.14~
   - Fixed issue with enemy drops on OW enemies

@@ -860,31 +860,33 @@ OWNewDestination:
 {
     tya : sta $4202 : lda #16 : sta $4203 ;wait 8 cycles
     rep #$20 : txa : nop : !add $4216 : tax ;a = offset to dest record
-    lda.w $0006,x : sta $06 ;set coord
     lda.w $0008,x : sta $04 ;save dest OW slot/ID
-    lda.w $000a,x : sta $84 ;VRAM
-
+    ldy $20 : lda $418 : dec #2 : bpl + : ldy $22 : + sty $06
+    
     ;;22	e0	e2	61c	61e - X
     ;;20	e6	e8	618	61a - Y
     ;keep current position if within incoming gap
     lda.w $0000,x : and #$01ff : pha : lda.w $0002,x : and #$01ff : pha
-    ldy $20 : lda $418 : dec #2 : bpl + : ldy $22
-    + tya : and #$01ff : cmp 3,s : !blt .adjustMainAxis
-    dec : cmp 1,s : !bge .adjustMainAxis
-        inc : pha : lda $06 : and #$fe00 : !add 1,s : sta $06 : pla
+    LDA.l OWMode : AND.w #$0007 : BEQ .noLayoutShuffle ;temporary fix until VRAM issues are solved
+        lda.w $0006,x : sta $06 ;set coord
+        lda.w $000a,x : sta $84 ;VRAM
+        tya : and #$01ff : cmp 3,s : !blt .adjustMainAxis
+        dec : cmp 1,s : !bge .adjustMainAxis
+            inc : pha : lda $06 : and #$fe00 : !add 1,s : sta $06 : pla
 
-        ; adjust and set other VRAM addresses
-        lda.w $0006,x : pha : lda $06 : !sub 1,s 
-        jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : pha ; number of tiles
-        lda $418 : dec #2 : bmi +
-            pla : pea $0000 : bra ++ ;pla : asl #7 : pha : bra ++ ; y-axis shifts VRAM by increments of 0x80 (disabled for now)
-        + pla : asl : pha ; x-axis shifts VRAM by increments of 0x02
-        ++ lda $84 : !add 1,s : sta $84 : pla : pla
+            ; adjust and set other VRAM addresses
+            lda.w $0006,x : pha : lda $06 : !sub 1,s 
+            jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : jsl DivideByTwoPreserveSign : pha ; number of tiles
+            lda $418 : dec #2 : bmi +
+                pla : pea $0000 : bra ++ ;pla : asl #7 : pha : bra ++ ; y-axis shifts VRAM by increments of 0x80 (disabled for now)
+            + pla : asl : pha ; x-axis shifts VRAM by increments of 0x02
+            ++ lda $84 : !add 1,s : sta $84 : pla : pla
 
-    .adjustMainAxis
-    LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88 ; vram
-    LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
+        .adjustMainAxis
+        LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88 ; vram
+        LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
 
+    .noLayoutShuffle
     LDA.w $000F,X : AND.w #$00FF : STA.w $06FC ; position to walk to after transition (if non-zero)
 
     LDY.w #$0000

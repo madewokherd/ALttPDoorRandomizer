@@ -528,9 +528,14 @@ def do_links_house(entrances, exits, avail, cross_world):
                 # can't have links house on eddm in restricted because Inverted Aga Tower isn't available
                 # todo: inverted full may have the same problem if both links house and a mandatory connector is chosen
                 # from the 3 inverted options
-                if avail.world.shuffle[avail.player] in ['restricted'] and avail.world.is_tile_swapped(0x03, avail.player):
+                if avail.world.shuffle[avail.player] in ['restricted', 'lite', 'lean'] and avail.world.is_tile_swapped(0x03, avail.player):
                     avail.links_on_mountain = True
                     forbidden.extend(['Spike Cave', 'Dark Death Mountain Fairy'])
+
+                if avail.world.shuffle[avail.player] in ['lite', 'lean']:
+                    if avail.world.is_tile_swapped(0x05, avail.player):
+                        avail.links_on_mountain = True
+                        forbidden.extend(['Cave Shop (Dark Death Mountain)'])
             else:
                 avail.links_on_mountain = True
 
@@ -558,15 +563,26 @@ def do_links_house(entrances, exits, avail, cross_world):
         if links_house in dm_spots and avail.world.owShuffle[avail.player] == 'vanilla':
             if avail.links_on_mountain:
                 return  # connector is fine
-            multi_exit_caves = figure_out_connectors(exits)
-            entrance_pool = entrances if avail.coupled else avail.decoupled_entrances
-            if cross_world:
-                possible_dm_exits = [e for e in entrances if e in LH_DM_Connector_List]
-                possible_exits = [e for e in entrance_pool if e not in dm_spots]
+            if avail.world.shuffle[avail.player] in ['lite', 'lean']:
+                rem_exits = [e for e in avail.exits if e in Connector_Exit_Set and e not in Dungeon_Exit_Set]
+                multi_exit_caves = figure_out_connectors(rem_exits)
+                if cross_world:
+                    possible_dm_exits = [e for e in avail.entrances if e not in entrances and e in LH_DM_Connector_List]
+                    possible_exits = [e for e in avail.entrances if e not in entrances and e not in dm_spots]
+                else:
+                    world_list = LW_Entrances if not avail.inverted else DW_Entrances
+                    possible_dm_exits = [e for e in avail.entrances if e not in entrances and e in LH_DM_Connector_List and e in world_list]
+                    possible_exits = [e for e in avail.entrances if e not in entrances and e not in dm_spots and e in world_list]
             else:
-                world_list = LW_Entrances if not avail.inverted else DW_Entrances
-                possible_dm_exits = [e for e in entrances if e in LH_DM_Connector_List and e in world_list]
-                possible_exits = [e for e in entrance_pool if e not in dm_spots and e in world_list]
+                multi_exit_caves = figure_out_connectors(exits)
+                entrance_pool = entrances if avail.coupled else avail.decoupled_entrances
+                if cross_world:
+                    possible_dm_exits = [e for e in entrances if e in LH_DM_Connector_List]
+                    possible_exits = [e for e in entrance_pool if e not in dm_spots]
+                else:
+                    world_list = LW_Entrances if not avail.inverted else DW_Entrances
+                    possible_dm_exits = [e for e in entrances if e in LH_DM_Connector_List and e in world_list]
+                    possible_exits = [e for e in entrance_pool if e not in dm_spots and e in world_list]
             chosen_cave = random.choice(multi_exit_caves)
             shuffle_connector_exits(chosen_cave)
             possible_dm_exits.sort()
@@ -2034,6 +2050,23 @@ Connector_Exit_Set = {
     'Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)',
     'Desert Palace Exit (South)', 'Desert Palace Exit (East)', 'Desert Palace Exit (West)', 'Turtle Rock Exit (Front)',
     'Turtle Rock Isolated Ledge Exit', 'Turtle Rock Ledge Exit (West)'
+}
+
+Dungeon_Exit_Set = {
+    'Eastern Palace Exit',
+    'Tower of Hera Exit',
+    'Agahnims Tower Exit',
+    'Palace of Darkness Exit',
+    'Swamp Palace Exit', 
+    'Skull Woods Final Section Exit',
+    'Thieves Town Exit',
+    'Ice Palace Exit',
+    'Misery Mire Exit',
+    'Ganons Tower Exit',
+    'Skull Woods First Section Exit', 'Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)',
+    'Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)',
+    'Desert Palace Exit (South)', 'Desert Palace Exit (East)', 'Desert Palace Exit (West)',
+    'Turtle Rock Exit (Front)', 'Turtle Rock Isolated Ledge Exit', 'Turtle Rock Ledge Exit (West)'
 }
 
 # Entrances that cannot be used to access a must_exit entrance - symmetrical to allow reverse lookups

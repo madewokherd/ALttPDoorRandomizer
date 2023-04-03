@@ -70,6 +70,13 @@ def set_rules(world, player):
     elif world.goal[player] == 'completionist':
         add_rule(world.get_location('Ganon', player), lambda state: state.everything(player))
 
+    if not world.is_tile_swapped(0x18, player):
+        if not world.is_copied_world:
+            # Commented out below, this would be needed for rando implementations where Inverted requires flute activation in bunny territory
+            # kak_region = self.world.get_region('Kakariko Area', player)
+            # add_rule(world.get_location('Flute Activation', player), lambda state: state.has('Ocarina', player) and state.is_not_bunny(kak_region, player))
+            add_rule(world.get_location('Flute Activation', player), lambda state: state.has('Ocarina', player))
+
     # if swamp and dam have not been moved we require mirror for swamp palace
     if not world.swamp_patch_required[player]:
         add_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has_Mirror(player))
@@ -1214,6 +1221,7 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Lake Hylia Central Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Lake Hylia Island Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Water D Leave', player), player)
     add_bunny_rule(world.get_entrance('Ice Cave SW', player), player)
     add_bunny_rule(world.get_entrance('Octoballoon Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), player)
@@ -1368,9 +1376,9 @@ def add_conditional_lamps(world, player):
         is_dark = False
         if not world.sewer_light_cone[player]:
             is_dark = True
-        elif world.doorShuffle[player] != 'crossed' and not info['sewer']:
+        elif world.doorShuffle[player] not in ['partitioned', 'crossed'] and not info['sewer']:
             is_dark = True
-        elif world.doorShuffle[player] == 'crossed':
+        elif world.doorShuffle[player] in ['partitioned', 'crossed']:
             sewer_builder = world.dungeon_layouts[player]['Hyrule Castle']
             is_dark = region not in sewer_builder.master_sector.region_set()
         if is_dark:
