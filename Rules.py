@@ -1376,9 +1376,9 @@ def add_conditional_lamps(world, player):
         is_dark = False
         if not world.sewer_light_cone[player]:
             is_dark = True
-        elif world.doorShuffle[player] != 'crossed' and not info['sewer']:
+        elif world.doorShuffle[player] not in ['partitioned', 'crossed'] and not info['sewer']:
             is_dark = True
-        elif world.doorShuffle[player] == 'crossed':
+        elif world.doorShuffle[player] in ['partitioned', 'crossed']:
             sewer_builder = world.dungeon_layouts[player]['Hyrule Castle']
             is_dark = region not in sewer_builder.master_sector.region_set()
         if is_dark:
