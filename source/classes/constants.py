@@ -80,7 +80,7 @@ SETTINGSTOPROCESS = {
       "dropshuffle": "dropshuffle",
       "keydropshuffle": "keydropshuffle",
       "take_any": "take_any",
-      
+
       "itempool": "difficulty",
       "flute_mode": "flute_mode",
       "bow_mode": "bow_mode",
@@ -118,7 +118,7 @@ SETTINGSTOPROCESS = {
       "experimental": "experimental",
       "dungeon_counters": "dungeon_counters",
       "mixed_travel": "mixed_travel",
-      "standardize_palettes": "standardize_palettes"
+      "standardize_palettes": "standardize_palettes",
     },
     "enemizer": {
       "enemyshuffle": "shuffleenemies",

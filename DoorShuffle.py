@@ -436,7 +436,6 @@ def pair_existing_key_doors(world, player, door_a, door_b):
 
 
 def choose_portals(world, player):
-
     if world.doorShuffle[player] != ['vanilla']:
         shuffle_flag = world.doorShuffle[player] != 'basic'
         allowed = {}
@@ -3286,7 +3285,8 @@ def remove_pair_type_if_present(door, world, player):
 
 def find_inaccessible_regions(world, player):
     world.inaccessible_regions[player] = []
-    start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
+    start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop']
+    start_regions.append('Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint')
     regs = convert_regions(start_regions, world, player)
     if all(all(not e.connected_region for e in r.exits) for r in regs):
         # if attempting to find inaccessible regions before any connections made above, assume eventual access to Pyramid S&Q
@@ -3328,9 +3328,10 @@ def find_accessible_entrances(world, player, builder):
         hc_std = True
         start_regions = ['Hyrule Castle Courtyard']
     else:
-        start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop', 'Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint']
-    if world.is_tile_swapped(0x1b, player):
-        start_regions.append('Hyrule Castle Ledge')
+        start_regions = ['Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop']
+        start_regions.append('Sanctuary' if world.mode[player] != 'inverted' else 'Dark Sanctuary Hint')
+        start_regions.append('Pyramid Area' if not world.is_tile_swapped(0x1b, player) else 'Hyrule Castle Ledge')
+
     regs = convert_regions(start_regions, world, player)
     visited_regions = set()
     visited_entrances = []
@@ -3350,12 +3351,12 @@ def find_accessible_entrances(world, player, builder):
             if connect not in queue and connect not in visited_regions:
                 queue.append(connect)
         for ext in next_region.exits:
-            if hc_std and ext.name == 'Hyrule Castle Main Gate (North)':  # just skip it
+            if hc_std and ext.name in ['Hyrule Castle Main Gate (North)', 'Castle Gate Teleporter (Inner)', 'Hyrule Castle Ledge Drop']:  # just skip it
                 continue
             connect = ext.connected_region
             if connect is None or ext.door and ext.door.blocked:
                 continue
-            if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle' and (ext.name.startswith('Flute From') or ext.name in ['Hyrule Castle Main Gate (North)', 'Top of Pyramid (Inner)', 'Inverted Pyramid Entrance']):
+            if world.mode[player] == 'standard' and builder.name == 'Hyrule Castle' and (ext.name.startswith('Flute From') or ext.name in ['Hyrule Castle Main Gate (North)', 'Castle Gate Teleporter (Inner)', 'Inverted Pyramid Entrance']):
                 continue
             if connect.name in entrances and connect not in visited_entrances:
                 visited_entrances.append(connect.name)
@@ -3388,10 +3389,7 @@ def create_doors_for_inaccessible_region(inaccessible_region, world, player):
     region = world.get_region(inaccessible_region, player)
     for ext in region.exits:
         create_door(world, player, ext.name, region.name)
-        if ext.connected_region is None:
-            # TODO: Since Open/Inverted regions are merged into one world model, some exits are left disconnected intentionally
-            logging.getLogger('').debug('Exit not connected to any region: %s', ext.name)
-        elif ext.connected_region.name.endswith(' Portal'):
+        if ext.connected_region and ext.connected_region.name.endswith(' Portal'):
             for more_exts in ext.connected_region.exits:
                 create_door(world, player, more_exts.name, ext.connected_region.name)
 
@@ -3401,7 +3399,7 @@ def create_door(world, player, entName, region_name):
     connect = entrance.connected_region
     if connect is not None:
         for ext in connect.exits:
-            if ext.connected_region is not None and ext.connected_region.name == region_name:
+            if ext.connected_region and ext.connected_region.name == region_name:
                 d = Door(player, ext.name, DoorType.Logical, ext),
                 world.doors += d
                 connect_door_only(world, ext.name, ext.connected_region, player)

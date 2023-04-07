@@ -112,6 +112,14 @@ These are now independent of retro mode and have three options: None, Random, an
 * 1.2.0.14u
   * Small fix for key logic validation (got rid of a false negative)
   * Customized doors in ice cross work properly now
+  * GUI reorganization
+  * Auto option for pyramid open (trinity or ER + crystals goal)
+  * World model refactor (combining inverted and normal world models)
+  * Partitioned fix for lamp logic and links house
+  * Fix starting flute logic
+  * Reduced universal keys in pool slightly for non-vanilla dungeons
+  * Fake world fix finally
+  * Some extra restrictions on links house placement for lite/lean
 * 1.2.0.13u
   * Allow green/blue potion refills to be customized
   * OW Map showing dungeon entrance at Snitch Lady (West) fixed (instead of @ HC Courtyard)

@@ -351,7 +351,7 @@ class World(object):
                 return True
             else:
                 return False
-    
+
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
@@ -3092,7 +3092,7 @@ class Spoiler(object):
                 outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                 if self.metadata['shuffle'][player] != 'vanilla':
                     outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
-                    outfile.write('Shuffle Links:'.ljust(line_width) + '%s\n' % yn(self.metadata['shufflelinks'][player]))
+                    outfile.write('Shuffle Link\'s House:'.ljust(line_width) + '%s\n' % yn(self.metadata['shufflelinks'][player]))
                     outfile.write('Shuffle Tavern:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffletavern'][player]))
                 outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % self.metadata['open_pyramid'][player])
                 if self.metadata['shuffle'][player] != 'vanilla' or self.metadata['ow_mixed'][player]:
@@ -3380,6 +3380,9 @@ class Pot(object):
         item = self.item if not self.indicator else self.standing_item_code
         return [self.x, high_byte, item]
 
+    def get_region(self, world, player):
+        return world.get_region(self.room, 1)
+
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.room == other.room
 
@@ -3485,7 +3488,7 @@ class Settings(object):
             | (counter_mode[w.dungeon_counters[p]] << 1) | (1 if w.experimental[p] else 0),
 
             ((8 if w.crystals_ganon_orig[p] == "random" else int(w.crystals_ganon_orig[p])) << 3)
-            | (0x4 if w.open_pyramid[p] else 0) | access_mode[w.accessibility[p]],
+            | (0x4 if w.is_pyramid_open(p) else 0) | access_mode[w.accessibility[p]],
 
             (0x80 if w.bigkeyshuffle[p] else 0)
             | (0x20 if w.mapshuffle[p] else 0) | (0x10 if w.compassshuffle[p] else 0)
