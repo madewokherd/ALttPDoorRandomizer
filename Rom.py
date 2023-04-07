@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '9f8084cde45565b76db290f4a38cbffa'
+RANDOMIZERBASEHASH = 'b5e862bd5dee7ca32f8a80cfdf1cb8aa'
 
 
 class JsonRom(object):
@@ -989,6 +989,13 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
                 rom.write_byte(0x13f000+dungeon_id, opposite_door.roomIndex)
             elif not opposite_door:
                 rom.write_byte(0x13f000+dungeon_id, 0)  # no supertile preceeding boss
+        # fix for resuming Hera music after leaving boss room
+        boss_door = world.get_door('Hera Boss Down Stairs', player)
+        quadrant = boss_door.dest.quadrant if boss_door.dest.quadrant is not None else 0x7f
+        write_int16(rom, 0x13f0fe, quadrant << 9 | boss_door.dest.roomIndex) # room to resume music
+        boss_door = boss_door.entrance.parent_region.entrances[0].door
+        quadrant = boss_door.quadrant if boss_door.quadrant is not None else 0x7f
+        write_int16(rom, 0x13f0fc, quadrant << 9 | boss_door.roomIndex) # room to fade out
     if is_mystery:
         dr_flags |= DROptions.Hide_Total
     rom.write_byte(0x138004, dr_flags.value & 0xff)
