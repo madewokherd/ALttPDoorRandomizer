@@ -209,22 +209,19 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Flute Spot 8', player), lambda state: state.can_flute(player))
     
     # overworld location rules
-    set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
-    set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
+    set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_location('Old Man', player), lambda state: state.has('Return Old Man', player))
     set_rule(world.get_location('Old Man Drop Off', player), lambda state: state.has('Escort Old Man', player))
+    set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
+    set_rule(world.get_location('Flute Spot', player), lambda state: state.has('Shovel', player))
     set_rule(world.get_location('Middle Aged Man', player), lambda state: state.has('Pick Up Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Deliver Purple Chest', player))  # Can S&Q with chest
+    set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
+    set_rule(world.get_location('Turtle Medallion Pad', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player))  # sword required to cast magic (!)
+    set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
     set_rule(world.get_location('Big Bomb', player), lambda state: state.has('Crystal 5', player) and state.has('Crystal 6', player))
-    set_rule(world.get_location('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
-    set_rule(world.get_entrance('Pyramid Crack', player), lambda state: state.has('Detonate Big Bomb', player))
     set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
     set_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
-    set_rule(world.get_location('Flute Spot', player), lambda state: state.has('Shovel', player))
-    set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
-    set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
-    set_rule(world.get_location('Turtle Medallion Pad', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player))  # sword required to cast magic (!)
 
     # bonk items
     if world.shuffle_bonk_drops[player]:
@@ -243,12 +240,12 @@ def global_rules(world, player):
     # underworld location rules
     set_rule(world.get_location('Mimic Cave', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_location('Potion Shop', player), lambda state: state.has('Mushroom', player) and state.can_reach('Potion Shop Area', 'Region', player))
+    set_rule(world.get_location('Sick Kid', player), lambda state: state.has_bottle(player))
+    set_rule(world.get_location('Sahasrahla', player), lambda state: state.has('Green Pendant', player))
     set_rule(world.get_location('Missing Smith', player), lambda state: state.has('Get Frog', player))
     set_rule(world.get_location('Blacksmith', player), lambda state: state.has('Return Smith', player))
     set_rule(world.get_location('Magic Bat', player), lambda state: state.has('Magic Powder', player))
-    set_rule(world.get_location('Sick Kid', player), lambda state: state.has_bottle(player))
     set_rule(world.get_location('Library', player), lambda state: state.has_Boots(player))
-    set_rule(world.get_location('Sahasrahla', player), lambda state: state.has('Green Pendant', player))
     set_rule(world.get_location('Spike Cave', player), lambda state:
              state.has('Hammer', player) and state.can_lift_rocks(player) and
              ((state.has('Cape', player) and state.can_extend_magic(player, 16, True)) or
@@ -340,6 +337,8 @@ def global_rules(world, player):
     set_rule(world.get_entrance('20 Rupee Cave', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('50 Rupee Cave', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Hookshot Cave', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_location('Pyramid Crack', player), lambda state: state.has('Pick Up Big Bomb', player))
+    set_rule(world.get_entrance('Pyramid Crack', player), lambda state: state.has('Detonate Big Bomb', player))
     set_rule(world.get_entrance('Hammer Peg Cave', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Bonk Fairy (Dark)', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Dark Lake Hylia Ledge Spike Cave', player), lambda state: state.can_lift_rocks(player))
@@ -546,8 +545,8 @@ def global_rules(world, player):
 
     set_rule(world.get_location('Ganons Tower - Bob\'s Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('GT Hope Room EN', player), lambda state: state.has('Cane of Somaria', player))
-    set_rule(world.get_entrance('GT Conveyor Cross WN', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('GT Conveyor Cross EN', player), lambda state: state.has('Hookshot', player))
+    set_rule(world.get_entrance('GT Conveyor Cross Hammer Path', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('GT Conveyor Cross Hookshot Path', player), lambda state: state.has('Hookshot', player))
     if not world.get_door('GT Speed Torch SE', player).entranceFlag:
         set_rule(world.get_entrance('GT Speed Torch SE', player), lambda state: state.has('Fire Rod', player))
     set_rule(world.get_entrance('GT Hookshot South-Mid Path', player), lambda state: state.has('Hookshot', player))
