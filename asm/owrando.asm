@@ -520,7 +520,7 @@ OWBonkGoodBeeDrop:
         LDA.w $0D00,Y : SEC : SBC.l OWBonkPrizeTable[42].vert_offset : STA.w $0D00,Y
             LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
 
-        LDA.b #$01 : STA !REDRAW : STA !FORCE_HEART_SPAWN
+        LDA.b #$01 : STA !REDRAW
 
     .return
     PLY
@@ -642,7 +642,7 @@ OWBonkDrops:
         LDA.w $0D00,Y : SEC : SBC.w OWBonkPrizeData,X : STA.w $0D00,Y
             LDA.w $0D20,Y : SBC #$00 : STA.w $0D20,Y
 
-        LDA.b #$01 : STA !REDRAW : STA !FORCE_HEART_SPAWN
+        LDA.b #$01 : STA !REDRAW
         
         PLB : RTL
 
