@@ -607,6 +607,7 @@ OWBonkDrops:
 
     .mark_collected ; S = Collected, FlagBitmask, X (row + 2)
     PLA : BNE + ; S = FlagBitmask, X (row + 2)
+    TYX : JSL Sprite_IsOnscreen : BCC +
         LDX.b $8A : LDA.l OverworldEventDataWRAM,X : ORA 1,S : STA.l OverworldEventDataWRAM,X
         
         REP #$20
