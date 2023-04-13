@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '92c16c60f26218c9aec838ce204c0b1e'
+RANDOMIZERBASEHASH = '544b8d7dd202c6e8a9e70b31af5bae3d'
 
 
 class JsonRom(object):
@@ -2881,7 +2881,7 @@ InconvenientDungeonEntrances = {'Turtle Rock': 'Turtle Rock Main',
 
 InconvenientOtherEntrances = {'Death Mountain Return Cave (West)': 'The SW DM foothills cave',
                               'Mimic Cave': 'Mimic Ledge',
-                              'Dark World Hammer Peg Cave': 'The rows of pegs',
+                              'Hammer Peg Cave': 'The rows of pegs',
                               'Pyramid Fairy': 'The crack on the pyramid'
                               }
 
@@ -2950,15 +2950,15 @@ ItemEntrances = {'Blinds Hideout': 'Blind\'s old house',
                  'Chest Game': 'The westmost building in the Village of Outcasts'
                  }
 
-ShopEntrances = {'Cave Shop (Lake Hylia)': 'The cave NW Lake Hylia',
+ShopEntrances = {'Lake Hylia Shop': 'The cave NW Lake Hylia',
                  'Kakariko Shop': 'The old Kakariko shop',
                  'Capacity Upgrade': 'The cave on the island',
                  'Dark Lake Hylia Shop': 'The building NW dark Lake Hylia',
                  'Dark World Shop': 'The hammer sealed building',
                  'Red Shield Shop': 'The fenced in building',
-                 'Cave Shop (Dark Death Mountain)': 'The base of east dark DM',
-                 'Dark World Potion Shop': 'The building near the catfish',
-                 'Dark World Lumberjack Shop': 'The northmost Dark World building'
+                 'Dark Death Mountain Shop': 'The base of east dark DM',
+                 'Dark Potion Shop': 'The building near the catfish',
+                 'Dark Lumberjack Shop': 'The northmost Dark World building'
                  }
 
 OtherEntrances = {'Lake Hylia Fairy': 'A cave NE of Lake Hylia',
@@ -2984,12 +2984,12 @@ OtherEntrances = {'Lake Hylia Fairy': 'A cave NE of Lake Hylia',
                   'Dark Lake Hylia Fairy': 'The cave NE dark Lake Hylia',
                   'Dark Death Mountain Fairy': 'The SW cave on dark DM',
                   'East Dark World Hint': 'The dark cave near the eastmost portal',
-                  'Dark Desert Hint': 'The cave east of the mire',
+                  'Mire Hint': 'The cave east of the mire',
                   'Palace of Darkness Hint': 'The building south of Kiki',
                   'Dark Lake Hylia Ledge Spike Cave': 'The rock SE dark Lake Hylia',
                   'Archery Game': 'The old archery game',
                   'Dark Lake Hylia Ledge Hint': 'The open cave SE dark Lake Hylia',
-                  'Dark Desert Fairy': 'The eastern hut in the mire',
+                  'Mire Fairy': 'The eastern hut in the mire',
                   'Dark Lake Hylia Ledge Fairy': 'The sealed cave SE dark Lake Hylia',
                   'Fortune Teller (Dark)': 'The building NE the Village of Outcasts'
                   }

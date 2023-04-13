@@ -36,7 +36,7 @@ from source.overworld.EntranceShuffle2 import link_entrances_new
 from source.tools.BPS import create_bps_from_data
 from source.classes.CustomSettings import CustomSettings
 
-version_number = '1.2.0.14'
+version_number = '1.2.0.15'
 version_branch = '-u'
 __version__ = f'{version_number}{version_branch}'
 
@@ -267,6 +267,7 @@ def main(args, seed=None, fish=None):
         set_rules(world, player)
 
     district_item_pool_config(world)
+    dungeon_tracking(world)
     fill_specific_items(world)
     for player in range(1, world.players + 1):
         if world.shopsanity[player]:
@@ -279,7 +280,6 @@ def main(args, seed=None, fish=None):
     massage_item_pool(world)
     if args.print_custom_yaml:
         world.settings.record_item_pool(world)
-    dungeon_tracking(world)
     logger.info(world.fish.translate("cli", "cli", "placing.dungeon.prizes"))
 
     fill_prizes(world)

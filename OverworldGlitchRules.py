@@ -37,7 +37,7 @@ def get_invalid_mirror_bunny_entrances():
     yield 'Hype Cave'
     yield 'Bonk Fairy (Dark)'
     yield 'Thieves Town'
-    yield 'Dark World Hammer Peg Cave'
+    yield 'Hammer Peg Cave'
     yield 'Brewery'
     yield 'Hookshot Cave'
     yield 'Dark Lake Hylia Ledge Fairy'
@@ -359,7 +359,7 @@ boots_clips_local = [ # (name, from_region, to_region)
     
     ('Floating Island Clip', 'East Death Mountain (Top East)', 'Death Mountain Floating Island'),
     ('Floating Island Return Clip', 'Death Mountain Floating Island', 'East Death Mountain (Top East)'),
-    #('DW Floating Island Clip', 'East Dark Death Mountain (Bottom)', 'Dark Death Mountain Floating Island'), #cannot guarantee camera correction
+    #('DW Floating Island Clip', 'East Dark Death Mountain (Bottom)', 'Death Mountain Floating Island'), #cannot guarantee camera correction
     ('EDM East Dropdown Clip', 'East Death Mountain (Top East)', 'East Death Mountain (Bottom Left)'),
     ('EDM Hammer Bypass Teleport', 'East Death Mountain (Top West)', 'East Death Mountain (Top East)'),
     ('EDDM West Dropdown Clip', 'East Dark Death Mountain (Top)', 'East Dark Death Mountain (Bottom Left)'),

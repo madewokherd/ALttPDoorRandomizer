@@ -33,7 +33,7 @@
         "padx": [20,0]
       }
     },
-    "openpyramid": { 
+    "openpyramid": {
       "type": "selectbox",
       "options": [
         "auto",

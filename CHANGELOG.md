@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0.6
+- \~Merged in DR v1.2.0.15~
+- Fixed Tower of Hera music silence issue
+- Improved GT crystal cutscene
+- Fixed issue with bonk drop items causing duplicate sprite spawns
+- Changed bonk prizes to not mark as collected unless it is visible on screen
+
 ## 0.3.0.5
 - Major reorganization to GUI Options
 - Corrected various fake world behavior in glitched modes

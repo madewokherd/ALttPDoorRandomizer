@@ -253,6 +253,7 @@
     "randomizer.item.worldstate.open": "Open",
     "randomizer.item.worldstate.inverted": "Inverted",
     "randomizer.item.worldstate.retro": "Retro",
+    "randomizer.item.retro": "Enable Retro",
 
     "randomizer.item.logiclevel": "Logic Level",
     "randomizer.item.logiclevel.noglitches": "No Glitches",
@@ -347,7 +348,7 @@
     "randomizer.item.potshuffle": "Pot Shuffle (Legacy)",
 
     "randomizer.item.dropshuffle": "Shuffle Enemy Key Drops",
-    "randomizer.item.keydropshuffle": "Key Drop Shuffle (Legacy)",
+    "randomizer.item.keydropshuffle": "Enable Key Drop Shuffle (Legacy)",
 
     "randomizer.item.take_any": "Take Any Caves",
     "randomizer.item.take_any.none": "None",
@@ -358,7 +359,6 @@
     "randomizer.item.itempool.normal": "Normal",
     "randomizer.item.itempool.hard": "Hard",
     "randomizer.item.itempool.expert": "Expert",
-    
     "randomizer.item.flute_mode": "Flute Mode",
     "randomizer.item.flute_mode.normal": "Normal",
     "randomizer.item.flute_mode.active": "Pre-Activated",

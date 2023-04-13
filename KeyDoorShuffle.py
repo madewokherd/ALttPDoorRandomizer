@@ -1421,7 +1421,7 @@ def prize_relevance(key_layout, dungeon_entrance, is_atgt_swapped):
 
 def prize_relevance_sig2(start_regions, d_name, dungeon_entrance, is_atgt_swapped):
     if len(start_regions) > 1 and dungeon_entrance and dungeon_table[d_name].prize:
-        if dungeon_entrance.name == ('Agahmins Tower' if is_atgt_swapped else 'Ganons Tower'):
+        if dungeon_entrance.name == ('Agahnims Tower' if is_atgt_swapped else 'Ganons Tower'):
             return 'GT'
         elif dungeon_entrance.name == 'Pyramid Fairy':
             return 'BigBomb'

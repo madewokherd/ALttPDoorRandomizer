@@ -7,7 +7,7 @@ from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitType
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
-version_number = '0.3.0.5'
+version_number = '0.3.0.6'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -1506,8 +1506,8 @@ ow_connections = {
             ('Graveyard Ladder (Bottom)', 'Graveyard Ledge')
         ]),
     0x1b: ([
-            ('Top of Pyramid', 'Pyramid Area'),
-            ('Top of Pyramid (Inner)', 'Pyramid Area')
+            ('Castle Gate Teleporter', 'Pyramid Area'),
+            ('Castle Gate Teleporter (Inner)', 'Pyramid Area')
         ], [
             ('Post Aga Inverted Teleporter', 'Hyrule Castle Area')
         ]),

@@ -11,12 +11,8 @@
       "options": [
         "standard",
         "open",
-        "inverted",
-        "retro"
-      ],
-      "config": {
-        "command": "worldstate"
-      }
+        "inverted"
+      ]
     },
     "logiclevel": {
       "type": "selectbox",
@@ -65,6 +61,12 @@
     }
   },
   "rightItemFrame": {
+    "retro": {
+      "type": "button",
+      "config": {
+        "command": "retro"
+      }
+    },
     "sortingalgo": {
       "type": "selectbox",
       "default": "balanced",
@@ -155,9 +157,11 @@
     },
     "dropshuffle": {
       "type": "checkbox"
-    },
+    }
+  },
+  "leftPoolFrame2": {
     "keydropshuffle": {
-      "type": "checkbox",
+      "type": "button",
       "config": {
         "command": "keydropshuffle"
       }

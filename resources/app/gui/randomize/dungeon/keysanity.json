@@ -6,7 +6,10 @@
         "none",
         "wild",
         "universal"
-      ]
+      ],
+      "config": {
+        "padx": [20,0]
+      }
     },
     "mapshuffle":       { "type": "checkbox" },
     "compassshuffle":   { "type": "checkbox" },
