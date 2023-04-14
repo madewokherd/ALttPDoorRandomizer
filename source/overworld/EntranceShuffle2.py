@@ -62,6 +62,9 @@ def link_entrances_new(world, player):
     one_way_map = {}
     one_way_map.update(drop_map)
     one_way_map.update(single_entrance_map)
+    if avail_pool.world.is_atgt_swapped(avail_pool.player):
+        default_map['Ganons Tower'] = 'Agahnims Tower Exit'
+        default_map['Agahnims Tower'] = 'Ganons Tower Exit'
     avail_pool.default_map = default_map
     avail_pool.one_way_map = one_way_map
 
