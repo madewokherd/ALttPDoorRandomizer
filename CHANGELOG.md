@@ -1,10 +1,18 @@
 # Changelog
 
+## 0.3.0.7
+- \~Merged in DR v1.2.0.16~
+- Major overhaul of how item GFX are drawn on screen
+  - Bonk prize GFX can now all be displayed simultaneously
+  - Rupee items that are in-plain-sight are now animated
+  - Narrow items are now centered within their tile space
+  - Fixed issue with pottery items showing bad GFX after map check or medallion use
+- Fixed issue with bonk drop items causing duplicate sprite spawns
+
 ## 0.3.0.6
 - \~Merged in DR v1.2.0.15~
 - Fixed Tower of Hera music silence issue
-- Improved GT crystal cutscene
-- Fixed issue with bonk drop items causing duplicate sprite spawns
+- Improved symmetrical GT crystal cutscene
 - Changed bonk prizes to not mark as collected unless it is visible on screen
 
 ## 0.3.0.5
