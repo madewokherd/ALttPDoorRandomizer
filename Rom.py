@@ -1647,7 +1647,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # powder patch: remove the need to leave the screen after powder, since it causes problems for potion shop at race game
     # temporarally we are just nopping out this check we will conver this to a rom fix soon.
-    rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
+    if world.powder_patch_required[player]:
+        rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA])
 
     # sprite patches
     rom.write_byte(snes_to_pc(0x0DB7D1), 0x03) # patch apple sprites to not permadeatch like enemies
