@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0.8
+- All Bonk prize GFX are no longer using the Power Star placeholder GFX
+- Fixed issue with dislaying Key GFX during tablet animations
+- Fixed issue with DPad input being disabled in Pause Menu if an item GFX is on screen
+
 ## 0.3.0.7
 - \~Merged in DR v1.2.0.16~
 - Major overhaul of how item GFX are drawn on screen

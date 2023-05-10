@@ -835,9 +835,10 @@ pot_items = {
     PotItem.OneRupee: 'Rupee (1)',
     PotItem.FiveRupees: 'Rupees (5)',
     PotItem.Heart: 'Small Heart',
-    PotItem.BigMagic: 'Big Magic',  # fast fill
+    PotItem.BigMagic: 'Big Magic',
     PotItem.SmallMagic: 'Small Magic',
-    PotItem.Chicken: 'Chicken'   # fast fill
+    PotItem.Chicken: 'Chicken',
+    PotItem.Fairy: 'Fairy'
 }
 
 valid_pot_items = {y: x for x, y in pot_items.items()}

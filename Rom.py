@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '3c651a38ea79504029c71b382c9c17da'
+RANDOMIZERBASEHASH = '333e288ccb654220c0b492f4bf030e0c'
 
 
 class JsonRom(object):
@@ -1647,7 +1647,8 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     # powder patch: remove the need to leave the screen after powder, since it causes problems for potion shop at race game
     # temporarally we are just nopping out this check we will conver this to a rom fix soon.
-    rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA] if world.powder_patch_required[player] else [0xAD, 0xBF, 0x0A, 0xF0, 0x4F])
+    if world.powder_patch_required[player]:
+        rom.write_bytes(0x02F539, [0xEA, 0xEA, 0xEA, 0xEA, 0xEA])
 
     # sprite patches
     rom.write_byte(snes_to_pc(0x0DB7D1), 0x03) # patch apple sprites to not permadeatch like enemies
