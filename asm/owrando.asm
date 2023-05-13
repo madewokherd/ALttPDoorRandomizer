@@ -968,9 +968,7 @@ OWNewDestination:
 OWLoadSpecialArea:
 {
     LDA.l Overworld_LoadSpecialOverworld_RoomId,X : STA.b $A0
-    CMP.w #$0182 : BNE +
-        JSL ZoraSplashGfxFix
-    + JSL Overworld_LoadSpecialOverworld ; sets M and X flags
+    JSL Overworld_LoadSpecialOverworld ; sets M and X flags
     TYX
     LDY.b #$00
     CPX.b #$01 : BNE + ; check if going to water transition
