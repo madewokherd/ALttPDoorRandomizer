@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '31a41e7a988597917f12db7107886607'
+RANDOMIZERBASEHASH = '37055215524a94f346e892b7a716c2ef'
 
 
 class JsonRom(object):
@@ -2489,7 +2489,7 @@ def write_strings(rom, world, player, team):
         tt['ganon_fall_in_alt'] = 'Why are you even here?\n You can\'t even hurt me! Get the Triforce Pieces.'
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'
         tt['sign_ganon'] = 'Go find the Triforce pieces... Ganon is invincible!'
-        tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
+        tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! You can see me? I knew I should have\nhidden in a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
     elif world.goal[player] in ['pedestal']:
         tt['ganon_fall_in_alt'] = 'Why are you even here?\n You can\'t even hurt me! Your goal is at the pedestal.'
         tt['ganon_phase_3_alt'] = 'Seriously? Go Away, I will not Die.'
@@ -2498,7 +2498,7 @@ def write_strings(rom, world, player, team):
         if world.goal[player] == 'trinity':
             trinity_crystal_text = ('%d crystal to beat Ganon.' if world.crystals_needed_for_ganon[player] == 1 else '%d crystals to beat Ganon.') % world.crystals_needed_for_ganon[player]
             tt['sign_ganon'] = 'Three ways to victory! %s Get to it!' % trinity_crystal_text
-            tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! you can see me? I knew I should have\nhidden in  a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
+            tt['murahdahla'] = "Hello @. I\nam Murahdahla, brother of\nSahasrahla and Aginah. Behold the power of\ninvisibility.\n\n\n\n… … …\n\nWait! You can see me? I knew I should have\nhidden in a hollow tree. If you bring\n%d triforce pieces, I can reassemble it." % int(world.treasure_hunt_count[player])
         elif world.goal[player] == 'ganonhunt':
             tt['sign_ganon'] = 'Go find the Triforce pieces to beat Ganon'
         elif world.goal[player] == 'completionist':
