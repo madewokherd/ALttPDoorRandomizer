@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1.0
+- Added new Triforce Cutscene when getting Triforce item (turning in TF Pieces)
+- Fixed issue with enemy key drops displaying the wrong GFX
+- Fixed issue with boss music playing in Hera after boss is defeated
+- Fixed issue that limited the Bonk count to cap at 99
+- Made Murahdahla interactable on Pyramid in Rainstate
+
 ## 0.3.0.8
 - All Bonk prize GFX are no longer using the Power Star placeholder GFX
 - Fixed issue with dislaying Key GFX during tablet animations
