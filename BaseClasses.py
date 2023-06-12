@@ -1213,7 +1213,7 @@ class CollectionState(object):
     def can_flute(self, player):
         if self.world.mode[player] == 'standard' and not self.has('Zelda Delivered', player):
             return False  # can't flute in rain state
-        lw = self.world.get_region('Light World', player)
+        lw = self.world.get_region('Kakariko Village', player)
         return self.has('Ocarina (Activated)', player) or (self.has('Ocarina', player) and lw.can_reach(self)
                                                          and self.is_not_bunny(lw, player))
 
@@ -1410,6 +1410,13 @@ class CollectionState(object):
 
         raise RuntimeError('Cannot parse %s.' % item)
 
+
+@unique
+class Terrain(Enum):
+    Land = 0
+    Water = 1
+
+
 @unique
 class RegionType(Enum):
     Menu = 0
@@ -1438,6 +1445,7 @@ class Region(object):
         self.is_light_world = False # will be set aftermaking connections.
         self.is_dark_world = False
         self.spot_type = 'Region'
+        self.terrain = None
         self.hint_text = hint
         self.recursion_count = 0
         self.player = player
