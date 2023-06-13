@@ -381,7 +381,7 @@
 - Removed sortedcontainers dependency
 
 ### 0.1.6.7
-- Mountain Entry and West Death Mountain are now Swapped independently (Old Man rescue is always in your starting world)
+- Mountain Pass and West Death Mountain are now Swapped independently (Old Man rescue is always in your starting world)
 - Fixed issue with AT/GT access logic
 - Improved spoiler log playthru accuracy
 - Fixed Boss Music when boss room is entered thru straight stairs
@@ -407,7 +407,7 @@
 
 ### 0.1.6.2
 - Added Balanced option for Flute Shuffle
-- Fixed issue with Flute Spot to Mountain Entry softlocking
+- Fixed issue with Flute Spot to Mountain Pass softlocking
 - Fixed logic bug with Inverted Kakariko Portal
 
 ### 0.1.6.1

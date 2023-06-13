@@ -138,10 +138,10 @@ def find_reachable_locations(state, player):
     return check_set
 
 
-inaccessible_regions_std = {'Desert Palace Mouth', 'Bumper Cave Ledge', 'Skull Woods Forest (West)',
+inaccessible_regions_std = {'Desert Mouth', 'Bumper Cave Ledge', 'Skull Woods Forest (West)',
                             'Dark Death Mountain Ledge', 'Dark Death Mountain Isolated Ledge',
                             'Death Mountain Floating Island'}
 
 
-inaccessible_regions_inv = {'Desert Palace Mouth', 'Maze Race Ledge', 'Desert Ledge',
-                            'Desert Palace Entrance (North) Spot', 'Hyrule Castle Ledge', 'Mountain Entry Ledge'}
+inaccessible_regions_inv = {'Desert Mouth', 'Maze Race Ledge', 'Desert Ledge',
+                            'Desert Ledge Keep', 'Hyrule Castle Ledge', 'Mountain Pass Ledge'}

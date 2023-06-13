@@ -473,7 +473,7 @@ def choose_portals(world, player):
                 if portal_region.type == RegionType.LightWorld:
                     world.get_portal(portal, player).light_world = True
                 if name in world.inaccessible_regions[player] or (hc_flag and portal != 'Hyrule Castle South'):
-                    name_key = 'Desert Ledge' if name == 'Desert Palace Entrance (North) Spot' else name
+                    name_key = 'Desert Ledge' if name == 'Desert Ledge Keep' else name
                     region_map[name_key].append(portal)
                     inaccessible_portals.append(portal)
                 else:
@@ -626,7 +626,7 @@ def analyze_portals(world, player):
             if portal_region.type == RegionType.LightWorld:
                 world.get_portal(portal, player).light_world = True
             if name in world.inaccessible_regions[player]:
-                name_key = 'Desert Ledge' if name == 'Desert Palace Entrance (North) Spot' else name
+                name_key = 'Desert Ledge' if name == 'Desert Ledge Keep' else name
                 region_map[name_key].append(portal)
                 inaccessible_portals.append(portal)
             else:
