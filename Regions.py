@@ -25,7 +25,7 @@ def create_regions(world, player):
                           'EDM To Spiral Ledge Drop', 'EDM To Fairy Ledge Drop', 'EDM To Mimic Ledge Drop', 'EDM Ledge Drop', 'East Death Mountain EN']),
         create_lw_region(player, 'Death Mountain Floating Island', ['Floating Island'], ['Floating Island Bridge (West)']),
         create_lw_region(player, 'Spiral Cave Ledge', None, ['Spiral Cave', 'Spiral Ledge Drop', 'Spiral Mimic Bridge (West)']),
-        create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave', 'Mimic Ledge Drop', 'Spiral Mimic Bridge (East)']),
+        create_lw_region(player, 'Mimic Cave Ledge', None, ['Mimic Cave', 'Spiral Mimic Bridge (East)']),
         create_lw_region(player, 'Spiral Mimic Ledge Extend', None, ['Spiral Ledge Approach', 'Mimic Ledge Approach', 'Spiral Mimic Ledge Drop']),
         create_lw_region(player, 'Fairy Ascension Ledge', None, ['Fairy Ascension Cave (Top)', 'Fairy Ascension Ledge Drop']),
         create_lw_region(player, 'Fairy Ascension Plateau', None, ['Fairy Ascension Cave (Bottom)', 'Fairy Ascension Rocks (Inner)', 'Fairy Ascension Plateau Ledge Drop']),

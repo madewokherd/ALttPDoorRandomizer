@@ -1270,7 +1270,6 @@ mandatory_connections = [
     ('DM Hammer Bridge (West)', 'East Death Mountain (Top East)'), #hammer
     ('DM Hammer Bridge (East)', 'East Death Mountain (Top West)'), #hammer
     ('EDM To Spiral Ledge Drop', 'Spiral Cave Ledge'),
-    ('EDM To Fairy Ledge Drop', 'Fairy Ascension Ledge'),
     ('EDM Ledge Drop', 'East Death Mountain (Bottom)'),
     ('Spiral Ledge Drop', 'East Death Mountain (Bottom)'),
     ('Fairy Ascension Ledge Drop', 'Fairy Ascension Plateau'),
@@ -1480,12 +1479,12 @@ ow_connections = {
             ('Dark Death Mountain Teleporter (West)', 'West Death Mountain (Bottom)')
         ]),
     0x05: ([
+            ('EDM To Fairy Ledge Drop', 'Fairy Ascension Ledge'),
             ('East Death Mountain Teleporter', 'East Dark Death Mountain (Bottom)')
         ], [
             ('Floating Island Bridge (West)', 'East Death Mountain (Top East)'),
             ('Floating Island Bridge (East)', 'Death Mountain Floating Island'),
             ('EDM To Mimic Ledge Drop', 'Mimic Cave Ledge'),
-            ('Mimic Ledge Drop', 'East Death Mountain (Bottom)'),
             ('Spiral Mimic Bridge (West)', 'Spiral Mimic Ledge Extend'),
             ('Spiral Mimic Bridge (East)', 'Spiral Mimic Ledge Extend'),
             ('Spiral Ledge Approach', 'Spiral Cave Ledge'),

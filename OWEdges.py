@@ -1454,7 +1454,6 @@ OWExitTypes = {
             'EDM To Mimic Ledge Drop',
             'EDM Ledge Drop',
             'Spiral Ledge Drop',
-            'Mimic Ledge Drop',
             'Spiral Mimic Ledge Drop',
             'Fairy Ascension Ledge Drop',
             'Fairy Ascension Plateau Ledge Drop',
