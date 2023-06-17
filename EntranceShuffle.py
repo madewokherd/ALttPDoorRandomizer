@@ -1298,7 +1298,7 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
             dw_must_exit.append(ledge.pop())
             dw_related.extend(ledge)
     if not world.is_tile_swapped(0x30, player):
-        if 'Desert Palace Mouth' in world.inaccessible_regions[player]:
+        if 'Desert Mouth' in world.inaccessible_regions[player]:
             lw_entrances.remove('Desert Palace Entrance (East)')
             lw_must_exit.append('Desert Palace Entrance (East)')
     else:
@@ -1501,8 +1501,8 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         inaccessible_regions = list(world.inaccessible_regions[player])
         
         # find OW regions that don't have a multi-entrance dungeon exit connected
-        glitch_regions = ['Central Cliffs', 'Eastern Cliff', 'Desert Northeast Cliffs', 'Hyrule Castle Water',
-                          'Dark Central Cliffs', 'Darkness Cliff', 'Mire Northeast Cliffs', 'Pyramid Water']
+        glitch_regions = ['Central Cliffs', 'Eastern Cliff', 'Desert Northern Cliffs', 'Hyrule Castle Water',
+                          'Dark Central Cliffs', 'Darkness Cliff', 'Mire Northern Cliffs', 'Pyramid Water']
         multi_dungeon_exits = {
             'Hyrule Castle South Portal', 'Hyrule Castle West Portal', 'Hyrule Castle East Portal', 'Sanctuary Portal',
             'Desert South Portal', 'Desert West Portal',

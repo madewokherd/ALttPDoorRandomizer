@@ -25,7 +25,7 @@ def set_rules(world, player):
 
     if world.swords[player] == 'swordless':
         swordless_rules(world, player)
-    
+
     ow_bunny_rules(world, player)
     ow_terrain_rules(world, player)
 
@@ -72,7 +72,7 @@ def set_rules(world, player):
     if not world.is_tile_swapped(0x18, player):
         if not world.is_copied_world:
             # Commented out below, this would be needed for rando implementations where Inverted requires flute activation in bunny territory
-            # kak_region = self.world.get_region('Kakariko Area', player)
+            # kak_region = self.world.get_region('Kakariko Village', player)
             # add_rule(world.get_location('Flute Activation', player), lambda state: state.has('Ocarina', player) and state.is_not_bunny(kak_region, player))
             add_rule(world.get_location('Flute Activation', player), lambda state: state.has('Ocarina', player))
 
@@ -133,6 +133,7 @@ def set_rule(spot, rule):
 def set_defeat_dungeon_boss_rule(location):
     # Lambda required to defer evaluation of dungeon.boss since it will change later if boos shuffle is used
     set_rule(location, lambda state: location.parent_region.dungeon.boss.can_defeat(state))
+
 
 def set_always_allow(spot, rule):
     spot.always_allow = rule
@@ -207,21 +208,21 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Flute Spot 6', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Flute Spot 7', player), lambda state: state.can_flute(player))
     set_rule(world.get_entrance('Flute Spot 8', player), lambda state: state.can_flute(player))
-    
+
     # overworld location rules
+    set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
     set_rule(world.get_location('Ether Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_location('Old Man', player), lambda state: state.has('Return Old Man', player))
     set_rule(world.get_location('Old Man Drop Off', player), lambda state: state.has('Escort Old Man', player))
-    set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
+    set_rule(world.get_location('Turtle Medallion Pad', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player))  # sword required to cast magic (!)
+    set_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_location('Flute Spot', player), lambda state: state.has('Shovel', player))
+    set_rule(world.get_location('Bombos Tablet', player), lambda state: state.has('Book of Mudora', player) and state.has_beam_sword(player))
     set_rule(world.get_location('Middle Aged Man', player), lambda state: state.has('Pick Up Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Purple Chest', player), lambda state: state.has('Deliver Purple Chest', player))  # Can S&Q with chest
     set_rule(world.get_location('Sunken Treasure', player), lambda state: state.has('Open Floodgate', player))
-    set_rule(world.get_location('Turtle Medallion Pad', player), lambda state: state.has_sword(player) and state.has_turtle_rock_medallion(player))  # sword required to cast magic (!)
     set_rule(world.get_location('Dark Blacksmith Ruins', player), lambda state: state.has('Return Smith', player))
     set_rule(world.get_location('Big Bomb', player), lambda state: state.has('Crystal 5', player) and state.has('Crystal 6', player))
-    set_rule(world.get_location('Master Sword Pedestal', player), lambda state: state.has('Red Pendant', player) and state.has('Blue Pendant', player) and state.has('Green Pendant', player))
-    set_rule(world.get_location('Zora\'s Ledge', player), lambda state: state.has('Flippers', player))
 
     # bonk items
     if world.shuffle_bonk_drops[player]:
@@ -253,7 +254,7 @@ def global_rules(world, player):
               (state.can_extend_magic(player, 12, True) or
               (state.world.can_take_damage and (state.has_Boots(player) or state.has_hearts(player, 4))))))
              )
-    
+
     # underworld rules
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: state.has_Mirror(player))  # can erase block - overridden in noglitches
     set_rule(world.get_entrance('Hookshot Cave Bonk Path', player), lambda state: state.has('Hookshot', player) or state.has('Pegasus Boots', player))
@@ -266,51 +267,70 @@ def global_rules(world, player):
     set_rule(world.get_entrance('DM Hammer Bridge (East)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('DM Broken Bridge (West)', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('DM Broken Bridge (East)', player), lambda state: state.has('Hookshot', player))
-    set_rule(world.get_entrance('Fairy Ascension Rocks (North)', player), lambda state: state.can_lift_heavy_rocks(player))
-    set_rule(world.get_entrance('Fairy Ascension Rocks (South)', player), lambda state: state.can_lift_heavy_rocks(player))
+    set_rule(world.get_entrance('Fairy Ascension Rocks (Inner)', player), lambda state: state.can_lift_heavy_rocks(player))
+    set_rule(world.get_entrance('Fairy Ascension Rocks (Outer)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('TR Pegs Ledge Entry', player), lambda state: state.can_lift_heavy_rocks(player))
-    set_rule(world.get_entrance('Mountain Entry Entrance Rock (West)', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Mountain Entry Entrance Rock (East)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Mountain Pass Rock (Outer)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Mountain Pass Rock (Inner)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Zora Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Zora Waterfall Water Entry', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Zora Waterfall Approach', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Lost Woods Pass Hammer (North)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Lost Woods Pass Hammer (South)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Lost Woods Pass Rock (North)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Lost Woods Pass Rock (South)', player), lambda state: state.can_lift_heavy_rocks(player))
-    set_rule(world.get_entrance('Kings Grave Outer Rocks', player), lambda state: state.can_lift_heavy_rocks(player))
-    set_rule(world.get_entrance('Kings Grave Inner Rocks', player), lambda state: state.can_lift_heavy_rocks(player))
-    set_rule(world.get_entrance('Potion Shop Rock (South)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Kakariko Pond Whirlpool', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Kings Grave Rocks (Outer)', player), lambda state: state.can_lift_heavy_rocks(player))
+    set_rule(world.get_entrance('Kings Grave Rocks (Inner)', player), lambda state: state.can_lift_heavy_rocks(player))
+    set_rule(world.get_entrance('River Bend Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Potion Shop Rock (North)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Potion Shop Rock (South)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Zora Approach Rocks (West)', player), lambda state: state.can_lift_heavy_rocks(player) or state.has_Boots(player))
     set_rule(world.get_entrance('Zora Approach Rocks (East)', player), lambda state: state.can_lift_heavy_rocks(player) or state.has_Boots(player))
-    set_rule(world.get_entrance('Hyrule Castle Inner East Rock', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Hyrule Castle Outer East Rock', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Bat Cave Ledge Peg', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('Bat Cave Ledge Peg (East)', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('Desert Palace Statue Move', player), lambda state: state.has('Book of Mudora', player))
-    set_rule(world.get_entrance('Desert Ledge Outer Rocks', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Desert Ledge Inner Rocks', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Hyrule Castle East Rock (Inner)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Hyrule Castle East Rock (Outer)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Wooden Bridge Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Wooden Bridge Northeast Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Blacksmith Ledge Peg (West)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Blacksmith Ledge Peg (East)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Desert Statue Move', player), lambda state: state.has('Book of Mudora', player))
+    set_rule(world.get_entrance('Desert Ledge Rocks (Outer)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Desert Ledge Rocks (Inner)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('C Whirlpool Rock (Bottom)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('C Whirlpool Rock (Top)', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('C Whirlpool Pegs (Left)', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('C Whirlpool Pegs (Right)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('C Whirlpool Pegs (Outer)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('C Whirlpool Pegs (Inner)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Lake Hylia Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Lake Hylia Central Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Lake Hylia Island Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Lake Hylia Water D Leave', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Ice Cave Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Desert Pass Rocks (North)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Desert Pass Rocks (South)', player), lambda state: state.can_lift_rocks(player))
-    
-    set_rule(world.get_entrance('Skull Woods Bush Rock (West)', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Skull Woods Bush Rock (East)', player), lambda state: state.can_lift_rocks(player))
-     # this more like an ohko rule - dependent on bird being present too - so enemizer could turn this off?
+    set_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
+
+    set_rule(world.get_entrance('Skull Woods Rock (West)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Skull Woods Rock (East)', player), lambda state: state.can_lift_rocks(player))
+    # this more like an ohko rule - dependent on bird being present too - so enemizer could turn this off?
     set_rule(world.get_entrance('Bumper Cave Ledge Drop', player), lambda state: (state.has('Cape', player) or state.has('Cane of Byrna', player) or state.has_sword(player)))
-    set_rule(world.get_entrance('Bumper Cave Entrance Rock', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Bumper Cave Rock (Outer)', player), lambda state: state.can_lift_rocks(player))
+    set_rule(world.get_entrance('Bumper Cave Rock (Inner)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Skull Woods Pass Rock (North)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Skull Woods Pass Rock (South)', player), lambda state: state.can_lift_heavy_rocks(player))
+    set_rule(world.get_entrance('Qirn Jump Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark Witch Rock (North)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Dark Witch Rock (South)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Catfish Approach Rocks (West)', player), lambda state: state.can_lift_heavy_rocks(player) or state.has_Boots(player))
     set_rule(world.get_entrance('Catfish Approach Rocks (East)', player), lambda state: state.can_lift_heavy_rocks(player) or state.has_Boots(player))
-    set_rule(world.get_entrance('Village of Outcasts Pegs', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('Grassy Lawn Pegs', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Bush Yard Pegs (Outer)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Bush Yard Pegs (Inner)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Broken Bridge Hammer Rock (South)', player), lambda state: state.can_lift_rocks(player) or state.has('Hammer', player))
     set_rule(world.get_entrance('Broken Bridge Hammer Rock (North)', player), lambda state: state.can_lift_rocks(player) or state.has('Hammer', player))
     set_rule(world.get_entrance('Broken Bridge Hookshot Gap', player), lambda state: state.has('Hookshot', player))
+    set_rule(world.get_entrance('Broken Bridge Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Broken Bridge Northeast Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Broken Bridge West Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Peg Area Rocks (West)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Peg Area Rocks (East)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Dig Game To Ledge Drop', player), lambda state: state.can_lift_heavy_rocks(player))
@@ -320,10 +340,18 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Archery Game Rock (South)', player), lambda state: state.can_lift_heavy_rocks(player))
     set_rule(world.get_entrance('Hammer Bridge Pegs (North)', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('Hammer Bridge Pegs (South)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Hammer Bridge Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Bottom)', player), lambda state: state.can_lift_rocks(player))
     set_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), lambda state: state.can_lift_rocks(player))
-    set_rule(world.get_entrance('Dark C Whirlpool Pegs (Left)', player), lambda state: state.has('Hammer', player))
-    set_rule(world.get_entrance('Dark C Whirlpool Pegs (Right)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Dark C Whirlpool Pegs (Outer)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Dark C Whirlpool Pegs (Inner)', player), lambda state: state.has('Hammer', player))
+    set_rule(world.get_entrance('Ice Lake Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Ice Lake Northeast Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Ice Lake Southwest Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Ice Lake Iceberg Water Entry', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Ice Lake Iceberg Bomb Jump', player), lambda state: state.can_use_bombs(player))
+    set_rule(world.get_entrance('Shopping Mall Water Drop', player), lambda state: state.has('Flippers', player))
+    set_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
 
     # entrance rules
     # Caution: If king's grave is relaxed at all to account for reaching it via a two way cave's exit in insanity mode, then the bomb shop logic will need to be updated (that would involve create a small ledge-like Region for it)
@@ -808,10 +836,10 @@ def bomb_rules(world, player):
     bombable_items = ['Chicken House', 'Aginah\'s Cave', 'Graveyard Cave',
                       'Hype Cave - Top', 'Hype Cave - Middle Right', 'Hype Cave - Middle Left', 'Hype Cave - Bottom']
     for location in bonkable_items:
-        add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player)) 
+        add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player) or state.has_Boots(player))
         add_bunny_rule(world.get_location(location, player), player)
     for location in bombable_items:
-        add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player)) 
+        add_rule(world.get_location(location, player), lambda state: state.can_use_bombs(player))
         add_bunny_rule(world.get_location(location, player), player)
 
     cave_kill_locations = ['Mini Moldorm Cave - Far Left', 'Mini Moldorm Cave - Far Right', 'Mini Moldorm Cave - Left', 'Mini Moldorm Cave - Right', 'Mini Moldorm Cave - Generous Guy', 'Spiral Cave']
@@ -882,7 +910,7 @@ def bomb_rules(world, player):
     if world.doorShuffle[player] == 'vanilla':
         add_rule(world.get_entrance('TR Lazy Eyes SE', player), lambda state: state.can_use_bombs(player)) # ToDo: Add always true for inverted, cross-entrance, and door-variants and so on.
         add_rule(world.get_entrance('Turtle Rock Ledge Exit (West)', player), lambda state: state.can_use_bombs(player)) # Is this the same as above?
-        
+
         dungeon_bonkable = ['Sewers Rat Path WS', 'Sewers Rat Path WN',
                             'PoD Warp Hint SE', 'PoD Jelly Hall NW', 'PoD Jelly Hall NE', 'PoD Mimics 1 SW',
                             'Thieves Ambush E', 'Thieves Rail Ledge W',
@@ -960,8 +988,8 @@ def ow_inverted_rules(world, player):
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
     else:
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player))  # barrier gets removed after killing agahnim, rule for that added later
-        set_rule(world.get_entrance('GT Entry Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
-        set_rule(world.get_entrance('GT Entry Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'))
+        set_rule(world.get_entrance('GT Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
+        set_rule(world.get_entrance('GT Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'))
 
     if world.is_tile_swapped(0x03, player):
         set_rule(world.get_entrance('Spectacle Rock Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))
@@ -970,15 +998,14 @@ def ow_inverted_rules(world, player):
     if not world.is_tile_swapped(0x05, player):
         set_rule(world.get_entrance('East Death Mountain Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
-        set_rule(world.get_entrance('Dark Death Mountain Teleporter (East)', player), lambda state: state.can_lift_heavy_rocks(player))
+        set_rule(world.get_entrance('East Dark Death Mountain Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
         
     if not world.is_tile_swapped(0x07, player):
         set_rule(world.get_entrance('TR Pegs Teleporter', player), lambda state: state.has('Hammer', player))
         set_rule(world.get_entrance('TR Pegs Ledge Leave', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
         set_rule(world.get_entrance('Turtle Rock Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
-        set_rule(world.get_entrance('TR Pegs Ledge Drop', player), lambda state: False)
-        set_rule(world.get_entrance('TR Pegs Ledge Leave', player), lambda state: state.has('Hammer', player) and state.can_lift_heavy_rocks(player) and state.has_Pearl(player))
+        set_rule(world.get_entrance('TR Pegs Ledge Leave', player), lambda state: state.has('Hammer', player) and state.can_lift_heavy_rocks(player))
         set_rule(world.get_entrance('Turtle Rock Tail Ledge Drop', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
     if not world.is_tile_swapped(0x10, player):
@@ -1000,7 +1027,7 @@ def ow_inverted_rules(world, player):
         set_rule(world.get_entrance('Pyramid Hole', player), lambda state: False)
         set_rule(world.get_entrance('Pyramid Entrance', player), lambda state: False)
         
-        set_rule(world.get_entrance('Post Aga Inverted Teleporter', player), lambda state: state.has_beaten_aga(player))
+        set_rule(world.get_entrance('Post Aga Teleporter', player), lambda state: state.has_beaten_aga(player))
         
     if not world.is_tile_swapped(0x2f, player):
         set_rule(world.get_entrance('East Hyrule Teleporter', player), lambda state: state.has('Hammer', player) and state.can_lift_rocks(player) and state.has_Pearl(player)) # bunny cannot use hammer
@@ -1011,13 +1038,13 @@ def ow_inverted_rules(world, player):
         set_rule(world.get_entrance('Mirror To Bombos Tablet Ledge', player), lambda state: state.has_Mirror(player))
         set_rule(world.get_entrance('Desert Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
-        set_rule(world.get_entrance('Misery Mire Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
+        set_rule(world.get_entrance('Mire Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
         set_rule(world.get_entrance('Checkerboard Ledge Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         set_rule(world.get_entrance('Checkerboard Ledge Leave', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
     if world.is_tile_swapped(0x32, player):
-        set_rule(world.get_entrance('Cave 45 Inverted Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
-        set_rule(world.get_entrance('Cave 45 Inverted Leave', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
+        set_rule(world.get_entrance('Cave 45 Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
+        set_rule(world.get_entrance('Cave 45 Leave', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
     if not world.is_tile_swapped(0x33, player):
         set_rule(world.get_entrance('South Hyrule Teleporter', player), lambda state: state.can_lift_rocks(player))
@@ -1027,7 +1054,7 @@ def ow_inverted_rules(world, player):
     if not world.is_tile_swapped(0x35, player):
         set_rule(world.get_entrance('Lake Hylia Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
     else:
-        set_rule(world.get_entrance('Ice Palace Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
+        set_rule(world.get_entrance('Ice Lake Teleporter', player), lambda state: state.can_lift_heavy_rocks(player))
         set_rule(world.get_entrance('Lake Hylia Island Pier', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'])
         
     if world.is_tile_swapped(0x3a, player):
@@ -1038,10 +1065,10 @@ def ow_inverted_rules(world, player):
 def ow_bunny_rules(world, player):
     # locations
     add_bunny_rule(world.get_location('Mushroom', player), player)
+    add_bunny_rule(world.get_location('Turtle Medallion Pad', player), player)
     add_bunny_rule(world.get_location('Zora\'s Ledge', player), player)
     add_bunny_rule(world.get_location('Maze Race', player), player)
     add_bunny_rule(world.get_location('Flute Spot', player), player)
-    add_bunny_rule(world.get_location('Turtle Medallion Pad', player), player)
     add_bunny_rule(world.get_location('Catfish', player), player)
 
     # entrances
@@ -1068,7 +1095,7 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Bonk Fairy (Dark)', player), player)
     add_bunny_rule(world.get_entrance('Misery Mire', player), player)
     add_bunny_rule(world.get_entrance('Dark Lake Hylia Ledge Spike Cave', player), player)
-    
+
     # terrain
     add_bunny_rule(world.get_entrance('Lost Woods Bush (West)', player), player)
     add_bunny_rule(world.get_entrance('Lost Woods Bush (East)', player), player)
@@ -1076,19 +1103,31 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('DM Hammer Bridge (East)', player), player)
     add_bunny_rule(world.get_entrance('DM Broken Bridge (West)', player), player)
     add_bunny_rule(world.get_entrance('DM Broken Bridge (East)', player), player)
-    add_bunny_rule(world.get_entrance('Fairy Ascension Rocks (North)', player), player)
-    add_bunny_rule(world.get_entrance('Fairy Ascension Rocks (South)', player), player)
+    add_bunny_rule(world.get_entrance('Fairy Ascension Rocks (Inner)', player), player)
+    add_bunny_rule(world.get_entrance('Fairy Ascension Rocks (Outer)', player), player)
     add_bunny_rule(world.get_entrance('TR Pegs Ledge Entry', player), player)
-    add_bunny_rule(world.get_entrance('Mountain Entry Entrance Rock (West)', player), player)
-    add_bunny_rule(world.get_entrance('Mountain Entry Entrance Rock (East)', player), player)
+    add_bunny_rule(world.get_entrance('TR Pegs Ledge Leave', player), player)
+    add_bunny_rule(world.get_entrance('Mountain Pass Rock (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('Mountain Pass Rock (Inner)', player), player)
+    add_bunny_rule(world.get_entrance('Zora Waterfall Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Zora Waterfall Water Entry', player), player)
+    add_bunny_rule(world.get_entrance('Zora Waterfall Approach', player), player)
     add_bunny_rule(world.get_entrance('Lost Woods Pass Hammer (North)', player), player)
     add_bunny_rule(world.get_entrance('Lost Woods Pass Hammer (South)', player), player)
     add_bunny_rule(world.get_entrance('Lost Woods Pass Rock (North)', player), player)
     add_bunny_rule(world.get_entrance('Lost Woods Pass Rock (South)', player), player)
-    add_bunny_rule(world.get_entrance('Kings Grave Outer Rocks', player), player)
-    add_bunny_rule(world.get_entrance('Kings Grave Inner Rocks', player), player)
-    add_bunny_rule(world.get_entrance('Potion Shop Rock (South)', player), player)
+    add_bunny_rule(world.get_entrance('Kakariko Pond Whirlpool', player), player)
+    add_bunny_rule(world.get_entrance('Kings Grave Rocks (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('Kings Grave Rocks (Inner)', player), player)
+    add_bunny_rule(world.get_entrance('Graveyard Ladder (Top)', player), player)
+    add_bunny_rule(world.get_entrance('Graveyard Ladder (Bottom)', player), player)
+    add_bunny_rule(world.get_entrance('River Bend Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('River Bend East Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Potion Shop Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Potion Shop Northeast Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Potion Shop Rock (North)', player), player)
+    add_bunny_rule(world.get_entrance('Potion Shop Rock (South)', player), player)
+    add_bunny_rule(world.get_entrance('Zora Approach Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Zora Approach Rocks (West)', player), player)
     add_bunny_rule(world.get_entrance('Zora Approach Rocks (East)', player), player)
     add_bunny_rule(world.get_entrance('Kakariko Southwest Bush (North)', player), player)
@@ -1099,31 +1138,46 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Hyrule Castle Southwest Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('Hyrule Castle Courtyard Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Hyrule Castle Courtyard Bush (South)', player), player)
-    add_bunny_rule(world.get_entrance('Hyrule Castle Inner East Rock', player), player)
-    add_bunny_rule(world.get_entrance('Hyrule Castle Outer East Rock', player), player)
+    add_bunny_rule(world.get_entrance('Hyrule Castle East Rock (Inner)', player), player)
+    add_bunny_rule(world.get_entrance('Hyrule Castle East Rock (Outer)', player), player)
     add_bunny_rule(world.get_entrance('Wooden Bridge Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Wooden Bridge Bush (South)', player), player)
-    add_bunny_rule(world.get_entrance('Bat Cave Ledge Peg', player), player)
-    add_bunny_rule(world.get_entrance('Bat Cave Ledge Peg (East)', player), player)
-    add_bunny_rule(world.get_entrance('Desert Ledge Outer Rocks', player), player)
-    add_bunny_rule(world.get_entrance('Desert Ledge Inner Rocks', player), player)
+    add_bunny_rule(world.get_entrance('Wooden Bridge Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Wooden Bridge Northeast Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Blacksmith Ledge Peg (West)', player), player)
+    add_bunny_rule(world.get_entrance('Blacksmith Ledge Peg (East)', player), player)
+    add_bunny_rule(world.get_entrance('Maze Race Game', player), player)
+    add_bunny_rule(world.get_entrance('Desert Ledge Rocks (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('Desert Ledge Rocks (Inner)', player), player)
     add_bunny_rule(world.get_entrance('Flute Boy Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Flute Boy Bush (South)', player), player)
+    add_bunny_rule(world.get_entrance('C Whirlpool Water Entry', player), player)
     add_bunny_rule(world.get_entrance('C Whirlpool Rock (Bottom)', player), player)
     add_bunny_rule(world.get_entrance('C Whirlpool Rock (Top)', player), player)
-    add_bunny_rule(world.get_entrance('C Whirlpool Pegs (Left)', player), player)
-    add_bunny_rule(world.get_entrance('C Whirlpool Pegs (Right)', player), player)
+    add_bunny_rule(world.get_entrance('C Whirlpool Pegs (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('C Whirlpool Pegs (Inner)', player), player)
+    add_bunny_rule(world.get_entrance('Statues Water Entry', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia South Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Central Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Island Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Lake Hylia Water D Leave', player), player)
+    add_bunny_rule(world.get_entrance('Ice Cave Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Desert Pass Rocks (North)', player), player)
     add_bunny_rule(world.get_entrance('Desert Pass Rocks (South)', player), player)
+    add_bunny_rule(world.get_entrance('Octoballoon Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), player)
 
-    add_bunny_rule(world.get_entrance('Skull Woods Bush Rock (West)', player), player)
-    add_bunny_rule(world.get_entrance('Skull Woods Bush Rock (East)', player), player)
+    add_bunny_rule(world.get_entrance('Skull Woods Rock (West)', player), player)
+    add_bunny_rule(world.get_entrance('Skull Woods Rock (East)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Forgotten Bush (West)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Forgotten Bush (East)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Second Section Hole', player), player)
     add_bunny_rule(world.get_entrance('East Dark Death Mountain Bushes', player), player)
     add_bunny_rule(world.get_entrance('Bumper Cave Ledge Drop', player), player)
-    add_bunny_rule(world.get_entrance('Bumper Cave Entrance Rock', player), player)
+    add_bunny_rule(world.get_entrance('Bumper Cave Rock (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('Bumper Cave Rock (Inner)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (West)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush Row (East)', player), player)
     add_bunny_rule(world.get_entrance('Skull Woods Pass Bush (North)', player), player)
@@ -1132,15 +1186,23 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Skull Woods Pass Rock (South)', player), player)
     add_bunny_rule(world.get_entrance('Dark Graveyard Bush (South)', player), player)
     add_bunny_rule(world.get_entrance('Dark Graveyard Bush (North)', player), player)
+    add_bunny_rule(world.get_entrance('Qirn Jump Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Qirn Jump East Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Dark Witch Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Dark Witch Northeast Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Dark Witch Rock (North)', player), player)
     add_bunny_rule(world.get_entrance('Dark Witch Rock (South)', player), player)
+    add_bunny_rule(world.get_entrance('Catfish Approach Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Catfish Approach Rocks (West)', player), player)
     add_bunny_rule(world.get_entrance('Catfish Approach Rocks (East)', player), player)
-    add_bunny_rule(world.get_entrance('Village of Outcasts Pegs', player), player)
-    add_bunny_rule(world.get_entrance('Grassy Lawn Pegs', player), player)
+    add_bunny_rule(world.get_entrance('Bush Yard Pegs (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('Bush Yard Pegs (Inner)', player), player)
     add_bunny_rule(world.get_entrance('Broken Bridge Hammer Rock (South)', player), player)
     add_bunny_rule(world.get_entrance('Broken Bridge Hammer Rock (North)', player), player)
     add_bunny_rule(world.get_entrance('Broken Bridge Hookshot Gap', player), player)
+    add_bunny_rule(world.get_entrance('Broken Bridge Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Broken Bridge Northeast Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Broken Bridge West Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Peg Area Rocks (West)', player), player)
     add_bunny_rule(world.get_entrance('Peg Area Rocks (East)', player), player)
     add_bunny_rule(world.get_entrance('Dig Game To Ledge Drop', player), player)
@@ -1150,12 +1212,27 @@ def ow_bunny_rules(world, player):
     add_bunny_rule(world.get_entrance('Archery Game Rock (South)', player), player)
     add_bunny_rule(world.get_entrance('Hammer Bridge Pegs (North)', player), player)
     add_bunny_rule(world.get_entrance('Hammer Bridge Pegs (South)', player), player)
+    add_bunny_rule(world.get_entrance('Hammer Bridge Water Drop', player), player)
     add_bunny_rule(world.get_entrance('Stumpy Approach Bush (North)', player), player)
     add_bunny_rule(world.get_entrance('Stumpy Approach Bush (South)', player), player)
+    add_bunny_rule(world.get_entrance('Dark C Whirlpool Water Entry', player), player)
     add_bunny_rule(world.get_entrance('Dark C Whirlpool Rock (Bottom)', player), player)
     add_bunny_rule(world.get_entrance('Dark C Whirlpool Rock (Top)', player), player)
-    add_bunny_rule(world.get_entrance('Dark C Whirlpool Pegs (Left)', player), player)
-    add_bunny_rule(world.get_entrance('Dark C Whirlpool Pegs (Right)', player), player)
+    add_bunny_rule(world.get_entrance('Dark C Whirlpool Pegs (Outer)', player), player)
+    add_bunny_rule(world.get_entrance('Dark C Whirlpool Pegs (Inner)', player), player)
+    add_bunny_rule(world.get_entrance('Hype Cave Water Entry', player), player)
+    add_bunny_rule(world.get_entrance('Ice Lake Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Ice Lake Northeast Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Ice Lake Southwest Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Ice Lake Iceberg Water Entry', player), player)
+    add_bunny_rule(world.get_entrance('Shopping Mall Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Bomber Corner Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), player)
+
+    # OWG rules
+    add_bunny_rule(world.get_entrance('Stone Bridge EC Cliff Water Drop', player), player)
+    add_bunny_rule(world.get_entrance('Hammer Bridge EC Cliff Water Drop', player), player)
 
     if not world.is_atgt_swapped(player):
         add_bunny_rule(world.get_entrance('Agahnims Tower', player), player)
@@ -1181,92 +1258,23 @@ def ow_terrain_rules(world, player):
 
 
 def no_glitches_rules(world, player):
-    set_rule(world.get_entrance('Zora Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Zora Waterfall Water Entry', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Zora Waterfall Water Approach', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Kakariko Pond Whirlpool', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('River Bend Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('River Bend East Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Potion Shop Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Potion Shop Northeast Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Zora Approach Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Wooden Bridge Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Wooden Bridge Northeast Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('C Whirlpool Water Entry', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Statues Water Entry', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Lake Hylia Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Lake Hylia South Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Lake Hylia Central Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Lake Hylia Island Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Lake Hylia Water D Leave', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Ice Cave SW', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Octoballoon Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
-    
-    set_rule(world.get_entrance('Qirn Jump Water Drop', player), lambda state: state.has('Flippers', player))
+
     set_rule(world.get_entrance('Qirn Jump East Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark Witch Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark Witch Northeast Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Catfish Approach Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Broken Bridge Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Broken Bridge Northeast Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Broken Bridge West Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Hammer Bridge Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Dark C Whirlpool Water Entry', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Hype Cave Water Entry', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Ice Lake Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Ice Lake Northeast Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Ice Lake Southwest Water Drop', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Ice Lake Moat Water Entry', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Shopping Mall SW', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Bomber Corner Water Drop', player), lambda state: state.has('Flippers', player))
-    set_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), lambda state: state.has('Flippers', player))
-
-    add_bunny_rule(world.get_entrance('Zora Waterfall Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Zora Waterfall Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Zora Waterfall Water Approach', player), player)
-    add_bunny_rule(world.get_entrance('Kakariko Pond Whirlpool', player), player)
-    add_bunny_rule(world.get_entrance('River Bend Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('River Bend East Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Potion Shop Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Potion Shop Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Zora Approach Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Wooden Bridge Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Wooden Bridge Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('C Whirlpool Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Statues Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia South Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia Central Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia Island Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia Water D Leave', player), player)
-    add_bunny_rule(world.get_entrance('Ice Cave SW', player), player)
-    add_bunny_rule(world.get_entrance('Octoballoon Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Octoballoon Waterfall Water Drop', player), player)
-
-    add_bunny_rule(world.get_entrance('Qirn Jump Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Qirn Jump East Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Dark Witch Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Dark Witch Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Catfish Approach Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Broken Bridge Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Broken Bridge Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Broken Bridge West Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Hammer Bridge Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Dark C Whirlpool Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Hype Cave Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Ice Lake Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Ice Lake Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Ice Lake Southwest Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Ice Lake Moat Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Shopping Mall SW', player), player)
-    add_bunny_rule(world.get_entrance('Bomber Corner Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Bomber Corner Waterfall Water Drop', player), player)
-
 
     # todo: move some dungeon rules to no glicthes logic - see these for examples
     # add_rule(world.get_entrance('Ganons Tower (Hookshot Room)', player), lambda state: state.has('Hookshot', player) or state.has_Boots(player))
@@ -1275,13 +1283,13 @@ def no_glitches_rules(world, player):
     # for location in DMs_room_chests:
     #     add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Push Block Reverse', player), lambda state: False)  # no glitches does not require block override
+    set_rule(world.get_entrance('Ice Lake Northeast Pier Hop', player), lambda state: False)
     forbid_bomb_jump_requirements(world, player)
     if not world.is_copied_world:
         add_conditional_lamps(world, player)
 
 
 def fake_flipper_rules(world, player):
-    set_rule(world.get_entrance('Zora Waterfall Water Approach', player), lambda state: True) # warning, assumes FF possible on other end of whirlpool or local ancilla splash delete
     set_rule(world.get_entrance('River Bend Water Drop', player), lambda state: True)
     set_rule(world.get_entrance('River Bend East Water Drop', player), lambda state: True)
     set_rule(world.get_entrance('Potion Shop Water Drop', player), lambda state: True)
@@ -1300,26 +1308,6 @@ def fake_flipper_rules(world, player):
     set_rule(world.get_entrance('Hype Cave Water Entry', player), lambda state: True)
     set_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), lambda state: True)
     set_rule(world.get_entrance('Bomber Corner Water Drop', player), lambda state: True)
-    
-    add_bunny_rule(world.get_entrance('Zora Waterfall Water Approach', player), player)
-    add_bunny_rule(world.get_entrance('River Bend Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('River Bend East Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Potion Shop Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Potion Shop Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Zora Approach Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('C Whirlpool Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Statues Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Lake Hylia South Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Octoballoon Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Qirn Jump Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Qirn Jump East Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Dark Witch Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Dark Witch Northeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Catfish Approach Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Dark C Whirlpool Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Hype Cave Water Entry', player), player)
-    add_bunny_rule(world.get_entrance('Ice Lake Southeast Water Drop', player), player)
-    add_bunny_rule(world.get_entrance('Bomber Corner Water Drop', player), player)
 
 
 def forbid_bomb_jump_requirements(world, player):
@@ -1327,7 +1315,7 @@ def forbid_bomb_jump_requirements(world, player):
     for location in DMs_room_chests:
         add_rule(world.get_location(location, player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Paradox Cave Bomb Jump', player), lambda state: False)
-    set_rule(world.get_entrance('Ice Lake Northeast Pier Hop', player), lambda state: False)
+    set_rule(world.get_entrance('Ice Lake Iceberg Bomb Jump', player), lambda state: False)
 
 def add_conditional_lamps(world, player):
     def add_conditional_lamp(spot, spottype='Location'):
@@ -1475,8 +1463,6 @@ def standard_rules(world, player):
             entrance = world.get_portal(portal_name, player).door.entrance
             set_rule(entrance, lambda state: state.has('Zelda Delivered', player))
     set_rule(world.get_entrance('Sanctuary Exit', player), lambda state: state.has('Zelda Delivered', player))
-    set_rule(world.get_entrance('Hyrule Castle Ledge Drop', player), lambda state: state.has('Zelda Delivered', player))
-    set_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has('Zelda Delivered', player))
     # zelda should be saved before agahnim is in play
     add_rule(world.get_location('Agahnim 1', player), lambda state: state.has('Zelda Delivered', player))
 
@@ -1519,15 +1505,9 @@ def standard_rules(world, player):
     rule_list, debug_path = find_rules_for_zelda_delivery(world, player)
     set_rule(world.get_location('Zelda Drop Off', player), lambda state: state.has('Zelda Herself', player) and check_rule_list(state, rule_list))
 
-    add_rule(world.get_entrance('Links House SC', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Links House ES', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Central Bonk Rocks SW', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Hyrule Castle WN', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Hyrule Castle ES', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Hyrule Castle Main Gate (South)', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Hyrule Castle Main Gate (North)', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Hyrule Castle Ledge Drop', player), lambda state: state.has('Zelda Delivered', player))
-    add_rule(world.get_entrance('Bonk Fairy (Light)', player), lambda state: state.has('Zelda Delivered', player))
+    for entrance in ['Links House SC', 'Links House ES', 'Central Bonk Rocks SW', 'Hyrule Castle WN', 'Hyrule Castle ES',
+                     'Bonk Fairy (Light)', 'Hyrule Castle Main Gate (South)', 'Hyrule Castle Main Gate (North)', 'Hyrule Castle Ledge Drop']:
+        add_rule(world.get_entrance(entrance, player), lambda state: state.has('Zelda Delivered', player))
 
     if world.shuffle_bonk_drops[player]:
         if not world.is_copied_world:
@@ -1536,6 +1516,7 @@ def standard_rules(world, player):
 
     # don't allow bombs to get past here before zelda is rescued
     set_rule(world.get_entrance('GT Hookshot South Entry to Ranged Crystal', player), lambda state: (state.can_use_bombs(player) and state.has('Zelda Delivered', player)) or state.has('Blue Boomerang', player) or state.has('Red Boomerang', player))  # or state.has('Cane of Somaria', player))
+
 
 def find_rules_for_zelda_delivery(world, player):
     # path rules for backtracking

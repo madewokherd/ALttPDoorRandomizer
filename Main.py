@@ -36,7 +36,7 @@ from source.overworld.EntranceShuffle2 import link_entrances_new
 from source.tools.BPS import create_bps_from_data
 from source.classes.CustomSettings import CustomSettings
 
-version_number = '1.2.0.16'
+version_number = '1.2.0.17'
 version_branch = '-u'
 __version__ = f'{version_number}{version_branch}'
 
@@ -786,7 +786,7 @@ def create_playthrough(world):
     prog_locations = [location for location in world.get_filled_locations() if location.item.advancement
                       or world.goal[location.player] == 'completionist']
     optional_locations = ['Trench 1 Switch', 'Trench 2 Switch', 'Ice Block Drop', 'Skull Star Tile', 'Flute Activation']
-    optional_locations.extend(['Hyrule Castle Courtyard Tree Pull', 'Mountain Entry Area Tree Pull']) # adding pre-aga tree pulls
+    optional_locations.extend(['Hyrule Castle Courtyard Tree Pull', 'Mountain Pass Tree Pull']) # adding pre-aga tree pulls
     optional_locations.extend(['Lumberjack Area Crab Drop', 'South Pass Area Crab Drop']) # adding pre-aga bush crabs
     state_cache = [None]
     collection_spheres = []

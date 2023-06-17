@@ -213,7 +213,7 @@ def generate_itempool(world, player):
         loc.forced_item = loc.item
 
     if not world.is_tile_swapped(0x18, player):
-        region = world.get_region('Kakariko Area',player)
+        region = world.get_region('Kakariko Village',player)
 
         loc = Location(player, "Flute Activation", parent=region)
         region.locations.append(loc)
@@ -589,10 +589,10 @@ def create_dynamic_shop_locations(world, player):
 
 def create_farm_locations(world, player):
     bush_bombs = ['Flute Boy Approach Area',
-                'Kakariko Area',
-                'Village of Outcasts Area',
+                'Kakariko Village',
+                'Village of Outcasts',
                 'Forgotten Forest Area',
-                'Bat Cave Ledge',
+                'Blacksmith Ledge',
                 'East Dark Death Mountain (Bottom)']
     rock_bombs = ['Links House Area',
                 'Dark Chapel Area',
@@ -606,7 +606,7 @@ def create_farm_locations(world, player):
                 'Dark Fortune Area',
                 'Qirn Jump Area',
                 'Shield Shop Area',
-                'Palace of Darkness Nook Area',
+                'Darkness Nook Area',
                 'Swamp Nook Area',
                 'Dark South Pass Area']
     bonk_bombs = ['Kakariko Fortune Area', 'Dark Graveyard Area'] #TODO: Flute Boy Approach Area and Bonk Rock Ledge are available post-Aga
@@ -622,10 +622,10 @@ def create_farm_locations(world, player):
                 'Hype Cave Area',
                 'Dark South Pass Area',
                 'Bumper Cave Area']
-    pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Entry Area']
+    pre_aga_tree_pulls = ['Hyrule Castle Courtyard', 'Mountain Pass Area']
     post_aga_tree_pulls = ['Statues Area', 'Eastern Palace Area']
 
-    bush_crabs = ['Lost Woods East Area', 'Mountain Entry Area']
+    bush_crabs = ['Lost Woods East Area', 'Mountain Pass Area']
     pre_aga_bush_crabs = ['Lumberjack Area', 'South Pass Area']
     rock_crabs = ['Desert Pass Area']
 
@@ -1118,8 +1118,6 @@ def get_pool_core(world, player, progressive, shuffle, difficulty, treasure_hunt
                 pool.remove('Fighter Sword')
             pool.extend(['Rupees (50)'])
 
-    #TODO: Remove test placements
-    #place_item('Purple Chest', 'Magic Mirror')
     if timer in ['timed', 'timed-countdown']:
         pool.extend(diff.timedother)
         clock_mode = 'stopwatch' if timer == 'timed' else 'countdown'
