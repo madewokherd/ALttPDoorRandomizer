@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1.1
+- \~Merged in DR v1.2.0.17~
+- Various renames/reorganizations of region/rule definition to match upcoming DR world remodel
+- Minor improvements to item GFX draw routine
+- Minor change to terrain/logic of Spiral/Mimic Ledge in Inverted 2.0
+
 ## 0.3.1.0
 - Added new Triforce Cutscene when getting Triforce item (turning in TF Pieces)
 - Fixed issue with enemy key drops displaying the wrong GFX
