@@ -639,17 +639,17 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
     if world.customizer:
         if not do_grouped:
             custom_flips = world.customizer.get_owtileflips()
-        if custom_flips:
+        if custom_flips and player in custom_flips:
+            custom_flips = custom_flips[player]
             nonflipped_groups = list()
             forced_flips = list()
             forced_nonflips = list()
-            player_key = player
-            if 'undefined_chance' in custom_flips[player_key]:
-                undefined_chance = custom_flips[player_key]['undefined_chance']
-            if 'force_flip' in custom_flips[player_key]:
-                forced_flips = custom_flips[player_key]['force_flip']
-            if 'force_no_flip' in custom_flips[player_key]:
-                forced_nonflips = custom_flips[player_key]['force_no_flip']
+            if 'undefined_chance' in custom_flips:
+                undefined_chance = custom_flips['undefined_chance']
+            if 'force_flip' in custom_flips:
+                forced_flips = custom_flips['force_flip']
+            if 'force_no_flip' in custom_flips:
+                forced_nonflips = custom_flips['force_no_flip']
 
             for group in groups:
                 if any(owid in group[0] for owid in forced_nonflips):
