@@ -2898,7 +2898,8 @@ class Spoiler(object):
                          'triforcegoal': self.world.treasure_hunt_count,
                          'triforcepool': self.world.treasure_hunt_total,
                          'race': self.world.settings.world_rep['meta']['race'],
-                         'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)}
+                         'code': {p: Settings.make_code(self.world, p) for p in range(1, self.world.players + 1)},
+                         'seed': self.world.seed
                          }
 
         for p in range(1, self.world.players + 1):
