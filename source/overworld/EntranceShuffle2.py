@@ -69,6 +69,8 @@ def link_entrances_new(world, player):
     avail_pool.one_way_map = one_way_map
 
     global LW_Entrances, DW_Entrances
+    LW_Entrances = []
+    DW_Entrances = []
     for e in [e for e in avail_pool.entrances if e not in drop_map]:
         region = world.get_entrance(e, player).parent_region
         if region.type == RegionType.LightWorld:
