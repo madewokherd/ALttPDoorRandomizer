@@ -515,7 +515,7 @@ def do_links_house(entrances, exits, avail, cross_world):
                 dark_sanc_region = avail.world.get_entrance('Dark Sanctuary Hint Exit', avail.player).connected_region.name
                 forbidden.extend(get_nearby_entrances(avail, dark_sanc_region))
             shuffle_mode = avail.world.shuffle[avail.player]
-            if shuffle_mode == 'vanilla':
+            if avail.world.owShuffle[avail.player] == 'vanilla':
                 # simple shuffle -
                 if shuffle_mode == 'simple':
                     avail.links_on_mountain = True  # taken care of by the logic below
