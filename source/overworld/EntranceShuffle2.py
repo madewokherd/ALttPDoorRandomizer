@@ -190,10 +190,10 @@ def do_vanilla_connections(avail_pool):
 
 
 def do_main_shuffle(entrances, exits, avail, mode_def):
-    # drops and holes
     cross_world = mode_def['cross_world'] == 'on' if 'cross_world' in mode_def else False
-    keep_together = mode_def['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_def else True
     avail.coupled = mode_def['decoupled'] != 'on' if 'decoupled' in mode_def else True
+    # drops and holes
+    keep_together = mode_def['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_def else True
     do_holes_and_linked_drops(entrances, exits, avail, cross_world, keep_together)
 
     if not avail.coupled:
@@ -298,6 +298,8 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
 
     def bonk_fairy_exception(x):  # (Bonk Fairy not eligible in standard)
         return not avail.is_standard() or x != 'Bonk Fairy (Light)'
+
+    # old man S&Q cave
     if not cross_world:
         #TODO: Add Swapped ER support for this
         # OM Cave entrance in lw/dw if cross_world off
