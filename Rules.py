@@ -26,18 +26,6 @@ def set_rules(world, player):
     if world.swords[player] == 'swordless':
         swordless_rules(world, player)
 
-    ow_bunny_rules(world, player)
-    ow_terrain_rules(world, player)
-
-    if world.mode[player] == 'standard':
-        if not world.is_copied_world:
-            standard_rules(world, player)
-    else:
-        misc_key_rules(world, player)
-
-    bomb_rules(world, player)
-    pot_rules(world, player)
-
     if world.logic[player] == 'noglitches':
         no_glitches_rules(world, player)
     elif world.logic[player] == 'minorglitches':
@@ -53,6 +41,18 @@ def set_rules(world, player):
         overworld_glitches_rules(world, player)
     else:
         raise NotImplementedError('Not implemented yet')
+
+    ow_bunny_rules(world, player)
+    ow_terrain_rules(world, player)
+
+    if world.mode[player] == 'standard':
+        if not world.is_copied_world:
+            standard_rules(world, player)
+    else:
+        misc_key_rules(world, player)
+
+    bomb_rules(world, player)
+    pot_rules(world, player)
 
     if world.goal[player] == 'dungeons':
         # require all dungeons to beat ganon
@@ -989,7 +989,7 @@ def ow_inverted_rules(world, player):
     else:
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player))  # barrier gets removed after killing agahnim, rule for that added later
         set_rule(world.get_entrance('GT Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
-        set_rule(world.get_entrance('GT Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'crossed', 'insanity'))
+        set_rule(world.get_entrance('GT Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'swapped', 'crossed', 'insanity'))
 
     if world.is_tile_swapped(0x03, player):
         set_rule(world.get_entrance('Spectacle Rock Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))

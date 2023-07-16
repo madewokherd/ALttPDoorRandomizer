@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2.0
+- New Swapped ER mode option
+- Fixed issue with flipper rules not properly getting pearl requirement added
+- Fixed minor issues in generating non-crossed ER on subsequent attempts
+
 ## 0.3.1.2
 - Retro now gives a universal key from bottle vendor fish prize
 - Fixed issue with Aga Door preventing Murahduhla Cutscene
