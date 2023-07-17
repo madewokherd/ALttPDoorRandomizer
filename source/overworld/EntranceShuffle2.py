@@ -289,6 +289,7 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
                 bomb_shop_options = [x for x in bomb_shop_options if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
             if avail.swapped and len(bomb_shop_options) > 1:
                 bomb_shop_options = [x for x in bomb_shop_options if x != 'Big Bomb Shop']
+
             bomb_shop_choice = random.choice(bomb_shop_options)
             connect_entrance(bomb_shop_choice, bomb_shop, avail)
             rem_entrances.remove(bomb_shop_choice)
@@ -433,6 +434,8 @@ def do_blacksmith(entrances, exits, avail):
         if avail.swapped:
             blacksmith_options = [e for e in blacksmith_options if e not in Forbidden_Swap_Entrances]
         blacksmith_options = [x for x in blacksmith_options if x in entrances]
+
+        assert len(blacksmith_options), 'No available entrances left to place Blacksmith'
         blacksmith_choice = random.choice(blacksmith_options)
         connect_entrance(blacksmith_choice, 'Blacksmiths Hut', avail)
         entrances.remove(blacksmith_choice)
@@ -563,6 +566,7 @@ def do_dark_sanc(entrances, exits, avail):
                 choices = [e for e in avail.world.districts[avail.player]['Northwest Dark World'].entrances if e not in forbidden and e in entrances]
             else:
                 choices = [e for e in get_starting_entrances(avail) if e not in forbidden and e in entrances]
+            
             choice = random.choice(choices)
             entrances.remove(choice)
             exits.remove('Dark Sanctuary Hint')
@@ -596,6 +600,10 @@ def do_links_house(entrances, exits, avail, cross_world):
             if avail.inverted:
                 dark_sanc_region = avail.world.get_entrance('Dark Sanctuary Hint Exit', avail.player).connected_region.name
                 forbidden.extend(get_nearby_entrances(avail, dark_sanc_region))
+            else:
+                if (avail.world.doorShuffle[avail.player] != 'vanilla' and avail.world.intensity[avail.player] > 2
+                        and not avail.world.is_tile_swapped(0x1b, avail.player)):
+                    forbidden.append('Hyrule Castle Entrance (South)')
             if avail.swapped:
                 forbidden.append(links_house_vanilla)
                 forbidden.extend(Forbidden_Swap_Entrances)
@@ -1381,13 +1389,17 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
         elif cave[-1] == 'Spectacle Rock Cave Exit':  # Spectacle rock only has one exit
             cave_entrances = []
             for cave_exit in rnd_cave[:-1]:
-                entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit] and e not in must_exit)
-                cave_entrances.append(entrance)
-                entrances.remove(entrance)
-                connect_two_way(entrance, cave_exit, avail)
-                if avail.swapped and combine_map[entrance] != cave_exit:
-                    swap_ent, _ = connect_cave_swap(entrance, cave_exit, cave)
-                    entrances.remove(swap_ent)
+                if avail.swapped and cave_exit not in avail.exits:
+                    entrance = avail.world.get_entrance(cave_exit, avail.player).parent_region.entrances[0].name
+                    cave_entrances.append(entrance)
+                else:
+                    entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit] and e not in must_exit)
+                    cave_entrances.append(entrance)
+                    entrances.remove(entrance)
+                    connect_two_way(entrance, cave_exit, avail)
+                    if avail.swapped and combine_map[entrance] != cave_exit:
+                        swap_ent, _ = connect_cave_swap(entrance, cave_exit, cave)
+                        entrances.remove(swap_ent)
                 if entrance not in invalid_connections:
                     invalid_connections[exit] = set()
             if all(entrance in invalid_connections for entrance in cave_entrances):
@@ -1408,13 +1420,16 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
     for cave in used_caves:
         if cave in cave_options:  # check if we placed multiple entrances from this 3 or 4 exit
             for cave_exit in cave:
-                entrance = next(e for e in entrances[::-1] if e not in invalid_cave_connections[tuple(cave)])
-                invalid_cave_connections[tuple(cave)] = set()
-                entrances.remove(entrance)
-                connect_two_way(entrance, cave_exit, avail)
-                if avail.swapped and combine_map[entrance] != cave_exit:
-                    swap_ent, _ = connect_cave_swap(entrance, cave_exit, cave)
-                    entrances.remove(swap_ent)
+                if avail.swapped and cave_exit not in avail.exits:
+                    continue
+                else:
+                    entrance = next(e for e in entrances[::-1] if e not in invalid_cave_connections[tuple(cave)])
+                    invalid_cave_connections[tuple(cave)] = set()
+                    entrances.remove(entrance)
+                    connect_two_way(entrance, cave_exit, avail)
+                    if avail.swapped and combine_map[entrance] != cave_exit:
+                        swap_ent, _ = connect_cave_swap(entrance, cave_exit, cave)
+                        entrances.remove(swap_ent)
             cave_options.remove(cave)
     if avail.swapped:
         entrances.extend(swap_forbidden)
