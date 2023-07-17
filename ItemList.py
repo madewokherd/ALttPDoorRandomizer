@@ -212,7 +212,8 @@ def generate_itempool(world, player):
         loc.locked = True
         loc.forced_item = loc.item
 
-    if not world.is_tile_swapped(0x18, player):
+    if (world.flute_mode[player] != 'active' and not world.is_tile_swapped(0x18, player)
+            and 'Ocarina (Activated)' not in list(map(str, [i for i in world.precollected_items if i.player == player]))):
         region = world.get_region('Kakariko Village',player)
 
         loc = Location(player, "Flute Activation", parent=region)

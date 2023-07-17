@@ -69,7 +69,8 @@ def set_rules(world, player):
     elif world.goal[player] == 'completionist':
         add_rule(world.get_location('Ganon', player), lambda state: state.everything(player))
 
-    if not world.is_tile_swapped(0x18, player):
+    if (world.flute_mode[player] != 'active' and not world.is_tile_swapped(0x18, player)
+            and 'Ocarina (Activated)' not in list(map(str, [i for i in world.precollected_items if i.player == player]))):
         if not world.is_copied_world:
             # Commented out below, this would be needed for rando implementations where Inverted requires flute activation in bunny territory
             # kak_region = self.world.get_region('Kakariko Village', player)
