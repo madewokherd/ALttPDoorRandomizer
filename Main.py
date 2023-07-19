@@ -877,6 +877,7 @@ def create_playthrough(world):
             if world.has_beaten_game(state):
                 required_locations.clear()
             else:
+                logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (loc.item.name, loc.item.player, loc.name, loc.player) for loc in required_locations])
                 raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
 
     # store the required locations for statistical analysis
