@@ -109,12 +109,18 @@ These are now independent of retro mode and have three options: None, Random, an
 
 # Bug Fixes and Notes
 
+* 1.2.0.19u
+  * Added min/max for triforce pool, goal, and difference for CLI and Customizer. (Thanks Catobat)
+  * Fixed a bug with dungeon generation
+  * Multiworld: Fixed /missing command to not list all the pots
+  * Changed the "Ganonhunt" goal to use open pyramid on the Auto setting
+  * Customizer: Fixed the example yaml for shopsanity
 * 1.2.0.18u
   * Fixed an issue with pyramid hole being in logic when it is not opened.
   * Crystal cutscene at GT use new symmetrical layouts (thanks Codemann)
   * Fix for Hera Boss music (thanks Codemann)
   * Fixed an issue where certain vanilla door types would not allow other types to be placed.
-  * Customizer: fixed an issue where last ditch placements would move customized items. Those are now locked and the generation will fail instead is no alternative are found.
+  * Customizer: fixed an issue where last ditch placements would move customized items. Those are now locked and the generation will fail instead if no alternatives are found.
   * Customizer: fixed an issue with assured sword and start_inventory
   * Customizer: warns when trying to specifically place an item that's not in the item pool
   * Fixed "accessibility: none" displaying a spoiling message

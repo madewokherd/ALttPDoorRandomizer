@@ -1362,19 +1362,6 @@ def make_custom_item_pool(world, player, progressive, shuffle, difficulty, timer
 
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_total, treasure_hunt_icon, lamps_needed_for_dark_rooms)
 
-def set_default_triforce(goal, custom_goal, custom_total):
-    triforce_goal, triforce_total = 0, 0
-    if goal == 'triforcehunt':
-        triforce_goal, triforce_total = 20, 30
-    elif goal == 'trinity':
-        triforce_goal, triforce_total = 8, 10
-    if custom_goal > 0:
-        triforce_goal = max(min(custom_goal, 128), 1)
-    if custom_total > 0 or custom_goal > 0:
-        triforce_total = max(min(custom_total, 128), triforce_goal) #128 max to ensure other progression can fit.
-    return (triforce_goal, triforce_total)
-
-
 def make_customizer_pool(world, player):
     pool = []
     placed_items = {}
