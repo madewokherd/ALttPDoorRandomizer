@@ -3450,7 +3450,7 @@ flutespot_mode = {"vanilla": 0, "balanced": 1, "random": 2}
 
 # byte 13: FBBB TTSS (flute_mode, bow_mode, take_any, small_key_mode)
 flute_mode = {'normal': 0, 'active': 1}
-keyshuffle_mode = {'none': 0, 'wild': 1, 'universal': 2}  # reserved 8 modes?
+keyshuffle_mode = {'none': 0, 'off': 0, 'wild': 1, 'on': 1, 'universal': 2}  # reserved 8 modes?
 take_any_mode = {'none': 0, 'random': 1, 'fixed': 2}
 bow_mode = {'progressive': 0, 'silvers': 1, 'retro': 2, 'retro_silvers': 3}
 
