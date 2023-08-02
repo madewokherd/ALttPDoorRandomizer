@@ -4,6 +4,7 @@ import urllib.parse
 import yaml
 from typing import Any
 from yaml.representer import Representer
+from Utils import HexInt, hex_representer
 from collections import defaultdict
 from pathlib import Path
 
@@ -350,7 +351,7 @@ class CustomSettings(object):
         for p in self.player_range:
             if p in world.owswaps and len(world.owswaps[p][0]) > 0:
                 flips[p] = {}
-                flips[p]['force_flip'] = list(f for f in world.owswaps[p][0] if f < 0x40 or f >= 0x80)
+                flips[p]['force_flip'] = list(HexInt(f) for f in world.owswaps[p][0] if f < 0x40 or f >= 0x80)
                 flips[p]['force_flip'].sort()
                 flips[p]['undefined_chance'] = 0
 
@@ -416,6 +417,7 @@ class CustomSettings(object):
 
     def write_to_file(self, destination):
         yaml.add_representer(defaultdict, Representer.represent_dict)
+        yaml.add_representer(HexInt, hex_representer)
         with open(destination, 'w') as file:
             yaml.dump(self.world_rep, file)
 
