@@ -36,7 +36,7 @@ from source.overworld.EntranceShuffle2 import link_entrances_new
 from source.tools.BPS import create_bps_from_data
 from source.classes.CustomSettings import CustomSettings
 
-version_number = '1.2.0.17'
+version_number = '1.2.0.20'
 version_branch = '-u'
 __version__ = f'{version_number}{version_branch}'
 
@@ -122,6 +122,7 @@ def main(args, seed=None, fish=None):
     world.trap_door_mode = args.trap_door_mode.copy()
     world.key_logic_algorithm = args.key_logic_algorithm.copy()
     world.decoupledoors = args.decoupledoors.copy()
+    world.door_self_loops = args.door_self_loops.copy()
     world.experimental = args.experimental.copy()
     world.dungeon_counters = args.dungeon_counters.copy()
     world.fish = fish
@@ -131,8 +132,6 @@ def main(args, seed=None, fish=None):
     world.potshuffle = args.shufflepots.copy()
     world.mixed_travel = args.mixed_travel.copy()
     world.standardize_palettes = args.standardize_palettes.copy()
-    world.treasure_hunt_count = {k: int(v) for k, v in args.triforce_goal.items()}
-    world.treasure_hunt_total = {k: int(v) for k, v in args.triforce_pool.items()}
     world.shufflelinks = args.shufflelinks.copy()
     world.shuffletavern = args.shuffletavern.copy()
     world.pseudoboots = args.pseudoboots.copy()
@@ -141,6 +140,26 @@ def main(args, seed=None, fish=None):
     world.restrict_boss_items = args.restrict_boss_items.copy()
     world.collection_rate = args.collection_rate.copy()
     world.colorizepots = args.colorizepots.copy()
+
+    world.treasure_hunt_count = {}
+    world.treasure_hunt_total = {}
+    for p in args.triforce_goal:
+        if int(args.triforce_goal[p]) != 0 or int(args.triforce_pool[p]) != 0 or int(args.triforce_goal_min[p]) != 0 or int(args.triforce_goal_max[p]) != 0 or int(args.triforce_pool_min[p]) != 0 or int(args.triforce_pool_max[p]) != 0:
+            if int(args.triforce_goal[p]) != 0:
+                world.treasure_hunt_count[p] = int(args.triforce_goal[p])
+            elif int(args.triforce_goal_min[p]) != 0 and int(args.triforce_goal_max[p]) != 0:
+                world.treasure_hunt_count[p] = random.randint(int(args.triforce_goal_min[p]), int(args.triforce_goal_max[p]))
+            else:
+                world.treasure_hunt_count[p] = 8 if world.goal[p] == 'trinity' else 20
+            if int(args.triforce_pool[p]) != 0:
+                world.treasure_hunt_total[p] = int(args.triforce_pool[p])
+            elif int(args.triforce_pool_min[p]) != 0 and int(args.triforce_pool_max[p]) != 0:
+                world.treasure_hunt_total[p] = random.randint(max(int(args.triforce_pool_min[p]), world.treasure_hunt_count[p] + int(args.triforce_min_difference[p])), min(int(args.triforce_pool_max[p]), world.treasure_hunt_count[p] + int(args.triforce_max_difference[p])))
+            else:
+                world.treasure_hunt_total[p] = 10 if world.goal[p] == 'trinity' else 30
+        else:
+            # this will be handled in ItemList.py and custom item pool is used to determine the numbers
+            world.treasure_hunt_count[p], world.treasure_hunt_total[p] = 0, 0
 
     world.rom_seeds = {player: random.randint(0, 999999999) for player in range(1, world.players + 1)}
     world.finish_init()
@@ -165,7 +184,7 @@ def main(args, seed=None, fish=None):
             world.player_names[player].append(name)
     logger.info('')
     world.settings = CustomSettings()
-    world.settings.create_from_world(world, args.race)
+    world.settings.create_from_world(world, args)
 
     outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
 
@@ -501,6 +520,7 @@ def copy_world(world):
     ret.beemizer = world.beemizer.copy()
     ret.intensity = world.intensity.copy()
     ret.decoupledoors = world.decoupledoors.copy()
+    ret.door_self_loops = world.door_self_loops.copy()
     ret.experimental = world.experimental.copy()
     ret.shopsanity = world.shopsanity.copy()
     ret.dropshuffle = world.dropshuffle.copy()
@@ -814,7 +834,9 @@ def create_playthrough(world):
 
         logging.getLogger('').debug(world.fish.translate("cli", "cli", "building.calculating.spheres"), len(collection_spheres), len(sphere), len(prog_locations))
         if not sphere:
-            logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
+            if world.accessibility[location.item.player] != 'none':
+                logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"),
+                                            [world.fish.translate("cli","cli","cannot.reach.item") % (location.item.name, location.item.player, location.name, location.player) for location in sphere_candidates])
             if any([location.name not in optional_locations and world.accessibility[location.item.player] != 'none' for location in sphere_candidates]):
                 raise RuntimeError(world.fish.translate("cli", "cli", "cannot.reach.progression"))
             else:
@@ -877,6 +899,7 @@ def create_playthrough(world):
             if world.has_beaten_game(state):
                 required_locations.clear()
             else:
+                logging.getLogger('').error(world.fish.translate("cli", "cli", "cannot.reach.items"), [world.fish.translate("cli","cli","cannot.reach.item") % (loc.item.name, loc.item.player, loc.name, loc.player) for loc in required_locations])
                 raise RuntimeError(world.fish.translate("cli","cli","cannot.reach.required"))
 
     # store the required locations for statistical analysis

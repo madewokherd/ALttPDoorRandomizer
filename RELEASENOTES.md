@@ -57,7 +57,7 @@ Please see [Customizer documentation](docs/Customizer.md) on how to create custo
 
 ## New Goals
 
-### Triforce Hunt + Ganon
+### Ganonhunt
 Collect the requisite triforce pieces, then defeat Ganon. (Aga2 not required). Use `ganonhunt` on CLI
 
 ### Completionist
@@ -109,6 +109,31 @@ These are now independent of retro mode and have three options: None, Random, an
 
 # Bug Fixes and Notes
 
+* 1.2.0.20u
+  * New generation feature that allows Spiral Stair to link to themselves (thank Catobat)
+  * Added logic for trap doors that could be opened using existing room triggers
+  * Fixed a problem with inverted generation and the experimental flag
+  * Added a notes field for user added notes either via CLI or Customizer (thanks Hiimcody and Codemann)
+  * Fixed a typo for a specific pot hint
+  * Fix for Hera Boss music (thanks Codemann)
+* 1.1.6 (from Stable)
+    * Minor issue with dungeon counter hud interfering with timer
+* 1.2.0.19u
+  * Added min/max for triforce pool, goal, and difference for CLI and Customizer. (Thanks Catobat)
+  * Fixed a bug with dungeon generation
+  * Multiworld: Fixed /missing command to not list all the pots
+  * Changed the "Ganonhunt" goal to use open pyramid on the Auto setting
+  * Customizer: Fixed the example yaml for shopsanity
+* 1.2.0.18u
+  * Fixed an issue with pyramid hole being in logic when it is not opened.
+  * Crystal cutscene at GT use new symmetrical layouts (thanks Codemann)
+  * Fix for Hera Boss music (thanks Codemann)
+  * Fixed an issue where certain vanilla door types would not allow other types to be placed.
+  * Customizer: fixed an issue where last ditch placements would move customized items. Those are now locked and the generation will fail instead if no alternatives are found.
+  * Customizer: fixed an issue with assured sword and start_inventory
+  * Customizer: warns when trying to specifically place an item that's not in the item pool
+  * Fixed "accessibility: none" displaying a spoiling message
+  * Fixed warning message about custom item pool when it is fine
 * 1.2.0.17u
   * Fixed logic bug that allowed Pearl to be behind Graveyard Cave or King's Tomb entrances with only Mirror and West Dark World access (cross world shuffles only) 
   * Removed backup locations for Dungeon Only and Major Only algorithms. If item cannot be placed in the appropriate location, the seed will fail to generate instead 

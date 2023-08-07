@@ -98,6 +98,7 @@ def roll_settings(weights):
     ret.trap_door_mode = get_choice('trap_door_mode')
     ret.key_logic_algorithm = get_choice('key_logic_algorithm')
     ret.decoupledoors = get_choice('decoupledoors') == 'on'
+    ret.door_self_loops = get_choice('door_self_loops') == 'on'
     ret.experimental = get_choice('experimental') == 'on'
     ret.collection_rate = get_choice('collection_rate') == 'on'
 
@@ -138,15 +139,14 @@ def roll_settings(weights):
     ret.crystals_gt = get_choice('tower_open')
     ret.crystals_ganon = get_choice('ganon_open')
 
-    from ItemList import set_default_triforce
-    default_tf_goal, default_tf_pool = set_default_triforce(ret.goal, 0, 0)
-    goal_min = get_choice_default('triforce_goal_min', default=default_tf_goal)
-    goal_max = get_choice_default('triforce_goal_max', default=default_tf_goal)
-    pool_min = get_choice_default('triforce_pool_min', default=default_tf_pool)
-    pool_max = get_choice_default('triforce_pool_max', default=default_tf_pool)
-    ret.triforce_goal = random.randint(int(goal_min), int(goal_max))
-    min_diff = get_choice_default('triforce_min_difference', default=(default_tf_pool-default_tf_goal))
-    ret.triforce_pool = random.randint(max(int(pool_min), ret.triforce_goal + int(min_diff)), int(pool_max))
+    ret.triforce_pool = get_choice_default('triforce_pool', default=0)
+    ret.triforce_goal = get_choice_default('triforce_goal', default=0)
+    ret.triforce_pool_min = get_choice_default('triforce_pool_min', default=0)
+    ret.triforce_pool_max = get_choice_default('triforce_pool_max', default=0)
+    ret.triforce_goal_min = get_choice_default('triforce_goal_min', default=0)
+    ret.triforce_goal_max = get_choice_default('triforce_goal_max', default=0)
+    ret.triforce_min_difference = get_choice_default('triforce_min_difference', default=0)
+    ret.triforce_max_difference = get_choice_default('triforce_max_difference', default=10000)
 
     ret.mode = get_choice('world_state')
     if ret.mode == 'retro':
