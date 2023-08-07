@@ -96,6 +96,7 @@ class World(object):
         self.rooms = []
         self._room_cache = {}
         self.dungeon_layouts = {}
+        self.dungeon_pool = {}
         self.inaccessible_regions = {}
         self.enabled_entrances = {}
         self.key_logic = {}
@@ -164,6 +165,7 @@ class World(object):
             set_player_attr('colorizepots', True)
             set_player_attr('pot_pool', {})
             set_player_attr('decoupledoors', False)
+            set_player_attr('door_self_loops', False)
             set_player_attr('door_type_mode', 'original')
             set_player_attr('trap_door_mode', 'optional')
             set_player_attr('key_logic_algorithm', 'default')
@@ -2023,6 +2025,7 @@ class Door(object):
         self.dest = None
         self.blocked = False  # Indicates if the door is normally blocked off as an exit. (Sanc door or always closed)
         self.blocked_orig = False
+        self.trapped = False
         self.stonewall = False  # Indicate that the door cannot be enter until exited (Desert Torches, PoD Eye Statue)
         self.smallKey = False  # There's a small key door on this side
         self.bigKey = False  # There's a big key door on this side
@@ -2133,7 +2136,7 @@ class Door(object):
         return self
 
     def no_exit(self):
-        self.blocked = self.blocked_orig = True
+        self.blocked = self.blocked_orig = self.trapped = True
         return self
 
     def no_entrance(self):
@@ -2869,6 +2872,7 @@ class Spoiler(object):
                          'trap_door_mode': self.world.trap_door_mode,
                          'key_logic': self.world.key_logic_algorithm,
                          'decoupledoors': self.world.decoupledoors,
+                         'door_self_loops': self.world.door_self_loops,
                          'dungeon_counters': self.world.dungeon_counters,
                          'item_pool': self.world.difficulty,
                          'item_functionality': self.world.difficulty_adjustments,
@@ -3115,6 +3119,7 @@ class Spoiler(object):
                     outfile.write('Door Type Mode:'.ljust(line_width) + '%s\n' % self.metadata['door_type_mode'][player])
                     outfile.write('Trap Door Mode:'.ljust(line_width) + '%s\n' % self.metadata['trap_door_mode'][player])
                     outfile.write('Decouple Doors:'.ljust(line_width) + '%s\n' % yn(self.metadata['decoupledoors'][player]))
+                    outfile.write('Spiral Stairs Self-Loop:'.ljust(line_width) + '%s\n' % yn(self.metadata['door_self_loops'][player]))
                 outfile.write('Experimental:'.ljust(line_width) + '%s\n' % yn(self.metadata['experimental'][player]))
                 outfile.write('Dungeon Counters:'.ljust(line_width) + '%s\n' % self.metadata['dungeon_counters'][player])
                 outfile.write('\n')
@@ -3396,7 +3401,7 @@ class Pot(object):
 
 
 # byte 0: DDDE EEEE (DR, ER)
-dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0, "partitioned": 3}
+dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0, "partitioned": 3, 'paired': 4}
 er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, 'lite': 8,
            'lean': 9, "dungeonsfull": 7, "dungeonssimple": 6, "swapped": 10}
 
@@ -3421,10 +3426,10 @@ mixed_travel_mode = {"prevent": 0, "allow": 1, "force": 2}
 pottery_mode = {'none': 0, 'keys': 2, 'lottery': 3, 'dungeon': 4, 'cave': 5, 'cavekeys': 6, 'reduced': 7,
                 'clustered': 8, 'nonempty': 9}
 
-# byte 5: CCCC CTTX (crystals gt, ctr2, experimental)
+# byte 5: SCCC CTTX (self-loop doors, crystals gt, ctr2, experimental)
 counter_mode = {"default": 0, "off": 1, "on": 2, "pickup": 3}
 
-# byte 6: CCCC CPAA (crystals ganon, pyramid, access
+# byte 6: ?CCC CPAA (crystals ganon, pyramid, access
 access_mode = {"items": 0, "locations": 1, "none": 2}
 
 # byte 7: B?MC DDEE (big, ?, maps, compass, door_type, enemies)
@@ -3489,7 +3494,8 @@ class Settings(object):
 
             (0x80 if w.shuffletavern[p] else 0) | (0x10 if w.dropshuffle[p] else 0) | (pottery_mode[w.pottery[p]]),
 
-            ((8 if w.crystals_gt_orig[p] == "random" else int(w.crystals_gt_orig[p])) << 3)
+            (0x80 if w.door_self_loops[p] else 0)
+            | ((8 if w.crystals_gt_orig[p] == "random" else int(w.crystals_gt_orig[p])) << 3)
             | (counter_mode[w.dungeon_counters[p]] << 1) | (1 if w.experimental[p] else 0),
 
             ((8 if w.crystals_ganon_orig[p] == "random" else int(w.crystals_ganon_orig[p])) << 3)
@@ -3515,8 +3521,8 @@ class Settings(object):
             (flute_mode[w.flute_mode[p]] << 7 | bow_mode[w.bow_mode[p]] << 4
              | take_any_mode[w.take_any[p]] << 2 | keyshuffle_mode[w.keyshuffle[p]]),
 
-            ((0x80 if w.pseudoboots[p] else 0) | overworld_map_mode[w.overworld_map[p]] << 6
-             | trap_door_mode[w.trap_door_mode[p]] << 4 | key_logic_algo[w.key_logic_algorithm[p]]),
+            ((0x80 if w.pseudoboots[p] else 0) | overworld_map_mode[w.overworld_map[p]] << 5
+             | trap_door_mode[w.trap_door_mode[p]] << 3 | key_logic_algo[w.key_logic_algorithm[p]]),
             ])
         return base64.b64encode(code, "+-".encode()).decode()
 
@@ -3554,12 +3560,13 @@ class Settings(object):
         args.dropshuffle[p] = True if settings[4] & 0x10 else False
         args.pottery[p] = r(pottery_mode)[settings[4] & 0x0F]
 
+        args.door_self_loops[p] = True if settings[5] & 0x80 else False
         args.dungeon_counters[p] = r(counter_mode)[(settings[5] & 0x6) >> 1]
-        cgt = (settings[5] & 0xf8) >> 3
+        cgt = (settings[5] & 0x78) >> 3
         args.crystals_gt[p] = "random" if cgt == 8 else cgt
         args.experimental[p] = True if settings[5] & 0x1 else False
 
-        cgan = (settings[6] & 0xf8) >> 3
+        cgan = (settings[6] & 0x78) >> 3
         args.crystals_ganon[p] = "random" if cgan == 8 else cgan
         args.openpyramid[p] = True if settings[6] & 0x4 else False
 
@@ -3599,8 +3606,8 @@ class Settings(object):
 
         if len(settings) > 14:
             args.pseudoboots[p] = True if settings[14] & 0x80 else False
-            args.overworld_map[p] = r(overworld_map_mode)[(settings[14] & 0x60) >> 6]
-            args.trap_door_mode[p] = r(trap_door_mode)[(settings[14] & 0x14) >> 4]
+            args.overworld_map[p] = r(overworld_map_mode)[(settings[14] & 0x60) >> 5]
+            args.trap_door_mode[p] = r(trap_door_mode)[(settings[14] & 0x18) >> 3]
             args.key_logic_algorithm[p] = r(key_logic_algo)[settings[14] & 0x07]
 
 
