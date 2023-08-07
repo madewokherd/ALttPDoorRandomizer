@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2.1
+- \~Merged in DR v1.2.0.20~
+- Some minor Swapped ER improvements
+- Fixed generation error with Flute Activation
+
 ## 0.3.2.0
 - New Swapped ER mode option
 - Fixed issue with flipper rules not properly getting pearl requirement added
