@@ -705,8 +705,8 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
             continue
         # ensure sanc can be placed in LW in certain modes
         if not do_grouped and world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lean', 'swapped', 'crossed', 'insanity'] and world.mode[player] != 'inverted' and (world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3 or world.mode[player] == 'standard'):
-            free_dw_drops = parity[5] + (1 if world.shuffle_ganon else 0)
-            free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon else 0)
+            free_dw_drops = parity[5] + (1 if world.shuffle_ganon[player] else 0)
+            free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon[player] else 0)
             if free_dw_drops == free_drops:
                 attempts -= 1
                 continue
@@ -1190,7 +1190,7 @@ def validate_layout(world, player):
             start_region = 'Big Bomb Shop Area'
         explore_region(start_region)
 
-    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean'] and world.mode == 'inverted':
+    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean'] and world.mode[player] == 'inverted':
         start_region = 'Dark Chapel Area'
         explore_region(start_region)
 
@@ -1220,7 +1220,7 @@ def validate_layout(world, player):
         unreachable_count = len(unreachable_regions)
         for region_name in reversed(unreachable_regions):
             # check if can be accessed flute
-            if unreachable_regions[region_name].type == RegionType.LightWorld:
+            if unreachable_regions[region_name].type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
                 owid = OWTileRegions[region_name]
                 if owid < 0x80 and owid % 40 in flute_data and region_name in flute_data[owid][0]:
                     if world.owFluteShuffle[player] != 'vanilla' or owid % 0x40 in default_flute_connections:
@@ -1230,9 +1230,9 @@ def validate_layout(world, player):
             # check if entrances in region could be used to access region
             if world.shuffle[player] != 'vanilla':
                 for entrance in [e for e in unreachable_regions[region_name].exits if e.spot_type == 'Entrance']:
-                    if (entrance.name == 'Links House' and (world.mode == 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
-                            or (entrance.name == 'Big Bomb Shop' and (world.mode != 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
-                            or (entrance.name == 'Ganons Tower' and (world.mode != 'inverted' and not world.shuffle_ganon[player])) \
+                    if (entrance.name == 'Links House' and (world.mode[player] == 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
+                            or (entrance.name == 'Big Bomb Shop' and (world.mode[player] != 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
+                            or (entrance.name == 'Ganons Tower' and (world.mode[player] != 'inverted' and not world.shuffle_ganon[player])) \
                             or (entrance.name in ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'] and world.shuffle[player] not in ['insanity']) \
                             or entrance.name == 'Tavern North':
                         continue # these are fixed entrances and cannot be used for gaining access to region
