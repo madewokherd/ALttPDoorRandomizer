@@ -265,9 +265,14 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
     else:
         # cross world mandantory
         entrance_list = list(entrances)
+        if avail.swapped:
+            forbidden = [e for e in Forbidden_Swap_Entrances if e in entrance_list]
+            entrance_list = [e for e in entrance_list if e not in forbidden]
         must_exit, multi_exit_caves = figure_out_must_exits_cross_world(entrances, exits, avail)
         do_mandatory_connections(avail, entrance_list, multi_exit_caves, must_exit)
         rem_entrances.update(entrance_list)
+        if avail.swapped:
+            rem_entrances.update(forbidden)
 
     rem_exits.update([x for item in multi_exit_caves for x in item if x in avail.exits])
     rem_exits.update(exits)
