@@ -689,9 +689,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         owFlags |= 0x0100
 
     for o in range(0, len(flute_spots)):
-        owslot = flute_spots[o]
+        owid = flute_spots[o]
         offset = 0
-        data = flute_data[owslot]
+        data = flute_data[owid]
 
         if world.is_tile_swapped(data[1], player):
             offset = 0x40
