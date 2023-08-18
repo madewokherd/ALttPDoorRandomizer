@@ -696,7 +696,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         if world.is_tile_swapped(data[1], player):
             offset = 0x40
         
-        write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), data[1] + offset) # owid
+        write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), owid + offset) # owid
         write_int16(rom, snes_to_pc(0x02E8D1 + (o * 2)), data[13] if offset > 0 and len(data) > 13 else data[5]) # link Y
         write_int16(rom, snes_to_pc(0x02E8F3 + (o * 2)), data[14] if offset > 0 and len(data) > 13 else data[6]) # link X
         
