@@ -417,11 +417,15 @@ def link_overworld(world, player):
     if world.owFluteShuffle[player] == 'vanilla':
         connect_flutes(default_flute_connections)
     else:
+        flute_spots = 8
         flute_pool = list(flute_data.keys())
         new_spots = list()
         ignored_regions = set()
+        used_flute_regions = []
+        forbidden_spots = []
+        forbidden_regions = []
 
-        def addSpot(owid, ignore_proximity):
+        def addSpot(owid, ignore_proximity, forced):
             if world.owFluteShuffle[player] == 'balanced':
                 def getIgnored(regionname, base_owid, owid):
                     region = world.get_region(regionname, player)
@@ -430,23 +434,28 @@ def link_overworld(world, player):
                             if exit.connected_region.name in OWTileRegions and (OWTileRegions[exit.connected_region.name] in [base_owid, owid] or OWTileRegions[regionname] == base_owid):
                                 new_ignored.add(exit.connected_region.name)
                                 getIgnored(exit.connected_region.name, base_owid, OWTileRegions[exit.connected_region.name])
+                    if regionname in one_way_ledges:
+                        for ledge_region in one_way_ledges[regionname]:
+                            if ledge_region not in new_ignored:
+                                new_ignored.add(ledge_region)
+                                getIgnored(ledge_region, base_owid, OWTileRegions[ledge_region])
 
                 if not world.is_tile_swapped(owid, player):
                     new_region = flute_data[owid][0][0]
                 else:
                     new_region = flute_data[owid][0][1]
 
-                if new_region in ignored_regions:
+                if new_region in ignored_regions and not forced:
                     return False
                 
                 new_ignored = {new_region}
                 getIgnored(new_region, OWTileRegions[new_region], OWTileRegions[new_region])
-                if not ignore_proximity and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
+                if not ignore_proximity and not forced and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
                     return False
                 ignored_regions.update(new_ignored)
             if owid in flute_pool:
                 flute_pool.remove(owid)
-                if ignore_proximity:
+                if ignore_proximity and not forced:
                     logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
                 logging.getLogger('').debug(f'Placing flute at: {hex(owid)}')
                 new_spots.append(owid)
@@ -455,23 +464,65 @@ def link_overworld(world, player):
                 logging.getLogger('').warning(f'Warning: Attempted to place flute spot not in pool: {hex(owid)}')
             return True
         
+        if world.customizer:
+            custom_spots = world.customizer.get_owflutespots()
+            if custom_spots and player in custom_spots:
+                if 'force' in custom_spots[player]:
+                    for id in custom_spots[player]['force']:
+                        owid = id & 0xBF
+                        addSpot(owid, True, True)
+                        flute_spots -= 1
+                        if not world.is_tile_swapped(owid, player):
+                            used_flute_regions.append(flute_data[owid][0][0])
+                        else:
+                            used_flute_regions.append(flute_data[owid][0][1])
+                if 'forbid' in custom_spots[player]:
+                    for id in custom_spots[player]['forbid']:
+                        owid = id & 0xBF
+                        if owid not in new_spots:
+                            forbidden_spots.append(owid)
+                            if not world.is_tile_swapped(owid, player):
+                                forbidden_regions.append(flute_data[owid][0][0])
+                            else:
+                                forbidden_regions.append(flute_data[owid][0][1])
+
         # determine sectors (isolated groups of regions) to place flute spots
-        flute_regions = {(f[0][0] if (o not in world.owswaps[player][0]) != (world.mode[player] == 'inverted') else f[0][1]) : o for o, f in flute_data.items()}
+        flute_regions = {(f[0][0] if (o not in world.owswaps[player][0]) != (world.mode[player] == 'inverted') else f[0][1]) : o for o, f in flute_data.items() if o not in new_spots and o not in forbidden_spots}
         flute_sectors = [(len([r for l in s for r in l]), [r for l in s for r in l if r in flute_regions]) for s in world.owsectors[player]]
         flute_sectors = [s for s in flute_sectors if len(s[1]) > 0]
         region_total = sum([c for c,_ in flute_sectors])
         sector_total = len(flute_sectors)
+        empty_sector_total = 0
+        sector_has_spot = []
 
-        # reserve a number of flute spots for each sector
-        flute_spots = 8
+        # determine which sectors still need a flute spot
         for sector in flute_sectors:
+            already_has_spot = any(region in sector for region in used_flute_regions)
+            sector_has_spot.append(already_has_spot)
+            if not already_has_spot:
+                empty_sector_total += 1
+        if flute_spots < empty_sector_total:
+            logging.getLogger('').warning(f'Warning: Not every sector can have a flute spot, generation might fail')
+            # pretend like some of the empty sectors already have a flute spot, don't know if they will be reachable
+            for i in range(len(flute_sectors)):
+                if not sector_has_spot[i]:
+                    sector_has_spot[i] = True
+                    empty_sector_total -= 1
+                    if flute_spots == empty_sector_total:
+                        break
+
+        # distribute flute spots for each sector
+        for i in range(len(flute_sectors)):
+            sector = flute_sectors[i]
             sector_total -= 1
-            spots_to_place = min(flute_spots - sector_total, max(1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
+            if not sector_has_spot[i]:
+                empty_sector_total -= 1
+            spots_to_place = min(flute_spots - empty_sector_total, max(0 if sector_has_spot[i] else 1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
             target_spots = len(new_spots) + spots_to_place
             logging.getLogger('').debug(f'Sector of {sector[0]} regions gets {spots_to_place} spot(s)')
             
-            if 'Desert Teleporter Ledge' in sector[1] or 'Mire Teleporter Ledge' in sector[1]:
-                addSpot(0x30, False) # guarantee desert/mire access
+            if 0x30 in flute_pool and 0x30 not in forbidden_spots and len(new_spots) < target_spots and ('Desert Teleporter Ledge' in sector[1] or 'Mire Teleporter Ledge' in sector[1]):
+                addSpot(0x30, True, True) # guarantee desert/mire access
 
             random.shuffle(sector[1])
             f = 0
@@ -482,8 +533,9 @@ def link_overworld(world, player):
                     t += 1
                     if t > 5:
                         raise GenerationException('Infinite loop detected in flute shuffle')
-                if sector[1][f] not in new_spots:
-                    addSpot(flute_regions[sector[1][f]], t > 0)
+                owid = flute_regions[sector[1][f]]
+                if owid not in new_spots and owid not in forbidden_spots:
+                    addSpot(owid, t > 0, False)
                 f += 1
 
             region_total -= sector[0]
