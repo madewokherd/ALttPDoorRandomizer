@@ -7,7 +7,7 @@ from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitType
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
-version_number = '0.3.2.1'
+version_number = '0.3.2.2'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -407,9 +407,9 @@ def link_overworld(world, player):
     logging.getLogger('').debug('Shuffling flute spots')
     def connect_flutes(flute_destinations):
         for o in range(0, len(flute_destinations)):
-            owslot = flute_destinations[o]
-            regions = flute_data[owslot][0]
-            if not world.is_tile_swapped(flute_data[owslot][1], player):
+            owid = flute_destinations[o]
+            regions = flute_data[owid][0]
+            if not world.is_tile_swapped(owid, player):
                 connect_simple(world, 'Flute Spot ' + str(o + 1), regions[0], player)
             else:
                 connect_simple(world, 'Flute Spot ' + str(o + 1), regions[1], player)
@@ -417,11 +417,15 @@ def link_overworld(world, player):
     if world.owFluteShuffle[player] == 'vanilla':
         connect_flutes(default_flute_connections)
     else:
+        flute_spots = 8
         flute_pool = list(flute_data.keys())
         new_spots = list()
         ignored_regions = set()
+        used_flute_regions = []
+        forbidden_spots = []
+        forbidden_regions = []
 
-        def addSpot(owid, ignore_proximity):
+        def addSpot(owid, ignore_proximity, forced):
             if world.owFluteShuffle[player] == 'balanced':
                 def getIgnored(regionname, base_owid, owid):
                     region = world.get_region(regionname, player)
@@ -430,23 +434,28 @@ def link_overworld(world, player):
                             if exit.connected_region.name in OWTileRegions and (OWTileRegions[exit.connected_region.name] in [base_owid, owid] or OWTileRegions[regionname] == base_owid):
                                 new_ignored.add(exit.connected_region.name)
                                 getIgnored(exit.connected_region.name, base_owid, OWTileRegions[exit.connected_region.name])
+                    if regionname in one_way_ledges:
+                        for ledge_region in one_way_ledges[regionname]:
+                            if ledge_region not in new_ignored:
+                                new_ignored.add(ledge_region)
+                                getIgnored(ledge_region, base_owid, OWTileRegions[ledge_region])
 
-                if not world.is_tile_swapped(flute_data[owid][1], player):
+                if not world.is_tile_swapped(owid, player):
                     new_region = flute_data[owid][0][0]
                 else:
                     new_region = flute_data[owid][0][1]
 
-                if new_region in ignored_regions:
+                if new_region in ignored_regions and not forced:
                     return False
                 
                 new_ignored = {new_region}
                 getIgnored(new_region, OWTileRegions[new_region], OWTileRegions[new_region])
-                if not ignore_proximity and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
+                if not ignore_proximity and not forced and random.randint(0, 31) != 0 and new_ignored.intersection(ignored_regions):
                     return False
                 ignored_regions.update(new_ignored)
             if owid in flute_pool:
                 flute_pool.remove(owid)
-                if ignore_proximity:
+                if ignore_proximity and not forced:
                     logging.getLogger('').warning(f'Warning: Adding flute spot within proximity: {hex(owid)}')
                 logging.getLogger('').debug(f'Placing flute at: {hex(owid)}')
                 new_spots.append(owid)
@@ -455,23 +464,65 @@ def link_overworld(world, player):
                 logging.getLogger('').warning(f'Warning: Attempted to place flute spot not in pool: {hex(owid)}')
             return True
         
+        if world.customizer:
+            custom_spots = world.customizer.get_owflutespots()
+            if custom_spots and player in custom_spots:
+                if 'force' in custom_spots[player]:
+                    for id in custom_spots[player]['force']:
+                        owid = id & 0xBF
+                        addSpot(owid, True, True)
+                        flute_spots -= 1
+                        if not world.is_tile_swapped(owid, player):
+                            used_flute_regions.append(flute_data[owid][0][0])
+                        else:
+                            used_flute_regions.append(flute_data[owid][0][1])
+                if 'forbid' in custom_spots[player]:
+                    for id in custom_spots[player]['forbid']:
+                        owid = id & 0xBF
+                        if owid not in new_spots:
+                            forbidden_spots.append(owid)
+                            if not world.is_tile_swapped(owid, player):
+                                forbidden_regions.append(flute_data[owid][0][0])
+                            else:
+                                forbidden_regions.append(flute_data[owid][0][1])
+
         # determine sectors (isolated groups of regions) to place flute spots
-        flute_regions = {(f[0][0] if (f[1] not in world.owswaps[player][0]) != (world.mode[player] == 'inverted') else f[0][1]) : o for o, f in flute_data.items()}
+        flute_regions = {(f[0][0] if (o not in world.owswaps[player][0]) != (world.mode[player] == 'inverted') else f[0][1]) : o for o, f in flute_data.items() if o not in new_spots and o not in forbidden_spots}
         flute_sectors = [(len([r for l in s for r in l]), [r for l in s for r in l if r in flute_regions]) for s in world.owsectors[player]]
         flute_sectors = [s for s in flute_sectors if len(s[1]) > 0]
         region_total = sum([c for c,_ in flute_sectors])
         sector_total = len(flute_sectors)
+        empty_sector_total = 0
+        sector_has_spot = []
 
-        # reserve a number of flute spots for each sector
-        flute_spots = 8
+        # determine which sectors still need a flute spot
         for sector in flute_sectors:
+            already_has_spot = any(region in sector for region in used_flute_regions)
+            sector_has_spot.append(already_has_spot)
+            if not already_has_spot:
+                empty_sector_total += 1
+        if flute_spots < empty_sector_total:
+            logging.getLogger('').warning(f'Warning: Not every sector can have a flute spot, generation might fail')
+            # pretend like some of the empty sectors already have a flute spot, don't know if they will be reachable
+            for i in range(len(flute_sectors)):
+                if not sector_has_spot[i]:
+                    sector_has_spot[i] = True
+                    empty_sector_total -= 1
+                    if flute_spots == empty_sector_total:
+                        break
+
+        # distribute flute spots for each sector
+        for i in range(len(flute_sectors)):
+            sector = flute_sectors[i]
             sector_total -= 1
-            spots_to_place = min(flute_spots - sector_total, max(1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
+            if not sector_has_spot[i]:
+                empty_sector_total -= 1
+            spots_to_place = min(flute_spots - empty_sector_total, max(0 if sector_has_spot[i] else 1, round((sector[0] * (flute_spots - sector_total) / region_total) + 0.5)))
             target_spots = len(new_spots) + spots_to_place
             logging.getLogger('').debug(f'Sector of {sector[0]} regions gets {spots_to_place} spot(s)')
             
-            if 'Desert Teleporter Ledge' in sector[1] or 'Mire Teleporter Ledge' in sector[1]:
-                addSpot(0x38, False) # guarantee desert/mire access
+            if 0x30 in flute_pool and 0x30 not in forbidden_spots and len(new_spots) < target_spots and ('Desert Teleporter Ledge' in sector[1] or 'Mire Teleporter Ledge' in sector[1]):
+                addSpot(0x30, True, True) # guarantee desert/mire access
 
             random.shuffle(sector[1])
             f = 0
@@ -482,8 +533,9 @@ def link_overworld(world, player):
                     t += 1
                     if t > 5:
                         raise GenerationException('Infinite loop detected in flute shuffle')
-                if sector[1][f] not in new_spots:
-                    addSpot(flute_regions[sector[1][f]], t > 0)
+                owid = flute_regions[sector[1][f]]
+                if owid not in new_spots and owid not in forbidden_spots:
+                    addSpot(owid, t > 0, False)
                 f += 1
 
             region_total -= sector[0]
@@ -495,7 +547,6 @@ def link_overworld(world, player):
         connect_flutes(new_spots)
 
         # update spoiler
-        new_spots = list(map(lambda o: flute_data[o][1], new_spots))
         s = list(map(lambda x: ' ' if x not in new_spots else 'F', [i for i in range(0x40)]))
         text_output = flute_spoiler_table.replace('s', '%s') % (                             s[0x02],                                s[0x07],
                                                                                  s[0x00],                s[0x03],        s[0x05],
@@ -639,33 +690,33 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
     if world.customizer:
         if not do_grouped:
             custom_flips = world.customizer.get_owtileflips()
-        if custom_flips and player in custom_flips:
-            custom_flips = custom_flips[player]
-            nonflipped_groups = list()
-            forced_flips = list()
-            forced_nonflips = list()
-            if 'undefined_chance' in custom_flips:
-                undefined_chance = custom_flips['undefined_chance']
-            if 'force_flip' in custom_flips:
-                forced_flips = custom_flips['force_flip']
-            if 'force_no_flip' in custom_flips:
-                forced_nonflips = custom_flips['force_no_flip']
+            if custom_flips and player in custom_flips:
+                custom_flips = custom_flips[player]
+                nonflipped_groups = list()
+                forced_flips = list()
+                forced_nonflips = list()
+                if 'undefined_chance' in custom_flips:
+                    undefined_chance = custom_flips['undefined_chance']
+                if 'force_flip' in custom_flips:
+                    forced_flips = custom_flips['force_flip']
+                if 'force_no_flip' in custom_flips:
+                    forced_nonflips = custom_flips['force_no_flip']
 
-            for group in groups:
-                if any(owid in group[0] for owid in forced_nonflips):
-                    nonflipped_groups.append(group)
-                if any(owid in group[0] for owid in forced_flips):
-                    flipped_groups.append(group)
+                for group in groups:
+                    if any(owid in group[0] for owid in forced_nonflips):
+                        nonflipped_groups.append(group)
+                    if any(owid in group[0] for owid in forced_flips):
+                        flipped_groups.append(group)
 
-            # Check if there are any groups that appear in both sets
-            if any(group in flipped_groups for group in nonflipped_groups):
-                raise GenerationException('Conflict found when flipping tiles')
-            
-            for g in nonflipped_groups:
-                always_removed.append(g)
-            if undefined_chance == 0:
-                for g in [g for g in groups if g not in flipped_groups + always_removed]:
+                # Check if there are any groups that appear in both sets
+                if any(group in flipped_groups for group in nonflipped_groups):
+                    raise GenerationException('Conflict found when flipping tiles')
+                
+                for g in nonflipped_groups:
                     always_removed.append(g)
+                if undefined_chance == 0:
+                    for g in [g for g in groups if g not in flipped_groups + always_removed]:
+                        always_removed.append(g)
     
     attempts = 1
     if 0 < undefined_chance < 100:
@@ -706,8 +757,8 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
             continue
         # ensure sanc can be placed in LW in certain modes
         if not do_grouped and world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lean', 'swapped', 'crossed', 'insanity'] and world.mode[player] != 'inverted' and (world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3 or world.mode[player] == 'standard'):
-            free_dw_drops = parity[5] + (1 if world.shuffle_ganon else 0)
-            free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon else 0)
+            free_dw_drops = parity[5] + (1 if world.shuffle_ganon[player] else 0)
+            free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon[player] else 0)
             if free_dw_drops == free_drops:
                 attempts -= 1
                 continue
@@ -1191,7 +1242,7 @@ def validate_layout(world, player):
             start_region = 'Big Bomb Shop Area'
         explore_region(start_region)
 
-    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean'] and world.mode == 'inverted':
+    if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean'] and world.mode[player] == 'inverted':
         start_region = 'Dark Chapel Area'
         explore_region(start_region)
 
@@ -1221,19 +1272,19 @@ def validate_layout(world, player):
         unreachable_count = len(unreachable_regions)
         for region_name in reversed(unreachable_regions):
             # check if can be accessed flute
-            if unreachable_regions[region_name].type == RegionType.LightWorld:
+            if unreachable_regions[region_name].type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
                 owid = OWTileRegions[region_name]
-                if owid < 0x80 and any(f[1] == owid and region_name in f[0] for f in flute_data.values()):
-                    if world.owFluteShuffle[player] != 'vanilla' or owid % 0x40 in [0x03, 0x16, 0x18, 0x2c, 0x2f, 0x3b, 0x3f]:
+                if owid < 0x80 and owid % 40 in flute_data and region_name in flute_data[owid][0]:
+                    if world.owFluteShuffle[player] != 'vanilla' or owid % 0x40 in default_flute_connections:
                         unreachable_regions.pop(region_name)
                         explore_region(region_name)
                         break
             # check if entrances in region could be used to access region
             if world.shuffle[player] != 'vanilla':
                 for entrance in [e for e in unreachable_regions[region_name].exits if e.spot_type == 'Entrance']:
-                    if (entrance.name == 'Links House' and (world.mode == 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
-                            or (entrance.name == 'Big Bomb Shop' and (world.mode != 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
-                            or (entrance.name == 'Ganons Tower' and (world.mode != 'inverted' and not world.shuffle_ganon[player])) \
+                    if (entrance.name == 'Links House' and (world.mode[player] == 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
+                            or (entrance.name == 'Big Bomb Shop' and (world.mode[player] != 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
+                            or (entrance.name == 'Ganons Tower' and (world.mode[player] != 'inverted' and not world.shuffle_ganon[player])) \
                             or (entrance.name in ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'] and world.shuffle[player] not in ['insanity']) \
                             or entrance.name == 'Tavern North':
                         continue # these are fixed entrances and cannot be used for gaining access to region
@@ -1467,7 +1518,7 @@ default_whirlpool_connections = [
 ]                         
 
 default_flute_connections = [
-    0x0b, 0x16, 0x18, 0x2c, 0x2f, 0x38, 0x3b, 0x3f
+    0x03, 0x16, 0x18, 0x2c, 0x2f, 0x30, 0x3b, 0x3f
 ]
 
 ow_connections = {
@@ -2131,10 +2182,10 @@ isolated_regions = [
 
 flute_data = {
     #Slot    LW Region                         DW Region                            OWID   VRAM    BG Y    BG X   Link Y  Link X   Cam Y   Cam X   Unk1    Unk2   IconY   IconX    AltY    AltX  AltVRAM  AltBGY  AltBGX  AltCamY AltCamX AltUnk1 AltUnk2 AltIconY AltIconX
-    0x09: (['Lost Woods East Area',           'Skull Woods Forest'],                0x00, 0x1042, 0x022e, 0x0202, 0x0290, 0x0288, 0x029b, 0x028f, 0xfff2, 0x000e, 0x0290, 0x0288, 0x0290, 0x0290),
+    0x00: (['Lost Woods East Area',           'Skull Woods Forest'],                0x09, 0x1042, 0x022e, 0x0202, 0x0290, 0x0288, 0x029b, 0x028f, 0xfff2, 0x000e, 0x0290, 0x0288, 0x0290, 0x0290),
     0x02: (['Lumberjack Area',                'Dark Lumberjack Area'],              0x02, 0x059c, 0x00d6, 0x04e6, 0x0138, 0x0558, 0x0143, 0x0563, 0xfffa, 0xfffa, 0x0138, 0x0550),
-    0x0b: (['West Death Mountain (Bottom)',   'West Dark Death Mountain (Top)'],    0x03, 0x1600, 0x02ca, 0x060e, 0x0328, 0x0678, 0x0337, 0x0683, 0xfff6, 0xfff2, 0x035b, 0x0680, 0x0118, 0x0860, 0x05c0, 0x00b8, 0x07ec, 0x0127, 0x086b, 0xfff8, 0x0004, 0x0148, 0x0850),
-    0x0e: (['East Death Mountain (Bottom)',   'East Dark Death Mountain (Bottom)'], 0x05, 0x1860, 0x031e, 0x0d00, 0x0388, 0x0da8, 0x038d, 0x0d7d, 0x0000, 0x0000, 0x0388, 0x0da8),
+    0x03: (['West Death Mountain (Bottom)',   'West Dark Death Mountain (Top)'],    0x0b, 0x1600, 0x02ca, 0x060e, 0x0328, 0x0678, 0x0337, 0x0683, 0xfff6, 0xfff2, 0x035b, 0x0680, 0x0118, 0x0860, 0x05c0, 0x00b8, 0x07ec, 0x0127, 0x086b, 0xfff8, 0x0004, 0x0148, 0x0850),
+    0x05: (['East Death Mountain (Bottom)',   'East Dark Death Mountain (Bottom)'], 0x0e, 0x1860, 0x031e, 0x0d00, 0x0388, 0x0da8, 0x038d, 0x0d7d, 0x0000, 0x0000, 0x0388, 0x0da8),
     0x07: (['Death Mountain TR Pegs Area',    'Turtle Rock Area'],                  0x07, 0x0804, 0x0102, 0x0e1a, 0x0160, 0x0e90, 0x016f, 0x0e97, 0xfffe, 0x0006, 0x0160, 0x0f20),
     0x0a: (['Mountain Pass Area',             'Bumper Cave Area'],                  0x0a, 0x0180, 0x0220, 0x0406, 0x0280, 0x0488, 0x028f, 0x0493, 0x0000, 0xfffa, 0x0280, 0x0488),
     0x0f: (['Zora Waterfall Area',            'Catfish Area'],                      0x0f, 0x0316, 0x025c, 0x0eb2, 0x02c0, 0x0f28, 0x02cb, 0x0f2f, 0x0002, 0xfffe, 0x02d0, 0x0f38),
@@ -2150,7 +2201,7 @@ flute_data = {
     0x1a: (['Forgotten Forest Area',          'Shield Shop Fence'],                 0x1a, 0x081a, 0x070f, 0x04d2, 0x0770, 0x0548, 0x077c, 0x054f, 0xffff, 0xfffe, 0x0770, 0x0548),
     0x1b: (['Hyrule Castle Courtyard',        'Pyramid Area'],                      0x1b, 0x0c30, 0x077a, 0x0786, 0x07d8, 0x07f8, 0x07e7, 0x0803, 0x0006, 0xfffa, 0x07d8, 0x07f8),
     0x1d: (['Wooden Bridge Area',             'Broken Bridge Northeast'],           0x1d, 0x0602, 0x06c2, 0x0a0e, 0x0720, 0x0a80, 0x072f, 0x0a8b, 0xfffe, 0x0002, 0x0720, 0x0a80),
-    0x26: (['Eastern Palace Area',            'Palace of Darkness Area'],           0x1e, 0x1802, 0x091e, 0x0c0e, 0x09c0, 0x0c80, 0x098b, 0x0c8b, 0x0000, 0x0002, 0x09c0, 0x0c80),
+    0x1e: (['Eastern Palace Area',            'Palace of Darkness Area'],           0x26, 0x1802, 0x091e, 0x0c0e, 0x09c0, 0x0c80, 0x098b, 0x0c8b, 0x0000, 0x0002, 0x09c0, 0x0c80),
     0x22: (['Blacksmith Area',                'Hammer Pegs Area'],                  0x22, 0x058c, 0x08aa, 0x0462, 0x0908, 0x04d8, 0x0917, 0x04df, 0x0006, 0xfffe, 0x0908, 0x04d8),
     0x25: (['Sand Dunes Area',                'Dark Dunes Area'],                   0x25, 0x030e, 0x085a, 0x0a76, 0x08b8, 0x0ae8, 0x08c7, 0x0af3, 0x0006, 0xfffa, 0x08b8, 0x0b08),
     0x28: (['Maze Race Area',                 'Dig Game Area'],                     0x28, 0x0908, 0x0b1e, 0x003a, 0x0b88, 0x00b8, 0x0b8d, 0x00bf, 0x0000, 0x0006, 0x0b88, 0x00b8),
@@ -2161,12 +2212,12 @@ flute_data = {
     0x2d: (['Stone Bridge South Area',        'Hammer Bridge South Area'],          0x2d, 0x0886, 0x0b1e, 0x0a2a, 0x0ba0, 0x0aa8, 0x0b8b, 0x0aaf, 0x0000, 0x0006, 0x0bc4, 0x0ad0),
     0x2e: (['Tree Line Area',                 'Dark Tree Line Area'],               0x2e, 0x0100, 0x0a1a, 0x0c00, 0x0a78, 0x0c30, 0x0a87, 0x0c7d, 0x0006, 0x0000, 0x0a78, 0x0c58),
     0x2f: (['Eastern Nook Area',              'Darkness Nook Area'],                0x2f, 0x0798, 0x0afa, 0x0eb2, 0x0b58, 0x0f30, 0x0b67, 0x0f37, 0xfff6, 0x000e, 0x0b50, 0x0f30),
-    0x38: (['Desert Teleporter Ledge',        'Mire Teleporter Ledge'],             0x30, 0x1880, 0x0f1e, 0x0000, 0x0fa8, 0x0078, 0x0f8d, 0x008d, 0x0000, 0x0000, 0x0fb0, 0x0070),
+    0x30: (['Desert Teleporter Ledge',        'Mire Teleporter Ledge'],             0x38, 0x1880, 0x0f1e, 0x0000, 0x0fa8, 0x0078, 0x0f8d, 0x008d, 0x0000, 0x0000, 0x0fb0, 0x0070),
     0x32: (['Flute Boy Approach Area',        'Stumpy Approach Area'],              0x32, 0x03a0, 0x0c6c, 0x0500, 0x0cd0, 0x05a8, 0x0cdb, 0x0585, 0x0002, 0x0000, 0x0cd6, 0x0568),
     0x33: (['C Whirlpool Outer Area',         'Dark C Whirlpool Outer Area'],       0x33, 0x0180, 0x0c20, 0x0600, 0x0c80, 0x0628, 0x0c8f, 0x067d, 0x0000, 0x0000, 0x0c80, 0x0628),
     0x34: (['Statues Area',                   'Hype Cave Area'],                    0x34, 0x088e, 0x0d00, 0x0866, 0x0d60, 0x08d8, 0x0d6f, 0x08e3, 0x0000, 0x000a, 0x0d60, 0x08d8),
     #0x35: (['Lake Hylia Northwest Bank',      'Ice Lake Northwest Bank'],           0x35, 0x0d00, 0x0da6, 0x0a06, 0x0e08, 0x0a80, 0x0e13, 0x0a8b, 0xfffa, 0xfffa, 0x0d88, 0x0a88),
-    0x3e: (['Lake Hylia South Shore',         'Ice Lake Southeast Ledge'],          0x35, 0x1860, 0x0f1e, 0x0d00, 0x0f98, 0x0da8, 0x0f8b, 0x0d85, 0x0000, 0x0000, 0x0f90, 0x0da4),
+    0x35: (['Lake Hylia South Shore',         'Ice Lake Southeast Ledge'],          0x3e, 0x1860, 0x0f1e, 0x0d00, 0x0f98, 0x0da8, 0x0f8b, 0x0d85, 0x0000, 0x0000, 0x0f90, 0x0da4),
     0x37: (['Ice Cave Area',                  'Shopping Mall Area'],                0x37, 0x0786, 0x0cf6, 0x0e2e, 0x0d58, 0x0ea0, 0x0d63, 0x0eab, 0x000a, 0x0002, 0x0d48, 0x0ed0),
     0x3a: (['Desert Pass Area',               'Swamp Nook Area'],                   0x3a, 0x001a, 0x0e08, 0x04c6, 0x0e70, 0x0540, 0x0e7d, 0x054b, 0x0006, 0x000a, 0x0e70, 0x0540),
     0x3b: (['Dam Area',                       'Swamp Area'],                        0x3b, 0x069e, 0x0edf, 0x06f2, 0x0f3d, 0x0778, 0x0f4c, 0x077f, 0xfff1, 0xfffe, 0x0f30, 0x0770),

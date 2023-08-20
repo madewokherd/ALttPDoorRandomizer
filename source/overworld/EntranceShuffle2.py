@@ -265,9 +265,14 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
     else:
         # cross world mandantory
         entrance_list = list(entrances)
+        if avail.swapped:
+            forbidden = [e for e in Forbidden_Swap_Entrances if e in entrance_list]
+            entrance_list = [e for e in entrance_list if e not in forbidden]
         must_exit, multi_exit_caves = figure_out_must_exits_cross_world(entrances, exits, avail)
         do_mandatory_connections(avail, entrance_list, multi_exit_caves, must_exit)
         rem_entrances.update(entrance_list)
+        if avail.swapped:
+            rem_entrances.update(forbidden)
 
     rem_exits.update([x for item in multi_exit_caves for x in item if x in avail.exits])
     rem_exits.update(exits)
@@ -1374,7 +1379,8 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
             entrances.remove(swap_ent)
         if len(cave) == 2:
             entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit]
-                            and e not in invalid_cave_connections[tuple(cave)] and e not in must_exit)
+                            and e not in invalid_cave_connections[tuple(cave)] and e not in must_exit
+                            and (not avail.swapped or rnd_cave[0] != combine_map[e]))
             entrances.remove(entrance)
             connect_two_way(entrance, rnd_cave[0], avail)
             if avail.swapped and combine_map[entrance] != rnd_cave[0]:
@@ -1393,7 +1399,8 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
                     entrance = avail.world.get_entrance(cave_exit, avail.player).parent_region.entrances[0].name
                     cave_entrances.append(entrance)
                 else:
-                    entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit] and e not in must_exit)
+                    entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit] and e not in must_exit
+                                    and (not avail.swapped or cave_exit != combine_map[e]))
                     cave_entrances.append(entrance)
                     entrances.remove(entrance)
                     connect_two_way(entrance, cave_exit, avail)
@@ -1423,7 +1430,8 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
                 if avail.swapped and cave_exit not in avail.exits:
                     continue
                 else:
-                    entrance = next(e for e in entrances[::-1] if e not in invalid_cave_connections[tuple(cave)])
+                    entrance = next(e for e in entrances[::-1] if e not in invalid_cave_connections[tuple(cave)]
+                                    and (not avail.swapped or cave_exit != combine_map[e]))
                     invalid_cave_connections[tuple(cave)] = set()
                     entrances.remove(entrance)
                     connect_two_way(entrance, cave_exit, avail)

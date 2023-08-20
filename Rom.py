@@ -688,15 +688,16 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         flute_spots = world.owflutespots[player]
         owFlags |= 0x0100
 
-    for o in range(0, len(flute_spots)):
-        owslot = flute_spots[o]
+    flute_writes = sorted([(f, flute_data[f][1]) for f in flute_spots], key = lambda f: f[1])
+    for o in range(0, len(flute_writes)):
+        owid = flute_writes[o][0]
         offset = 0
-        data = flute_data[owslot]
+        data = flute_data[owid]
 
         if world.is_tile_swapped(data[1], player):
             offset = 0x40
         
-        write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), data[1] + offset) # owid
+        write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), owid + offset) # owid
         write_int16(rom, snes_to_pc(0x02E8D1 + (o * 2)), data[13] if offset > 0 and len(data) > 13 else data[5]) # link Y
         write_int16(rom, snes_to_pc(0x02E8F3 + (o * 2)), data[14] if offset > 0 and len(data) > 13 else data[6]) # link X
         
@@ -2185,7 +2186,7 @@ def write_strings(rom, world, player, team):
         # Now we write inconvenient locations for most shuffles and finish taking care of the less chaotic ones.
         if world.shuffle[player] not in ['lite', 'lean']:
             entrances_to_hint.update(InconvenientOtherEntrances)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean']:
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean', 'swapped']:
             hint_count = 0
         elif world.shuffle[player] in ['simple', 'restricted']:
             hint_count = 2
@@ -2236,7 +2237,7 @@ def write_strings(rom, world, player, team):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
                     entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
-        hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 0
+        hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'swapped'] else 0
         hint_count -= 2 if world.shuffle[player] not in ['simple', 'restricted'] else 0
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
@@ -2255,7 +2256,7 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
             locations_to_hint.extend(InconvenientVanillaLocations)
         random.shuffle(locations_to_hint)
-        hint_count = 3 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 5
+        hint_count = 3 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'swapped'] else 5
         hint_count -= 2 if world.doorShuffle[player] not in ['vanilla', 'basic'] else 0
         del locations_to_hint[hint_count:]
         for location in locations_to_hint:
@@ -2330,7 +2331,7 @@ def write_strings(rom, world, player, team):
         if world.bigkeyshuffle[player]:
             items_to_hint.extend(BigKeys)
         random.shuffle(items_to_hint)
-        hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull'] else 8
+        hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'swapped'] else 8
         hint_count += 2 if world.doorShuffle[player] not in ['vanilla', 'basic'] else 0
         hint_count += 1 if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] != 'none' or world.owMixed[player] else 0
         while hint_count > 0 and len(items_to_hint) > 0:

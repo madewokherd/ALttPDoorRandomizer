@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2.2
+- Added Customizer support for Flute Shuffle (thanks Catobat)
+- Fixed bad Old Man rescue possibility in Swapped ER
+- Fixed vanilla placement issue in Swapped ER
+- Removed entrance hints in Swapped ER
+- Fixed various generation/validation errors
+
 ## 0.3.2.1
 - \~Merged in DR v1.2.0.20~
 - Some minor Swapped ER improvements

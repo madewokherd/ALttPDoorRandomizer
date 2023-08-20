@@ -808,7 +808,7 @@ def create_playthrough(world):
     prog_locations = [location for location in world.get_filled_locations() if location.item.advancement
                       or world.goal[location.player] == 'completionist']
     optional_locations = ['Trench 1 Switch', 'Trench 2 Switch', 'Ice Block Drop', 'Skull Star Tile', 'Flute Activation']
-    optional_locations.extend(['Hyrule Castle Courtyard Tree Pull', 'Mountain Pass Tree Pull']) # adding pre-aga tree pulls
+    optional_locations.extend(['Hyrule Castle Courtyard Tree Pull', 'Mountain Pass Area Tree Pull']) # adding pre-aga tree pulls
     optional_locations.extend(['Lumberjack Area Crab Drop', 'South Pass Area Crab Drop']) # adding pre-aga bush crabs
     state_cache = [None]
     collection_spheres = []
