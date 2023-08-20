@@ -688,8 +688,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         flute_spots = world.owflutespots[player]
         owFlags |= 0x0100
 
-    for o in range(0, len(flute_spots)):
-        owid = flute_spots[o]
+    flute_writes = sorted([(f, flute_data[f][1]) for f in flute_spots], key = lambda f: f[1])
+    for o in range(0, len(flute_writes)):
+        owid = flute_writes[o][0]
         offset = 0
         data = flute_data[owid]
 
