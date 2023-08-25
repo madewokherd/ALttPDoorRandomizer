@@ -361,7 +361,7 @@ def link_overworld(world, player):
         #TODO: Remove, just for testing
         for exitname, destname in test_connections:
             connect_two_way(world, exitname, destname, player, connected_edges)
-        
+
         # layout shuffle
         groups = adjust_edge_groups(world, trimmed_groups, edges_to_swap, player)
 
@@ -1370,7 +1370,7 @@ def validate_layout(world, player):
             # check if can be accessed flute
             if unreachable_regions[region_name].type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
                 owid = OWTileRegions[region_name]
-                if owid < 0x80 and owid % 40 in flute_data and region_name in flute_data[owid][0]:
+                if owid < 0x80 and owid % 40 in flute_data and region_name in flute_data[owid % 0x40][0]:
                     if world.owFluteShuffle[player] != 'vanilla' or owid % 0x40 in default_flute_connections:
                         unreachable_regions.pop(region_name)
                         explore_region(region_name)
