@@ -1370,7 +1370,7 @@ def validate_layout(world, player):
             # check if can be accessed flute
             if unreachable_regions[region_name].type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
                 owid = OWTileRegions[region_name]
-                if owid < 0x80 and owid % 40 in flute_data and region_name in flute_data[owid % 0x40][0]:
+                if owid < 0x80 and owid % 0x40 in flute_data and region_name in flute_data[owid % 0x40][0]:
                     if world.owFluteShuffle[player] != 'vanilla' or owid % 0x40 in default_flute_connections:
                         unreachable_regions.pop(region_name)
                         explore_region(region_name)
