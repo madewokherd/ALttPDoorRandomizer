@@ -593,6 +593,7 @@ def connect_custom(world, connected_edges, groups, player):
                     forward_set.remove(edgename2)
                 unresolved_similars.append(tuple((forward_set, back_set)))
         for forward_pool, back_pool in groups:
+            if not len(forward_pool):
                 continue
             if len(forward_pool[0]) == 1:
                 if [edgename1] in forward_pool:
