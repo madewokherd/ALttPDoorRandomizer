@@ -2784,6 +2784,7 @@ class Spoiler(object):
         self.world = world
         self.hashes = {}
         self.overworlds = {}
+        self.whirlpools = {}
         self.maps = {}
         self.entrances = {}
         self.doors = {}
@@ -2807,6 +2808,12 @@ class Spoiler(object):
             self.overworlds[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
         else:
             self.overworlds[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
+
+    def set_whirlpool(self, entrance, exit, direction, player):
+        if self.world.players == 1:
+            self.whirlpools[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
+        else:
+            self.whirlpools[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
 
     def set_map(self, type, text, data, player):
         if self.world.players == 1:
@@ -3010,6 +3017,7 @@ class Spoiler(object):
         self.parse_data()
         out = OrderedDict()
         out['Overworld'] = list(self.overworlds.values())
+        out['Whirlpools'] = list(self.whirlpools.values())
         out['Maps'] = list(self.maps.values())
         out['Entrances'] = list(self.entrances.values())
         out['Doors'] = list(self.doors.values())
@@ -3181,7 +3189,7 @@ class Spoiler(object):
             for fairy, bottle in self.bottles.items():
                 outfile.write(f'{fairy}: {bottle}\n')
 
-            if self.overworlds or self.maps:
+            if self.overworlds or self.whirlpools or self.maps:
                 outfile.write('\n\nOverworld:\n\n')
 
                 # flute shuffle
@@ -3216,6 +3224,10 @@ class Spoiler(object):
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
                         outfile.write(self.maps[('groups', player)]['text'] + '\n\n')
+            
+            if self.whirlpools:
+                # whirlpools
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","whirlpools",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","whirlpools",entry['exit'])) for entry in self.whirlpools.values()]))
             
             if self.overworlds:
                 # overworld transitions

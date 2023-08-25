@@ -3,6 +3,7 @@ from collections import OrderedDict, defaultdict
 from DungeonGenerator import GenerationException
 from BaseClasses import OWEdge, WorldType, RegionType, Direction, Terrain, PolSlot, Entrance
 from Regions import mark_light_dark_world_regions
+from source.overworld.EntranceShuffle2 import connect_simple
 from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitTypes, OpenStd, parallel_links, IsParallel
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
@@ -278,16 +279,24 @@ def link_overworld(world, player):
             connect_simple(world, from_whirlpool, to_region, player)
             connect_simple(world, to_whirlpool, from_region, player)
     else:
+        def connect_whirlpool(from_whirlpool, to_whirlpool):
+            (from_owid, from_name, from_region) = from_whirlpool
+            (to_owid, to_name, to_region) = to_whirlpool
+            connect_simple(world, from_name, to_region, player)
+            connect_simple(world, to_name, from_region, player)
+            world.owwhirlpools[player][next(i for i, v in enumerate(whirlpool_map) if v == to_owid)] = from_owid
+            world.owwhirlpools[player][next(i for i, v in enumerate(whirlpool_map) if v == from_owid)] = to_owid
+            connected_whirlpools.append(tuple((from_name, to_name)))
+            world.spoiler.set_whirlpool(from_name, to_name, 'both', player)
+
+        whirlpool_map = [ 0x35, 0x0f, 0x15, 0x33, 0x12, 0x3f, 0x55, 0x7f ]
         whirlpool_candidates = [[],[]]
+        connected_whirlpools = []
         world.owwhirlpools[player] = [None] * 8
         for (from_owid, from_whirlpool, from_region), (to_owid, to_whirlpool, to_region) in default_whirlpool_connections:
             if world.owCrossed[player] == 'polar' and world.owMixed[player] and from_owid == 0x55:
                 # connect the 2 DW whirlpools in Polar Mixed
-                connect_simple(world, from_whirlpool, to_region, player)
-                connect_simple(world, to_whirlpool, from_region, player)
-                world.owwhirlpools[player][7] = from_owid
-                world.owwhirlpools[player][6] = to_owid
-                world.spoiler.set_overworld(from_whirlpool, to_whirlpool, 'both', player)
+                connect_whirlpool((from_owid, from_whirlpool, from_region), (to_owid, to_whirlpool, to_region))
             else:
                 if ((world.owCrossed[player] == 'none' or (world.owCrossed[player] == 'polar' and not world.owMixed[player])) and (world.get_region(from_region, player).type == RegionType.LightWorld)) \
                         or world.owCrossed[player] not in ['none', 'polar', 'grouped'] \
@@ -304,19 +313,27 @@ def link_overworld(world, player):
                     whirlpool_candidates[1].append(tuple((to_owid, to_whirlpool, to_region)))
 
         # shuffle happens here
-        whirlpool_map = [ 0x35, 0x0f, 0x15, 0x33, 0x12, 0x3f, 0x55, 0x7f ]
+        if world.customizer:
+            custom_whirlpools = world.customizer.get_whirlpools()
+            if custom_whirlpools and player in custom_whirlpools:
+                custom_whirlpools = custom_whirlpools[player]
+                if 'two-way' in custom_whirlpools:
+                    for whirlpools in whirlpool_candidates:
+                        for whirlname1, whirlname2 in custom_whirlpools['two-way'].items():
+                            whirl1 = next((w for w in whirlpools if w[1] == whirlname1), None)
+                            whirl2 = next((w for w in whirlpools if w[1] == whirlname2), None)
+                            if whirl1 and whirl2:
+                                whirlpools.remove(whirl1)
+                                whirlpools.remove(whirl2)
+                                connect_whirlpool(whirl1, whirl2)
+                            elif whirl1 != whirl2 or not any(w for w in connected_whirlpools if (whirlname1 in w) and (whirlname2 in w)):
+                                raise GenerationException('Attempting to connect whirlpools not in same pool: \'%s\' <-> \'%s\'', whirl1, whirl2)
         for whirlpools in whirlpool_candidates:
             random.shuffle(whirlpools)
             while len(whirlpools):
                 if len(whirlpools) % 2 == 1:
                     x=0
-                from_owid, from_whirlpool, from_region = whirlpools.pop()
-                to_owid, to_whirlpool, to_region = whirlpools.pop()
-                connect_simple(world, from_whirlpool, to_region, player)
-                connect_simple(world, to_whirlpool, from_region, player)
-                world.owwhirlpools[player][next(i for i, v in enumerate(whirlpool_map) if v == to_owid)] = from_owid
-                world.owwhirlpools[player][next(i for i, v in enumerate(whirlpool_map) if v == from_owid)] = to_owid
-                world.spoiler.set_overworld(from_whirlpool, to_whirlpool, 'both', player)
+                connect_whirlpool(whirlpools.pop(), whirlpools.pop())
 
     # layout shuffle
     logging.getLogger('').debug('Shuffling overworld layout')
@@ -337,7 +354,7 @@ def link_overworld(world, player):
 
         world.owsectors[player] = build_sectors(world, player)
     else:
-        if world.owKeepSimilar[player] and world.owShuffle[player] in ['vanilla', 'parallel']:
+        if world.owKeepSimilar[player] and world.owShuffle[player] == 'parallel':
             for exitname, destname in parallelsimilar_connections:
                 connect_two_way(world, exitname, destname, player, connected_edges)
 
@@ -345,10 +362,10 @@ def link_overworld(world, player):
         for exitname, destname in test_connections:
             connect_two_way(world, exitname, destname, player, connected_edges)
         
-        connect_custom(world, connected_edges, player)
-        
         # layout shuffle
         groups = adjust_edge_groups(world, trimmed_groups, edges_to_swap, player)
+
+        connect_custom(world, connected_edges, groups, player)
         
         tries = 100
         valid_layout = False
@@ -564,21 +581,100 @@ def link_overworld(world, player):
                                                                                              s[0x3a],s[0x3b],s[0x3c],                s[0x3f])
         world.spoiler.set_map('flute', text_output, new_spots, player)
 
-def connect_custom(world, connected_edges, player):
-    if hasattr(world, 'custom_overworld') and world.custom_overworld[player]:
-        for edgename1, edgename2 in world.custom_overworld[player]:
-            if edgename1 in connected_edges or edgename2 in connected_edges:
-                owedge1 = world.check_for_owedge(edgename1, player)
-                owedge2 = world.check_for_owedge(edgename2, player)
-                if owedge1.dest is not None and owedge1.dest.name == owedge2.name:
-                    continue # if attempting to connect a pair that was already connected earlier, allow it to continue
-                raise RuntimeError('Invalid plando connection: rule violation based on current settings')
-            connect_two_way(world, edgename1, edgename2, player, connected_edges)
-            if world.owKeepSimilar[player]: #TODO: If connecting an edge that belongs to a similar pair, the remaining edges need to get connected automatically
+def connect_custom(world, connected_edges, groups, player):
+    def remove_pair_from_pool(edgename1, edgename2):
+        def add_to_unresolved(forward_set, back_set):
+            if len(forward_set) > 1:
+                if edgename1 in forward_set:
+                    forward_set.remove(edgename1)
+                    back_set.remove(edgename2)
+                else:
+                    back_set.remove(edgename1)
+                    forward_set.remove(edgename2)
+                unresolved_similars.append(tuple((forward_set, back_set)))
+        for forward_pool, back_pool in groups:
                 continue
+            if len(forward_pool[0]) == 1:
+                if [edgename1] in forward_pool:
+                    if [edgename2] in back_pool:
+                        forward_pool.remove([edgename1])
+                        back_pool.remove([edgename2])
+                        return
+                    else:
+                        break
+                elif [edgename1] in back_pool:
+                    if [edgename2] in forward_pool:
+                        back_pool.remove([edgename1])
+                        forward_pool.remove([edgename2])
+                        return
+                    else:
+                        break
+            else:
+                forward_similar = next((x for x in forward_pool if edgename1 in x), None)
+                if forward_similar:
+                    back_similar = next((x for x in back_pool if edgename2 in x), None)
+                    if back_similar:
+                        forward_pool.remove(forward_similar)
+                        back_pool.remove(back_similar)
+                        add_to_unresolved(forward_similar, back_similar)
+                        return
+                    else:
+                        break
+                else:
+                    back_similar = next((x for x in back_pool if edgename1 in x), None)
+                    if back_similar:
+                        forward_similar = next((x for x in forward_pool if edgename2 in x), None)
+                        if forward_similar:
+                            back_pool.remove(forward_similar)
+                            forward_pool.remove(back_similar)
+                            add_to_unresolved(forward_similar, back_similar)
+                            return
+                        else:
+                            break
+        for pair in unresolved_similars:
+            forward_set, back_set = pair
+            if edgename1 in forward_set:
+                if edgename2 in back_set:
+                    unresolved_similars.remove(pair)
+                    add_to_unresolved(forward_set, back_set)
+                    return
+                else:
+                    break
+            else:
+                if edgename1 in back_set:
+                    if edgename2 in forward_set:
+                        unresolved_similars.remove(pair)
+                        add_to_unresolved(forward_set, back_set)
+                        return
+                    else:
+                        break
+        raise GenerationException('Could not find both OW edges in same pool: \'%s\' <-> \'%s\'', edgename1, edgename2)
 
-def connect_simple(world, exitname, regionname, player):
-    world.get_entrance(exitname, player).connect(world.get_region(regionname, player))
+    if world.customizer:
+        custom_edges = world.customizer.get_owedges()
+        if custom_edges and player in custom_edges:
+            custom_edges = custom_edges[player]
+            if 'two-way' in custom_edges:
+                unresolved_similars = []
+                for edgename1, edgename2 in custom_edges['two-way'].items():
+                    edge1 = world.check_for_owedge(edgename1, player)
+                    edge2 = world.check_for_owedge(edgename2, player)
+                    if edgename1 not in connected_edges and edgename2 not in connected_edges:
+                        # attempt connection
+                        remove_pair_from_pool(edgename1, edgename2)
+                        connect_two_way(world, edgename1, edgename2, player, connected_edges)
+                        # resolve parallel
+                        if (world.owShuffle[player] == 'parallel' and
+                                (edgename1 in parallel_links.keys() or edgename1 in parallel_links.inverse.keys())):
+                            parallel_forward_edge = parallel_links[edgename1] if edgename1 in parallel_links.keys() else parallel_links.inverse[edgename1][0]
+                            parallel_back_edge = parallel_links[edgename2] if edgename2 in parallel_links.keys() else parallel_links.inverse[edgename2][0]
+                            remove_pair_from_pool(parallel_forward_edge, parallel_back_edge)
+                    elif not edge1.dest or not edge2.dest or edge1.dest.name != edgename2 or edge2.dest.name != edgename1:
+                        raise GenerationException('OW Edge already connected: \'%s\' <-> \'%s\'', edgename1, edgename2)
+                # connect leftover similars
+                for forward_pool, back_pool in unresolved_similars:
+                    for (forward_edge, back_edge) in zip(forward_pool, back_pool):
+                        connect_two_way(world, forward_edge, back_edge, player, connected_edges)
 
 def connect_two_way(world, edgename1, edgename2, player, connected_edges=None):
     edge1 = world.get_entrance(edgename1, player)
