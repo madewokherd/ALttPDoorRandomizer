@@ -1030,6 +1030,9 @@ def adjust_edge_groups(world, trimmed_groups, edges_to_swap, player):
     return list(groups.values())
 
 def create_flute_exits(world, player):
+    flute_in_pool = True if player not in world.customitemarray else any(i for i, n in world.customitemarray[player].items() if i == 'flute' and n > 0)
+    if not flute_in_pool:
+        return
     for region in (r for r in world.regions if r.player == player and r.terrain == Terrain.Land and r.name not in ['Zoras Domain', 'Master Sword Meadow', 'Hobo Bridge']):
         if region.type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
             exitname = 'Flute From ' + region.name
@@ -1121,7 +1124,7 @@ def can_reach_smith(world, player):
             for exit in region.exits:
                 if not found and exit.connected_region is not None:
                     if exit.spot_type == 'Flute':
-                        if any(map(lambda i: i.name == 'Ocarina (Activated)', world.precollected_items)):
+                        if any(map(lambda i: i.name == 'Ocarina (Activated)' and i.player == player, world.precollected_items)):
                             for flutespot in exit.connected_region.exits:
                                 if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
                                     explore_region(flutespot.connected_region.name, flutespot.connected_region)
@@ -1239,7 +1242,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
             region = base_world.get_region(region_name, player)
         for exit in region.exits:
             if exit.connected_region is not None:
-                if any(map(lambda i: i.name == 'Ocarina (Activated)', base_world.precollected_items)) and exit.spot_type == 'Flute':
+                if any(map(lambda i: i.name == 'Ocarina (Activated)' and i.player == player, base_world.precollected_items)) and exit.spot_type == 'Flute':
                     fluteregion = exit.connected_region
                     for flutespot in fluteregion.exits:
                         if flutespot.connected_region and flutespot.connected_region.name not in explored_regions:
@@ -1305,7 +1308,8 @@ def validate_layout(world, player):
     item_entrances = list(zip(*default_item_connections))[0]
     shop_entrances = list(zip(*default_shop_connections))[0]
     drop_entrances = list(zip(*default_drop_connections + default_dropexit_connections))[0]
-    
+    flute_in_pool = True if player not in world.customitemarray else any(i for i, n in world.customitemarray[player].items() if i == 'flute' and n > 0)
+
     def explore_region(region_name, region=None):
         if stack_size3a() > 500:
             raise GenerationException(f'Infinite loop detected for "{region_name}" located at \'validate_layout\'')
@@ -1343,11 +1347,12 @@ def validate_layout(world, player):
         start_region = 'Dark Chapel Area'
         explore_region(start_region)
 
-    if not world.is_tile_swapped(0x30, player):
-        start_region = 'Desert Teleporter Ledge'
-    else:
-        start_region = 'Mire Teleporter Ledge'
-    explore_region(start_region)
+    if flute_in_pool:
+        if not world.is_tile_swapped(0x30, player):
+            start_region = 'Desert Teleporter Ledge'
+        else:
+            start_region = 'Mire Teleporter Ledge'
+        explore_region(start_region)
     
     if not world.is_tile_swapped(0x1b, player):
         start_region = 'Pyramid Area'
@@ -1369,7 +1374,7 @@ def validate_layout(world, player):
         unreachable_count = len(unreachable_regions)
         for region_name in reversed(unreachable_regions):
             # check if can be accessed flute
-            if unreachable_regions[region_name].type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
+            if flute_in_pool and unreachable_regions[region_name].type == (RegionType.LightWorld if world.mode[player] != 'inverted' else RegionType.DarkWorld):
                 owid = OWTileRegions[region_name]
                 if owid < 0x80 and owid % 0x40 in flute_data and region_name in flute_data[owid % 0x40][0]:
                     if world.owFluteShuffle[player] != 'vanilla' or owid % 0x40 in default_flute_connections:
@@ -1394,7 +1399,11 @@ def validate_layout(world, player):
                         break
                 if unreachable_count != len(unreachable_regions):
                     break
-    
+
+    if not flute_in_pool:
+        unreachable_regions.pop('Desert Teleporter Ledge')
+        unreachable_regions.pop('Mire Teleporter Ledge')
+
     if len(unreachable_regions):
         return False
     
