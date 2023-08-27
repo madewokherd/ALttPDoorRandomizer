@@ -326,8 +326,10 @@ def link_overworld(world, player):
                                 whirlpools.remove(whirl1)
                                 whirlpools.remove(whirl2)
                                 connect_whirlpool(whirl1, whirl2)
-                            elif whirl1 != whirl2 or not any(w for w in connected_whirlpools if (whirlname1 in w) and (whirlname2 in w)):
-                                raise GenerationException('Attempting to connect whirlpools not in same pool: \'%s\' <-> \'%s\'', whirl1, whirl2)
+                            elif whirl1 != whirl2:
+                                raise GenerationException('Attempting to connect whirlpools not in same pool: \'%s\' <-> \'%s\'', whirlname1, whirlname2)
+                            elif any(w for w in connected_whirlpools if (whirlname1 in w) != (whirlname2 in w)):
+                                raise GenerationException('Attempting to connect whirlpools already connected: \'%s\' <-> \'%s\'', whirlname1, whirlname2)
         for whirlpools in whirlpool_candidates:
             random.shuffle(whirlpools)
             while len(whirlpools):
