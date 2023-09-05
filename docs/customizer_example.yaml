@@ -69,6 +69,24 @@ placements:
     Palace of Darkness - Big Chest: Hammer
     Capacity Upgrade - Left: Moon Pearl
     Turtle Rock - Pokey 2 Key Drop: Ice Rod
+ow-edges:
+  1:
+    two-way:
+      Kakariko Fortune ES*: Sanctuary WN*
+      Central Bonk Rocks EC: Potion Shop WN
+      Central Bonk Rocks ES: Potion Shop WC
+ow-crossed:
+  1:
+    force_crossed:
+      - Links House ES*
+      - Kakariko Fortune ES*
+    force_noncrossed:
+      - Links House NE
+    limit_crossed: 9 # emulates Limited Crossed
+ow-whirlpools:
+  1:
+    two-way:
+      River Bend Whirlpool: Lake Hylia Whirlpool
 ow-tileflips:
   1:
     force_flip:

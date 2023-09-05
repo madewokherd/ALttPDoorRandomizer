@@ -87,6 +87,7 @@ class World(object):
         self.owedges = []
         self._owedge_cache = {}
         self.owswaps = {}
+        self.owcrossededges = {}
         self.owwhirlpools = {}
         self.owflutespots = {}
         self.owsectors = {}
@@ -114,6 +115,7 @@ class World(object):
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('owswaps', [[],[],[]])
+            set_player_attr('owcrossededges', [])
             set_player_attr('owwhirlpools', [])
             set_player_attr('owsectors', None)
             set_player_attr('remote_items', False)
@@ -321,6 +323,16 @@ class World(object):
         if isinstance(edgename, OWEdge):
             return edgename
         try:
+            if edgename[-1] == '*':
+                edgename = edgename[:-1]
+                edge = self.check_for_owedge(edgename, player)
+                if self.is_tile_swapped(edge.owIndex, player):
+                    from OverworldShuffle import parallel_links
+                    if edgename in parallel_links.keys() or edgename in parallel_links.inverse.keys():
+                        edgename = parallel_links[edgename] if edgename in parallel_links.keys() else parallel_links.inverse[edgename][0]
+                        return self.check_for_owedge(edgename, player)
+                    else:
+                        raise Exception("Edge notated with * doesn't have a parallel edge: %s" & edgename)
             return self._owedge_cache[(edgename, player)]
         except KeyError:
             for edge in self.owedges:
@@ -2248,7 +2260,7 @@ class OWEdge(object):
         self.unknownX = 0x0
         self.unknownY = 0x0
 
-        if self.owIndex < 0x40 or self.owIndex >= 0x80:
+        if self.owIndex & 0x40 == 0:
             self.worldType = WorldType.Light
         else:
             self.worldType = WorldType.Dark
@@ -2288,6 +2300,12 @@ class OWEdge(object):
         self.specialExit = True
         self.specialID = special_id
         return self
+
+    def is_tile_swapped(self, world):
+        return world.is_tile_swapped(self.owIndex, self.player)
+
+    def is_lw(self, world):
+        return (self.worldType == WorldType.Light) != self.is_tile_swapped(world)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name

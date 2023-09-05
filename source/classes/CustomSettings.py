@@ -201,6 +201,11 @@ class CustomSettings(object):
             return self.file_source['ow-edges']
         return None
 
+    def get_owcrossed(self):
+        if 'ow-crossed' in self.file_source:
+            return self.file_source['ow-crossed']
+        return None
+
     def get_whirlpools(self):
         if 'ow-whirlpools' in self.file_source:
             return self.file_source['ow-whirlpools']
