@@ -233,105 +233,104 @@ def link_overworld(world, player):
                 world.owcrossededges[player].append(edge)
                 count_crossed = count_crossed + 1
 
-    if world.owCrossed[player] == 'grouped' or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'chaos') or limited_crossed > -1:
-        if world.owCrossed[player] == 'grouped':
-            # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
-            # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
-            ow_crossed_tiles_mask = [[],[],[]]
-            world.owcrossededges[player] = shuffle_tiles(world, define_tile_groups(world, player, True), ow_crossed_tiles_mask, True, player)
-            ow_crossed_tiles = [i for i in range(0x82) if (i in world.owswaps[player][0]) != (i in ow_crossed_tiles_mask[0])]
+    if world.owCrossed[player] == 'grouped':
+        # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
+        # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
+        ow_crossed_tiles_mask = [[],[],[]]
+        world.owcrossededges[player] = shuffle_tiles(world, define_tile_groups(world, player, True), ow_crossed_tiles_mask, True, player)
+        ow_crossed_tiles = [i for i in range(0x82) if (i in world.owswaps[player][0]) != (i in ow_crossed_tiles_mask[0])]
 
-            # update spoiler
-            s = list(map(lambda x: 'O' if x not in ow_crossed_tiles else 'X', [i for i in range(0x40, 0x82)]))
-            text_output = tile_swap_spoiler_table.replace('s', '%s') % (                         s[0x02],                                s[0x07],
-                                                                                     s[0x00],                s[0x03],        s[0x05],
-                s[0x00],        s[0x02],s[0x03],        s[0x05],        s[0x07],                 s[0x0a],                                s[0x0f],
-                                s[0x0a],                                s[0x0f],
-                s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17], s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17],
-                s[0x18],        s[0x1a],s[0x1b],        s[0x1d],s[0x1e],
-                                s[0x22],                s[0x25],                                 s[0x1a],                s[0x1d],
-                s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],     s[0x18],                s[0x1b],                s[0x1e],
-                s[0x30],        s[0x32],s[0x33],s[0x34],s[0x35],        s[0x37],                 s[0x22],                s[0x25],
-                                s[0x3a],s[0x3b],s[0x3c],                s[0x3f],
-                                                                                 s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],
-                                                                        s[0x40],                 s[0x32],s[0x33],s[0x34],                s[0x37],
-                                                                                    s[0x30],                                s[0x35],
-                                                                        s[0x41],                 s[0x3a],s[0x3b],s[0x3c],                s[0x3f])
-            world.spoiler.set_map('groups', text_output, ow_crossed_tiles, player)
-        else:
-            crossed_candidates = list()
-            for group in trimmed_groups.keys():
-                (mode, wrld, dir, terrain, parallel, count) = group
-                if wrld == WorldType.Light and mode != OpenStd.Standard:
-                    for (forward_set, back_set) in zip(trimmed_groups[group][0], trimmed_groups[group][1]):
-                        if forward_set[0] in parallel_links_new:
-                            forward_parallel = [parallel_links_new[e] for e in forward_set]
-                            back_parallel = [parallel_links_new[e] for e in back_set]
-                            forward_combine = forward_set+forward_parallel
-                            back_combine = back_set+back_parallel
-                            combine_set = forward_combine+back_combine
-                            
-                            skip_forward = False
-                            if world.owShuffle[player] == 'vanilla':
-                                if any(edge in force_crossed for edge in combine_set):
-                                    if not any(edge in force_noncrossed for edge in combine_set):
-                                        if any(edge in force_crossed for edge in forward_combine):
-                                            world.owcrossededges[player].extend(forward_set)
-                                            count_crossed = count_crossed + 1
-                                            continue
-                                        else:
-                                            world.owcrossededges[player].extend(back_set)
-                                            count_crossed = count_crossed + 1
-                                            continue
-                                    else:
-                                        raise GenerationException('Conflict detected in force_crossed and force_noncrossed')
-                                if any(edge in list(force_noncrossed)+world.owcrossededges[player] for edge in combine_set):
-                                    continue
-                            else:
-                                skip_back = False
-                                if any(edge in force_crossed for edge in forward_combine):
-                                    if not any(edge in force_noncrossed for edge in forward_combine):
+        # update spoiler
+        s = list(map(lambda x: 'O' if x not in ow_crossed_tiles else 'X', [i for i in range(0x40, 0x82)]))
+        text_output = tile_swap_spoiler_table.replace('s', '%s') % (                         s[0x02],                                s[0x07],
+                                                                                    s[0x00],                s[0x03],        s[0x05],
+            s[0x00],        s[0x02],s[0x03],        s[0x05],        s[0x07],                 s[0x0a],                                s[0x0f],
+                            s[0x0a],                                s[0x0f],
+            s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17], s[0x10],s[0x11],s[0x12],s[0x13],s[0x14],s[0x15],s[0x16],s[0x17],
+            s[0x18],        s[0x1a],s[0x1b],        s[0x1d],s[0x1e],
+                            s[0x22],                s[0x25],                                 s[0x1a],                s[0x1d],
+            s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],     s[0x18],                s[0x1b],                s[0x1e],
+            s[0x30],        s[0x32],s[0x33],s[0x34],s[0x35],        s[0x37],                 s[0x22],                s[0x25],
+                            s[0x3a],s[0x3b],s[0x3c],                s[0x3f],
+                                                                                s[0x28],s[0x29],s[0x2a],s[0x2b],s[0x2c],s[0x2d],s[0x2e],s[0x2f],
+                                                                    s[0x40],                 s[0x32],s[0x33],s[0x34],                s[0x37],
+                                                                                s[0x30],                                s[0x35],
+                                                                    s[0x41],                 s[0x3a],s[0x3b],s[0x3c],                s[0x3f])
+        world.spoiler.set_map('groups', text_output, ow_crossed_tiles, player)
+    elif limited_crossed > -1 or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'chaos'):
+        crossed_candidates = list()
+        for group in trimmed_groups.keys():
+            (mode, wrld, dir, terrain, parallel, count) = group
+            if wrld == WorldType.Light and mode != OpenStd.Standard:
+                for (forward_set, back_set) in zip(trimmed_groups[group][0], trimmed_groups[group][1]):
+                    if forward_set[0] in parallel_links_new:
+                        forward_parallel = [parallel_links_new[e] for e in forward_set]
+                        back_parallel = [parallel_links_new[e] for e in back_set]
+                        forward_combine = forward_set+forward_parallel
+                        back_combine = back_set+back_parallel
+                        combine_set = forward_combine+back_combine
+                        
+                        skip_forward = False
+                        if world.owShuffle[player] == 'vanilla':
+                            if any(edge in force_crossed for edge in combine_set):
+                                if not any(edge in force_noncrossed for edge in combine_set):
+                                    if any(edge in force_crossed for edge in forward_combine):
                                         world.owcrossededges[player].extend(forward_set)
                                         count_crossed = count_crossed + 1
-                                        skip_forward = True
+                                        continue
                                     else:
-                                        raise GenerationException('Conflict detected in force_crossed and force_noncrossed')
-                                if any(edge in force_crossed for edge in back_combine):
-                                    if not any(edge in force_noncrossed for edge in back_combine):
                                         world.owcrossededges[player].extend(back_set)
                                         count_crossed = count_crossed + 1
-                                        skip_back = True
-                                    else:
-                                        raise GenerationException('Conflict detected in force_crossed and force_noncrossed')
-                                if any(edge in list(force_noncrossed)+world.owcrossededges[player] for edge in forward_combine):
-                                    skip_forward = True
-                                if any(edge in list(force_noncrossed)+world.owcrossededges[player] for edge in back_combine):
-                                    skip_back = True
-                                if not skip_back:
-                                    if limited_crossed > -1:
-                                        crossed_candidates.append(back_set)
-                                    elif random.randint(0, 1):
-                                        world.owcrossededges[player].extend(back_set)
-                                        count_crossed = count_crossed + 1
-                            if not skip_forward:
-                                if limited_crossed > -1:
-                                    crossed_candidates.append(forward_set)
-                                elif random.randint(0, 1):
+                                        continue
+                                else:
+                                    raise GenerationException('Conflict detected in force_crossed and force_noncrossed')
+                            if any(edge in list(force_noncrossed)+world.owcrossededges[player] for edge in combine_set):
+                                continue
+                        else:
+                            skip_back = False
+                            if any(edge in force_crossed for edge in forward_combine):
+                                if not any(edge in force_noncrossed for edge in forward_combine):
                                     world.owcrossededges[player].extend(forward_set)
                                     count_crossed = count_crossed + 1
-            assert len(world.owcrossededges[player]) == len(set(world.owcrossededges[player])), "Same edge added to crossed edges"
+                                    skip_forward = True
+                                else:
+                                    raise GenerationException('Conflict detected in force_crossed and force_noncrossed')
+                            if any(edge in force_crossed for edge in back_combine):
+                                if not any(edge in force_noncrossed for edge in back_combine):
+                                    world.owcrossededges[player].extend(back_set)
+                                    count_crossed = count_crossed + 1
+                                    skip_back = True
+                                else:
+                                    raise GenerationException('Conflict detected in force_crossed and force_noncrossed')
+                            if any(edge in list(force_noncrossed)+world.owcrossededges[player] for edge in forward_combine):
+                                skip_forward = True
+                            if any(edge in list(force_noncrossed)+world.owcrossededges[player] for edge in back_combine):
+                                skip_back = True
+                            if not skip_back:
+                                if limited_crossed > -1:
+                                    crossed_candidates.append(back_set)
+                                elif random.randint(0, 1):
+                                    world.owcrossededges[player].extend(back_set)
+                                    count_crossed = count_crossed + 1
+                        if not skip_forward:
+                            if limited_crossed > -1:
+                                crossed_candidates.append(forward_set)
+                            elif random.randint(0, 1):
+                                world.owcrossededges[player].extend(forward_set)
+                                count_crossed = count_crossed + 1
+        assert len(world.owcrossededges[player]) == len(set(world.owcrossededges[player])), "Same edge added to crossed edges"
 
-            if limited_crossed > -1:
-                limit = limited_crossed - count_crossed
-                random.shuffle(crossed_candidates)
-                for edge_set in crossed_candidates[:limit]:
-                    world.owcrossededges[player].extend(edge_set)
-            assert len(world.owcrossededges[player]) == len(set(world.owcrossededges[player])), "Same edge candidate added to crossed edges"
+        if limited_crossed > -1:
+            limit = limited_crossed - count_crossed
+            random.shuffle(crossed_candidates)
+            for edge_set in crossed_candidates[:limit]:
+                world.owcrossededges[player].extend(edge_set)
+        assert len(world.owcrossededges[player]) == len(set(world.owcrossededges[player])), "Same edge candidate added to crossed edges"
 
-            for edge in copy.deepcopy(world.owcrossededges[player]):
-                if edge in parallel_links_new:
-                    if parallel_links_new[edge] not in world.owcrossededges[player]:
-                        world.owcrossededges[player].append(parallel_links_new[edge])
+        for edge in copy.deepcopy(world.owcrossededges[player]):
+            if edge in parallel_links_new:
+                if parallel_links_new[edge] not in world.owcrossededges[player]:
+                    world.owcrossededges[player].append(parallel_links_new[edge])
 
     # after tile flip and crossed, determine edges that need to flip
     edges_to_swap = [e for e in swapped_edges+world.owcrossededges[player] if (e not in swapped_edges) or (e not in world.owcrossededges[player])]
