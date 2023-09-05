@@ -14,17 +14,19 @@ version_branch = '-u'
 
 __version__ = '%s%s' % (version_number, version_branch)
 
+parallel_links_new = None # needs to be globally available, reset every new generation/player
+
 def link_overworld(world, player):
+    global parallel_links_new
+
     # setup mandatory connections
     for exitname, regionname in mandatory_connections:
         connect_simple(world, exitname, regionname, player)
 
     def performSwap(groups, swaps):
         def getParallel(edgename):
-            if edgename in parallel_links:
-                return parallel_links[edgename]
-            elif edgename in parallel_links.inverse:
-                return parallel_links.inverse[edgename][0]
+            if edgename in parallel_links_new:
+                return parallel_links_new[edgename]
             else:
                 raise Exception('No parallel edge found for edge %s', edgename)
         
@@ -112,16 +114,19 @@ def link_overworld(world, player):
     swapped_edges = list()
 
     # restructure Maze Race/Suburb/Frog/Dig Game manually due to NP/P relationship
+    parallel_links_new = bidict(parallel_links) # shallow copy is enough (deep copy is broken)
     if world.owKeepSimilar[player]:
+        del parallel_links_new['Maze Race ES']
+        del parallel_links_new['Kakariko Suburb WS']
         for group in trimmed_groups.keys():
             (std, region, axis, terrain, parallel, _) = group
             if parallel == IsParallel.Yes:
                 (forward_edges, back_edges) = trimmed_groups[group]
                 if ['Maze Race ES'] in forward_edges:
-                    forward_edges = list(filter((['Maze Race ES']).__ne__, forward_edges))
+                    forward_edges.remove(['Maze Race ES'])
                     trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][0].append(['Maze Race ES'])
                 if ['Kakariko Suburb WS'] in back_edges:
-                    back_edges = list(filter((['Kakariko Suburb WS']).__ne__, back_edges))
+                    back_edges.remove(['Kakariko Suburb WS'])
                     trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][1].append(['Kakariko Suburb WS'])
                 trimmed_groups[group] = (forward_edges, back_edges)
     else:
@@ -129,14 +134,15 @@ def link_overworld(world, player):
             (std, region, axis, terrain, _, _) = group
             (forward_edges, back_edges) = trimmed_groups[group]
             if ['Dig Game EC', 'Dig Game ES'] in forward_edges:
-                forward_edges = list(filter((['Dig Game EC', 'Dig Game ES']).__ne__, forward_edges))
+                forward_edges.remove(['Dig Game EC', 'Dig Game ES'])
                 trimmed_groups[(std, region, axis, terrain, IsParallel.Yes, 1)][0].append(['Dig Game ES'])
                 trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][0].append(['Dig Game EC'])
             if ['Frog WC', 'Frog WS'] in back_edges:
-                back_edges = list(filter((['Frog WC', 'Frog WS']).__ne__, back_edges))
+                back_edges.remove(['Frog WC', 'Frog WS'])
                 trimmed_groups[(std, region, axis, terrain, IsParallel.Yes, 1)][1].append(['Frog WS'])
                 trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][1].append(['Frog WC'])
             trimmed_groups[group] = (forward_edges, back_edges)
+    parallel_links_new = {**dict(parallel_links_new), **dict({e:p[0] for e, p in parallel_links_new.inverse.items()})}
 
     connected_edges = []
     if world.owShuffle[player] != 'vanilla':
@@ -201,19 +207,13 @@ def link_overworld(world, player):
     logging.getLogger('').debug('Crossing overworld edges')
     crossed_edges = list()
 
-    # more Maze Race/Suburb/Frog/Dig Game fixes
-    parallel_links_new = bidict(parallel_links) # shallow copy is enough (deep copy is broken)
-    if world.owKeepSimilar[player]:
-        del parallel_links_new['Maze Race ES']
-        del parallel_links_new['Kakariko Suburb WS']
-
     #TODO: Revisit with changes to Limited/Allowed
     if world.owCrossed[player] not in ['none', 'grouped', 'polar', 'chaos']:
         for edge in swapped_edges:
-            if edge not in parallel_links_new and edge not in parallel_links_new.inverse:
                 crossed_edges.append(edge)
     
     if world.owCrossed[player] in ['grouped', 'limited'] or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'chaos'):
+            if edge not in parallel_links_new:
         if world.owCrossed[player] == 'grouped':
             # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
             # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
@@ -244,13 +244,13 @@ def link_overworld(world, player):
                 (mode, wrld, dir, terrain, parallel, count) = group
                 if wrld == WorldType.Light and mode != OpenStd.Standard:
                     for (forward_set, back_set) in zip(trimmed_groups[group][0], trimmed_groups[group][1]):
-                        if forward_set[0] in parallel_links_new or forward_set[0] in parallel_links_new.inverse:
                             if world.owKeepSimilar[player]:
                                 if world.owCrossed[player] == 'chaos' and random.randint(0, 1):
                                     for edge in forward_set:
                                         crossed_edges.append(edge)
                                 elif world.owCrossed[player] == 'limited':
                                     crossed_candidates.append(forward_set)
+                        if forward_set[0] in parallel_links_new:
                             else:
                                 for edge in forward_set:
                                     if world.owCrossed[player] == 'chaos' and random.randint(0, 1):
@@ -667,12 +667,11 @@ def connect_custom(world, connected_edges, groups, player):
                         remove_pair_from_pool(edgename1, edgename2)
                         connect_two_way(world, edgename1, edgename2, player, connected_edges)
                         # resolve parallel
-                        if (world.owShuffle[player] == 'parallel' and
-                                (edgename1 in parallel_links.keys() or edgename1 in parallel_links.inverse.keys())):
-                            parallel_forward_edge = parallel_links[edgename1] if edgename1 in parallel_links.keys() else parallel_links.inverse[edgename1][0]
-                            parallel_back_edge = parallel_links[edgename2] if edgename2 in parallel_links.keys() else parallel_links.inverse[edgename2][0]
                             remove_pair_from_pool(parallel_forward_edge, parallel_back_edge)
                     elif not edge1.dest or not edge2.dest or edge1.dest.name != edgename2 or edge2.dest.name != edgename1:
+                        if world.owShuffle[player] == 'parallel' and edge1.name in parallel_links_new:
+                            parallel_forward_edge = parallel_links_new[edge1.name]
+                            parallel_back_edge = parallel_links_new[edge2.name]
                         raise GenerationException('OW Edge already connected: \'%s\' <-> \'%s\'', edgename1, edgename2)
                 # connect leftover similars
                 for forward_pool, back_pool in unresolved_similars:
@@ -716,10 +715,10 @@ def connect_two_way(world, edgename1, edgename2, player, connected_edges=None):
     
         # connecting parallel connections
         if world.owShuffle[player] in ['vanilla', 'parallel']:
-            if (edgename1 in parallel_links.keys() or edgename1 in parallel_links.inverse.keys()):
+            if edgename1 in parallel_links_new:
                 try:
-                    parallel_forward_edge = parallel_links[edgename1] if edgename1 in parallel_links.keys() else parallel_links.inverse[edgename1][0]
-                    parallel_back_edge = parallel_links[edgename2] if edgename2 in parallel_links.keys() else parallel_links.inverse[edgename2][0]
+                    parallel_forward_edge = parallel_links_new[edgename1]
+                    parallel_back_edge = parallel_links_new[edgename2]
                     if not (parallel_forward_edge in connected_edges) and not (parallel_back_edge in connected_edges):
                         connect_two_way(world, parallel_forward_edge, parallel_back_edge, player, connected_edges)
                 except KeyError:
@@ -2075,7 +2074,8 @@ mirror_connections = {
 }
 
 parallelsimilar_connections = [('Maze Race ES', 'Kakariko Suburb WS'),
-                                ('Dig Game EC', 'Frog WC')
+                               ('Dig Game EC', 'Frog WC'),
+                               ('Dig Game ES', 'Frog WS')
                             ]
 
 # non shuffled overworld
