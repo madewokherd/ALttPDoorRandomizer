@@ -317,7 +317,7 @@ def link_overworld(world, player):
             custom_whirlpools = world.customizer.get_whirlpools()
             if custom_whirlpools and player in custom_whirlpools:
                 custom_whirlpools = custom_whirlpools[player]
-                if 'two-way' in custom_whirlpools:
+                if 'two-way' in custom_whirlpools and len(custom_whirlpools['two-way']) > 0:
                     for whirlpools in whirlpool_candidates:
                         for whirlname1, whirlname2 in custom_whirlpools['two-way'].items():
                             whirl1 = next((w for w in whirlpools if w[1] == whirlname1), None)
@@ -784,13 +784,12 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
     # customizer adjustments
     undefined_chance = 50
     flipped_groups = list()
-    always_removed = list()
+    nonflipped_groups = list()
     if world.customizer:
         if not do_grouped:
             custom_flips = world.customizer.get_owtileflips()
             if custom_flips and player in custom_flips:
                 custom_flips = custom_flips[player]
-                nonflipped_groups = list()
                 forced_flips = list()
                 forced_nonflips = list()
                 if 'undefined_chance' in custom_flips:
@@ -805,30 +804,72 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
                         nonflipped_groups.append(group)
                     if any(owid in group[0] for owid in forced_flips):
                         flipped_groups.append(group)
-
-                # Check if there are any groups that appear in both sets
-                if any(group in flipped_groups for group in nonflipped_groups):
-                    raise GenerationException('Conflict found when flipping tiles')
                 
-                for g in nonflipped_groups:
-                    always_removed.append(g)
                 if undefined_chance == 0:
-                    for g in [g for g in groups if g not in flipped_groups + always_removed]:
-                        always_removed.append(g)
+                    nonflipped_groups.extend([g for g in groups if g not in flipped_groups + nonflipped_groups])
+            if world.owCrossed[player] != 'none':
+                # ensure any customized whirlpool connections don't end up crossworld
+                custom_whirlpools = world.customizer.get_whirlpools()
+                if custom_whirlpools and player in custom_whirlpools:
+                    custom_whirlpools = custom_whirlpools[player]
+                    if 'two-way' in custom_whirlpools and len(custom_whirlpools['two-way']) > 0:
+                        custom_whirlpools = custom_whirlpools['two-way']
+                        whirlpool_map = {name:owid for wc in default_whirlpool_connections for (owid, name, _) in wc}
+                        for whirl1, whirl2 in custom_whirlpools.items():
+                            w1_owid = whirlpool_map[whirl1]
+                            w2_owid = whirlpool_map[whirl2]
+                            flip_together = (w1_owid & 0x40) == (w2_owid & 0x40)
+                            w1_nonflipped = any(g for g in nonflipped_groups if w1_owid in g[0])
+                            w1_flipped = any(g for g in flipped_groups if w1_owid in g[0])
+                            if w1_nonflipped or w1_flipped:
+                                group = next(g for g in groups if w2_owid in g[0])
+                                if w1_nonflipped == flip_together:
+                                    nonflipped_groups.append(group)
+                                else:
+                                    flipped_groups.append(group)
+                            else:
+                                w2_nonflipped = any(g for g in nonflipped_groups if w2_owid in g[0])
+                                w2_flipped = any(g for g in flipped_groups if w2_owid in g[0])
+                                if w2_nonflipped or w2_flipped:
+                                    group = next(g for g in groups if w1_owid in g[0])
+                                    if w2_nonflipped == flip_together:
+                                        nonflipped_groups.append(group)
+                                    else:
+                                        flipped_groups.append(group)
+                                else:
+                                    w1_group = next(g for g in groups if w1_owid in g[0])
+                                    w2_group = next(g for g in groups if w2_owid in g[0])
+                                    if not flip_together:
+                                        if random.randint(0, 1) > 0:
+                                            nonflipped_groups.append(w1_group)
+                                            flipped_groups.append(w2_group)
+                                        else:
+                                            flipped_groups.append(w1_group)
+                                            nonflipped_groups.append(w2_group)
+                                    else:
+                                        if random.randint(1, 100) > undefined_chance:
+                                            nonflipped_groups.append(w1_group)
+                                            nonflipped_groups.append(w2_group)
+                                        else:
+                                            flipped_groups.append(w1_group)
+                                            flipped_groups.append(w2_group)
+            # Check if there are any groups that appear in both sets
+            if any(group in flipped_groups for group in nonflipped_groups):
+                raise GenerationException('Conflict found when flipping tiles')
     
     attempts = 1
     if 0 < undefined_chance < 100:
         # do roughly 1000 attempts at a full list
-        attempts = len(groups) - len(always_removed)
+        attempts = len(groups) - len(nonflipped_groups)
         attempts = (attempts ** 1.9) + (attempts * 10) + 1
     while True:
         if attempts == 0: # expected to only occur with custom flips
             raise GenerationException('Could not find valid tile flips')
 
         # tile shuffle happens here
-        removed = copy.deepcopy(always_removed)
+        removed = copy.deepcopy(nonflipped_groups)
         if 0 < undefined_chance < 100:
-            for group in [g for g in groups if g not in always_removed]:
+            for group in [g for g in groups if g not in nonflipped_groups]:
                 if group not in flipped_groups and random.randint(1, 100) > undefined_chance:
                     removed.append(group)
 
