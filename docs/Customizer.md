@@ -87,6 +87,38 @@ You may define an item, and a list of locations. The locations may be weighted i
 
 You may define an item and a list of locations that an item should not be placed at. This will apply to all items of that type. The logic is considered for this. If it is otherwise impossible, the item will be considered for the listed locations. This is important for small key layouts mostly, but it will try other locations first. 
 
+### ow-edges
+
+This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have either `ow_shuffle` or `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has one primary subsection: `two-way`.
+
+#### two-way
+
+`two-way` should be used for defining overworld edge transition connections. An asterisk `*` at the end of an edge name can be used on any parallel edge (an edge that exists in the same place in the opposite world), this will swap the defined edge with its parallel edge if the tile is flipped by Tile Flip.
+
+`Links House ES*: Stone Bridge WS*` The edge east of Links House will be vanilla, but if Links House screen gets flipped by Tile Flip, then Big Bomb Shop ES will connect to Stone Bridge.
+
+### ow-crossed
+
+This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has three primary subsections: `force_crossed`, `force_noncrossed`, and `limit_crossed`.
+
+#### force_crossed / force_noncrossed
+
+`force_crossed` and `force_noncrossed` should be used to define specific overworld edge transitions you wish to be cross-world connected without needing to specify an exact destination. These sections are optional but must contain a list of edge names. An asterisk `*` at the end of an edge name can be used on any parallel edge (an edge that exists in the same place in the opposite world), this will swap the defined edge with its parallel edge if the tile is flipped by Tile Flip.
+
+#### limit_crossed
+
+`limit_crossed` should be used to limit how many overworld edge transitions end up connecting cross-world. This value can be set to any non-negative integer. A value of 0 means no edges will be cross-world, except for edges that are forced cross-world (either by the previous step or a result of some combination of OWR settings).
+
+### ow-whirlpools
+
+This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_whirlpool: true` in the `settings` section in order for any values here to take effect. This section has one primary subsection: `two-way`.
+
+#### two-way
+
+`two-way` should be used for defining whirlpool connections.
+
+`River Bend Whirlpool: Lake Hylia Whirlpool` The whirlpool west of Potion Shop will be connected to the whirlpool at Lake Hylia.
+
 ### ow-tileflips
 
 This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_mixed: true` in the `settings` section in order for any values here to take effect. This section has three primary subsections: `force_flip`, `force_no_flip`, and `undefined_chance`.
