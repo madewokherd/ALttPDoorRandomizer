@@ -79,6 +79,10 @@ class CustomSettings(object):
                 args.ow_shuffle[p] = get_setting(settings['ow_shuffle'], args.ow_shuffle[p])
                 args.ow_terrain[p] = get_setting(settings['ow_terrain'], args.ow_terrain[p])
                 args.ow_crossed[p] = get_setting(settings['ow_crossed'], args.ow_crossed[p])
+                if args.ow_crossed[p] == 'chaos':
+                    import logging
+                    logging.getLogger('').info("Crossed OWR option 'chaos' is deprecated. Use 'unrestricted' instead.")
+                    args.ow_crossed[p] = 'unrestricted'
                 args.ow_keepsimilar[p] = get_setting(settings['ow_keepsimilar'], args.ow_keepsimilar[p])
                 args.ow_mixed[p] = get_setting(settings['ow_mixed'], args.ow_mixed[p])
                 args.ow_whirlpool[p] = get_setting(settings['ow_whirlpool'], args.ow_whirlpool[p])

@@ -210,7 +210,7 @@ def link_overworld(world, player):
     force_crossed = set()
     force_noncrossed = set()
     count_crossed = 0
-    limited_crossed = 9 if world.owCrossed[player] == 'limited' else -1
+    limited_crossed = -1
     if world.customizer:
         custom_crossed = world.customizer.get_owcrossed()
         if custom_crossed and player in custom_crossed:
@@ -257,7 +257,7 @@ def link_overworld(world, player):
                                                                                 s[0x30],                                s[0x35],
                                                                     s[0x41],                 s[0x3a],s[0x3b],s[0x3c],                s[0x3f])
         world.spoiler.set_map('groups', text_output, ow_crossed_tiles, player)
-    elif limited_crossed > -1 or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'chaos'):
+    elif limited_crossed > -1 or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'unrestricted'):
         crossed_candidates = list()
         for group in trimmed_groups.keys():
             (mode, wrld, dir, terrain, parallel, count) = group
@@ -1084,7 +1084,7 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
     exist_dw_regions.extend(new_results[2])
 
     # replace LW edges with DW
-    if world.owCrossed[player] not in ['polar', 'grouped', 'chaos'] or do_grouped:
+    if world.owCrossed[player] == 'none' or do_grouped:
         # in polar, the actual edge connections remain vanilla
         def getSwappedEdges(world, lst, player):
             for regionname in lst:
@@ -1238,7 +1238,7 @@ def adjust_edge_groups(world, trimmed_groups, edges_to_swap, player):
         if mode == OpenStd.Standard:
             groups[key] = group
         else:
-            if world.owCrossed[player] == 'chaos' and not limited_crossed:
+            if world.owCrossed[player] == 'unrestricted' and not limited_crossed:
                 groups[(mode, None, dir, terrain, parallel, count)][0].extend(group[0])
                 groups[(mode, None, dir, terrain, parallel, count)][1].extend(group[1])
             else:

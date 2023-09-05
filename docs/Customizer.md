@@ -107,7 +107,7 @@ This must be defined by player. Each player number should be listed with the app
 
 #### limit_crossed
 
-`limit_crossed` should be used to limit how many overworld edge transitions end up connecting cross-world. This value can be set to any non-negative integer. A value of 0 means no edges will be cross-world, except for edges that are forced cross-world (either by the previous step or a result of some combination of OWR settings).
+`limit_crossed` should be used to limit how many overworld edge transitions end up connecting cross-world. This value can be set to any non-negative integer. A value of 0 means no edges will be cross-world, except for edges that are forced cross-world (either by the previous step or a result of some combination of OWR settings). This option only takes effect if `ow_crossed: unrestricted` is in the `settings` section.
 
 ### ow-whirlpools
 

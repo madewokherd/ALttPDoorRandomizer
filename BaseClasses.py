@@ -3481,7 +3481,7 @@ boss_mode = {"none": 0, "simple": 1, "full": 2, "chaos": 3, 'random': 3, 'unique
 
 # byte 11: OOOT WCCC (OWR layout, free terrain, whirlpools, OWR crossed)
 or_mode = {"vanilla": 0, "parallel": 1, "full": 2}
-orcrossed_mode = {"none": 0, "polar": 1, "grouped": 2, "limited": 3, "chaos": 4}
+orcrossed_mode = {"none": 0, "polar": 1, "grouped": 2, "unrestricted": 4}
 
 # byte 12: KMB? FF?? (keep similar, mixed/tile flip, bonk drops, flute spots)
 flutespot_mode = {"vanilla": 0, "balanced": 1, "random": 2}
