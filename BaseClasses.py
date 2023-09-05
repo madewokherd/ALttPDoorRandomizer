@@ -240,29 +240,16 @@ class World(object):
             raise RuntimeError('No such region %s for player %d' % (regionname, player))
 
     def get_owedge(self, edgename, player):
-        if isinstance(edgename, OWEdge):
-            return edgename
-        try:
-            return self._owedge_cache[(edgename, player)]
-        except KeyError:
-            for edge in self.owedges:
-                if edge.name == edgename and edge.player == player:
-                    self._owedge_cache[(edgename, player)] = edge
-                    return edge
+        edge = self.check_for_owedge(edgename, player)
+        if edge is None:
             raise RuntimeError('No such edge %s for player %d' % (edgename, player))
+        return edge
 
     def get_entrance(self, entrance, player):
-        if isinstance(entrance, Entrance):
-            return entrance
-        try:
-            return self._entrance_cache[(entrance, player)]
-        except KeyError:
-            for region in self.regions:
-                for exit in region.exits:
-                    if exit.name == entrance and exit.player == player:
-                        self._entrance_cache[(entrance, player)] = exit
-                        return exit
+        ent = self.check_for_entrance(entrance, player)
+        if ent is None:
             raise RuntimeError('No such entrance %s for player %d' % (entrance, player))
+        return ent
 
     def remove_entrance(self, entrance, player):
         if (entrance, player) in self._entrance_cache.keys():
@@ -296,16 +283,10 @@ class World(object):
         raise RuntimeError('No such dungeon %s for player %d' % (dungeonname, player))
 
     def get_door(self, doorname, player):
-        if isinstance(doorname, Door):
-            return doorname
-        try:
-            return self._door_cache[(doorname, player)]
-        except KeyError:
-            for door in self.doors:
-                if door.name == doorname and door.player == player:
-                    self._door_cache[(doorname, player)] = door
-                    return door
+        door = self.check_for_door(doorname, player)
+        if door is None:
             raise RuntimeError('No such door %s for player %d' % (doorname, player))
+        return door
 
     def get_portal(self, portal_name, player):
         if isinstance(portal_name, Portal):
@@ -319,28 +300,6 @@ class World(object):
                     return portal
             raise RuntimeError('No such portal %s for player %d' % (portal_name, player))
 
-    def check_for_owedge(self, edgename, player):
-        if isinstance(edgename, OWEdge):
-            return edgename
-        try:
-            if edgename[-1] == '*':
-                edgename = edgename[:-1]
-                edge = self.check_for_owedge(edgename, player)
-                if self.is_tile_swapped(edge.owIndex, player):
-                    from OverworldShuffle import parallel_links
-                    if edgename in parallel_links.keys() or edgename in parallel_links.inverse.keys():
-                        edgename = parallel_links[edgename] if edgename in parallel_links.keys() else parallel_links.inverse[edgename][0]
-                        return self.check_for_owedge(edgename, player)
-                    else:
-                        raise Exception("Edge notated with * doesn't have a parallel edge: %s" & edgename)
-            return self._owedge_cache[(edgename, player)]
-        except KeyError:
-            for edge in self.owedges:
-                if edge.name == edgename and edge.player == player:
-                    self._owedge_cache[(edgename, player)] = edge
-                    return edge
-            return None
-    
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
@@ -366,6 +325,28 @@ class World(object):
             else:
                 return False
 
+    def check_for_owedge(self, edgename, player):
+        if isinstance(edgename, OWEdge):
+            return edgename
+        try:
+            if edgename[-1] == '*':
+                edgename = edgename[:-1]
+                edge = self.check_for_owedge(edgename, player)
+                if self.is_tile_swapped(edge.owIndex, player):
+                    from OverworldShuffle import parallel_links
+                    if edgename in parallel_links.keys() or edgename in parallel_links.inverse.keys():
+                        edgename = parallel_links[edgename] if edgename in parallel_links.keys() else parallel_links.inverse[edgename][0]
+                        return self.check_for_owedge(edgename, player)
+                    else:
+                        raise Exception("Edge notated with * doesn't have a parallel edge: %s" & edgename)
+            return self._owedge_cache[(edgename, player)]
+        except KeyError:
+            for edge in self.owedges:
+                if edge.name == edgename and edge.player == player:
+                    self._owedge_cache[(edgename, player)] = edge
+                    return edge
+            return None
+    
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
