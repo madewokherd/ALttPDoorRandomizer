@@ -454,7 +454,9 @@ def link_overworld(world, player):
             groupKeys = list(groups.keys())
 
             if world.mode[player] == 'standard':
-                random.shuffle(groupKeys[2:]) # keep first 2 groups (Standard) first
+                subset = groupKeys[2:]
+                random.shuffle(subset) # keep first 2 groups (Standard) first
+                groupKeys[2:] = subset
             else:
                 random.shuffle(groupKeys)
 
@@ -697,7 +699,9 @@ def link_overworld(world, player):
             if 0x30 in flute_pool and 0x30 not in forbidden_spots and len(new_spots) < target_spots and ('Desert Teleporter Ledge' in sector[1] or 'Mire Teleporter Ledge' in sector[1]):
                 addSpot(0x30, True, True) # guarantee desert/mire access
 
-            random.shuffle(sector[1])
+            subset = sector[1]
+            random.shuffle(subset)
+            sector[1] = subset
             f = 0
             t = 0
             while len(new_spots) < target_spots:
