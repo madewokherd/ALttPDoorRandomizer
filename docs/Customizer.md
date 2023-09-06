@@ -89,7 +89,7 @@ You may define an item and a list of locations that an item should not be placed
 
 ### ow-edges
 
-This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have either `ow_shuffle` or `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has one primary subsection: `two-way`.
+This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have either `ow_shuffle` or `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has two primary subsections: `two-way` and `groups`.
 
 #### two-way
 
@@ -97,13 +97,24 @@ This must be defined by player. Each player number should be listed with the app
 
 `Links House ES*: Stone Bridge WS*` The edge east of Links House will be vanilla, but if Links House screen gets flipped by Tile Flip, then Big Bomb Shop ES will connect to Stone Bridge.
 
+#### groups
+
+`groups` should be used for defining new pool divisions of overworld edge transitions. Each group must have some unique name with all the edges listed that are desired to exist in the pool. The name of a group can be anything as long as it is valid yaml syntax. These defined groups cannot break up edges that conflict with mode settings, like `Keep Similar Edges Together`. The asterisk `*` notation, described in the `ow-edges/two-way` section, can be used here.
+
+This example puts these 2 edges in their own pool, while the rest of the edges remain in their existing pools:
+```
+someDescription:
+  - Links House ES*
+  - Stone Bridge WS*
+```
+
 ### ow-crossed
 
 This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has three primary subsections: `force_crossed`, `force_noncrossed`, and `limit_crossed`.
 
 #### force_crossed / force_noncrossed
 
-`force_crossed` and `force_noncrossed` should be used to define specific overworld edge transitions you wish to be cross-world connected without needing to specify an exact destination. These sections are optional but must contain a list of edge names. An asterisk `*` at the end of an edge name can be used on any parallel edge (an edge that exists in the same place in the opposite world), this will swap the defined edge with its parallel edge if the tile is flipped by Tile Flip.
+`force_crossed` and `force_noncrossed` should be used to define specific overworld edge transitions you wish to be cross-world connected without needing to specify an exact destination. These sections are optional but must contain a list of edge names. The asterisk `*` notation, described in the `ow-edges/two-way` section, can be used here.
 
 #### limit_crossed
 

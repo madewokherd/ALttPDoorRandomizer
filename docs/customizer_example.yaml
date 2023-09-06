@@ -75,6 +75,17 @@ ow-edges:
       Kakariko Fortune ES*: Sanctuary WN*
       Central Bonk Rocks EC: Potion Shop WN
       Central Bonk Rocks ES: Potion Shop WC
+    groups:
+      someDescription:
+        - Tree Line SC*
+        - Lake Hylia NC*
+        - Dark Tree Line SC*
+        - Ice Lake NC*
+      1234:
+        - Lake Hylia EC*
+        - Octoballoon WC*
+        - Ice Lake EC*
+        - Bomber Corner WC*
 ow-crossed:
   1:
     force_crossed:

@@ -60,7 +60,7 @@ def link_overworld(world, player):
             new_groups[group] = ([],[])
         
         for group in groups.keys():
-            (mode, wrld, dir, terrain, parallel, count) = group
+            (mode, wrld, dir, terrain, parallel, count, custom) = group
             for (forward_set, back_set) in zip(groups[group][0], groups[group][1]):
                 anyF = any(edge in orig_swaps for edge in forward_set)
                 anyB = any(edge in orig_swaps for edge in back_set)
@@ -75,11 +75,11 @@ def link_overworld(world, player):
                     if parallel == IsParallel.Yes and not (all(edge in orig_swaps for edge in map(getParallel, forward_set)) and all(edge in orig_swaps for edge in map(getParallel, back_set))):
                         raise Exception('Cannot move a parallel edge without the other')
                     new_mode = OpenStd.Open
-                    if tuple((OpenStd.Open, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)) not in new_groups.keys():
+                    if tuple((OpenStd.Open, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count, custom)) not in new_groups.keys():
                         # when Links House tile is flipped, the DW edges need to get put into existing Standard group
                         new_mode = OpenStd.Standard
-                    new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][0].append(forward_set)
-                    new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count)][1].append(back_set)
+                    new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count, custom)][0].append(forward_set)
+                    new_groups[(new_mode, WorldType((int(wrld) + 1) % 2), dir, terrain, parallel, count, custom)][1].append(back_set)
                     for edge in forward_set:
                         swaps.remove(edge)
                     for edge in back_set:
@@ -119,28 +119,28 @@ def link_overworld(world, player):
         del parallel_links_new['Maze Race ES']
         del parallel_links_new['Kakariko Suburb WS']
         for group in trimmed_groups.keys():
-            (std, region, axis, terrain, parallel, _) = group
+            (std, region, axis, terrain, parallel, _, custom) = group
             if parallel == IsParallel.Yes:
                 (forward_edges, back_edges) = trimmed_groups[group]
                 if ['Maze Race ES'] in forward_edges:
                     forward_edges.remove(['Maze Race ES'])
-                    trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][0].append(['Maze Race ES'])
+                    trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1, custom)][0].append(['Maze Race ES'])
                 if ['Kakariko Suburb WS'] in back_edges:
                     back_edges.remove(['Kakariko Suburb WS'])
-                    trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][1].append(['Kakariko Suburb WS'])
+                    trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1, custom)][1].append(['Kakariko Suburb WS'])
                 trimmed_groups[group] = (forward_edges, back_edges)
     else:
         for group in trimmed_groups.keys():
-            (std, region, axis, terrain, _, _) = group
+            (std, region, axis, terrain, _, _, custom) = group
             (forward_edges, back_edges) = trimmed_groups[group]
             if ['Dig Game EC', 'Dig Game ES'] in forward_edges:
                 forward_edges.remove(['Dig Game EC', 'Dig Game ES'])
-                trimmed_groups[(std, region, axis, terrain, IsParallel.Yes, 1)][0].append(['Dig Game ES'])
-                trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][0].append(['Dig Game EC'])
+                trimmed_groups[(std, region, axis, terrain, IsParallel.Yes, 1, custom)][0].append(['Dig Game ES'])
+                trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1, custom)][0].append(['Dig Game EC'])
             if ['Frog WC', 'Frog WS'] in back_edges:
                 back_edges.remove(['Frog WC', 'Frog WS'])
-                trimmed_groups[(std, region, axis, terrain, IsParallel.Yes, 1)][1].append(['Frog WS'])
-                trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1)][1].append(['Frog WC'])
+                trimmed_groups[(std, region, axis, terrain, IsParallel.Yes, 1, custom)][1].append(['Frog WS'])
+                trimmed_groups[(std, region, axis, terrain, IsParallel.No, 1, custom)][1].append(['Frog WC'])
             trimmed_groups[group] = (forward_edges, back_edges)
     parallel_links_new = {**dict(parallel_links_new), **dict({e:p[0] for e, p in parallel_links_new.inverse.items()})}
 
@@ -260,7 +260,7 @@ def link_overworld(world, player):
     elif limited_crossed > -1 or (world.owShuffle[player] == 'vanilla' and world.owCrossed[player] == 'unrestricted'):
         crossed_candidates = list()
         for group in trimmed_groups.keys():
-            (mode, wrld, dir, terrain, parallel, count) = group
+            (mode, wrld, dir, terrain, parallel, count, _) = group
             if wrld == WorldType.Light and mode != OpenStd.Standard:
                 for (forward_set, back_set) in zip(trimmed_groups[group][0], trimmed_groups[group][1]):
                     if forward_set[0] in parallel_links_new:
@@ -459,7 +459,7 @@ def link_overworld(world, player):
                 random.shuffle(groupKeys)
 
             for key in groupKeys:
-                (mode, wrld, dir, terrain, parallel, count) = key
+                (mode, wrld, dir, terrain, parallel, count, _) = key
                 (forward_edge_sets, back_edge_sets) = groups[key]
                 def remove_connected():
                     s = 0
@@ -1227,24 +1227,42 @@ def reorganize_groups(world, groups, player):
 def adjust_edge_groups(world, trimmed_groups, edges_to_swap, player):
     groups = defaultdict(lambda: ([],[]))
     limited_crossed = False
+    custom_groups = dict()
     if world.customizer:
         custom_crossed = world.customizer.get_owcrossed()
         limited_crossed = custom_crossed and (player in custom_crossed) and ('limit_crossed' in custom_crossed[player])
+        custom_edge_groups = world.customizer.get_owedges()
+        if custom_edge_groups and player in custom_edge_groups:
+            custom_edge_groups = custom_edge_groups[player]
+            if 'groups' in custom_edge_groups:
+                custom_groups = dict(custom_edge_groups['groups'])
+                for name, edges in custom_groups.items():
+                    custom_groups[name] = [world.get_owedge(e, player).name if e[-1] == '*' else e for e in edges]
     for (key, group) in trimmed_groups.items():
-        (mode, wrld, dir, terrain, parallel, count) = key
+        (mode, wrld, dir, terrain, parallel, count, custom) = key
         if mode == OpenStd.Standard:
             groups[key] = group
         else:
             if world.owCrossed[player] == 'unrestricted' and not limited_crossed:
-                groups[(mode, None, dir, terrain, parallel, count)][0].extend(group[0])
-                groups[(mode, None, dir, terrain, parallel, count)][1].extend(group[1])
+                groups[(mode, None, dir, terrain, parallel, count, custom)][0].extend(group[0])
+                groups[(mode, None, dir, terrain, parallel, count, custom)][1].extend(group[1])
             else:
                 for i in range(2):
                     for edge_set in group[i]:
                         new_world = int(wrld)
                         if edge_set[0] in edges_to_swap:
                             new_world += 1
-                        groups[(mode, WorldType(new_world % 2), dir, terrain, parallel, count)][i].append(edge_set)
+                        groups[(mode, WorldType(new_world % 2), dir, terrain, parallel, count, custom)][i].append(edge_set)
+    for (key, group) in groups.copy().items():
+        (mode, wrld, dir, terrain, parallel, count, custom) = key
+        if mode != OpenStd.Standard:
+            for group_name, edges in custom_groups.items():
+                for i in range(0, 2):
+                    matches = [s for s in groups[key][i] if any(e in s for e in edges)]
+                    if len(matches) > 0:
+                        for m in matches:
+                            groups[key][i].remove(m)
+                        groups[(mode, wrld, dir, terrain, parallel, count, group_name)][i].extend(matches)
     return groups
 
 def create_flute_exits(world, player):
