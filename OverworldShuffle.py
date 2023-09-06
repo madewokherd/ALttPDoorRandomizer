@@ -700,9 +700,7 @@ def link_overworld(world, player):
             if 0x30 in flute_pool and 0x30 not in forbidden_spots and len(new_spots) < target_spots and ('Desert Teleporter Ledge' in sector[1] or 'Mire Teleporter Ledge' in sector[1]):
                 addSpot(0x30, True, True) # guarantee desert/mire access
 
-            subset = sector[1]
-            random.shuffle(subset)
-            sector[1] = subset
+            random.shuffle(sector[1])
             f = 0
             t = 0
             while len(new_spots) < target_spots:
