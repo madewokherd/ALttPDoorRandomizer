@@ -388,7 +388,7 @@ class CustomSettings(object):
             # tile flips
             if p in world.owswaps and len(world.owswaps[p][0]) > 0:
                 flips[p] = {}
-                flips[p]['force_flip'] = list(HexInt(f) for f in world.owswaps[p][0] if f < 0x40 or f >= 0x80)
+                flips[p]['force_flip'] = list(HexInt(f) for f in world.owswaps[p][0] if f & 0x40 == 0)
                 flips[p]['force_flip'].sort()
                 flips[p]['undefined_chance'] = 0
             # flute spots

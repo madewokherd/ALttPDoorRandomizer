@@ -217,11 +217,11 @@ def link_overworld(world, player):
             custom_crossed = custom_crossed[player]
             if 'force_crossed' in custom_crossed and len(custom_crossed['force_crossed']) > 0:
                 for edgename in custom_crossed['force_crossed']:
-                    edge = world.check_for_owedge(edgename, player)
+                    edge = world.get_owedge(edgename, player)
                     force_crossed.add(edge.name)
             if 'force_noncrossed' in custom_crossed and len(custom_crossed['force_noncrossed']) > 0:
                 for edgename in custom_crossed['force_noncrossed']:
-                    edge = world.check_for_owedge(edgename, player)
+                    edge = world.get_owedge(edgename, player)
                     force_noncrossed.add(edge.name)
             if 'limit_crossed' in custom_crossed:
                 limited_crossed = custom_crossed['limit_crossed']
@@ -322,9 +322,10 @@ def link_overworld(world, player):
 
         if limited_crossed > -1:
             limit = limited_crossed - count_crossed
-            random.shuffle(crossed_candidates)
-            for edge_set in crossed_candidates[:limit]:
-                world.owcrossededges[player].extend(edge_set)
+            if limit > 1:
+                random.shuffle(crossed_candidates)
+                for edge_set in crossed_candidates[:limit]:
+                    world.owcrossededges[player].extend(edge_set)
         assert len(world.owcrossededges[player]) == len(set(world.owcrossededges[player])), "Same edge candidate added to crossed edges"
 
         for edge in copy.deepcopy(world.owcrossededges[player]):
@@ -488,7 +489,7 @@ def link_overworld(world, player):
                     back_parallel_lw_sets, back_parallel_dw_sets = [], []
                     
                     for edge_set in forward_edge_sets:
-                        if world.check_for_owedge(edge_set[0], player).is_lw(world):
+                        if world.get_owedge(edge_set[0], player).is_lw(world):
                             forward_lw_sets.append(edge_set)
                             if parallel == IsParallel.Yes:
                                 forward_parallel_lw_sets.append([parallel_links_new[e] for e in edge_set])
@@ -497,7 +498,7 @@ def link_overworld(world, player):
                             if parallel == IsParallel.Yes:
                                 forward_parallel_dw_sets.append([parallel_links_new[e] for e in edge_set])
                     for edge_set in back_edge_sets:
-                        if world.check_for_owedge(edge_set[0], player).is_lw(world):
+                        if world.get_owedge(edge_set[0], player).is_lw(world):
                             back_lw_sets.append(edge_set)
                             if parallel == IsParallel.Yes:
                                 back_parallel_lw_sets.append([parallel_links_new[e] for e in edge_set])
@@ -817,12 +818,12 @@ def connect_custom(world, connected_edges, groups, forced, player):
                     return not ((not is_crossed and (edge1 in forced_crossed or edge2 in forced_crossed))
                             or (is_crossed and (edge1 in forced_noncrossed or edge2 in forced_noncrossed)))
                 for edgename1, edgename2 in custom_edges['two-way'].items():
-                    edge1 = world.check_for_owedge(edgename1, player)
-                    edge2 = world.check_for_owedge(edgename2, player)
+                    edge1 = world.get_owedge(edgename1, player)
+                    edge2 = world.get_owedge(edgename2, player)
                     is_crossed = edge1.is_lw(world) != edge2.is_lw(world)
                     if not validate_crossed_allowed(edge1.name, edge2.name, is_crossed):
                         if edgename2[-1] == '*':
-                            edge2 = world.check_for_owedge(edge2.name + '*', player)
+                            edge2 = world.get_owedge(edge2.name + '*', player)
                             is_crossed = not is_crossed
                         else:
                             raise GenerationException('Violation of force crossed rules: \'%s\' <-> \'%s\'', edgename1, edgename2)
@@ -856,13 +857,9 @@ def connect_custom(world, connected_edges, groups, forced, player):
 def connect_two_way(world, edgename1, edgename2, player, connected_edges=None):
     edge1 = world.get_entrance(edgename1, player)
     edge2 = world.get_entrance(edgename2, player)
-    x = world.check_for_owedge(edgename1, player)
-    y = world.check_for_owedge(edgename2, player)
+    x = world.get_owedge(edgename1, player)
+    y = world.get_owedge(edgename2, player)
     
-    if x is None:
-        raise Exception('%s is not a valid edge.', edgename1)
-    elif y is None:
-        raise Exception('%s is not a valid edge.', edgename2)
     if connected_edges is not None:
         if edgename1 in connected_edges or edgename2 in connected_edges:
             if (x.dest and x.dest.name == edgename2) and (y.dest and y.dest.name == edgename1):
