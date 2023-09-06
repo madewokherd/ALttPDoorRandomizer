@@ -109,7 +109,6 @@ def link_overworld(world, player):
                     raise NotImplementedError('Invalid OW Edge flip scenario')
         return new_groups
 
-    tile_groups = define_tile_groups(world, player, False)
     trimmed_groups = copy.deepcopy(OWEdgeGroupsTerrain if world.owTerrain[player] else OWEdgeGroups)
     swapped_edges = list()
 
@@ -152,7 +151,8 @@ def link_overworld(world, player):
     # tile shuffle
     logging.getLogger('').debug('Flipping overworld tiles')
     if world.owMixed[player]:
-        swapped_edges = shuffle_tiles(world, tile_groups, world.owswaps[player], False, player)
+        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, player, False)
+        swapped_edges = shuffle_tiles(world, tile_groups, world.owswaps[player], False, (force_flipped, force_nonflipped, undefined_chance), player)
         
         update_world_regions(world, player)
 
@@ -237,7 +237,8 @@ def link_overworld(world, player):
         # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
         # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
         ow_crossed_tiles_mask = [[],[],[]]
-        world.owcrossededges[player] = shuffle_tiles(world, define_tile_groups(world, player, True), ow_crossed_tiles_mask, True, player)
+        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, player, True)
+        world.owcrossededges[player] = shuffle_tiles(world, tile_groups, ow_crossed_tiles_mask, True, (force_flipped, force_nonflipped, undefined_chance), player)
         ow_crossed_tiles = [i for i in range(0x82) if (i in world.owswaps[player][0]) != (i in ow_crossed_tiles_mask[0])]
 
         # update spoiler
@@ -900,7 +901,96 @@ def connect_two_way(world, edgename1, edgename2, player, connected_edges=None):
                 except KeyError:
                     raise KeyError('No parallel edge for edge %s' % edgename2)
 
-def shuffle_tiles(world, groups, result_list, do_grouped, player):
+def determine_forced_flips(world, tile_ow_groups, player):
+    undefined_chance = 50
+    flipped_groups = list()
+    nonflipped_groups = list()
+    merged_owids = list()
+    if world.customizer:
+        custom_flips = world.customizer.get_owtileflips()
+        if custom_flips and player in custom_flips:
+            custom_flips = custom_flips[player]
+            forced_flips = list()
+            forced_nonflips = list()
+            if 'undefined_chance' in custom_flips:
+                undefined_chance = custom_flips['undefined_chance']
+            if 'force_flip' in custom_flips:
+                forced_flips = custom_flips['force_flip']
+            if 'force_no_flip' in custom_flips:
+                forced_nonflips = custom_flips['force_no_flip']
+
+            for group in tile_ow_groups:
+                if any(owid in group[0]+group[1] for owid in forced_nonflips):
+                    nonflipped_groups.append(group)
+                if any(owid in group[0]+group[1] for owid in forced_flips):
+                    flipped_groups.append(group)
+            
+            if undefined_chance == 0:
+                nonflipped_groups.extend([g for g in tile_ow_groups if g not in flipped_groups + nonflipped_groups])
+        
+        # ensure any customized connections don't end up crossworld
+        if world.owCrossed[player] == 'none':
+            def should_merge_group(s1_owid, s2_owid):
+                flip_together = (s1_owid & 0x40) == (s2_owid & 0x40)
+                s1_nonflipped = any(g for g in nonflipped_groups if s1_owid in g)
+                s1_flipped = any(g for g in flipped_groups if s1_owid in g)
+                if s1_nonflipped or s1_flipped:
+                    group = next(g for g in tile_ow_groups if s2_owid in g)
+                    if s1_nonflipped == flip_together:
+                        nonflipped_groups.append(group)
+                    else:
+                        flipped_groups.append(group)
+                else:
+                    s2_nonflipped = any(g for g in nonflipped_groups if s2_owid in g)
+                    s2_flipped = any(g for g in flipped_groups if s2_owid in g)
+                    if s2_nonflipped or s2_flipped:
+                        group = next(g for g in tile_ow_groups if s1_owid in g)
+                        if s2_nonflipped == flip_together:
+                            nonflipped_groups.append(group)
+                        else:
+                            flipped_groups.append(group)
+                    else:
+                        s1_group = next(g for g in tile_ow_groups if s1_owid in g)
+                        s2_group = next(g for g in tile_ow_groups if s2_owid in g)
+                        if not flip_together:
+                            if random.randint(0, 1) > 0:
+                                nonflipped_groups.append(s1_group)
+                                flipped_groups.append(s2_group)
+                            else:
+                                flipped_groups.append(s1_group)
+                                nonflipped_groups.append(s2_group)
+                        else:
+                            return True
+                return False
+            if world.owWhirlpoolShuffle[player]:
+                custom_whirlpools = world.customizer.get_whirlpools()
+                if custom_whirlpools and player in custom_whirlpools:
+                    custom_whirlpools = custom_whirlpools[player]
+                    if 'two-way' in custom_whirlpools and len(custom_whirlpools['two-way']) > 0:
+                        custom_whirlpools = custom_whirlpools['two-way']
+                        whirlpool_map = {name:owid for wc in default_whirlpool_connections for (owid, name, _) in wc}
+                        for whirl1, whirl2 in custom_whirlpools.items():
+                            if [whirlpool_map[whirl1], whirlpool_map[whirl2]] not in merged_owids and should_merge_group(whirlpool_map[whirl1], whirlpool_map[whirl2]):
+                                merged_owids.append([whirlpool_map[whirl1], whirlpool_map[whirl2]])
+            if world.owShuffle[player] != 'vanilla':
+                custom_edges = world.customizer.get_owedges()
+                if custom_edges and player in custom_edges:
+                    custom_edges = custom_edges[player]
+                    if 'two-way' in custom_edges and len(custom_edges['two-way']) > 0:
+                        custom_edges = custom_edges['two-way']
+                        for edgename1, edgename2 in custom_edges.items():
+                            if edgename1[-1] != '*' and edgename2[-1] != '*':
+                                edge1 = world.get_owedge(edgename1, player)
+                                edge2 = world.get_owedge(edgename2, player)
+                                if [edge1.owIndex, edge2.owIndex] not in merged_owids and should_merge_group(edge1.owIndex, edge2.owIndex):
+                                    merged_owids.append([edge1.owIndex, edge2.owIndex])
+    # Check if there are any groups that appear in both sets
+    if any(group in flipped_groups for group in nonflipped_groups):
+        raise GenerationException('Conflict found when flipping tiles')
+    return flipped_groups, nonflipped_groups, undefined_chance, merged_owids
+
+def shuffle_tiles(world, groups, result_list, do_grouped, forced_flips, player):
+    (flipped_groups, nonflipped_groups, undefined_chance) = forced_flips
     swapped_edges = list()
     group_parity = {}
     for group_data in groups:
@@ -957,82 +1047,6 @@ def shuffle_tiles(world, groups, result_list, do_grouped, player):
             parity[5] -= 1
         group_parity[group[0]] = parity
 
-    # customizer adjustments
-    undefined_chance = 50
-    flipped_groups = list()
-    nonflipped_groups = list()
-    if world.customizer:
-        if not do_grouped:
-            custom_flips = world.customizer.get_owtileflips()
-            if custom_flips and player in custom_flips:
-                custom_flips = custom_flips[player]
-                forced_flips = list()
-                forced_nonflips = list()
-                if 'undefined_chance' in custom_flips:
-                    undefined_chance = custom_flips['undefined_chance']
-                if 'force_flip' in custom_flips:
-                    forced_flips = custom_flips['force_flip']
-                if 'force_no_flip' in custom_flips:
-                    forced_nonflips = custom_flips['force_no_flip']
-
-                for group in groups:
-                    if any(owid in group[0] for owid in forced_nonflips):
-                        nonflipped_groups.append(group)
-                    if any(owid in group[0] for owid in forced_flips):
-                        flipped_groups.append(group)
-                
-                if undefined_chance == 0:
-                    nonflipped_groups.extend([g for g in groups if g not in flipped_groups + nonflipped_groups])
-            if world.owCrossed[player] != 'none':
-                # ensure any customized whirlpool connections don't end up crossworld
-                custom_whirlpools = world.customizer.get_whirlpools()
-                if custom_whirlpools and player in custom_whirlpools:
-                    custom_whirlpools = custom_whirlpools[player]
-                    if 'two-way' in custom_whirlpools and len(custom_whirlpools['two-way']) > 0:
-                        custom_whirlpools = custom_whirlpools['two-way']
-                        whirlpool_map = {name:owid for wc in default_whirlpool_connections for (owid, name, _) in wc}
-                        for whirl1, whirl2 in custom_whirlpools.items():
-                            w1_owid = whirlpool_map[whirl1]
-                            w2_owid = whirlpool_map[whirl2]
-                            flip_together = (w1_owid & 0x40) == (w2_owid & 0x40)
-                            w1_nonflipped = any(g for g in nonflipped_groups if w1_owid in g[0])
-                            w1_flipped = any(g for g in flipped_groups if w1_owid in g[0])
-                            if w1_nonflipped or w1_flipped:
-                                group = next(g for g in groups if w2_owid in g[0])
-                                if w1_nonflipped == flip_together:
-                                    nonflipped_groups.append(group)
-                                else:
-                                    flipped_groups.append(group)
-                            else:
-                                w2_nonflipped = any(g for g in nonflipped_groups if w2_owid in g[0])
-                                w2_flipped = any(g for g in flipped_groups if w2_owid in g[0])
-                                if w2_nonflipped or w2_flipped:
-                                    group = next(g for g in groups if w1_owid in g[0])
-                                    if w2_nonflipped == flip_together:
-                                        nonflipped_groups.append(group)
-                                    else:
-                                        flipped_groups.append(group)
-                                else:
-                                    w1_group = next(g for g in groups if w1_owid in g[0])
-                                    w2_group = next(g for g in groups if w2_owid in g[0])
-                                    if not flip_together:
-                                        if random.randint(0, 1) > 0:
-                                            nonflipped_groups.append(w1_group)
-                                            flipped_groups.append(w2_group)
-                                        else:
-                                            flipped_groups.append(w1_group)
-                                            nonflipped_groups.append(w2_group)
-                                    else:
-                                        if random.randint(1, 100) > undefined_chance:
-                                            nonflipped_groups.append(w1_group)
-                                            nonflipped_groups.append(w2_group)
-                                        else:
-                                            flipped_groups.append(w1_group)
-                                            flipped_groups.append(w2_group)
-            # Check if there are any groups that appear in both sets
-            if any(group in flipped_groups for group in nonflipped_groups):
-                raise GenerationException('Conflict found when flipping tiles')
-    
     attempts = 1
     if 0 < undefined_chance < 100:
         # do roughly 1000 attempts at a full list
@@ -1158,6 +1172,11 @@ def define_tile_groups(world, player, do_grouped):
     if not world.owWhirlpoolShuffle[player] and (world.owCrossed[player] == 'none' or do_grouped):
         merge_groups([[0x0f, 0x35], [0x12, 0x15, 0x33, 0x3f]])
 
+    # customizer adjustments
+    flipped_groups, nonflipped_groups, undefined_chance, merged_owids = determine_forced_flips(world, groups, player)
+    for owids in merged_owids:
+        merge_groups([owids])
+
     tile_groups = []
     for group in groups:
         if can_shuffle_group(group):
@@ -1167,7 +1186,7 @@ def define_tile_groups(world, player, do_grouped):
                 (lw_regions if id < 0x40 or id >= 0x80 else dw_regions).extend(OWTileRegions.inverse[id])
             tile_groups.append((group, lw_regions, dw_regions))
 
-    return tile_groups
+    return tile_groups, flipped_groups, nonflipped_groups, undefined_chance
 
 def remove_reserved(world, groupedlist, connected_edges, player):
     new_grouping = {}
