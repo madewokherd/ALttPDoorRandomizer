@@ -149,6 +149,17 @@ force_no_flip:
   - 0x13
 ```
 
+#### force_together
+
+`force_together` should be used for defining tiles you want to force to flip as a group. Each group must have some unique name with all the OW Screen IDs listed that are desired to be grouped together. The name of a group can be anything as long as it is valid yaml syntax.
+
+Here is an example which forces Links House and Sanctuary screens to flip together:
+```
+someGroup:
+  - 0x2c
+  - 0x13
+```
+
 #### undefined_chance
 
 `undefined_chance` should be used to determine how to handle all the remaining tiles that aren't explicitly defined in the earlier step. This represents the percent chance a tile will flip. This value can be set from 0 to 100 (default is 50). A value of 0 means there is a 0% chance it will be flipped.

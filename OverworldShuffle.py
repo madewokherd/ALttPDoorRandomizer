@@ -916,6 +916,8 @@ def determine_forced_flips(world, tile_ow_groups, player):
                 forced_flips = custom_flips['force_flip']
             if 'force_no_flip' in custom_flips:
                 forced_nonflips = custom_flips['force_no_flip']
+            if 'force_together' in custom_flips:
+                merged_owids = list(custom_flips['force_together'].values())
 
             for group in tile_ow_groups:
                 if any(owid in group[0]+group[1] for owid in forced_nonflips):
