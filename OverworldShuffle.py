@@ -920,9 +920,9 @@ def determine_forced_flips(world, tile_ow_groups, player):
                 merged_owids = list(custom_flips['force_together'].values())
 
             for group in tile_ow_groups:
-                if any(owid in group[0]+group[1] for owid in forced_nonflips):
+                if any(owid in group for owid in forced_nonflips):
                     nonflipped_groups.append(group)
-                if any(owid in group[0]+group[1] for owid in forced_flips):
+                if any(owid in group for owid in forced_flips):
                     flipped_groups.append(group)
             
             if undefined_chance == 0:
