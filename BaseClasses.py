@@ -3188,49 +3188,49 @@ class Spoiler(object):
             for fairy, bottle in self.bottles.items():
                 outfile.write(f'{fairy}: {bottle}\n')
 
-            if self.overworlds or self.whirlpools or self.maps:
-                outfile.write('\n\nOverworld:\n\n')
-
+            if self.maps:
                 # flute shuffle
                 for player in range(1, self.world.players + 1):
                     if ('flute', player) in self.maps:
-                        outfile.write('Flute Spots:\n')
+                        outfile.write('\n\nFlute Spots:\n\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('flute', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('flute', player)]['text'] + '\n\n')
+                        outfile.write(self.maps[('flute', player)]['text'])
                 
                 # overworld tile flips
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
-                        outfile.write('OW Tile Flips:\n')
+                        outfile.write('\n\nOW Tile Flips:\n\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('swaps', player)]['text'] + '\n\n')
+                        outfile.write(self.maps[('swaps', player)]['text'])
                 
                 # crossed groups
                 for player in range(1, self.world.players + 1):
                     if ('groups', player) in self.maps:
-                        outfile.write('OW Crossed Groups:\n')
+                        outfile.write('\n\nOW Crossed Groups:\n\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('groups', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('groups', player)]['text'] + '\n\n')
-            
-            if self.whirlpools:
-                # whirlpools
-                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","whirlpools",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","whirlpools",entry['exit'])) for entry in self.whirlpools.values()]))
+                        outfile.write(self.maps[('groups', player)]['text'])
             
             if self.overworlds:
+                outfile.write('\n\nOverworld Edges:\n\n')
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
+            
+            if self.whirlpools:
+                outfile.write('\n\nWhirlpools:\n\n')
+                # whirlpools
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","whirlpools",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","whirlpools",entry['exit'])) for entry in self.whirlpools.values()]))
             
             if self.entrances:
                 # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly
