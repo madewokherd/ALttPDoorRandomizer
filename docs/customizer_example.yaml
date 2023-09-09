@@ -94,6 +94,7 @@ ow-crossed:
     force_noncrossed:
       - Links House NE
     limit_crossed: 9 # emulates Limited Crossed
+    undefined_chance: 25
 ow-whirlpools:
   1:
     two-way:

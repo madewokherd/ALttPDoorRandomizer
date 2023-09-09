@@ -151,7 +151,7 @@ def link_overworld(world, player):
     # tile shuffle
     logging.getLogger('').debug('Flipping overworld tiles')
     if world.owMixed[player]:
-        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, player, False)
+        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, False, player)
         swapped_edges = shuffle_tiles(world, tile_groups, world.owswaps[player], False, (force_flipped, force_nonflipped, undefined_chance), player)
         
         update_world_regions(world, player)
@@ -211,6 +211,7 @@ def link_overworld(world, player):
     force_noncrossed = set()
     count_crossed = 0
     limited_crossed = -1
+    undefined_chance = 50
     if world.customizer:
         custom_crossed = world.customizer.get_owcrossed()
         if custom_crossed and player in custom_crossed:
@@ -225,6 +226,8 @@ def link_overworld(world, player):
                     force_noncrossed.add(edge.name)
             if 'limit_crossed' in custom_crossed:
                 limited_crossed = custom_crossed['limit_crossed']
+            if 'undefined_chance' in custom_crossed:
+                undefined_chance = custom_crossed['undefined_chance']
 
     if limited_crossed > -1:
         # connect forced crossed non-parallel edges based on previously determined tile flips
@@ -237,7 +240,7 @@ def link_overworld(world, player):
         # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
         # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
         ow_crossed_tiles_mask = [[],[],[]]
-        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, player, True)
+        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, True, player)
         world.owcrossededges[player] = shuffle_tiles(world, tile_groups, ow_crossed_tiles_mask, True, (force_flipped, force_nonflipped, undefined_chance), player)
         ow_crossed_tiles = [i for i in range(0x82) if (i in world.owswaps[player][0]) != (i in ow_crossed_tiles_mask[0])]
 
@@ -310,13 +313,13 @@ def link_overworld(world, player):
                             if not skip_back:
                                 if limited_crossed > -1:
                                     crossed_candidates.append(back_set)
-                                elif random.randint(0, 1):
+                                elif random.randint(1, 100) <= undefined_chance:
                                     world.owcrossededges[player].extend(back_set)
                                     count_crossed = count_crossed + 1
                         if not skip_forward:
                             if limited_crossed > -1:
                                 crossed_candidates.append(forward_set)
-                            elif random.randint(0, 1):
+                            elif random.randint(1, 100) <= undefined_chance:
                                 world.owcrossededges[player].extend(forward_set)
                                 count_crossed = count_crossed + 1
         assert len(world.owcrossededges[player]) == len(set(world.owcrossededges[player])), "Same edge added to crossed edges"
@@ -899,13 +902,16 @@ def connect_two_way(world, edgename1, edgename2, player, connected_edges=None):
                 except KeyError:
                     raise KeyError('No parallel edge for edge %s' % edgename2)
 
-def determine_forced_flips(world, tile_ow_groups, player):
+def determine_forced_flips(world, tile_ow_groups, do_grouped, player):
     undefined_chance = 50
     flipped_groups = list()
     nonflipped_groups = list()
     merged_owids = list()
     if world.customizer:
-        custom_flips = world.customizer.get_owtileflips()
+        if do_grouped:
+            custom_flips = world.customizer.get_owcrossed()
+        else:
+            custom_flips = world.customizer.get_owtileflips()
         if custom_flips and player in custom_flips:
             custom_flips = custom_flips[player]
             forced_flips = list()
@@ -1113,7 +1119,7 @@ def shuffle_tiles(world, groups, result_list, do_grouped, forced_flips, player):
 
     return swapped_edges
 
-def define_tile_groups(world, player, do_grouped):
+def define_tile_groups(world, do_grouped, player):
     groups = [[i, i + 0x40] for i in range(0x40)]
 
     def get_group(id):
@@ -1173,7 +1179,7 @@ def define_tile_groups(world, player, do_grouped):
         merge_groups([[0x0f, 0x35], [0x12, 0x15, 0x33, 0x3f]])
 
     # customizer adjustments
-    flipped_groups, nonflipped_groups, undefined_chance, merged_owids = determine_forced_flips(world, groups, player)
+    flipped_groups, nonflipped_groups, undefined_chance, merged_owids = determine_forced_flips(world, groups, do_grouped, player)
     for owids in merged_owids:
         merge_groups([owids])
 

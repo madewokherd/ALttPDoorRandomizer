@@ -110,7 +110,7 @@ someDescription:
 
 ### ow-crossed
 
-This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has three primary subsections: `force_crossed`, `force_noncrossed`, and `limit_crossed`.
+This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_crossed` enabled in the `settings` section in order for any values here to take effect. This section has four primary subsections: `force_crossed`, `force_noncrossed`, `limit_crossed`, and `undefined_chance`. There are also 
 
 #### force_crossed / force_noncrossed
 
@@ -118,7 +118,17 @@ This must be defined by player. Each player number should be listed with the app
 
 #### limit_crossed
 
-`limit_crossed` should be used to limit how many overworld edge transitions end up connecting cross-world. This value can be set to any non-negative integer. A value of 0 means no edges will be cross-world, except for edges that are forced cross-world (either by the previous step or a result of some combination of OWR settings). This option only takes effect if `ow_crossed: unrestricted` is in the `settings` section.
+`limit_crossed` should be used to limit how many overworld edge transitions end up connecting cross-world. This value can be set to any non-negative integer. A value of 0 means no edges will be cross-world, except for edges that are forced cross-world (either by the previous step or a result of some combination of OWR settings). This option only takes effect in `Unrestricted` Crossed setting.
+
+#### undefined_chance
+
+`undefined_chance` should be used to determine how to handle all the remaining overworld edge transitions that aren't explicitly defined in the earlier steps. This represents the percent chance an edge will be cross-world. This value can be set from 0 to 100 (default is 50). A value of 0 means there is a 0% chance it will be cross-world. This option only takes effect under two mode combinations:
+- 1: `Unrestricted` Crossed with a `Vanilla` OW Layout
+- 2: `Grouped` Crossed
+
+#### (Grouped specific options)
+
+All four options available in the `ow-tileflips` section below are also available for `Grouped`, but must be defined under the `ow-crossed` section. In addition to the previous `undefined_chance`, the three other subsections are: `force_flip`, `force_no_flip`, and `force_together`. For more information about these sections, see the `ow-tileflips` section below.
 
 ### ow-whirlpools
 
@@ -132,7 +142,7 @@ This must be defined by player. Each player number should be listed with the app
 
 ### ow-tileflips
 
-This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_mixed: true` in the `settings` section in order for any values here to take effect. This section has three primary subsections: `force_flip`, `force_no_flip`, and `undefined_chance`.
+This must be defined by player. Each player number should be listed with the appropriate sections and each of these players MUST have `ow_mixed: true` in the `settings` section in order for any values here to take effect. This section has four primary subsections: `force_flip`, `force_no_flip`, `force_together`, and `undefined_chance`.
 
 #### force_flip / force_no_flip
 
