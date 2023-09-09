@@ -468,10 +468,12 @@ def link_overworld(world, player):
                 (mode, wrld, dir, terrain, parallel, count, _) = key
                 (forward_edge_sets, back_edge_sets) = groups[key]
                 def remove_connected():
+                    deleted_edges = []
                     s = 0
                     while s < len(forward_edge_sets):
                         forward_set = forward_edge_sets[s]
                         if forward_set[0] in connected_edges:
+                            deleted_edges.extend(forward_edge_sets[s])
                             del forward_edge_sets[s]
                             continue
                         s += 1
@@ -479,10 +481,14 @@ def link_overworld(world, player):
                     while s < len(back_edge_sets):
                         back_set = back_edge_sets[s]
                         if back_set[0] in connected_edges:
+                            deleted_edges.extend(back_edge_sets[s])
                             del back_edge_sets[s]
                             continue
                         s += 1
-                    assert len(forward_edge_sets) == len(back_edge_sets)
+                    if len(forward_edge_sets) != len(back_edge_sets):
+                        x=', '.join(deleted_edges)
+                        x=0
+                    assert len(forward_edge_sets) == len(back_edge_sets), "OW edge pool is uneven due to prior connections: " + ', '.join(deleted_edges)
                 
                 remove_connected()
                 random.shuffle(forward_edge_sets)
