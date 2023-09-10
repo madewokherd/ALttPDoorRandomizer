@@ -375,6 +375,7 @@
       "Random:         Take any caves can replace a random set of un-interesting caves. See documentation for full list",
       "Fixed:          Take any caves will replace certain location. See documentation for full list"
     ],
+    "collection_rate": [ "Display collection rate (default: %(default)s)" ],
     "pseudoboots": [ " Start with pseudo boots that allow dashing but no item checks (default: %(default)s)"],
     "bombbag": ["Start with 0 bomb capacity. Two capacity upgrades (+10) are added to the pool (default: %(default)s)" ],
     "startinventory": [ "Specifies a list of items that will be in your starting inventory (separated by commas). (default: %(default)s)" ],
@@ -425,7 +426,6 @@
     "reduce_flashing": [ "Reduce some in-game flashing (default: %(default)s)" ],
     "shuffle_sfx": [ "Shuffle sounds effects (default: %(default)s)" ],
     "msu_resume": [ "Enable MSU Resume (default: %(default)s)" ],
-    "collection_rate": [ "Display collection rate (default: %(default)s)" ],
     "create_rom": [ "Create an output rom file. (default: %(default)s)" ],
     "gui": [ "Launch the GUI. (default: %(default)s)" ],
     "jsonout": [
