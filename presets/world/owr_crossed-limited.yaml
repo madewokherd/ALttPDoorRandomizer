@@ -1,7 +1,6 @@
 settings:
   1:
-    ow_shuffle: vanilla
     ow_crossed: unrestricted
 ow-crossed:
   1:
-    undefined_chance: 100
+    limit_crossed: 9
