@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3.0
+- Added Customizer support for all remaining OWR options
+- Added several OWR preset yamls (many ideas are thanks to Catobat)
+- Fixed issue with Mixed OWR + Flute Shuffle placing spots on large screens
+- Removed Limited Crossed OWR and renamed Chaos Crossed to Unrestricted Crossed
+
 ## 0.3.2.2
 - Added Customizer support for Flute Shuffle (thanks Catobat)
 - Fixed bad Old Man rescue possibility in Swapped ER

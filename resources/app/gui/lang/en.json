@@ -147,8 +147,7 @@
     "randomizer.overworld.crossed.none": "None",
     "randomizer.overworld.crossed.grouped": "Grouped",
     "randomizer.overworld.crossed.polar": "Polar",
-    "randomizer.overworld.crossed.limited": "Limited",
-    "randomizer.overworld.crossed.chaos": "Chaos",
+    "randomizer.overworld.crossed.unrestricted": "Unrestricted",
 
     "randomizer.overworld.keepsimilar": "Keep Similar Edges Together",
     
@@ -192,7 +191,6 @@
     "randomizer.gameoptions.reduce_flashing": "Reduce Flashing",
     "randomizer.gameoptions.shuffle_sfx": "Shuffle Sound Effects",
     "randomizer.gameoptions.msu_resume": "MSU Resume",
-    "randomizer.gameoptions.collection_rate": "Display Collection Rate",
 
     "randomizer.gameoptions.heartcolor": "Heart Color",
     "randomizer.gameoptions.heartcolor.red": "Red",
@@ -250,6 +248,7 @@
     "randomizer.item.race": "Generate \"Race\" ROM",
     "randomizer.item.retro": "Retro mode",
     "randomizer.item.pseudoboots": "Pseudoboots",
+    "randomizer.item.collection_rate": "Display Collection Rate",
 
     "randomizer.item.worldstate": "World State",
     "randomizer.item.worldstate.standard": "Standard",

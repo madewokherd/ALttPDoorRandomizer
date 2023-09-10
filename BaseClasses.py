@@ -87,6 +87,7 @@ class World(object):
         self.owedges = []
         self._owedge_cache = {}
         self.owswaps = {}
+        self.owcrossededges = {}
         self.owwhirlpools = {}
         self.owflutespots = {}
         self.owsectors = {}
@@ -114,6 +115,7 @@ class World(object):
             set_player_attr('_region_cache', {})
             set_player_attr('player_names', [])
             set_player_attr('owswaps', [[],[],[]])
+            set_player_attr('owcrossededges', [])
             set_player_attr('owwhirlpools', [])
             set_player_attr('owsectors', None)
             set_player_attr('remote_items', False)
@@ -238,29 +240,16 @@ class World(object):
             raise RuntimeError('No such region %s for player %d' % (regionname, player))
 
     def get_owedge(self, edgename, player):
-        if isinstance(edgename, OWEdge):
-            return edgename
-        try:
-            return self._owedge_cache[(edgename, player)]
-        except KeyError:
-            for edge in self.owedges:
-                if edge.name == edgename and edge.player == player:
-                    self._owedge_cache[(edgename, player)] = edge
-                    return edge
+        edge = self.check_for_owedge(edgename, player)
+        if edge is None:
             raise RuntimeError('No such edge %s for player %d' % (edgename, player))
+        return edge
 
     def get_entrance(self, entrance, player):
-        if isinstance(entrance, Entrance):
-            return entrance
-        try:
-            return self._entrance_cache[(entrance, player)]
-        except KeyError:
-            for region in self.regions:
-                for exit in region.exits:
-                    if exit.name == entrance and exit.player == player:
-                        self._entrance_cache[(entrance, player)] = exit
-                        return exit
+        ent = self.check_for_entrance(entrance, player)
+        if ent is None:
             raise RuntimeError('No such entrance %s for player %d' % (entrance, player))
+        return ent
 
     def remove_entrance(self, entrance, player):
         if (entrance, player) in self._entrance_cache.keys():
@@ -294,16 +283,10 @@ class World(object):
         raise RuntimeError('No such dungeon %s for player %d' % (dungeonname, player))
 
     def get_door(self, doorname, player):
-        if isinstance(doorname, Door):
-            return doorname
-        try:
-            return self._door_cache[(doorname, player)]
-        except KeyError:
-            for door in self.doors:
-                if door.name == doorname and door.player == player:
-                    self._door_cache[(doorname, player)] = door
-                    return door
+        door = self.check_for_door(doorname, player)
+        if door is None:
             raise RuntimeError('No such door %s for player %d' % (doorname, player))
+        return door
 
     def get_portal(self, portal_name, player):
         if isinstance(portal_name, Portal):
@@ -317,18 +300,6 @@ class World(object):
                     return portal
             raise RuntimeError('No such portal %s for player %d' % (portal_name, player))
 
-    def check_for_owedge(self, edgename, player):
-        if isinstance(edgename, OWEdge):
-            return edgename
-        try:
-            return self._owedge_cache[(edgename, player)]
-        except KeyError:
-            for edge in self.owedges:
-                if edge.name == edgename and edge.player == player:
-                    self._owedge_cache[(edgename, player)] = edge
-                    return edge
-            return None
-    
     def is_tile_swapped(self, owid, player):
         return (self.mode[player] == 'inverted') != (owid in self.owswaps[player][0] and self.owMixed[player])
 
@@ -354,6 +325,28 @@ class World(object):
             else:
                 return False
 
+    def check_for_owedge(self, edgename, player):
+        if isinstance(edgename, OWEdge):
+            return edgename
+        try:
+            if edgename[-1] == '*':
+                edgename = edgename[:-1]
+                edge = self.check_for_owedge(edgename, player)
+                if self.is_tile_swapped(edge.owIndex, player):
+                    from OverworldShuffle import parallel_links
+                    if edgename in parallel_links.keys() or edgename in parallel_links.inverse.keys():
+                        edgename = parallel_links[edgename] if edgename in parallel_links.keys() else parallel_links.inverse[edgename][0]
+                        return self.check_for_owedge(edgename, player)
+                    else:
+                        raise Exception("Edge notated with * doesn't have a parallel edge: %s" & edgename)
+            return self._owedge_cache[(edgename, player)]
+        except KeyError:
+            for edge in self.owedges:
+                if edge.name == edgename and edge.player == player:
+                    self._owedge_cache[(edgename, player)] = edge
+                    return edge
+            return None
+    
     def check_for_door(self, doorname, player):
         if isinstance(doorname, Door):
             return doorname
@@ -2248,7 +2241,7 @@ class OWEdge(object):
         self.unknownX = 0x0
         self.unknownY = 0x0
 
-        if self.owIndex < 0x40 or self.owIndex >= 0x80:
+        if self.owIndex & 0x40 == 0:
             self.worldType = WorldType.Light
         else:
             self.worldType = WorldType.Dark
@@ -2288,6 +2281,12 @@ class OWEdge(object):
         self.specialExit = True
         self.specialID = special_id
         return self
+
+    def is_tile_swapped(self, world):
+        return world.is_tile_swapped(self.owIndex, self.player)
+
+    def is_lw(self, world):
+        return (self.worldType == WorldType.Light) != self.is_tile_swapped(world)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.name == other.name
@@ -2784,6 +2783,7 @@ class Spoiler(object):
         self.world = world
         self.hashes = {}
         self.overworlds = {}
+        self.whirlpools = {}
         self.maps = {}
         self.entrances = {}
         self.doors = {}
@@ -2807,6 +2807,12 @@ class Spoiler(object):
             self.overworlds[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
         else:
             self.overworlds[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
+
+    def set_whirlpool(self, entrance, exit, direction, player):
+        if self.world.players == 1:
+            self.whirlpools[(entrance, direction, player)] = OrderedDict([('entrance', entrance), ('exit', exit), ('direction', direction)])
+        else:
+            self.whirlpools[(entrance, direction, player)] = OrderedDict([('player', player), ('entrance', entrance), ('exit', exit), ('direction', direction)])
 
     def set_map(self, type, text, data, player):
         if self.world.players == 1:
@@ -3010,6 +3016,7 @@ class Spoiler(object):
         self.parse_data()
         out = OrderedDict()
         out['Overworld'] = list(self.overworlds.values())
+        out['Whirlpools'] = list(self.whirlpools.values())
         out['Maps'] = list(self.maps.values())
         out['Entrances'] = list(self.entrances.values())
         out['Doors'] = list(self.doors.values())
@@ -3181,45 +3188,49 @@ class Spoiler(object):
             for fairy, bottle in self.bottles.items():
                 outfile.write(f'{fairy}: {bottle}\n')
 
-            if self.overworlds or self.maps:
-                outfile.write('\n\nOverworld:\n\n')
-
+            if self.maps:
                 # flute shuffle
                 for player in range(1, self.world.players + 1):
                     if ('flute', player) in self.maps:
-                        outfile.write('Flute Spots:\n')
+                        outfile.write('\n\nFlute Spots:\n\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('flute', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('flute', player)]['text'] + '\n\n')
+                        outfile.write(self.maps[('flute', player)]['text'])
                 
                 # overworld tile flips
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
-                        outfile.write('OW Tile Flips:\n')
+                        outfile.write('\n\nOW Tile Flips:\n\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('swaps', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('swaps', player)]['text'] + '\n\n')
+                        outfile.write(self.maps[('swaps', player)]['text'])
                 
                 # crossed groups
                 for player in range(1, self.world.players + 1):
                     if ('groups', player) in self.maps:
-                        outfile.write('OW Crossed Groups:\n')
+                        outfile.write('\n\nOW Crossed Groups:\n\n')
                         break
                 for player in range(1, self.world.players + 1):
                     if ('groups', player) in self.maps:
                         if self.world.players > 1:
                             outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('groups', player)]['text'] + '\n\n')
+                        outfile.write(self.maps[('groups', player)]['text'])
             
             if self.overworlds:
+                outfile.write('\n\nOverworld Edges:\n\n')
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
+            
+            if self.whirlpools:
+                outfile.write('\n\nWhirlpools:\n\n')
+                # whirlpools
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","whirlpools",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","whirlpools",entry['exit'])) for entry in self.whirlpools.values()]))
             
             if self.entrances:
                 # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly
@@ -3451,7 +3462,7 @@ boss_mode = {"none": 0, "simple": 1, "full": 2, "chaos": 3, 'random': 3, 'unique
 
 # byte 11: OOOT WCCC (OWR layout, free terrain, whirlpools, OWR crossed)
 or_mode = {"vanilla": 0, "parallel": 1, "full": 2}
-orcrossed_mode = {"none": 0, "polar": 1, "grouped": 2, "limited": 3, "chaos": 4}
+orcrossed_mode = {"none": 0, "polar": 1, "grouped": 2, "unrestricted": 4}
 
 # byte 12: KMB? FF?? (keep similar, mixed/tile flip, bonk drops, flute spots)
 flutespot_mode = {"vanilla": 0, "balanced": 1, "random": 2}

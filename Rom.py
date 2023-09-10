@@ -740,7 +740,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         elif world.owShuffle[player] == 'full':
             owMode = 2
 
-        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player] in ['limited', 'chaos']):
+        if world.owKeepSimilar[player] and (world.owShuffle[player] != 'vanilla' or world.owCrossed[player] == 'unrestricted'):
             owMode |= 0x0100
         if world.owCrossed[player] != 'none' and (world.owCrossed[player] != 'polar' or world.owMixed[player]):
             owMode |= 0x0200

@@ -79,6 +79,10 @@ class CustomSettings(object):
                 args.ow_shuffle[p] = get_setting(settings['ow_shuffle'], args.ow_shuffle[p])
                 args.ow_terrain[p] = get_setting(settings['ow_terrain'], args.ow_terrain[p])
                 args.ow_crossed[p] = get_setting(settings['ow_crossed'], args.ow_crossed[p])
+                if args.ow_crossed[p] == 'chaos':
+                    import logging
+                    logging.getLogger('').info("Crossed OWR option 'chaos' is deprecated. Use 'unrestricted' instead.")
+                    args.ow_crossed[p] = 'unrestricted'
                 args.ow_keepsimilar[p] = get_setting(settings['ow_keepsimilar'], args.ow_keepsimilar[p])
                 args.ow_mixed[p] = get_setting(settings['ow_mixed'], args.ow_mixed[p])
                 args.ow_whirlpool[p] = get_setting(settings['ow_whirlpool'], args.ow_whirlpool[p])
@@ -194,6 +198,21 @@ class CustomSettings(object):
     def get_advanced_placements(self):
         if 'advanced_placements' in self.file_source:
             return self.file_source['advanced_placements']
+        return None
+
+    def get_owedges(self):
+        if 'ow-edges' in self.file_source:
+            return self.file_source['ow-edges']
+        return None
+
+    def get_owcrossed(self):
+        if 'ow-crossed' in self.file_source:
+            return self.file_source['ow-crossed']
+        return None
+
+    def get_whirlpools(self):
+        if 'ow-whirlpools' in self.file_source:
+            return self.file_source['ow-whirlpools']
         return None
 
     def get_owtileflips(self):
@@ -355,21 +374,40 @@ class CustomSettings(object):
                     placements[location.player][location.name] = location.item.name
 
     def record_overworld(self, world):
+        self.world_rep['ow-edges'] = edges = {}
+        self.world_rep['ow-whirlpools'] = whirlpools = {}
         self.world_rep['ow-tileflips'] = flips = {}
-        for p in self.player_range:
-            if p in world.owswaps and len(world.owswaps[p][0]) > 0:
-                flips[p] = {}
-                flips[p]['force_flip'] = list(HexInt(f) for f in world.owswaps[p][0] if f < 0x40 or f >= 0x80)
-                flips[p]['force_flip'].sort()
-                flips[p]['undefined_chance'] = 0
         self.world_rep['ow-flutespots'] = flute = {}
         for p in self.player_range:
+            connections = edges[p] = {}
+            connections['two-way'] = {}
+            connections['one-way'] = {}
+            whirlconnects = whirlpools[p] = {}
+            whirlconnects['two-way'] = {}
+            whirlconnects['one-way'] = {}
+            # tile flips
+            if p in world.owswaps and len(world.owswaps[p][0]) > 0:
+                flips[p] = {}
+                flips[p]['force_flip'] = list(HexInt(f) for f in world.owswaps[p][0] if f & 0x40 == 0)
+                flips[p]['force_flip'].sort()
+                flips[p]['undefined_chance'] = 0
+            # flute spots
             flute[p] = {}
             if p in world.owflutespots:
                 flute[p]['force'] = list(HexInt(id) for id in sorted(world.owflutespots[p]))
             else:
                 flute[p]['force'] = list(HexInt(id) for id in sorted(default_flute_connections))
             flute[p]['forbid'] = []
+        for key, data in world.spoiler.overworlds.items():
+            player = data['player'] if 'player' in data else 1
+            connections = edges[player]
+            sub = 'two-way' if data['direction'] == 'both' else 'one-way'
+            connections[sub][data['entrance']] = data['exit']
+        for key, data in world.spoiler.whirlpools.items():
+            player = data['player'] if 'player' in data else 1
+            whirlconnects = whirlconnects[player]
+            sub = 'two-way' if data['direction'] == 'both' else 'one-way'
+            whirlconnects[sub][data['entrance']] = data['exit']
 
     def record_entrances(self, world):
         self.world_rep['entrances'] = entrances = {}

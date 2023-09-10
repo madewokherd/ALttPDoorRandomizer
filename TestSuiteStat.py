@@ -49,7 +49,7 @@ SETTINGS = {
     'ow_fluteshuffle': ['balanced'],
     'ow_keepsimilar': [True, False],
     'ow_mixed': [True, False],
-    'ow_crossed': ['none', 'polar', 'grouped', 'limited'],
+    'ow_crossed': ['none', 'polar', 'grouped', 'unrestricted'],
     'accessibility': [True],
     'difficulty': [False],
     'shufflepots': [False],

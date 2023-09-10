@@ -57,6 +57,7 @@ SETTINGSTOPROCESS = {
     "item": {
       "hints": "hints",
       "pseudoboots": "pseudoboots",
+      'collection_rate': 'collection_rate',
       "race": "race",
 
       "worldstate": "mode",
@@ -139,7 +140,6 @@ SETTINGSTOPROCESS = {
       "reduce_flashing": "reduce_flashing",
       "shuffle_sfx": "shuffle_sfx",
       'msu_resume': 'msu_resume',
-      'collection_rate': 'collection_rate',
     },
     "generation": {
       "bps": "bps",
