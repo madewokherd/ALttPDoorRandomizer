@@ -225,7 +225,8 @@ def link_overworld(world, player):
                     edge = world.get_owedge(edgename, player)
                     force_noncrossed.add(edge.name)
             if 'limit_crossed' in custom_crossed:
-                limited_crossed = custom_crossed['limit_crossed']
+                if world.owCrossed[player] == 'unrestricted':
+                    limited_crossed = custom_crossed['limit_crossed']
             if 'undefined_chance' in custom_crossed:
                 undefined_chance = custom_crossed['undefined_chance']
 
@@ -1266,6 +1267,7 @@ def adjust_edge_groups(world, trimmed_groups, edges_to_swap, player):
     if world.customizer:
         custom_crossed = world.customizer.get_owcrossed()
         limited_crossed = custom_crossed and (player in custom_crossed) and ('limit_crossed' in custom_crossed[player])
+        limited_crossed = limited_crossed and world.owCrossed[player] == 'unrestricted'
         custom_edge_groups = world.customizer.get_owedges()
         if custom_edge_groups and player in custom_edge_groups:
             custom_edge_groups = custom_edge_groups[player]
