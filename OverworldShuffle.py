@@ -1459,18 +1459,6 @@ def build_sectors(world, player):
             else:
                 sectors2.append(explored_regions)
         sectors[s] = sectors2
-
-    #TODO: Keep largest LW sector for Links House consideration, keep sector containing WDM for Old Man consideration
-    # sector_entrances = list()
-    # for sector in sectors:
-    #     entrances = list()
-    #     for s2 in sector:
-    #         for region_name in s2:
-    #             region = world.get_region(region_name, player)
-    #             for exit in region.exits:
-    #                 if exit.spot_type == 'Entrance' and exit.name in entrance_pool:
-    #                     entrances.append(exit.name)
-    #     sector_entrances.append(entrances)
     
     return sectors
 
