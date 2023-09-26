@@ -694,7 +694,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         offset = 0
         data = flute_data[owid]
 
-        if world.is_tile_swapped(data[1], player):
+        if world.is_tile_swapped(owid, player):
             offset = 0x40
         
         write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), owid + offset) # owid
