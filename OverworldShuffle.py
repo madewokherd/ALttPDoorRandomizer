@@ -485,7 +485,7 @@ def link_overworld(world, player):
             for key in groupKeys:
                 (mode, wrld, dir, terrain, parallel, count, _) = key
                 (forward_edge_sets, back_edge_sets) = groups[key]
-                remove_connected()
+                remove_connected(forward_edge_sets, back_edge_sets)
                 random.shuffle(forward_edge_sets)
                 random.shuffle(back_edge_sets)
 
