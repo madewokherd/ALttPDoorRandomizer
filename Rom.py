@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'da111397d4118054e5ab4b9375cfb9e4'
+RANDOMIZERBASEHASH = '52317b2dd4fb303887f26ecc40a4cae3'
 
 
 class JsonRom(object):
@@ -694,7 +694,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         offset = 0
         data = flute_data[owid]
 
-        if world.is_tile_swapped(data[1], player):
+        if world.is_tile_swapped(owid, player):
             offset = 0x40
         
         write_int16(rom, snes_to_pc(0x02E849 + (o * 2)), owid + offset) # owid
@@ -1403,6 +1403,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
     rom.write_byte(0x18004A, 0x00 if world.mode[player] != 'inverted' else 0x01)  # Inverted mode
     rom.write_byte(0x18005D, 0x00) # Hammer always breaks barrier
+    rom.write_byte(0x02AF79, 0xD0 if world.mode[player] != 'inverted' else 0xF0) # vortexes: Normal  (D0=light to dark, F0=dark to light, 42 = both)
     rom.write_byte(0x03A943, 0xD0 if world.mode[player] != 'inverted' else 0xF0) # Mirror: Normal  (D0=Dark to Light, F0=light to dark, 42 = both)
     rom.write_byte(0x03A96D, 0xF0 if world.mode[player] != 'inverted' else 0xD0) # Residual Portal: Normal  (F0= Light Side, D0=Dark Side, 42 = both (Darth Vader))
     rom.write_byte(0x03A9A7, 0xD0) # Residual Portal: Normal  (D0= Light Side, F0=Dark Side, 42 = both (Darth Vader))
