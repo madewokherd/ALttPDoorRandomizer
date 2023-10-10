@@ -169,11 +169,6 @@ plb : rtl
 nop #3
 +
 
-; follower hooks
-;org $8689D9
-;SpritePrep_BombShoppe:
-;JML BombShoppe_ConditionalSpawn : NOP
-
 ;Code
 org $aa8800
 OWTransitionDirection:
@@ -541,7 +536,6 @@ OWBonkDrops:
     INX : LDA.w OWBonkPrizeData,X : PHX : PHA ; S = FlagBitmask, X (row + 2)
     LDX.b $8A : LDA.l OverworldEventDataWRAM,X : AND 1,S : PHA : BNE + ; S = Collected, FlagBitmask, X (row + 2)
         LDA.b #$1B : STA $12F ; JSL Sound_SetSfx3PanLong ; seems that when you bonk, there is a pending bonk sfx, so we clear that out and replace with reveal secret sfx
-        ; JSLSpriteSFX_QueueSFX3WithPan
     +
     LDA 3,S : TAX : INX : LDA.w OWBonkPrizeData,X
     PHA : INX : LDA.w OWBonkPrizeData,X : BEQ +
@@ -873,7 +867,6 @@ OWNewDestination:
             ++ lda $84 : !add 1,s : sta $84 : pla : pla
 
         .adjustMainAxis
-        ;LDA $84 : SEC : SBC #$0400 : AND #$0F80 : ASL : XBA : STA $88 ; vram
         LDA $84 : SEC : SBC #$0400 : AND #$0F00 : ASL : XBA : STA $88 ; vram
         LDA $84 : SEC : SBC #$0010 : AND #$003E : LSR : STA $86
 
@@ -936,7 +929,6 @@ OWNewDestination:
     sep #$30 : lda $04 : and #$3f : !add OWOppSlotOffset,y : asl : sta $700
     
     ; crossed OW shuffle and terrain
-    ;lda $8a : JSR OWDetermineScreensPaletteSet : STX $04
     ldx $05 : ldy $08 : jsr OWWorldTerrainUpdate
     
     ldx $8a : lda $05 : sta $8a : stx $05 ; $05 is prev screen id, $8a is dest screen
@@ -1160,14 +1152,6 @@ OWEndScrollTransition:
     CMP.l Overworld_FinalizeEntryOntoScreen_Data,X ; what we wrote over
     RTL
 }
-
-; BombShoppe_ConditionalSpawn:
-; {
-;     nop
-;     INC.w $0BA0,X : LDA.b #$B5 ; what we wrote over
-;     JML SpritePrep_BombShoppe+5
-;     nop#20
-; }
 
 ;Data
 org $aaa000
