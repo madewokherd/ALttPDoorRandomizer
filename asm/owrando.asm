@@ -29,6 +29,9 @@ BCS OWDetectTransitionReturn
 org $02a999
 jsl OWEdgeTransition : nop #4 ;LDA $02A4E3,X : ORA $7EF3CA
 
+org $02aa07
+JSL OWMarkVisited : NOP
+
 org $04e8ae
 JSL OWDetectSpecialTransition
 RTL : NOP
@@ -339,6 +342,16 @@ OWOldManSpeed:
     .vanilla
     lda #$0c : sta $5e ; what we wrote over
     rtl
+}
+OWMarkVisited:
+{
+    LDX.b $8A : STZ.w $0412 ; what we wrote over
+    LDA.b $10 : CMP.b #$14 : BCS .return
+        LDA.l OverworldEventDataWRAM,X
+        ORA.b #$80 : STA.l OverworldEventDataWRAM,X
+
+    .return
+    RTL
 }
 
 LoadMapDarkOrMixed:
