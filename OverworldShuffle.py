@@ -1173,6 +1173,7 @@ def define_tile_groups(world, do_grouped, player):
                 (lw_regions if id < 0x40 or id >= 0x80 else dw_regions).extend(OWTileRegions.inverse[id])
             tile_groups.append((group, lw_regions, dw_regions))
 
+    random.shuffle(tile_groups)
     return tile_groups, flipped_groups, nonflipped_groups, undefined_chance
 
 def remove_reserved(world, groupedlist, connected_edges, player):
@@ -1623,7 +1624,7 @@ def validate_layout(world, player):
                             or (entrance.name == 'Big Bomb Shop' and (world.mode[player] != 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
                             or (entrance.name == 'Ganons Tower' and (world.mode[player] != 'inverted' and not world.shuffle_ganon[player])) \
                             or (entrance.name in ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'] and world.shuffle[player] not in ['insanity']) \
-                            or entrance.name == 'Tavern North':
+                            or (entrance.name == 'Tavern North' and not world.shuffletavern[player]):
                         continue # these are fixed entrances and cannot be used for gaining access to region
                     if entrance.name not in drop_entrances \
                             and ((entrance.name in dungeon_entrances and world.shuffle[player] not in ['dungeonssimple', 'simple', 'restricted']) \
