@@ -1378,7 +1378,7 @@ def can_reach_smith(world, player):
                     elif exit.connected_region.name == 'Blacksmiths Hut' and exit.access_rule(blank_state):
                         found = True
                         return
-                    elif exit.connected_region.name not in explored_regions:
+                    elif exit.connected_region.name not in explored_regions and exit.name != "Dig Game To Ledge Drop":
                         if (region.type == RegionType.Dungeon and exit.connected_region.name.endswith(' Portal')) \
                             or (exit.connected_region.type in [RegionType.LightWorld, RegionType.DarkWorld] \
                                 and exit.access_rule(blank_state)):
