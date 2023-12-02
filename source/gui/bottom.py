@@ -261,7 +261,8 @@ def create_guiargs(parent):
       "owpalettes": "ow_palettes",
       "uwpalettes": "uw_palettes",
       "reduce_flashing": "reduce_flashing",
-      "shuffle_sfx": "shuffle_sfx"
+      "shuffle_sfx": "shuffle_sfx",
+      "shuffle_songinstruments": "shuffle_songinstruments"
     }
     for adjustarg in adjustargs:
       internal = adjustargs[adjustarg]

@@ -208,7 +208,8 @@ def loadadjustargs(gui, settings):
                 "owpalettes": "adjust.owpalettes",
                 "uwpalettes": "adjust.uwpalettes",
                 "reduce_flashing": "adjust.reduce_flashing",
-                "shuffle_sfx": "adjust.shuffle_sfx"
+                "shuffle_sfx": "adjust.shuffle_sfx",
+                "shuffle_songinstruments": "adjust.shuffle_songinstruments"
             }
         }
     }
