@@ -1707,15 +1707,16 @@ def set_bunny_rules(world, player, inverted):
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        queue = deque([(region, [], {region})])
+        seen = {region}
+        queue = deque([(region, [])])
         while queue:
-            (current, path, seen) = queue.popleft()
+            (current, path) = queue.popleft()
             for entrance in current.entrances:
                 new_region = entrance.parent_region
                 if new_region.type in (RegionType.Cave, RegionType.Dungeon) and new_region in seen:
                     continue
                 new_path = path + [entrance.access_rule]
-                new_seen = seen.union({new_region})
+                seen.add(new_region)
                 if not is_link(new_region):
                     if world.logic[player] == 'owglitches':
                         if region.type == RegionType.Dungeon and new_region.type != RegionType.Dungeon:
@@ -1752,7 +1753,7 @@ def set_bunny_rules(world, player, inverted):
                     else:
                         continue
                 if is_bunny(new_region):
-                    queue.append((new_region, new_path, new_seen))
+                    queue.append((new_region, new_path))
                 else:
                     # we have reached pure light world, so we have a new possible option
                     possible_options.append(path_to_access_rule(new_path, entrance))
