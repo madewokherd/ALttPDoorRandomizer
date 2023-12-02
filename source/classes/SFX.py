@@ -1,4 +1,4 @@
-from aenum import IntEnum
+from enum import IntEnum
 import random
 from Utils import int16_as_bytes, snes_to_pc
 
