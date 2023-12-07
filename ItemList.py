@@ -227,6 +227,12 @@ def generate_itempool(world, player):
         loc.locked = True
         loc.forced_item = loc.item
 
+    if 'Return Old Man' in list(map(str, [i for i in world.precollected_items if i.player == player])):
+        old_man = world.get_location('Old Man', player)
+        world.push_item(old_man, ItemFactory('Nothing', player), False)
+        old_man.forced_item = old_man.item
+        old_man.skip = True
+
     world.get_location('Ganon', player).event = True
     world.get_location('Ganon', player).locked = True
     world.push_item(world.get_location('Agahnim 1', player), ItemFactory('Beat Agahnim 1', player), False)
