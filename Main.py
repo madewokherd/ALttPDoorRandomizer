@@ -204,6 +204,13 @@ def main(args, seed=None, fish=None):
                 if item:
                     world.push_precollected(item)
 
+    if world.customizer and world.customizer.get_start_inventory():
+        for p, inv_list in world.customizer.get_start_inventory().items():
+            for inv_item in inv_list:
+                item = ItemFactory(inv_item.strip(), p)
+                if item:
+                    world.push_precollected(item)
+
     if args.create_spoiler and not args.jsonout:
         logger.info(world.fish.translate("cli", "cli", "create.meta"))
         world.spoiler.meta_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
@@ -221,12 +228,6 @@ def main(args, seed=None, fish=None):
         adjust_locations(world, player)
         place_bosses(world, player)
 
-    if world.customizer and world.customizer.get_start_inventory():
-        for p, inv_list in world.customizer.get_start_inventory().items():
-            for inv_item in inv_list:
-                item = ItemFactory(inv_item.strip(), p)
-                if item:
-                    world.push_precollected(item)
     if args.print_custom_yaml:
         world.settings.record_info(world)
 
