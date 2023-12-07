@@ -1541,6 +1541,7 @@ def standard_rules(world, player):
     world.get_entrance('Uncle S&Q', player).hide_path = True
     set_rule(world.get_entrance('Links House S&Q', player), lambda state: state.has('Zelda Delivered', player))
     set_rule(world.get_entrance('Sanctuary S&Q', player), lambda state: state.has('Zelda Delivered', player))
+    add_rule(world.get_entrance('Old Man S&Q', player), lambda state: state.has('Zelda Delivered', player))
     # these are because of rails
     if world.shuffle[player] != 'vanilla':
         # where ever these happen to be
