@@ -115,7 +115,13 @@ class InitialSram:
             equip[0x36E] = 0x80
 
         if startingstate.has('Return Old Man', player):
-            self._initial_sram_bytes[0x410] = self._initial_sram_bytes[0x410] | 0x01
+            self._initial_sram_bytes[0x410] |= 0x01
+
+        if startingstate.has('Beat Agahnim 1', player):
+            if world.mode[player] == 'standard':
+                self._initial_sram_bytes[0x3C5] = 0x80
+            else:
+                self._initial_sram_bytes[0x3C5] = 0x03
 
         for item in world.precollected_items:
             if item.player != player:
@@ -127,7 +133,7 @@ class InitialSram:
                              'Mirror Shield', 'Red Shield', 'Blue Shield', 'Progressive Shield',
                              'Red Mail', 'Blue Mail', 'Progressive Armor',
                              'Magic Upgrade (1/4)', 'Magic Upgrade (1/2)',
-                             'Return Old Man']:
+                             'Return Old Man', 'Beat Agahnim 1']:
                 continue
 
             set_table = {'Book of Mudora': (0x34E, 1), 'Hammer': (0x34B, 1), 'Bug Catching Net': (0x34D, 1), 'Hookshot': (0x342, 1), 'Magic Mirror': (0x353, 2),
