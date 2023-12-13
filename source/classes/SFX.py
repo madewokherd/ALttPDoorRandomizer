@@ -263,7 +263,7 @@ def output_song_data(rom, filepath, outfilebase):
             if tracks > 0:
                 outfile.write(' ' * tracks)
             outfile.write(f' = {rom.read_byte(snes_to_pc(next(iter(change.tracks.values()))[0])):02X}')
-            
+
 
 def randomize_songinstruments(rom):
     # categorize instruments in pools
