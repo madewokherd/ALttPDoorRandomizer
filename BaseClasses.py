@@ -1555,6 +1555,9 @@ class Region(object):
 
         return self.is_dark_world if self.world.mode[player] != 'inverted' else self.is_light_world
 
+    def is_outdoors(self):
+        return self.type in {RegionType.LightWorld, RegionType.DarkWorld}
+
     def __str__(self):
         return str(self.__unicode__())
 
