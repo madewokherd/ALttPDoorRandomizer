@@ -575,11 +575,11 @@
     "action": "store_true",
     "type": "bool"
   },
-  "saveonexit": {
+  "settingsonload": {
     "choices": [
-      "ask",
-      "always",
-      "never"
+      "default",
+      "saved",
+      "lastused"
     ]
   },
   "outputname": {},

@@ -236,10 +236,10 @@
     "randomizer.generation.calcplaythrough": "Calculate Playthrough",
     "randomizer.generation.print_custom_yaml": "Print Customizer File",
 
-    "randomizer.generation.saveonexit": "Save Settings on Exit",
-    "randomizer.generation.saveonexit.ask": "Ask Me",
-    "randomizer.generation.saveonexit.always": "Always",
-    "randomizer.generation.saveonexit.never": "Never",
+    "randomizer.generation.settingsonload": "Settings On Load",
+    "randomizer.generation.settingsonload.default": "Default",
+    "randomizer.generation.settingsonload.saved": "Saved",
+    "randomizer.generation.settingsonload.lastused": "Last Used",
 
     "randomizer.generation.rom": "Base Rom: ",
     "randomizer.generation.rom.button": "Select Rom",

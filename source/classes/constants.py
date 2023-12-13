@@ -148,7 +148,7 @@ SETTINGSTOPROCESS = {
       "createrom": "create_rom",
       "calcplaythrough": "calc_playthrough",
       "print_custom_yaml": "print_custom_yaml",
-      "saveonexit": "saveonexit"
+      "settingsonload": "settingsonload"
     }
   },
   "startinventory": {

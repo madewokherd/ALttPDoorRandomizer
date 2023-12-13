@@ -355,7 +355,7 @@ def parse_settings():
         },
         "randomSprite": False,
         "outputpath": os.path.join("."),
-        "saveonexit": "ask",
+        "settingsonload": "saved",
         "outputname": "",
         "startinventoryarray": {},
         "notes": ""
@@ -367,6 +367,12 @@ def parse_settings():
     # read saved settings file if it exists and set these
     settings_path = os.path.join(".", "resources", "user", "settings.json")
     settings = apply_settings_file(settings, settings_path)
+    if settings["settingsonload"] == "saved":
+        settings_path = os.path.join(".", "resources", "user", "saved.json")
+        settings = apply_settings_file(settings, settings_path)
+    elif settings["settingsonload"] == "lastused":
+        settings_path = os.path.join(".", "resources", "user", "last.json")
+        settings = apply_settings_file(settings, settings_path)
     return settings
 
 # Priority fallback is:

@@ -69,6 +69,15 @@ def bottom_frame(self, parent, args=None):
 
     def generateRom():
         guiargs = create_guiargs(parent)
+        argsDump = vars(guiargs)
+        from Gui import save_settings
+        if parent.randomSprite.get():
+            argsDump['sprite'] = 'random'
+        elif argsDump['sprite']:
+            argsDump['sprite'] = argsDump['sprite'].name
+        save_settings(parent, argsDump, "last.json")
+
+        guiargs = create_guiargs(parent)
         # get default values for missing parameters
         for k,v in vars(parse_cli(['--multi', str(guiargs.multi)])).items():
             if k not in vars(guiargs):
