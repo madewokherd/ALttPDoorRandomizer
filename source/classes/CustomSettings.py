@@ -262,10 +262,11 @@ class CustomSettings(object):
         self.world_rep['meta'] = meta_dict
         meta_dict['players'] = world.players
         meta_dict['algorithm'] = world.algorithm
-        meta_dict['seed'] = world.seed
         meta_dict['race'] = settings.race
         meta_dict['user_notes'] = settings.notes
         self.world_rep['settings'] = settings_dict
+        if world.precollected_items:
+            self.world_rep['start_inventory'] = start_inv = {}
         for p in self.player_range:
             settings_dict[p] = {}
             settings_dict[p]['ow_shuffle'] = world.owShuffle[p]
@@ -323,6 +324,10 @@ class CustomSettings(object):
             settings_dict[p]['triforce_goal'] = world.treasure_hunt_count[p]
             settings_dict[p]['triforce_pool'] = world.treasure_hunt_total[p]
             settings_dict[p]['beemizer'] = world.beemizer[p]
+            if world.precollected_items:
+                start_inv[p] = []
+        for item in world.precollected_items:
+            start_inv[item.player].append(item.name)
 
             # rom adjust stuff
             # settings_dict[p]['sprite'] = world.sprite[p]
@@ -335,33 +340,41 @@ class CustomSettings(object):
             # settings_dict[p]['ow_palettes'] = world.ow_palettes[p]
             # settings_dict[p]['uw_palettes'] = world.uw_palettes[p]
             # settings_dict[p]['shuffle_sfx'] = world.shuffle_sfx[p]
+            # settings_dict[p]['shuffle_songinstruments'] = world.shuffle_songinstruments[p]
             # more settings?
 
     def record_info(self, world):
+        self.world_rep['meta']['seed'] = world.seed
         self.world_rep['bosses'] = bosses = {}
-        self.world_rep['start_inventory'] = start_inv = {}
+        self.world_rep['medallions'] = medallions = {}
         for p in self.player_range:
             bosses[p] = {}
-            start_inv[p] = []
+            medallions[p] = {}
         for dungeon in world.dungeons:
             for level, boss in dungeon.bosses.items():
                 location = dungeon.name if level is None else f'{dungeon.name} ({level})'
                 if boss and 'Agahnim' not in boss.name:
                     bosses[dungeon.player][location] = boss.name
-        for item in world.precollected_items:
-            start_inv[item.player].append(item.name)
-
-    def record_item_pool(self, world):
-        self.world_rep['item_pool'] = item_pool = {}
-        self.world_rep['medallions'] = medallions = {}
-        for p in self.player_range:
-            item_pool[p] = defaultdict(int)
-            medallions[p] = {}
-        for item in world.itempool:
-            item_pool[item.player][item.name] += 1
         for p, req_medals in world.required_medallions.items():
             medallions[p]['Misery Mire'] = req_medals[0]
             medallions[p]['Turtle Rock'] = req_medals[1]
+
+    def record_item_pool(self, world, use_custom_pool=False):
+        if not use_custom_pool or world.custom:
+            self.world_rep['item_pool'] = item_pool = {}
+            for p in self.player_range:
+                if not use_custom_pool or p in world.customitemarray:
+                    item_pool[p] = defaultdict(int)
+        if use_custom_pool and world.custom:
+            import source.classes.constants as CONST
+            for p in world.customitemarray:
+                for i, c in world.customitemarray[p].items():
+                    if c > 0:
+                        item = CONST.CUSTOMITEMLABELS[CONST.CUSTOMITEMS.index(i)]
+                        item_pool[p][item] += c
+        else:
+            for item in world.itempool:
+                item_pool[item.player][item.name] += 1
 
     def record_item_placements(self, world):
         self.world_rep['placements'] = placements = {}

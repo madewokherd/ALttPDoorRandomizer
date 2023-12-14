@@ -4,6 +4,7 @@
     "bps":                { "type": "checkbox" },
     "createspoiler":      { "type": "checkbox" },
     "calcplaythrough":    { "type": "checkbox" },
+    "print_template_yaml":{ "type": "checkbox" },
     "print_custom_yaml":  { "type": "checkbox" }
   }
 }

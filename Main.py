@@ -183,8 +183,6 @@ def main(args, seed=None, fish=None):
         for player, name in enumerate(team, 1):
             world.player_names[player].append(name)
     logger.info('')
-    world.settings = CustomSettings()
-    world.settings.create_from_world(world, args)
 
     outfilebase = f'OR_{args.outputname if args.outputname else world.seed}'
 
@@ -210,6 +208,12 @@ def main(args, seed=None, fish=None):
                 if item:
                     world.push_precollected(item)
 
+    world.settings = CustomSettings()
+    world.settings.create_from_world(world, args)
+
+    if args.print_template_yaml:
+        world.settings.record_item_pool(world, True)
+        world.settings.write_to_file(output_path(f'{outfilebase}_template.yaml'))
     if args.create_spoiler and not args.jsonout:
         logger.info(world.fish.translate("cli", "cli", "create.meta"))
         world.spoiler.meta_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
@@ -226,9 +230,6 @@ def main(args, seed=None, fish=None):
         create_dungeons(world, player)
         adjust_locations(world, player)
         place_bosses(world, player)
-
-    if args.print_custom_yaml:
-        world.settings.record_info(world)
 
     if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
@@ -247,8 +248,6 @@ def main(args, seed=None, fish=None):
         update_world_regions(world, player)
         mark_light_dark_world_regions(world, player)
         create_dynamic_exits(world, player)
-    if args.print_custom_yaml:
-        world.settings.record_overworld(world)
     
     init_districts(world)
 
@@ -262,8 +261,6 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         link_doors_prep(world, player)
 
-    if args.print_custom_yaml:
-        world.settings.record_entrances(world)
     create_item_pool_config(world)
 
     logger.info(world.fish.translate("cli", "cli", "shuffling.dungeons"))
@@ -271,8 +268,6 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         link_doors(world, player)
         mark_light_dark_world_regions(world, player)
-    if args.print_custom_yaml:
-        world.settings.record_doors(world)
 
     logger.info(world.fish.translate("cli", "cli", "generating.itempool"))
 
@@ -300,8 +295,6 @@ def main(args, seed=None, fish=None):
             lock_shop_locations(world, player)
 
     massage_item_pool(world)
-    if args.print_custom_yaml:
-        world.settings.record_item_pool(world)
     logger.info(world.fish.translate("cli", "cli", "placing.dungeon.prizes"))
 
     fill_prizes(world)
@@ -351,6 +344,11 @@ def main(args, seed=None, fish=None):
     ensure_good_pots(world, True)
 
     if args.print_custom_yaml:
+        world.settings.record_info(world)
+        world.settings.record_overworld(world)
+        world.settings.record_entrances(world)
+        world.settings.record_doors(world)
+        world.settings.record_item_pool(world)
         world.settings.record_item_placements(world)
         world.settings.write_to_file(output_path(f'{outfilebase}_custom.yaml'))
 

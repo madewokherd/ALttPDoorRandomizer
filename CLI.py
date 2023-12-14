@@ -34,7 +34,9 @@ def parse_cli(argv, no_defaults=False):
     parser.add_argument('--settingsfile', help="input json file of settings", type=str)
     parser.add_argument('--multi', default=defval(settings["multi"]), type=lambda value: min(max(int(value), 1), 255))
     parser.add_argument('--customizer', help='input yaml file for customizations', type=str)
-    parser.add_argument('--print_custom_yaml', help='print example yaml for current settings',
+    parser.add_argument('--print_template_yaml', help='print example yaml for current settings',
+                        default=False, action="store_true")
+    parser.add_argument('--print_custom_yaml', help='print example plando yaml for current settings and placements',
                         default=False, action="store_true")
     parser.add_argument('--mystery', dest="mystery", default=False, action="store_true")
 
@@ -94,6 +96,7 @@ def parse_cli(argv, no_defaults=False):
     parser.add_argument('--teams', default=defval(1), type=lambda value: max(int(value), 1))
     parser.add_argument('--settingsfile', dest="filename", help="input json file of settings", type=str)
     parser.add_argument('--customizer', dest="customizer", help='input yaml file for customizations', type=str)
+    parser.add_argument('--print_template_yaml', dest="print_template_yaml", default=False, action="store_true")
     parser.add_argument('--print_custom_yaml', dest="print_custom_yaml", default=False, action="store_true")
 
     if player_num:
