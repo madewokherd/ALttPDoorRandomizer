@@ -1686,13 +1686,18 @@ def connect_exit(exit_name, entrancename, avail):
     if exit.connected_region is not None:
         exit.connected_region.entrances.remove(exit)
 
-    exit.connect(entrance.parent_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
+    dest_region = entrance.parent_region
+    if dest_region.name == 'Pyramid Crack':
+        # Needs to logically exit into greater Pyramid Area
+        dest_region = entrance.parent_region.entrances[0].parent_region
+
+    exit.connect(dest_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
     if exit_name != 'Chris Houlihan Room Exit':
         if avail.coupled:
             avail.entrances.remove(entrancename)
         avail.exits.remove(exit_name)
     world.spoiler.set_entrance(entrance.name, exit.name, 'exit', player)
-    logging.getLogger('').debug(f'Connected (exit) {entrance.name} to {exit.name}')
+    logging.getLogger('').debug(f'Connected (exit) {exit.name} to {entrance.name}')
 
 
 def connect_two_way(entrancename, exit_name, avail):
