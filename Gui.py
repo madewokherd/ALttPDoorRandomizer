@@ -34,7 +34,7 @@ def check_python_version(fish):
     import sys
     version = sys.version_info
     if version.major < 3 or version.minor < 7:
-        messagebox.showinfo("Door Shuffle " + ESVersion, fish.translate("cli","cli","old.python.version") % sys.version)
+        messagebox.showinfo("Overworld Shuffle %s (DR %s)" % (ORVersion, ESVersion), fish.translate("cli","cli","old.python.version") % sys.version)
 
 
 # Save settings to file
