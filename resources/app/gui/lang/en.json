@@ -234,7 +234,6 @@
     "randomizer.generation.createspoiler": "Create Spoiler Log",
     "randomizer.generation.createrom": "Create Patched ROM",
     "randomizer.generation.calcplaythrough": "Calculate Playthrough",
-    "randomizer.generation.print_template_yaml": "Print Customizer Template",
     "randomizer.generation.print_custom_yaml": "Print Customizer File",
 
     "randomizer.generation.settingsonload": "Settings On Load",
@@ -391,6 +390,7 @@
     "bottom.content.seed": "Seed #",
     "bottom.content.generationcount": "Count",
     "bottom.content.go": "Generate Game",
+    "bottom.content.exportyaml": "Export Yaml",
     "bottom.content.dialog.error": "Error while creating seed",
     "bottom.content.dialog.success": "Success",
     "bottom.content.dialog.success.message": "Rom created successfully.",

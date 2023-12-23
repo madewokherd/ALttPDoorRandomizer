@@ -56,32 +56,25 @@ def check_python_version():
 
 def main(args, seed=None, fish=None):
     check_python_version()
+    
+    if args.print_template_yaml:
+        return export_yaml(args, fish)
+
     if args.outputpath:
         os.makedirs(args.outputpath, exist_ok=True)
         output_path.cached_path = args.outputpath
 
     start = time.perf_counter()
 
+    world = init_world(args, fish)
+
     if args.securerandom:
         random.use_secure()
     seeded = False
-    # initialize the world
-    if args.code:
-        for player, code in args.code.items():
-            if code:
-                Settings.adjust_args_from_code(code, player, args)
-    customized = None
-    if args.customizer:
-        customized = CustomSettings()
-        customized.load_yaml(args.customizer)
-        seed = customized.determine_seed(seed)
+    if world.customizer:
+        seed = world.customizer.determine_seed(seed)
         seeded = True
-        customized.adjust_args(args)
-    world = World(args.multi, args.ow_shuffle, args.ow_crossed, args.ow_mixed, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
-                  args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
-                  args.accessibility, args.shuffleganon, args.custom, args.customitemarray, args.hints)
-    world.customizer = customized if customized else None
-    logger = logging.getLogger('')
+        world.customizer.adjust_args(args)
     if seed is None:
         random.seed(None)
         world.seed = random.randint(0, 999999999)
@@ -93,53 +86,9 @@ def main(args, seed=None, fish=None):
     if args.securerandom:
         world.seed = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(9))
 
-    world.boots_hint = args.boots_hint.copy()
-    world.remote_items = args.remote_items.copy()
-    world.mapshuffle = args.mapshuffle.copy()
-    world.compassshuffle = args.compassshuffle.copy()
-    world.keyshuffle = args.keyshuffle.copy()
-    world.bigkeyshuffle = args.bigkeyshuffle.copy()
-    world.bombbag = args.bombbag.copy()
-    world.flute_mode = args.flute_mode.copy()
-    world.bow_mode = args.bow_mode.copy()
     world.crystals_needed_for_ganon = {player: random.randint(0, 7) if args.crystals_ganon[player] == 'random' else int(args.crystals_ganon[player]) for player in range(1, world.players + 1)}
     world.crystals_needed_for_gt = {player: random.randint(0, 7) if args.crystals_gt[player] == 'random' else int(args.crystals_gt[player]) for player in range(1, world.players + 1)}
-    world.crystals_ganon_orig = args.crystals_ganon.copy()
-    world.crystals_gt_orig = args.crystals_gt.copy()
-    world.owTerrain = args.ow_terrain.copy()
-    world.owKeepSimilar = args.ow_keepsimilar.copy()
-    world.owWhirlpoolShuffle = args.ow_whirlpool.copy()
-    world.owFluteShuffle = args.ow_fluteshuffle.copy()
-    world.shuffle_bonk_drops = args.bonk_drops.copy()
-    world.open_pyramid = args.openpyramid.copy()
-    world.boss_shuffle = args.shufflebosses.copy()
-    world.enemy_shuffle = args.shuffleenemies.copy()
-    world.enemy_health = args.enemy_health.copy()
-    world.enemy_damage = args.enemy_damage.copy()
-    world.beemizer = args.beemizer.copy()
     world.intensity = {player: random.randint(1, 3) if args.intensity[player] == 'random' else int(args.intensity[player]) for player in range(1, world.players + 1)}
-    world.door_type_mode = args.door_type_mode.copy()
-    world.trap_door_mode = args.trap_door_mode.copy()
-    world.key_logic_algorithm = args.key_logic_algorithm.copy()
-    world.decoupledoors = args.decoupledoors.copy()
-    world.door_self_loops = args.door_self_loops.copy()
-    world.experimental = args.experimental.copy()
-    world.dungeon_counters = args.dungeon_counters.copy()
-    world.fish = fish
-    world.shopsanity = args.shopsanity.copy()
-    world.dropshuffle = args.dropshuffle.copy()
-    world.pottery = args.pottery.copy()
-    world.potshuffle = args.shufflepots.copy()
-    world.mixed_travel = args.mixed_travel.copy()
-    world.standardize_palettes = args.standardize_palettes.copy()
-    world.shufflelinks = args.shufflelinks.copy()
-    world.shuffletavern = args.shuffletavern.copy()
-    world.pseudoboots = args.pseudoboots.copy()
-    world.overworld_map = args.overworld_map.copy()
-    world.take_any = args.take_any.copy()
-    world.restrict_boss_items = args.restrict_boss_items.copy()
-    world.collection_rate = args.collection_rate.copy()
-    world.colorizepots = args.colorizepots.copy()
 
     world.treasure_hunt_count = {}
     world.treasure_hunt_total = {}
@@ -193,27 +142,11 @@ def main(args, seed=None, fish=None):
             if hasattr(world,"escape_assist") and player in world.escape_assist:
                 world.escape_assist[player].append('bombs') # enemized escape assumes infinite bombs available and will likely be unbeatable without it
 
-        if args.usestartinventory[player]:
-            for tok in filter(None, args.startinventory[player].split(',')):
-                name = tok.strip()
-                name = name if name != 'Ocarina' or world.flute_mode[player] != 'active' else 'Ocarina (Activated)'
-                item = ItemFactory(name, player)
-                if item:
-                    world.push_precollected(item)
-
-    if world.customizer and world.customizer.get_start_inventory():
-        for p, inv_list in world.customizer.get_start_inventory().items():
-            for inv_item in inv_list:
-                item = ItemFactory(inv_item.strip(), p)
-                if item:
-                    world.push_precollected(item)
+    set_starting_inventory(world, args)
 
     world.settings = CustomSettings()
     world.settings.create_from_world(world, args)
 
-    if args.print_template_yaml:
-        world.settings.record_item_pool(world, True)
-        world.settings.write_to_file(output_path(f'{outfilebase}_template.yaml'))
     if args.create_spoiler and not args.jsonout:
         logger.info(world.fish.translate("cli", "cli", "create.meta"))
         world.spoiler.meta_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
@@ -464,6 +397,120 @@ def main(args, seed=None, fish=None):
 #    print_wiki_doors_by_region(dungeon_regions,world,1)
 
     return world
+
+
+def export_yaml(args, fish):
+    if args.outputpath:
+        os.makedirs(args.outputpath, exist_ok=True)
+        output_path.cached_path = args.outputpath
+
+    outfilebase = f'{args.outputname if args.outputname else "export"}'
+    logger = logging.getLogger('')
+
+    world = init_world(args, fish)
+
+    from OverworldShuffle import __version__ as ORVersion
+    logger.info(
+        world.fish.translate("cli","cli","app.title") + "\n",
+        ORVersion,
+        "(%s)" % outfilebase,
+        Settings.make_code(world, 1) if world.players == 1 else ''
+    )
+
+    for k,v in {"DR":__version__,"OR":ORVersion}.items():
+        logger.info((k + ' Version:').ljust(16) + '%s' % v)
+
+    set_starting_inventory(world, args)
+
+    world.settings = CustomSettings()
+    world.settings.create_from_world(world, args)
+
+    world.settings.record_item_pool(world, True)
+    world.settings.write_to_file(output_path(f'{outfilebase}.yaml'))
+
+    return world
+
+
+def init_world(args, fish):
+    if args.code:
+        for player, code in args.code.items():
+            if code:
+                Settings.adjust_args_from_code(code, player, args)
+
+    world = World(args.multi, args.ow_shuffle, args.ow_crossed, args.ow_mixed, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
+                  args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
+                  args.accessibility, args.shuffleganon, args.custom, args.customitemarray, args.hints)
+
+    world.boots_hint = args.boots_hint.copy()
+    world.remote_items = args.remote_items.copy()
+    world.mapshuffle = args.mapshuffle.copy()
+    world.compassshuffle = args.compassshuffle.copy()
+    world.keyshuffle = args.keyshuffle.copy()
+    world.bigkeyshuffle = args.bigkeyshuffle.copy()
+    world.bombbag = args.bombbag.copy()
+    world.flute_mode = args.flute_mode.copy()
+    world.bow_mode = args.bow_mode.copy()
+    world.crystals_ganon_orig = args.crystals_ganon.copy()
+    world.crystals_gt_orig = args.crystals_gt.copy()
+    world.owTerrain = args.ow_terrain.copy()
+    world.owKeepSimilar = args.ow_keepsimilar.copy()
+    world.owWhirlpoolShuffle = args.ow_whirlpool.copy()
+    world.owFluteShuffle = args.ow_fluteshuffle.copy()
+    world.shuffle_bonk_drops = args.bonk_drops.copy()
+    world.open_pyramid = args.openpyramid.copy()
+    world.boss_shuffle = args.shufflebosses.copy()
+    world.enemy_shuffle = args.shuffleenemies.copy()
+    world.enemy_health = args.enemy_health.copy()
+    world.enemy_damage = args.enemy_damage.copy()
+    world.beemizer = args.beemizer.copy()
+    world.intensity = {player: 'random' if args.intensity[player] == 'random' else int(args.intensity[player]) for player in range(1, world.players + 1)}
+    world.door_type_mode = args.door_type_mode.copy()
+    world.trap_door_mode = args.trap_door_mode.copy()
+    world.key_logic_algorithm = args.key_logic_algorithm.copy()
+    world.decoupledoors = args.decoupledoors.copy()
+    world.door_self_loops = args.door_self_loops.copy()
+    world.experimental = args.experimental.copy()
+    world.dungeon_counters = args.dungeon_counters.copy()
+    world.fish = fish
+    world.shopsanity = args.shopsanity.copy()
+    world.dropshuffle = args.dropshuffle.copy()
+    world.pottery = args.pottery.copy()
+    world.potshuffle = args.shufflepots.copy()
+    world.mixed_travel = args.mixed_travel.copy()
+    world.standardize_palettes = args.standardize_palettes.copy()
+    world.shufflelinks = args.shufflelinks.copy()
+    world.shuffletavern = args.shuffletavern.copy()
+    world.pseudoboots = args.pseudoboots.copy()
+    world.overworld_map = args.overworld_map.copy()
+    world.take_any = args.take_any.copy()
+    world.restrict_boss_items = args.restrict_boss_items.copy()
+    world.collection_rate = args.collection_rate.copy()
+    world.colorizepots = args.colorizepots.copy()
+
+    world.customizer = None
+    if args.customizer:
+        world.customizer = CustomSettings()
+        world.customizer.load_yaml(args.customizer)
+    
+    return world
+
+
+def set_starting_inventory(world, args):
+    for player in range(1, world.players + 1):
+        if args.usestartinventory[player]:
+            for tok in filter(None, args.startinventory[player].split(',')):
+                name = tok.strip()
+                name = name if name != 'Ocarina' or world.flute_mode[player] != 'active' else 'Ocarina (Activated)'
+                item = ItemFactory(name, player)
+                if item:
+                    world.push_precollected(item)
+
+    if world.customizer and world.customizer.get_start_inventory():
+        for p, inv_list in world.customizer.get_start_inventory().items():
+            for inv_item in inv_list:
+                item = ItemFactory(inv_item.strip(), p)
+                if item:
+                    world.push_precollected(item)
 
 
 def copy_world(world):

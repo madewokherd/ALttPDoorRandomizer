@@ -8,11 +8,13 @@ The cli includes a couple arguments to help:
 
 `--print_template_yaml` will create a yaml file based on the settings used. This does not contain any seed specific information.
 
+Present on the GUI as `Export Yaml` on the bottom.
+
 `--print_custom_yaml` will create a yaml file based on the seed rolled. Treat it like a spoiler.
 
 `--customizer` takes a file as an argument. 
 
-Present on the GUI as `Print Customizer Template`, `Print Customizer File`, and `Customizer File` on the Generation Setup tab.
+Present on the GUI as `Print Customizer File` and `Customizer File` on the Generation Setup tab.
 
 ### meta
 
