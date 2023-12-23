@@ -390,10 +390,11 @@
     "bottom.content.names": "Player names",
     "bottom.content.seed": "Seed #",
     "bottom.content.generationcount": "Count",
-    "bottom.content.go": "Generate Patched Rom",
+    "bottom.content.go": "Generate Game",
     "bottom.content.dialog.error": "Error while creating seed",
     "bottom.content.dialog.success": "Success",
     "bottom.content.dialog.success.message": "Rom created successfully.",
+    "bottom.content.savesettings": "Save Settings",
     "bottom.content.outputdir": "Select Destination",
     "bottom.content.docs": "Open Documentation"
   }

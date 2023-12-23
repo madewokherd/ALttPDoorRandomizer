@@ -150,9 +150,10 @@ def bottom_frame(self, parent, args=None):
 
     # button
     self.widgets[widget].type = "button"
-    self.widgets[widget].pieces["button"] = Button(self, text='Generate Patched Rom', command=generateRom)
+    self.widgets[widget].pieces["button"] = Button(self, command=generateRom)
     # button: pack
     self.widgets[widget].pieces["button"].pack(side=LEFT)
+    self.widgets[widget].pieces["button"].configure(bg="#CCCCCC")
 
     def open_output():
         if output_path.cached_path is None:
@@ -170,12 +171,8 @@ def bottom_frame(self, parent, args=None):
             args.outputpath = parent.settings["outputpath"] = folder_selected
 
     ## Output Button
-    # widget ID
     widget = "outputdir"
-
-    # Empty object
     self.widgets[widget] = Empty()
-    # pieces
     self.widgets[widget].pieces = {}
 
     # storagevar
@@ -183,8 +180,16 @@ def bottom_frame(self, parent, args=None):
 
     # button
     self.widgets[widget].type = "button"
-    self.widgets[widget].pieces["button"] = Button(self, text='Open Output Directory', command=select_output)
-    # button: pack
+    self.widgets[widget].pieces["button"] = Button(self, command=select_output)
+    self.widgets[widget].pieces["button"].pack(side=RIGHT)
+
+    ## Save Settings Button
+    widget = "savesettings"
+    self.widgets[widget] = Empty()
+    self.widgets[widget].pieces = {}
+    # button
+    self.widgets[widget].type = "button"
+    self.widgets[widget].pieces["button"] = Button(self)
     self.widgets[widget].pieces["button"].pack(side=RIGHT)
 
     ## Documentation Button

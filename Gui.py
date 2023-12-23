@@ -175,8 +175,8 @@ def guiMain(args=None):
     self.pages["bottom"].pages = {}
     self.pages["bottom"].pages["content"] = bottom_frame(self, self, None)
     ## Save Settings Button
-    savesettingsButton = Button(self.pages["bottom"].pages["content"], text='Save Settings to File', command=lambda: save_settings_from_gui(True))
-    savesettingsButton.pack(side=RIGHT)
+    savesettingsButton = self.pages["bottom"].pages["content"].widgets["savesettings"].pieces["button"]
+    savesettingsButton.configure(command=lambda: save_settings_from_gui(True))
 
     # set bottom frame to main window
     self.pages["bottom"].pages["content"].pack(side=BOTTOM, fill=X, padx=5, pady=5)
