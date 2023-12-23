@@ -6,7 +6,7 @@ import random
 import re
 from CLI import parse_cli
 from Fill import FillError
-from Main import main, EnemizerError
+from Main import main, export_yaml, EnemizerError
 from Utils import local_path, output_path, open_file, update_deprecated_args
 import source.classes.constants as CONST
 from source.gui.randomize.multiworld import multiworld_page
@@ -154,6 +154,41 @@ def bottom_frame(self, parent, args=None):
     # button: pack
     self.widgets[widget].pieces["button"].pack(side=LEFT)
     self.widgets[widget].pieces["button"].configure(bg="#CCCCCC")
+
+    def exportYaml():
+        guiargs = create_guiargs(parent)
+        # get default values for missing parameters
+        for k,v in vars(parse_cli(['--multi', str(guiargs.multi)])).items():
+            if k not in vars(guiargs):
+                setattr(guiargs, k, v)
+            elif type(v) is dict: # use same settings for every player
+                setattr(guiargs, k, {player: getattr(guiargs, k) for player in range(1, guiargs.multi + 1)})
+
+        filename = None
+        try:
+            from tkinter import filedialog
+            filename = filedialog.asksaveasfilename(initialdir=guiargs.outputpath, title="Save file", filetypes=(("Yaml Files", (".yaml", ".yml")), ("All Files", "*")))
+            if filename is not None and filename != '':
+                guiargs.outputpath = parent.settings["outputpath"] = os.path.dirname(filename)
+                guiargs.outputname = os.path.splitext(os.path.basename(filename))[0]
+                export_yaml(args=guiargs, fish=parent.fish)
+        except (FillError, EnemizerError, Exception, RuntimeError) as e:
+            logging.exception(e)
+            messagebox.showerror(title="Error while exporting yaml", message=str(e))
+        else:
+            if filename is not None and filename != '':
+                successMsg = "File Exported"
+                # FIXME: English
+                messagebox.showinfo(title="Success", message=successMsg)
+
+    ## Export Yaml Button
+    widget = "exportyaml"
+    self.widgets[widget] = Empty()
+    self.widgets[widget].pieces = {}
+    # button
+    self.widgets[widget].type = "button"
+    self.widgets[widget].pieces["button"] = Button(self, command=exportYaml)
+    self.widgets[widget].pieces["button"].pack(side=LEFT)
 
     def open_output():
         if output_path.cached_path is None:
