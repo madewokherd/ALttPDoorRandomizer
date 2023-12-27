@@ -118,10 +118,11 @@ class InitialSram:
             self._initial_sram_bytes[0x410] |= 0x01
 
         if startingstate.has('Beat Agahnim 1', player):
+            self.pre_open_lumberjack()
             if world.mode[player] == 'standard':
-                self._initial_sram_bytes[0x3C5] = 0x80
+                self.set_progress_indicator(0x80)
             else:
-                self._initial_sram_bytes[0x3C5] = 0x03
+                self.set_progress_indicator(0x03)
 
         for item in world.precollected_items:
             if item.player != player:
