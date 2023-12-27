@@ -28,6 +28,7 @@ from Fill import distribute_items_restrictive, promote_dungeon_items, fill_dunge
 from Fill import dungeon_tracking
 from Fill import sell_potions, sell_keys, balance_multiworld_progression, balance_money_progression, lock_shop_locations, set_prize_drops
 from ItemList import generate_itempool, difficulties, fill_prizes, customize_shops, fill_specific_items, create_farm_locations
+from UnderworldGlitchRules import create_hybridmajor_connections, create_hybridmajor_connectors
 from Utils import output_path, parse_player_names
 
 from source.item.District import init_districts
@@ -78,6 +79,11 @@ def main(args, seed=None, fish=None):
         seeded = True
         world.customizer.adjust_args(args)
         world = init_world(args, fish)
+
+    for i in zip(args.logic.values(), args.door_shuffle.values()):
+        if i[0] == 'hybridglitches' and i[1] != 'vanilla':
+            raise RuntimeError(BabelFish().translate("cli","cli","hybridglitches.door.shuffle"))
+
     if seed is None:
         random.seed(None)
         world.seed = random.randint(0, 999999999)
@@ -166,6 +172,8 @@ def main(args, seed=None, fish=None):
         create_dungeons(world, player)
         adjust_locations(world, player)
         place_bosses(world, player)
+        if world.logic[player] in ('nologic', 'hybridglitches'):
+            create_hybridmajor_connections(world, player)
 
     if any(world.potshuffle.values()):
         logger.info(world.fish.translate("cli", "cli", "shuffling.pots"))
@@ -191,6 +199,8 @@ def main(args, seed=None, fish=None):
 
     for player in range(1, world.players + 1):
         link_entrances_new(world, player)
+        if world.logic[player] in ('nologic', 'hybridglitches'):
+            create_hybridmajor_connectors(world, player)
 
     logger.info(world.fish.translate("cli", "cli", "shuffling.prep"))
 
@@ -594,8 +604,10 @@ def copy_world(world):
     for player in range(1, world.players + 1):
         create_regions(ret, player)
         update_world_regions(ret, player)
-        if world.logic[player] in ('owglitches', 'nologic'):
+        if world.logic[player] in ('owglitches', 'hybridglitches', 'nologic'):
             create_owg_connections(ret, player)
+        if world.logic[player] in ('nologic', 'hybridglitches'):
+            create_hybridmajor_connections(ret, player)
         create_dynamic_exits(ret, player)
         create_dungeon_regions(ret, player)
         create_owedges(ret, player)
@@ -703,6 +715,8 @@ def copy_world(world):
     for player in range(1, world.players + 1):
         categorize_world_regions(ret, player)
         create_farm_locations(ret, player)
+        if world.logic[player] in ('nologic', 'hybridglitches'):
+            create_hybridmajor_connectors(ret, player)
         set_rules(ret, player)
 
     return ret
@@ -782,8 +796,10 @@ def copy_world_premature(world, player):
 
     create_regions(ret, player)
     update_world_regions(ret, player)
-    if world.logic[player] in ('owglitches', 'nologic'):
+    if world.logic[player] in ('owglitches', 'hybridglitches', 'nologic'):
         create_owg_connections(ret, player)
+    if world.logic[player] in ('nologic', 'hybridglitches'):
+        create_hybridmajor_connections(ret, player)
     create_dynamic_exits(ret, player)
     create_dungeon_regions(ret, player)
     create_owedges(ret, player)
@@ -843,6 +859,9 @@ def copy_world_premature(world, player):
                 copied_door.entrance = copied_entrance
     for portal in world.dungeon_portals[player]:
         connect_portal(portal, ret, player)
+
+    if world.logic[player] in ('nologic', 'hybridglitches'):
+        create_hybridmajor_connectors(ret, player)
 
     set_rules(ret, player)
 

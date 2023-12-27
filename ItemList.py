@@ -327,6 +327,11 @@ def generate_itempool(world, player):
             for _ in range(0, amt):
                 pool.append('Rupees (20)')
 
+    if world.logic[player] == 'hybridglitches' and world.pottery[player] not in ['none', 'cave']:
+        # In HMG force swamp smalls in pots to allow getting out of swamp palace
+        placed_items['Swamp Palace - Trench 1 Pot Key'] = 'Small Key (Swamp Palace)'
+        placed_items['Swamp Palace - Pot Row Pot Key'] = 'Small Key (Swamp Palace)'
+
     start_inventory = list(world.precollected_items)
     for item in precollected_items:
         world.push_precollected(ItemFactory(item, player))
@@ -1056,7 +1061,7 @@ def get_pool_core(world, player, progressive, shuffle, difficulty, treasure_hunt
         return random.choice([True, False]) if progressive == 'random' else progressive == 'on'
 
     # provide boots to boots glitch dependent modes
-    if logic in ['owglitches', 'nologic']:
+    if logic in ['owglitches', 'hybridglitches', 'nologic']:
         precollected_items.append('Pegasus Boots')
         pool.remove('Pegasus Boots')
         pool.extend(['Rupees (20)'])
@@ -1362,12 +1367,12 @@ def make_custom_item_pool(world, player, progressive, shuffle, difficulty, timer
 
     start_inventory = [x for x in world.precollected_items if x.player == player]
     if not start_inventory:
-        if world.logic[player] in ['owglitches', 'nologic']:
+        if world.logic[player] in ['owglitches', 'hybridglitches', 'nologic'] and all(x.name != 'Pegasus Boots' for x in start_inventory):
             precollected_items.append('Pegasus Boots')
             if 'Pegasus Boots' in pool:
                 pool.remove('Pegasus Boots')
                 pool.append('Rupees (20)')
-        if world.swords[player] == 'assured':
+        if world.swords[player] == 'assured' and all(' Sword' not in x.name for x in start_inventory):
             precollected_items.append('Progressive Sword')
             if 'Progressive Sword' in pool:
                 pool.remove('Progressive Sword')
@@ -1503,7 +1508,7 @@ def make_customizer_pool(world, player):
     sphere_0 = world.customizer.get_start_inventory()
     no_start_inventory = not sphere_0 or not sphere_0[player]
     init_equip = [] if no_start_inventory else sphere_0[player]
-    if (world.logic[player] in ['owglitches', 'nologic']
+    if (world.logic[player] in ['owglitches', 'hybridglitches', 'nologic']
        and (no_start_inventory or all(x != 'Pegasus Boots' for x in init_equip))):
         precollected_items.append('Pegasus Boots')
         if 'Pegasus Boots' in pool:

@@ -46,8 +46,9 @@ def roll_settings(weights):
 
     ret.algorithm = get_choice('algorithm')
 
-    glitch_map = {'none': 'noglitches', 'no_logic': 'nologic', 'owglitches': 'owglitches',
-                  'owg': 'owglitches', 'minorglitches': 'minorglitches'}
+    glitch_map = {'none': 'noglitches', 'minorglitches': 'minorglitches', 'no_logic': 'nologic',
+                  'hmg': 'hybridglitches', 'hybridglitches': 'hybridglitches',
+                  'owg': 'owglitches', 'owglitches': 'owglitches'}
     glitches_required = get_choice('glitches_required')
     if glitches_required is not None:
         if glitches_required not in glitch_map.keys():
