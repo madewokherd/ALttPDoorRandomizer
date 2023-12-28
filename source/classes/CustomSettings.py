@@ -48,11 +48,13 @@ class CustomSettings(object):
         meta = defaultdict(lambda: None, self.file_source['meta'])
         return meta['players']
 
-    def adjust_args(self, args):
+    def adjust_args(self, args, resolve_weighted=True):
         def get_setting(value: Any, default):
             if value or value == 0:
                 if isinstance(value, dict):
-                    return random.choices(list(value.keys()), list(value.values()), k=1)[0]
+                    if resolve_weighted:
+                        return random.choices(list(value.keys()), list(value.values()), k=1)[0]
+                    return None
                 else:
                     return value
             return default

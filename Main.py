@@ -75,6 +75,7 @@ def main(args, seed=None, fish=None):
         seed = world.customizer.determine_seed(seed)
         seeded = True
         world.customizer.adjust_args(args)
+        world = init_world(args, fish)
     if seed is None:
         random.seed(None)
         world.seed = random.randint(0, 999999999)
@@ -437,10 +438,17 @@ def init_world(args, fish):
             if code:
                 Settings.adjust_args_from_code(code, player, args)
 
+    customized = None
+    if args.customizer:
+        customized = CustomSettings()
+        customized.load_yaml(args.customizer)
+        customized.adjust_args(args, False)
+
     world = World(args.multi, args.ow_shuffle, args.ow_crossed, args.ow_mixed, args.shuffle, args.door_shuffle, args.logic, args.mode, args.swords,
                   args.difficulty, args.item_functionality, args.timer, args.progressive, args.goal, args.algorithm,
                   args.accessibility, args.shuffleganon, args.custom, args.customitemarray, args.hints)
 
+    world.customizer = customized
     world.boots_hint = args.boots_hint.copy()
     world.remote_items = args.remote_items.copy()
     world.mapshuffle = args.mapshuffle.copy()
@@ -487,10 +495,6 @@ def init_world(args, fish):
     world.collection_rate = args.collection_rate.copy()
     world.colorizepots = args.colorizepots.copy()
 
-    world.customizer = None
-    if args.customizer:
-        world.customizer = CustomSettings()
-        world.customizer.load_yaml(args.customizer)
     
     return world
 
