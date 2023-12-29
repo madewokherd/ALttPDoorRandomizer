@@ -634,7 +634,9 @@ def copy_world(world):
         for exit in region.exits:
             if exit.connected_region:
                 dest_region = ret.get_region(exit.connected_region.name, region.player)
-                ret.get_entrance(exit.name, exit.player).connect(dest_region)
+                src_exit = ret.get_entrance(exit.name, exit.player)
+                if exit.name not in [e.name for e in dest_region.entrances]:
+                    src_exit.connect(dest_region)
 
     # fill locations
     for location in world.get_locations():
@@ -796,7 +798,9 @@ def copy_world_premature(world, player):
             for exit in region.exits:
                 if exit.connected_region:
                     dest_region = ret.get_region(exit.connected_region.name, region.player)
-                    ret.get_entrance(exit.name, exit.player).connect(dest_region)
+                    src_exit = ret.get_entrance(exit.name, exit.player)
+                    if exit.name not in [e.name for e in dest_region.entrances]:
+                        src_exit.connect(dest_region)
 
     from OverworldShuffle import categorize_world_regions
     categorize_world_regions(ret, player)
