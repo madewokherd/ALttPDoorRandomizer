@@ -1643,6 +1643,7 @@ OWExitTypes = {
                 'Lake Hylia East Pier',
                 'Lake Hylia Water D Approach',
                 'Lake Hylia Water D Leave',
+                'Ice Cave Pier',
                 'Desert Pass Ladder (South)',
                 'Desert Pass Rocks (North)',
                 'Desert Pass Rocks (South)',
@@ -1702,6 +1703,7 @@ OWExitTypes = {
                 'Ice Lake Northeast Pier',
                 'Ice Lake Northeast Pier Hop',
                 'Ice Lake Iceberg Water Entry',
+                'Shopping Mall Pier',
                 'Bomber Corner Water Drop',
                 'Bomber Corner Pier'
             ],
