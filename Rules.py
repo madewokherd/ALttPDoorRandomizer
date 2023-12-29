@@ -1714,7 +1714,7 @@ def set_bunny_rules(world, player, inverted):
         queue = deque([(region, [], {region})])
         seen_sets = set([frozenset({region})])
         while queue:
-            (current, path) = queue.popleft()
+            (current, path, seen) = queue.popleft()
             for entrance in current.entrances:
                 new_region = entrance.parent_region
                 new_seen = seen.union({new_region})
