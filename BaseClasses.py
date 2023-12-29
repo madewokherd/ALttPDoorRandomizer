@@ -1300,7 +1300,9 @@ class CollectionState(object):
         return self.has('Fire Rod', player) or (self.has('Bombos', player) and self.has_sword(player))
 
     def can_avoid_lasers(self, player):
-        return self.has('Mirror Shield', player) or self.has('Cane of Byrna', player) or self.has('Cape', player)
+        return (self.has('Mirror Shield', player) or
+                self.has('Cape', player) or 
+                (self.has('Cane of Byrna', player) and self.world.difficulty_adjustments[player] not in ['hard', 'expert']))
 
     def is_not_bunny(self, region, player):
         return self.has_Pearl(player) or not region.can_cause_bunny(player)
