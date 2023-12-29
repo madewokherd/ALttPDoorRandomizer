@@ -228,7 +228,7 @@ def parse_settings():
         "intensity": 3,
         "door_type_mode": "original",
         "trap_door_mode": "optional",
-        "key_logic_algorithm": "default",
+        "key_logic_algorithm": "partial",
         "decoupledoors": False,
         "door_self_loops": False,
         "experimental": False,

@@ -1711,16 +1711,17 @@ def set_bunny_rules(world, player, inverted):
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        seen = {region}
-        queue = deque([(region, [])])
+        queue = deque([(region, [], {region})])
+        seen_sets = set([frozenset({region})])
         while queue:
             (current, path) = queue.popleft()
             for entrance in current.entrances:
                 new_region = entrance.parent_region
-                if new_region.type in (RegionType.Cave, RegionType.Dungeon) and new_region in seen:
+                new_seen = seen.union({new_region})
+                if new_region.type in (RegionType.Cave, RegionType.Dungeon) and new_seen in seen_sets:
                     continue
                 new_path = path + [entrance.access_rule]
-                seen.add(new_region)
+                seen_sets.add(frozenset(new_seen))
                 if not is_link(new_region):
                     if world.logic[player] == 'owglitches':
                         if region.type == RegionType.Dungeon and new_region.type != RegionType.Dungeon:
@@ -1757,7 +1758,8 @@ def set_bunny_rules(world, player, inverted):
                     else:
                         continue
                 if is_bunny(new_region):
-                    queue.append((new_region, new_path))
+                    # todo: if not owg or hmg and entrance is in bunny_impassible_doors, then skip this nonsense?
+                    queue.append((new_region, new_path, new_seen))
                 else:
                     # we have reached pure light world, so we have a new possible option
                     possible_options.append(path_to_access_rule(new_path, entrance))
