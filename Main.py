@@ -68,6 +68,8 @@ def main(args, seed=None, fish=None):
 
     world = init_world(args, fish)
 
+    logger = logging.getLogger('')
+
     if args.securerandom:
         random.use_secure()
     seeded = False
