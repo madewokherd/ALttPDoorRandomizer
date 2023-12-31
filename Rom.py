@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'fe9e7870071daa40829c1072829bf30b'
+RANDOMIZERBASEHASH = '3f08ebba5a2c79b373dbd0c9151ade9b'
 
 
 class JsonRom(object):
@@ -802,10 +802,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # setting spriteID to D8, a placeholder sprite we use to inform ROM to spawn a dynamic item
         #for address in bonk_addresses:
         for address in [b for b in bonk_addresses if b != 0x4D0AE]: # temp fix for screen 1A murahdahla sprite replacement
-            rom.write_byte(address, 0xD8)
+            rom.write_byte(address, 0xD9)
         # temporary fix for screen 1A
-        rom.write_byte(snes_to_pc(0x09AE32), 0xD8)
-        rom.write_byte(snes_to_pc(0x09AE35), 0xD8)
+        rom.write_byte(snes_to_pc(0x09AE32), 0xD9)
+        rom.write_byte(snes_to_pc(0x09AE35), 0xD9)
 
         rom.write_byte(snes_to_pc(0x06918E), 0x80) # skip good bee bottle check
 
