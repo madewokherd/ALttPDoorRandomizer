@@ -8,7 +8,7 @@ from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitType
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
-version_number = '0.3.3.2'
+version_number = '0.3.4.0'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -200,7 +200,7 @@ def link_overworld(world, player):
 
     categorize_world_regions(world, player)
 
-    if world.logic[player] in ('owglitches', 'nologic'):
+    if world.logic[player] in ('owglitches', 'hybridglitches', 'nologic'):
         create_owg_connections(world, player)
     
     # crossed shuffle
@@ -1486,7 +1486,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
                 elif exit.connected_region.name not in explored_regions \
                         and (exit.connected_region.type == region.type 
                             or exit.name in OWExitTypes['OWEdge'] or (cross_world and exit.name in (OWExitTypes['Portal'] + OWExitTypes['Mirror']))) \
-                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.name not in OWExitTypes['Ledge']):
+                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.name not in OWExitTypes['Ledge', 'OWG']):
                     explore_region(exit.connected_region.name, exit.connected_region)
     
     if build_copy_world:

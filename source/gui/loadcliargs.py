@@ -158,6 +158,22 @@ def loadcliargs(gui, args, settings=None):
         label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
         gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
 
+        # Set Export Yaml button
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "exportyaml"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
+
+        # Set Save Settings button
+        mainpage = "bottom"
+        subpage = "content"
+        widget = "savesettings"
+        # set textbox/frame label
+        label = fish.translate("gui","gui",mainpage + '.' + subpage + '.' + widget)
+        gui.pages[mainpage].pages[subpage].widgets[widget].pieces["button"].configure(text=label)
+
         # Set Output Directory button
         mainpage = "bottom"
         subpage = "content"

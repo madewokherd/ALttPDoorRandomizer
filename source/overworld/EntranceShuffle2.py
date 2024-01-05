@@ -1317,7 +1317,7 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
     invalid_connections = Must_Exit_Invalid_Connections.copy()
     invalid_cave_connections = defaultdict(set)
 
-    if avail.world.logic[avail.player] in ['owglitches', 'nologic']:
+    if avail.world.logic[avail.player] in ['owglitches', 'hybridglitches', 'nologic']:
         import OverworldGlitchRules
         for entrance in OverworldGlitchRules.get_non_mandatory_exits(avail.world, avail.player):
             invalid_connections[entrance] = set()
@@ -1686,13 +1686,18 @@ def connect_exit(exit_name, entrancename, avail):
     if exit.connected_region is not None:
         exit.connected_region.entrances.remove(exit)
 
-    exit.connect(entrance.parent_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
+    dest_region = entrance.parent_region
+    if dest_region.name == 'Pyramid Crack':
+        # Needs to logically exit into greater Pyramid Area
+        dest_region = entrance.parent_region.entrances[0].parent_region
+
+    exit.connect(dest_region, door_addresses[entrance.name][1], exit_ids[exit.name][1])
     if exit_name != 'Chris Houlihan Room Exit':
         if avail.coupled:
             avail.entrances.remove(entrancename)
         avail.exits.remove(exit_name)
     world.spoiler.set_entrance(entrance.name, exit.name, 'exit', player)
-    logging.getLogger('').debug(f'Connected (exit) {entrance.name} to {exit.name}')
+    logging.getLogger('').debug(f'Connected (exit) {exit.name} to {entrance.name}')
 
 
 def connect_two_way(entrancename, exit_name, avail):
@@ -2659,7 +2664,7 @@ door_addresses = {'Links House':                            (0x00, (0x0104, 0x2c
                   'Mire Hint':                              (0x61, (0x0114, 0x70, 0x0654, 0x0cc5, 0x02aa, 0x0d16, 0x0328, 0x0d32, 0x032f, 0x09, 0xf7, 0x0000, 0x0000), 0x00),
                   'Mire Fairy':                             (0x55, (0x0115, 0x70, 0x03a8, 0x0c6a, 0x013a, 0x0cb7, 0x01b8, 0x0cd7, 0x01bf, 0x06, 0xfa, 0x0000, 0x0000), 0x00),
                   'Spike Cave':                             (0x40, (0x0117, 0x43, 0x0ed4, 0x01e4, 0x08aa, 0x0236, 0x0928, 0x0253, 0x092f, 0x0a, 0xf6, 0x0000, 0x0000), 0x00),
-                  'Dark Death Mountain Shop':               (0x6D, (0x0112, 0x45, 0x0ee0, 0x01e3, 0x0d00, 0x0236, 0x0daa, 0x0252, 0x0d7d, 0x0b, 0xf5, 0x0000, 0x0000), 0x00),
+                  'Dark Death Mountain Shop':               (0x6D, (0x0112, 0x45, 0x0ee0, 0x01e3, 0x0d00, 0x0236, 0x0da8, 0x0252, 0x0d7d, 0x0b, 0xf5, 0x0000, 0x0000), 0x00),
                   'Dark Death Mountain Fairy':              (0x6F, (0x0115, 0x43, 0x1400, 0x0294, 0x0600, 0x02e8, 0x0678, 0x0303, 0x0685, 0x0a, 0xf6, 0x0000, 0x0000), 0x00),
                   'Mimic Cave':                             (0x4E, (0x010c, 0x05, 0x07e0, 0x0103, 0x0d00, 0x0156, 0x0d78, 0x0172, 0x0d7d, 0x0b, 0xf5, 0x0000, 0x0000), 0x00),
                   'Big Bomb Shop':                          (0x52, (0x011c, 0x6c, 0x0506, 0x0a9a, 0x0832, 0x0ae7, 0x08b8, 0x0b07, 0x08bf, 0x06, 0xfa, 0x0816, 0x0000), 0x00),

@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.4.0
+- \~Merged in some things from DR v1.4.0.0-v~
+  - Improved bunny-walking algorithm
+  - Improved multiworld balancing
+- Implemented Hyrid Major Glitches logic (thanks Muffins/Espeon)
+- Added sparkles to Bonk Drop locations for better visibility
+- Some tweaks/improvements to Shuffle Song Instruments
+- Replaced Save Settings on Exit with Settings on Load
+- Added new button in GUI to export a Yaml file based on current settings
+- Allow starting Aga-Defeated and Old-Man-Rescued in inventory
+
+## 0.3.3.2
+- \~Merged in DR v1.2.0.22~
+- Added Shuffle Song Instruments as post-gen option
+- Allow user to change and save output directory within the GUI
+- Fixed issue with Smith not deleting on S+Q when no path is possible
+- Fixed various MSU inaccuracies
+
 ## 0.3.3.1
 - \~Merged in DR v1.2.0.21~
 - Fixed issue with Old Man death spawning on Pyramid/Castle

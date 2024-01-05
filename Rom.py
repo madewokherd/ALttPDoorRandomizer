@@ -38,7 +38,7 @@ from source.dungeon.RoomList import Room0127
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'fe9e7870071daa40829c1072829bf30b'
+RANDOMIZERBASEHASH = '3f08ebba5a2c79b373dbd0c9151ade9b'
 
 
 class JsonRom(object):
@@ -802,10 +802,10 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # setting spriteID to D8, a placeholder sprite we use to inform ROM to spawn a dynamic item
         #for address in bonk_addresses:
         for address in [b for b in bonk_addresses if b != 0x4D0AE]: # temp fix for screen 1A murahdahla sprite replacement
-            rom.write_byte(address, 0xD8)
+            rom.write_byte(address, 0xD9)
         # temporary fix for screen 1A
-        rom.write_byte(snes_to_pc(0x09AE32), 0xD8)
-        rom.write_byte(snes_to_pc(0x09AE35), 0xD8)
+        rom.write_byte(snes_to_pc(0x09AE32), 0xD9)
+        rom.write_byte(snes_to_pc(0x09AE35), 0xD9)
 
         rom.write_byte(snes_to_pc(0x06918E), 0x80) # skip good bee bottle check
 
@@ -1365,9 +1365,9 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x180211, gametype)  # Game type
 
     warningflags = 0x00 # none
-    if world.logic[player] in ['owglitches', 'nologic']:
+    if world.logic[player] in ['owglitches', 'hybridglitches', 'nologic']:
         warningflags |= 0x20
-    if world.logic[player] in ['minorglitches', 'owglitches', 'nologic']:
+    if world.logic[player] in ['minorglitches', 'owglitches', 'hybridglitches', 'nologic']:
         warningflags |= 0x40
     rom.write_byte(0x180212, warningflags)  # Warning flags
 
@@ -1391,7 +1391,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18008F, 0x01 if world.is_atgt_swapped(player) else 0x00) # AT/GT swapped
     rom.write_byte(0xF5D73, 0xF0) # bees are catchable
     rom.write_byte(0xF5F10, 0xF0) # bees are catchable
-    rom.write_byte(0x180086, 0x00 if world.aga_randomness else 0x01)  # set blue ball and ganon warp randomness
+    rom.write_byte(0x180086, 0x00 if world.aga_randomness[player] else 0x01)  # set blue ball and ganon warp randomness
     rom.write_byte(0x1800A0, 0x01)  # return to light world on s+q without mirror
     rom.write_byte(0x1800A1, 0x01)  # enable overworld screen transition draining for water level inside swamp
     rom.write_byte(0x180174, 0x01 if world.fix_fake_world[player] else 0x00)
@@ -1434,10 +1434,11 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x18005F, world.crystals_needed_for_ganon[player])
 
     # block HC upstairs doors in rain state in standard mode
-    prevent_rain = world.mode[player] == "standard" and world.shuffle[player] != 'vanilla'
+    prevent_rain = world.mode[player] == 'standard' and world.shuffle[player] != 'vanilla' and world.logic[player] != 'nologic'
     rom.write_byte(0x18008A, 0x01 if prevent_rain else 0x00)
     # block sanc door in rain state and the dungeon is not vanilla
-    rom.write_byte(0x13f0fa, 0x01 if world.mode[player] == "standard" and world.doorShuffle[player] != 'vanilla' else 0x00)
+    block_sanc = world.mode[player] == 'standard' and world.doorShuffle[player] != 'vanilla' and world.logic[player] != 'nologic'
+    rom.write_byte(0x13f0fa, 0x01 if block_sanc else 0x00)
 
     if prevent_rain:
         portals = [world.get_portal('Hyrule Castle East', player), world.get_portal('Hyrule Castle West', player)]
@@ -1598,7 +1599,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     rom.write_byte(0x1800A3, 0x01)  # enable correct world setting behaviour after agahnim kills
     rom.write_byte(0x1800A4, 0x01 if world.logic[player] != 'nologic' else 0x00)  # enable POD EG fix
     rom.write_byte(0x180042, 0x01 if world.save_and_quit_from_boss else 0x00)  # Allow Save and Quit after boss kill
-    rom.write_byte(0x180358, 0x01 if (world.logic[player] in ['owglitches', 'nologic']) else 0x00)
+    rom.write_byte(0x180358, 0x01 if (world.logic[player] in ['owglitches', 'hybridglitches', 'nologic']) else 0x00)
 
     # remove shield from uncle
     rom.write_bytes(0x6D253, [0x00, 0x00, 0xf6, 0xff, 0x00, 0x0E])

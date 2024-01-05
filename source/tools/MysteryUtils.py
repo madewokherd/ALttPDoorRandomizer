@@ -46,8 +46,9 @@ def roll_settings(weights):
 
     ret.algorithm = get_choice('algorithm')
 
-    glitch_map = {'none': 'noglitches', 'no_logic': 'nologic', 'owglitches': 'owglitches',
-                  'owg': 'owglitches', 'minorglitches': 'minorglitches'}
+    glitch_map = {'none': 'noglitches', 'minorglitches': 'minorglitches', 'no_logic': 'nologic',
+                  'hmg': 'hybridglitches', 'hybridglitches': 'hybridglitches',
+                  'owg': 'owglitches', 'owglitches': 'owglitches'}
     glitches_required = get_choice('glitches_required')
     if glitches_required is not None:
         if glitches_required not in glitch_map.keys():
@@ -114,6 +115,7 @@ def roll_settings(weights):
     ret.pottery = 'keys' if ret.pottery == 'none' and keydropshuffle else ret.pottery
     ret.colorizepots = get_choice_default('colorizepots', default='on') == 'on'
     ret.shufflepots = get_choice('pot_shuffle') == 'on'
+    ret.aga_randomness = get_choice('aga_randomness') == 'on'
     ret.mixed_travel = get_choice('mixed_travel') if 'mixed_travel' in weights else 'prevent'
     ret.standardize_palettes = (get_choice('standardize_palettes') if 'standardize_palettes' in weights
                                 else 'standardize')
