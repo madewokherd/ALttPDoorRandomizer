@@ -1841,10 +1841,11 @@ def set_bunny_rules(world, player, inverted):
                     continue
                 add_rule(location, get_rule_to_add(region, location))
 
-    for ent_name in bunny_pocket_entrances:
-        bunny_exit = world.get_entrance(ent_name, player)
-        if bunny_exit.connected_region and is_bunny(bunny_exit.parent_region) and not can_bunny_pocket_to(world, ent_name, player):
-            add_rule(bunny_exit, lambda state: state.has_Pearl(player))
+    if world.logic[player] in ['owglitches', 'hybridglitches']:
+        for ent_name in bunny_pocket_entrances:
+            bunny_exit = world.get_entrance(ent_name, player)
+            if bunny_exit.connected_region and is_bunny(bunny_exit.parent_region) and not can_bunny_pocket_to(world, ent_name, player):
+                add_rule(bunny_exit, lambda state: state.has_Pearl(player))
 
 
 drop_dungeon_entrances = {
