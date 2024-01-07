@@ -1044,10 +1044,10 @@ def shuffle_tiles(world, groups, result_list, do_grouped, forced_flips, player):
             raise GenerationException('Could not find valid tile flips')
 
         # tile shuffle happens here
-        removed = copy.deepcopy(nonflipped_groups)
+        removed = []
         if 0 < undefined_chance < 100:
-            for group in [g for g in groups if g not in nonflipped_groups]:
-                if group not in flipped_groups and random.randint(1, 100) > undefined_chance:
+            for group in groups:
+                if group[0] in nonflipped_groups or (group[0] not in flipped_groups and random.randint(1, 100) > undefined_chance):
                     removed.append(group)
 
         # save shuffled tiles to list
