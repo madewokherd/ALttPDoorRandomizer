@@ -111,9 +111,6 @@ These are now independent of retro mode and have three options: None, Random, an
 
 * 1.4.0.1v
   * Key logic: Vanilla key logic fixes. Statically set some HC logic and PoD front door
-* 1.4.0.0v
-  * Generation: fix for bunny walk logic taking up too much memory
-  * Key Logic: Partial is now the new default
 * 1.3.0.9v
   * Ganonhunt: playthrough no longer collects crystals
   * Vanilla Fill: Uncle weapon is always a sword, medallions for Mire/TR will be vanilla
@@ -123,7 +120,10 @@ These are now independent of retro mode and have three options: None, Random, an
   * MW Progression Balancing: Change to be percentage based instead of raw count. (80% threshold)
   * Take anys: Good Bee cave chosen as take any should no longer prevent generation
   * Money balancing: Fixed generation issue
-  1.2.0.22u
+  1.2.0.23u
+  * Generation: fix for bunny walk logic taking up too much memory
+  * Key Logic: Partial is now the new default
+* 1.2.0.22u
   * Flute can't be activated in rain state (except glitched modes) (Thanks codemann!)
   * ER: Minor fix for Link's House on DM in Insanity (escape cave should not be re-used) 
   * Logic issues:
