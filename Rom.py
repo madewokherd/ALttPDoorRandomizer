@@ -799,7 +799,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
 
         owFlags |= 0x0200
 
-        # setting spriteID to D8, a placeholder sprite we use to inform ROM to spawn a dynamic item
+        # setting spriteID to D9, a placeholder sprite we use to inform ROM to spawn a dynamic item
         #for address in bonk_addresses:
         for address in [b for b in bonk_addresses if b != 0x4D0AE]: # temp fix for screen 1A murahdahla sprite replacement
             rom.write_byte(address, 0xD9)
@@ -1549,7 +1549,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
     # b - Big Key
     # a - Small Key
     #
-    enable_menu_map_check = world.overworld_map[player] != 'default' and world.shuffle[player] != 'none'
+    enable_menu_map_check = world.overworld_map[player] != 'default' and world.shuffle[player] != 'vanilla'
     rom.write_byte(0x180045, ((0x01 if world.keyshuffle[player] == 'wild' else 0x00)
                               | (0x02 if world.bigkeyshuffle[player] else 0x00)
                               | (0x04 if world.mapshuffle[player] or enable_menu_map_check else 0x00)
@@ -2732,10 +2732,6 @@ def set_inverted_mode(world, player, rom, inverted_buffer):
         write_int16s(rom, snes_to_pc(0x1BB810), [0x00BE, 0x00C0, 0x013E])  # update pyramid hole entrance
         write_int16s(rom, snes_to_pc(0x1BB836), [0x001B, 0x001B, 0x001B])
         
-        write_int16(rom, snes_to_pc(0x308300), 0x0140)  # add extra pyramid hole
-        write_int16(rom, snes_to_pc(0x308320), 0x001B)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-            rom.write_byte(snes_to_pc(0x308340), 0x7B)
         
         rom.write_byte(snes_to_pc(0x00DB9D), 0x1A)  # make retreat bat gfx available in HC area
         rom.write_byte(snes_to_pc(0x00DC09), 0x1A)
