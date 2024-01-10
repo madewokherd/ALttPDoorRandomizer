@@ -13,6 +13,7 @@ class EntrancePool(object):
         self.inverted = False
         self.coupled = True
         self.swapped = False
+        self.assumed_loose_caves = False
         self.keep_drops_together = True
         self.default_map = {}
         self.one_way_map = {}
@@ -55,6 +56,7 @@ def link_entrances_new(world, player):
     avail_pool.entrances = set(i_drop_map.keys()).union(i_entrance_map.keys()).union(i_single_ent_map.keys())
     avail_pool.exits = set(i_entrance_map.values()).union(i_drop_map.values()).union(i_single_ent_map.values())
     avail_pool.inverted = world.mode[player] == 'inverted'
+    avail_pool.assumed_loose_caves = world.shuffle[player] == 'district'
     inverted_substitution(avail_pool, avail_pool.entrances, True, True)
     inverted_substitution(avail_pool, avail_pool.exits, False, True)
     avail_pool.original_entrances.update(avail_pool.entrances)
@@ -128,6 +130,14 @@ def link_entrances_new(world, player):
                 do_limited_shuffle_exclude_drops(pool, avail_pool, False)
             elif special_shuffle == 'vanilla':
                 do_vanilla_connect(pool, avail_pool)
+            elif special_shuffle == 'district':
+                drops = []
+                world_limiter = LW_Entrances if pool['condition'] == 'lightworld' else DW_Entrances
+                entrances = [e for e in pool['entrances'] if e in world_limiter]
+                if 'drops' in pool:
+                    drops = [e for e in pool['drops'] if combine_linked_drop_map[e] in world_limiter]
+                entrances, exits = find_entrances_and_exits(avail_pool, entrances+drops)
+                do_main_shuffle(entrances, exits, avail_pool, mode_cfg)
             elif special_shuffle == 'skull':
                 entrances, exits = find_entrances_and_exits(avail_pool, pool['entrances'])
                 rem_ent = None
@@ -151,6 +161,8 @@ def link_entrances_new(world, player):
             do_vanilla_connections(avail_pool)
         elif undefined_behavior in ['shuffle', 'swap']:
             do_main_shuffle(set(avail_pool.entrances), set(avail_pool.exits), avail_pool, mode_cfg)
+        elif undefined_behavior == 'error':
+            assert len(avail_pool.entrances)+len(avail_pool.exits) == 0, 'Not all entrances were placed in their districts'
 
     # afterward
 
@@ -310,7 +322,7 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
         return not avail.is_standard() or x != 'Bonk Fairy (Light)'
 
     # old man S&Q cave
-    if not cross_world:
+    if not cross_world and not avail.assumed_loose_caves:
         #TODO: Add Swapped ER support for this
         # OM Cave entrance in lw/dw if cross_world off
         if 'Old Man Cave Exit (West)' in rem_exits:
@@ -382,7 +394,7 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
 def do_old_man_cave_exit(entrances, exits, avail, cross_world):
     if 'Old Man Cave Exit (East)' in exits:
         from EntranceShuffle import build_accessible_region_list
-        if not avail.world.is_tile_swapped(0x03, avail.player):
+        if not avail.world.is_tile_swapped(0x03, avail.player) or avail.world.shuffle[avail.player] == 'district':
             region_name = 'West Death Mountain (Top)'
         else:
             region_name = 'West Dark Death Mountain (Top)'
@@ -420,11 +432,14 @@ def do_blacksmith(entrances, exits, avail):
         if avail.world.logic[avail.player] in ['noglitches', 'minorglitches'] and (avail.world.is_tile_swapped(0x29, avail.player) == avail.inverted):
             assumed_inventory.append('Titans Mitts')
         
+        blacksmith_options = list()
         if not avail.world.is_bombshop_start(avail.player):
-            links_region = avail.world.get_entrance('Links House Exit', avail.player).connected_region.name
+            links_region = avail.world.get_entrance('Links House Exit', avail.player).connected_region
         else:
-            links_region = avail.world.get_entrance('Big Bomb Shop Exit', avail.player).connected_region.name
-        blacksmith_options = list(get_accessible_entrances(links_region, avail, assumed_inventory, False, True, True))
+            links_region = avail.world.get_entrance('Big Bomb Shop Exit', avail.player).connected_region
+        if links_region is not None:
+            links_region = links_region.name
+            blacksmith_options = list(get_accessible_entrances(links_region, avail, assumed_inventory, False, True, True))
         
         if avail.inverted:
             dark_sanc = avail.world.get_entrance('Dark Sanctuary Hint Exit', avail.player).connected_region.name
@@ -439,6 +454,9 @@ def do_blacksmith(entrances, exits, avail):
         if avail.swapped:
             blacksmith_options = [e for e in blacksmith_options if e not in Forbidden_Swap_Entrances]
         blacksmith_options = [x for x in blacksmith_options if x in entrances]
+
+        if avail.world.shuffle[avail.player] == 'district' and not len(blacksmith_options):
+            blacksmith_options = [e for e in entrances if e not in Forbidden_Swap_Entrances or not avail.swapped]
 
         assert len(blacksmith_options), 'No available entrances left to place Blacksmith'
         blacksmith_choice = random.choice(blacksmith_options)
@@ -577,6 +595,8 @@ def do_dark_sanc(entrances, exits, avail):
                 forbidden.extend(Forbidden_Swap_Entrances)
                 if not avail.world.is_bombshop_start(avail.player):
                     forbidden.append('Links House')
+                else:
+                    forbidden.append('Big Bomb Shop')
             if avail.world.owShuffle[avail.player] == 'vanilla':
                 choices = [e for e in avail.world.districts[avail.player]['Northwest Dark World'].entrances if e not in forbidden and e in entrances]
             else:
@@ -612,7 +632,7 @@ def do_links_house(entrances, exits, avail, cross_world):
                 forbidden.append('Mimic Cave')
             if avail.world.is_bombshop_start(avail.player) and (avail.inverted == avail.world.is_tile_swapped(0x03, avail.player)):
                 forbidden.extend(['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)'])
-            if avail.inverted:
+            if avail.inverted and avail.world.shuffle[avail.player] != 'district':
                 dark_sanc_region = avail.world.get_entrance('Dark Sanctuary Hint Exit', avail.player).connected_region.name
                 forbidden.extend(get_nearby_entrances(avail, dark_sanc_region))
             else:
@@ -654,7 +674,7 @@ def do_links_house(entrances, exits, avail, cross_world):
             sanc_spawn_can_be_dark = (not avail.inverted and avail.world.doorShuffle[avail.player] in ['partitioned', 'crossed']
                                     and avail.world.intensity[avail.player] >= 3)
 
-            if cross_world and not sanc_spawn_can_be_dark:
+            if (cross_world and not sanc_spawn_can_be_dark) or avail.world.shuffle[avail.player] == 'district':
                 possible = [e for e in entrance_pool if e not in forbidden]
             else:
                 world_list = LW_Entrances if not avail.inverted else DW_Entrances
@@ -686,7 +706,7 @@ def do_links_house(entrances, exits, avail, cross_world):
             return
             if avail.world.shuffle[avail.player] in ['lite', 'lean']:
                 rem_exits = [e for e in avail.exits if e in Connector_Exit_Set and e not in Dungeon_Exit_Set]
-                multi_exit_caves = figure_out_connectors(rem_exits)
+                multi_exit_caves = figure_out_connectors(rem_exits, avail)
                 if cross_world:
                     possible_dm_exits = [e for e in avail.entrances if e not in entrances and e in LH_DM_Connector_List]
                     possible_exits = [e for e in avail.entrances if e not in entrances and e not in dm_spots]
@@ -695,7 +715,7 @@ def do_links_house(entrances, exits, avail, cross_world):
                     possible_dm_exits = [e for e in avail.entrances if e not in entrances and e in LH_DM_Connector_List and e in world_list]
                     possible_exits = [e for e in avail.entrances if e not in entrances and e not in dm_spots and e in world_list]
             else:
-                multi_exit_caves = figure_out_connectors(exits)
+                multi_exit_caves = figure_out_connectors(exits, avail)
                 entrance_pool = entrances if avail.coupled else avail.decoupled_entrances
                 if cross_world:
                     possible_dm_exits = [e for e in entrances if e in LH_DM_Connector_List]
@@ -842,12 +862,22 @@ def get_accessible_entrances(start_region, avail, assumed_inventory=[], cross_wo
     return found_entrances
 
 
-def figure_out_connectors(exits):
+def figure_out_connectors(exits, avail):
     multi_exit_caves = []
-    for item in Connector_List:
+    cave_list = list(Connector_List)
+    if avail.assumed_loose_caves:
+        sw_list = ['Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)']
+        random.shuffle(sw_list)
+        cave_list.extend([sw_list])
+        cave_list.extend([[entrance_map[e]] for e in linked_drop_map.values() if 'Inverted ' not in e])
+    for item in cave_list:
         if all(x in exits for x in item):
             remove_from_list(exits, item)
             multi_exit_caves.append(list(item))
+        elif avail.assumed_loose_caves and any(x in exits for x in item):
+            remaining = [i for i in item if i in exits]
+            remove_from_list(exits, remaining)
+            multi_exit_caves.append(list(remaining))
     return multi_exit_caves
 
 
@@ -1025,7 +1055,7 @@ def figure_out_must_exits_same_world(entrances, exits, avail):
 
     for x in entrances:
         lw_entrances.append(x) if x in LW_Entrances else dw_entrances.append(x)
-    multi_exit_caves = figure_out_connectors(exits)
+    multi_exit_caves = figure_out_connectors(exits, avail)
 
     must_exit_lw, must_exit_dw = must_exits_helper(avail)
     must_exit_lw = must_exit_filter(avail, must_exit_lw, lw_entrances)
@@ -1035,7 +1065,7 @@ def figure_out_must_exits_same_world(entrances, exits, avail):
 
 
 def figure_out_must_exits_cross_world(entrances, exits, avail):
-    multi_exit_caves = figure_out_connectors(exits)
+    multi_exit_caves = figure_out_connectors(exits, avail)
 
     must_exit_lw, must_exit_dw = must_exits_helper(avail)
     must_exit = must_exit_filter(avail, must_exit_lw + must_exit_dw, entrances)
@@ -1374,7 +1404,8 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
         # find multi exit cave
         candidates = []
         for candidate in cave_options:
-            if not isinstance(candidate, str) and len(candidate) > 1 and (candidate in used_caves
+            allow_single = avail.assumed_loose_caves or len(candidate) > 1
+            if not isinstance(candidate, str) and allow_single and (candidate in used_caves
                                                    or len(candidate) < len(entrances) - required_entrances):
                 if not avail.swapped or (combine_map[exit] not in candidate and not any(e for e in must_exit if combine_map[e] in candidate)): #maybe someday allow these, but we need to disallow mutual locks in Swapped
                     candidates.append(candidate)
@@ -1408,6 +1439,10 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
             if entrance in invalid_connections:
                 for exit2 in invalid_connections[entrance]:
                     invalid_connections[exit2] = invalid_connections[exit2].union(invalid_connections[exit]).union(invalid_cave_connections[tuple(cave)])
+        elif len(cave) == 1 and avail.assumed_loose_caves:
+            #TODO: keep track of caves we use for must exits that are unaccounted here
+            # the other exits of the cave should NOT be used to satisfy must-exit later
+            pass
         elif cave[-1] == 'Spectacle Rock Cave Exit':  # Spectacle rock only has one exit
             cave_entrances = []
             for cave_exit in rnd_cave[:-1]:
@@ -1532,14 +1567,12 @@ def find_entrances_and_exits(avail_pool, entrance_pool):
     entrances, targets = [], []
     inverted_substitution(avail_pool, entrance_pool, True)
     for item in entrance_pool:
-        if item == 'Ganons Tower' and not avail_pool.world.shuffle_ganon[avail_pool.player]:
-            continue
         if item in avail_pool.entrances:
             entrances.append(item)
-        if item in entrance_map and entrance_map[item] in avail_pool.exits:
-            targets.append(entrance_map[item])
-        elif item in single_entrance_map and single_entrance_map[item] in avail_pool.exits:
-            targets.append(single_entrance_map[item])
+        if item in avail_pool.default_map and avail_pool.default_map[item] in avail_pool.exits:
+            targets.append(avail_pool.default_map[item])
+        elif item in avail_pool.one_way_map and avail_pool.one_way_map[item] in avail_pool.exits:
+            targets.append(avail_pool.one_way_map[item])
     return entrances, targets
 
 
@@ -2077,6 +2110,157 @@ modes = {
             },
         }
     },
+    'district': {
+        'undefined': 'error',
+        'keep_drops_together': 'off',
+        'cross_world': 'off',
+        'pools': {
+            'northwest_hyrule': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'drops': ['Lost Woods Hideout Drop', 'Lumberjack Tree Tree', 'Sanctuary Grave', 'North Fairy Cave Drop',
+
+                          'Skull Woods First Section Hole (West)', 'Skull Woods First Section Hole (East)',
+                          'Skull Woods First Section Hole (North)', 'Skull Woods Second Section Hole'],
+                'entrances': ['Lost Woods Hideout Stump', 'Lumberjack Tree Cave', 'Sanctuary', 'North Fairy Cave',
+                              'Lost Woods Gamble', 'Lumberjack House', 'Old Man Cave (West)', 'Death Mountain Return Cave (West)',
+                              'Fortune Teller (Light)', 'Bonk Rock Cave', 'Graveyard Cave', 'Kings Grave',
+
+                              'Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
+                              'Skull Woods Second Section Door (West)', 'Skull Woods Final Section', 'Dark Lumberjack Shop',
+                              'Bumper Cave (Bottom)', 'Bumper Cave (Top)', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint',
+                              'Red Shield Shop']
+            },
+            'northwest_dark_world': {
+                'special': 'district',
+                'condition': 'darkworld',
+                'drops': ['Skull Woods First Section Hole (West)', 'Skull Woods First Section Hole (East)',
+                          'Skull Woods First Section Hole (North)', 'Skull Woods Second Section Hole',
+
+                          'Lost Woods Hideout Drop', 'Lumberjack Tree Tree', 'Sanctuary Grave', 'North Fairy Cave Drop',
+                          'Kakariko Well Drop', 'Bat Cave Drop'],
+                'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
+                              'Skull Woods Second Section Door (West)', 'Skull Woods Final Section', 'Dark Lumberjack Shop',
+                              'Bumper Cave (Bottom)', 'Bumper Cave (Top)', 'Fortune Teller (Dark)', 'Dark Sanctuary Hint',
+                              'Chest Game', 'Thieves Town', 'C-Shaped House', 'Dark World Shop', 'Brewery',
+                              'Red Shield Shop', 'Hammer Peg Cave',
+
+                              'Lost Woods Hideout Stump', 'Lumberjack Tree Cave', 'Sanctuary', 'North Fairy Cave',
+                              'Kakariko Well Cave', 'Bat Cave Cave', 'Lost Woods Gamble', 'Lumberjack House', 'Fortune Teller (Light)',
+                              'Old Man Cave (West)', 'Death Mountain Return Cave (West)', 'Bonk Rock Cave', 'Graveyard Cave',
+                              'Kings Grave', 'Blinds Hideout', 'Elder House (West)', 'Elder House (East)', 'Snitch Lady (West)',
+                              'Snitch Lady (East)', 'Chicken House', 'Sick Kids House', 'Bush Covered House', 'Light World Bomb Hut',
+                              'Kakariko Shop', 'Tavern North', 'Tavern (Front)', 'Blacksmiths Hut']
+            },
+            'central_hyrule': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'drops': ['Hyrule Castle Secret Entrance Drop', 'Inverted Pyramid Hole',
+
+                          'Pyramid Hole'],
+                'entrances': ['Hyrule Castle Secret Entrance Stairs', 'Inverted Pyramid Entrance', 'Agahnims Tower',
+                              'Hyrule Castle Entrance (West)', 'Hyrule Castle Entrance (East)', 'Hyrule Castle Entrance (South)',
+                              'Bonk Fairy (Light)', 'Links House', 'Cave 45', 'Light Hype Fairy', 'Dam',
+
+                              'Pyramid Entrance', 'Pyramid Fairy', 'Bonk Fairy (Dark)', 'Big Bomb Shop', 'Hype Cave', 'Swamp Palace']
+            },
+            'kakariko': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'drops': ['Kakariko Well Drop', 'Bat Cave Drop'],
+                'entrances': ['Kakariko Well Cave', 'Bat Cave Cave', 'Blinds Hideout', 'Elder House (West)', 'Elder House (East)',
+                              'Snitch Lady (West)', 'Snitch Lady (East)', 'Chicken House', 'Sick Kids House', 'Bush Covered House',
+                              'Light World Bomb Hut', 'Kakariko Shop', 'Tavern North', 'Tavern (Front)', 'Blacksmiths Hut',
+                              'Two Brothers House (West)', 'Two Brothers House (East)', 'Library', 'Kakariko Gamble Game',
+
+                              'Chest Game', 'Thieves Town', 'C-Shaped House', 'Dark World Shop', 'Brewery',
+                              'Hammer Peg Cave', 'Archery Game']
+            },
+            'eastern_hyrule': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'entrances': ['Waterfall of Wishing', 'Potion Shop', 'Sahasrahlas Hut', 'Eastern Palace', 'Lake Hylia Fairy',
+                              'Long Fairy Cave',
+
+                              'Dark Potion Shop', 'Palace of Darkness Hint', 'Palace of Darkness', 'Dark Lake Hylia Fairy',
+                              'East Dark World Hint']
+            },
+            'lake_hylia': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'entrances': ['Lake Hylia Fortune Teller', 'Lake Hylia Shop', 'Capacity Upgrade', 'Mini Moldorm Cave',
+                              'Ice Rod Cave', 'Good Bee Cave', '20 Rupee Cave',
+
+                              'Dark Lake Hylia Shop', 'Ice Palace', 'Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Hint',
+                              'Dark Lake Hylia Ledge Spike Cave']
+            },
+            'desert': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'entrances': ['Desert Palace Entrance (North)', 'Desert Palace Entrance (West)', 'Desert Palace Entrance (South)',
+                              'Desert Palace Entrance (East)', 'Checkerboard Cave', 'Aginahs Cave', 'Desert Fairy', '50 Rupee Cave',
+
+                              'Mire Shed', 'Misery Mire', 'Mire Fairy', 'Mire Hint']
+            },
+            'death_mountain': {
+                'special': 'district',
+                'condition': 'lightworld',
+                'entrances': ['Tower of Hera', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'Spectacle Rock Cave',
+                              'Death Mountain Return Cave (East)', 'Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)',
+                              'Spiral Cave', 'Spiral Cave (Bottom)', 'Fairy Ascension Cave (Top)', 'Fairy Ascension Cave (Bottom)',
+                              'Mimic Cave', 'Hookshot Fairy', 'Paradox Cave (Top)', 'Paradox Cave (Middle)', 'Paradox Cave (Bottom)',
+
+                              'Ganons Tower', 'Dark Death Mountain Fairy', 'Spike Cave', 'Superbunny Cave (Bottom)', 'Superbunny Cave (Top)',
+                              'Dark Death Mountain Shop', 'Hookshot Cave', 'Hookshot Cave Back Entrance',
+                              'Dark Death Mountain Ledge (West)', 'Dark Death Mountain Ledge (East)', 'Turtle Rock Isolated Ledge Entrance', 'Turtle Rock']
+            },
+            'dark_death_mountain': {
+                'special': 'district',
+                'condition': 'darkworld',
+                'entrances': ['Ganons Tower', 'Dark Death Mountain Fairy', 'Spike Cave', 'Superbunny Cave (Bottom)', 'Superbunny Cave (Top)',
+                              'Dark Death Mountain Shop', 'Hookshot Cave', 'Hookshot Cave Back Entrance',
+                              'Dark Death Mountain Ledge (West)', 'Dark Death Mountain Ledge (East)', 'Turtle Rock Isolated Ledge Entrance', 'Turtle Rock',
+
+                              'Tower of Hera', 'Spectacle Rock Cave Peak', 'Spectacle Rock Cave (Bottom)', 'Spectacle Rock Cave',
+                              'Death Mountain Return Cave (East)', 'Old Man Cave (East)', 'Old Man House (Bottom)', 'Old Man House (Top)',
+                              'Spiral Cave', 'Spiral Cave (Bottom)', 'Fairy Ascension Cave (Top)', 'Fairy Ascension Cave (Bottom)',
+                              'Mimic Cave', 'Hookshot Fairy', 'Paradox Cave (Top)', 'Paradox Cave (Middle)', 'Paradox Cave (Bottom)']
+            },
+            'south_dark_world': {
+                'special': 'district',
+                'condition': 'darkworld',
+                'entrances': ['Archery Game', 'Bonk Fairy (Dark)', 'Big Bomb Shop', 'Hype Cave', 'Dark Lake Hylia Shop', 'Ice Palace',
+                              'Dark Lake Hylia Ledge Fairy', 'Dark Lake Hylia Ledge Hint', 'Dark Lake Hylia Ledge Spike Cave',
+                              'Swamp Palace',
+
+                              'Two Brothers House (West)', 'Two Brothers House (East)', 'Library', 'Kakariko Gamble Game',
+                              'Bonk Fairy (Light)', 'Links House', 'Cave 45', 'Desert Fairy', '50 Rupee Cave', 'Dam',
+                              'Light Hype Fairy', 'Lake Hylia Fortune Teller', 'Lake Hylia Shop', 'Capacity Upgrade',
+                              'Mini Moldorm Cave', 'Ice Rod Cave', 'Good Bee Cave', '20 Rupee Cave']
+            },
+            'east_dark_world': {
+                'special': 'district',
+                'condition': 'darkworld',
+                'drops': ['Pyramid Hole',
+
+                          'Hyrule Castle Secret Entrance Drop', 'Inverted Pyramid Hole'],
+                'entrances': ['Pyramid Entrance', 'Pyramid Fairy', 'Dark Potion Shop', 'Palace of Darkness Hint', 'Palace of Darkness',
+                              'Dark Lake Hylia Fairy', 'East Dark World Hint',
+
+                              'Hyrule Castle Secret Entrance Stairs', 'Inverted Pyramid Entrance', 'Waterfall of Wishing', 'Potion Shop', 
+                              'Agahnims Tower', 'Hyrule Castle Entrance (West)', 'Hyrule Castle Entrance (East)',
+                              'Hyrule Castle Entrance (South)', 'Sahasrahlas Hut', 'Eastern Palace', 'Lake Hylia Fairy', 'Long Fairy Cave']
+            },
+            'mire': {
+                'special': 'district',
+                'condition': 'darkworld',
+                'entrances': ['Mire Shed', 'Misery Mire', 'Mire Fairy', 'Mire Hint',
+
+                              'Desert Palace Entrance (North)', 'Desert Palace Entrance (West)', 'Desert Palace Entrance (South)',
+                              'Desert Palace Entrance (East)', 'Checkerboard Cave', 'Aginahs Cave']
+            }
+        }
+    },
     'swapped': {
         'undefined': 'swap',
         'keep_drops_together': 'on',
@@ -2147,6 +2331,13 @@ linked_drop_map = {
     'Sanctuary Grave': 'Sanctuary',
     'Pyramid Hole': 'Pyramid Entrance',
     'Inverted Pyramid Hole': 'Inverted Pyramid Entrance'
+}
+
+sw_linked_drop_map = {
+    'Skull Woods Second Section Hole': 'Skull Woods Second Section Door (West)',
+    'Skull Woods First Section Hole (North)': 'Skull Woods First Section Door',
+    'Skull Woods First Section Hole (West)': 'Skull Woods First Section Door',
+    'Skull Woods First Section Hole (East)': 'Skull Woods First Section Door'
 }
 
 entrance_map = {
@@ -2257,6 +2448,7 @@ single_entrance_map = {
 }
 
 combine_map = {**entrance_map, **single_entrance_map, **drop_map}
+combine_linked_drop_map = {**linked_drop_map, **sw_linked_drop_map}
 
 LW_Entrances = []
 DW_Entrances = []

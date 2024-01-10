@@ -212,6 +212,7 @@
       "                item locations are shuffled in separate pools. Non-item",
       "                locations remain vanilla. Connectors are same-world.",
       "Lean:           Same as Lite, except connectors can travel cross worlds.",
+      "District:       Entrances are shuffled within their overworld districts.",
       "Crossed:        Mix cave and dungeon entrances freely while allowing",
       "                caves to cross between worlds.",
       "Swapped:        Same as Crossed, but entrances switch places in pairs.",

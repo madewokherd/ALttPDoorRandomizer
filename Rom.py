@@ -1667,7 +1667,7 @@ def patch_rom(world, rom, player, team, enemized, is_mystery=False):
         # rom.write_byte(snes_to_pc(0x0DB730), 0x08) # allows chickens to travel across water
 
     # allow smith into multi-entrance caves in appropriate shuffles
-    if world.shuffle[player] in ['restricted', 'full', 'lite', 'lean', 'swapped', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
+    if world.shuffle[player] in ['restricted', 'full', 'lite', 'lean', 'district', 'swapped', 'crossed', 'insanity'] or (world.shuffle[player] == 'simple' and world.mode[player] == 'inverted'):
         rom.write_byte(0x18004C, 0x01)
 
     # set correct flag for hera basement item
@@ -2142,7 +2142,7 @@ def write_strings(rom, world, player, team):
     tt.removeUnwantedText()
 
     # Let's keep this guy's text accurate to the shuffle setting.
-    if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple']:
+    if world.shuffle[player] in ['vanilla', 'dungeonsfull', 'dungeonssimple', 'lite', 'lean']:
         tt['kakariko_flophouse_man_no_flippers'] = 'I really hate mowing my yard.\n{PAGEBREAK}\nI should move.'
         tt['kakariko_flophouse_man'] = 'I really hate mowing my yard.\n{PAGEBREAK}\nI should move.'
 
@@ -2193,7 +2193,7 @@ def write_strings(rom, world, player, team):
         # Now we write inconvenient locations for most shuffles and finish taking care of the less chaotic ones.
         if world.shuffle[player] not in ['lite', 'lean']:
             entrances_to_hint.update(InconvenientOtherEntrances)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean', 'swapped']:
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean', 'district']:
             hint_count = 0
         elif world.shuffle[player] in ['simple', 'restricted']:
             hint_count = 2
@@ -2227,7 +2227,7 @@ def write_strings(rom, world, player, team):
             entrances_to_hint.update(OtherEntrances)
             if world.mode[player] != 'inverted':
                 entrances_to_hint.update({'Dark Sanctuary Hint': 'The dark sanctuary cave'})
-        if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean']:
+        if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean', 'district']:
             if world.shufflelinks[player]:
                 entrances_to_hint.update({'Big Bomb Shop': 'The old bomb shop'})
                 entrances_to_hint.update({'Links House': 'The hero\'s old residence'})
@@ -2244,7 +2244,7 @@ def write_strings(rom, world, player, team):
                     entrances_to_hint.update({'Inverted Pyramid Entrance': 'The extra castle passage'})
                 else:
                     entrances_to_hint.update({'Pyramid Entrance': 'The pyramid ledge'})
-        hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'swapped'] else 0
+        hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped'] else 0
         hint_count -= 2 if world.shuffle[player] not in ['simple', 'restricted'] else 0
         for entrance in all_entrances:
             if entrance.name in entrances_to_hint:
@@ -2263,7 +2263,7 @@ def write_strings(rom, world, player, team):
         if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
             locations_to_hint.extend(InconvenientVanillaLocations)
         random.shuffle(locations_to_hint)
-        hint_count = 3 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'swapped'] else 5
+        hint_count = 3 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped'] else 5
         hint_count -= 2 if world.doorShuffle[player] not in ['vanilla', 'basic'] else 0
         del locations_to_hint[hint_count:]
         for location in locations_to_hint:
@@ -2338,7 +2338,7 @@ def write_strings(rom, world, player, team):
         if world.bigkeyshuffle[player]:
             items_to_hint.extend(BigKeys)
         random.shuffle(items_to_hint)
-        hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'swapped'] else 8
+        hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped'] else 8
         hint_count += 2 if world.doorShuffle[player] not in ['vanilla', 'basic'] else 0
         hint_count += 1 if world.owShuffle[player] != 'vanilla' or world.owCrossed[player] != 'none' or world.owMixed[player] else 0
         while hint_count > 0 and len(items_to_hint) > 0:
@@ -2382,11 +2382,11 @@ def write_strings(rom, world, player, team):
                         choices.clear()
                         choices.append(location_item)
             if hint_type == 'foolish':
-                if district.dungeons and world.shuffle[player] != 'vanilla':
+                if district.dungeons and world.shuffle[player] not in ['vanilla', 'district']:
                     choices.extend(district.dungeons)
                     hint_type = 'dungeon_path'
                 elif district.access_points and world.shuffle[player] not in ['vanilla', 'dungeonssimple',
-                                                                              'dungeonsfull']:
+                                                                              'dungeonsfull', 'district']:
                     choices.extend([x.hint_text for x in district.access_points])
                     hint_type = 'connector'
             if hint_type == 'foolish':
