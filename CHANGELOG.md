@@ -1,10 +1,18 @@
 # Changelog
 
+## 0.3.4.1
+- Implemented new District ER mode option
+- Added alternate boss logic when in GT Ice Basement
+- Updated Inverted 2.0 to start in Bomb Shop regardless of ER mode
+- Fixed broken customizer features with OWR Tile Flip
+- Allowing Insanity ER + Standard to decouple standard entrances
+
 ## 0.3.4.0
-- \~Merged in some things from DR v1.4.0.0-v~
+- \~Merged in DR v1.2.0.23~
   - Improved bunny-walking algorithm
   - Improved multiworld balancing
-- Implemented Hyrid Major Glitches logic (thanks Muffins/Espeon)
+- \~Merged in some things from DR v1.4.0.0-v~
+- Implemented Hybrid Major Glitches logic (thanks Muffins/Espeon)
 - Added sparkles to Bonk Drop locations for better visibility
 - Some tweaks/improvements to Shuffle Song Instruments
 - Replaced Save Settings on Exit with Settings on Load
