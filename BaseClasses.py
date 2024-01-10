@@ -310,7 +310,7 @@ class World(object):
         return self.is_tile_swapped(0x03, player) and self.is_tile_swapped(0x1b, player)
 
     def is_bombshop_start(self, player):
-        return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
+        return self.is_tile_swapped(0x2c, player)
 
     def is_pyramid_open(self, player):
         if self.open_pyramid[player] == 'yes':
@@ -318,7 +318,7 @@ class World(object):
         elif self.open_pyramid[player] == 'no':
             return False
         else:
-            if self.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
+            if self.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district']:
                 return False
             elif self.goal[player] in ['crystals', 'trinity', 'ganonhunt']:
                 return True
@@ -3464,7 +3464,7 @@ class Pot(object):
 # byte 0: DDDE EEEE (DR, ER)
 dr_mode = {"basic": 1, "crossed": 2, "vanilla": 0, "partitioned": 3, 'paired': 4}
 er_mode = {"vanilla": 0, "simple": 1, "restricted": 2, "full": 3, "crossed": 4, "insanity": 5, 'lite': 8,
-           'lean': 9, "dungeonsfull": 7, "dungeonssimple": 6, "swapped": 10}
+           'lean': 9, "dungeonsfull": 7, "dungeonssimple": 6, "swapped": 10, "district": 11}
 
 # byte 1: LLLW WSS? (logic, mode, sword)
 logic_mode = {"noglitches": 0, "minorglitches": 1, "nologic": 2, "owglitches": 3, "majorglitches": 4, "hybridglitches": 5}

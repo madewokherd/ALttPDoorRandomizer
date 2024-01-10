@@ -1067,7 +1067,7 @@ def ow_inverted_rules(world, player):
     else:
         set_rule(world.get_entrance('Agahnims Tower', player), lambda state: state.has('Cape', player) or state.has_beam_sword(player))  # barrier gets removed after killing agahnim, rule for that added later
         set_rule(world.get_entrance('GT Approach', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player))
-        set_rule(world.get_entrance('GT Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'swapped', 'crossed', 'insanity'))
+        set_rule(world.get_entrance('GT Leave', player), lambda state: state.has_crystals(world.crystals_needed_for_gt[player], player) or state.world.shuffle[player] in ('restricted', 'full', 'lite', 'lean', 'district', 'swapped', 'crossed', 'insanity'))
 
     if world.is_tile_swapped(0x03, player):
         set_rule(world.get_entrance('Spectacle Rock Approach', player), lambda state: world.logic[player] in ['noglitches', 'minorglitches'] and state.has_Pearl(player))
@@ -1742,16 +1742,19 @@ def set_bunny_rules(world, player, inverted):
         # for each such entrance a new option is added that consist of:
         #    a) being able to reach it, and
         #    b) being able to access all entrances from there to `region`
-        queue = deque([(region, [], {region})])
+        queue = deque([(region, [], {region}, [region])])
         seen_sets = set([frozenset({region})])
         while queue:
-            (current, path, seen) = queue.popleft()
+            (current, path, seen, region_path) = queue.popleft()
             for entrance in current.entrances:
+                if entrance.door and entrance.door.blocked:
+                    continue
                 new_region = entrance.parent_region
                 new_seen = seen.union({new_region})
                 if new_region.type in (RegionType.Cave, RegionType.Dungeon) and new_seen in seen_sets:
                     continue
                 new_path = path + [entrance.access_rule]
+                new_region_path = region_path + [new_region]
                 seen_sets.add(frozenset(new_seen))
                 if not is_link(new_region):
                     if world.logic[player] in ['owglitches', 'hybridglitches']:
@@ -1796,7 +1799,7 @@ def set_bunny_rules(world, player, inverted):
                         continue
                 if is_bunny(new_region):
                     # todo: if not owg or hmg and entrance is in bunny_impassible_doors, then skip this nonsense?
-                    queue.append((new_region, new_path, new_seen))
+                    queue.append((new_region, new_path, new_seen, new_region_path))
                 else:
                     # we have reached pure light world, so we have a new possible option
                     possible_options.append(path_to_access_rule(new_path, entrance))
@@ -1838,10 +1841,11 @@ def set_bunny_rules(world, player, inverted):
                     continue
                 add_rule(location, get_rule_to_add(region, location))
 
-    for ent_name in bunny_pocket_entrances:
-        bunny_exit = world.get_entrance(ent_name, player)
-        if bunny_exit.connected_region and is_bunny(bunny_exit.parent_region) and not can_bunny_pocket_to(world, ent_name, player):
-            add_rule(bunny_exit, lambda state: state.has_Pearl(player))
+    if world.logic[player] in ['owglitches', 'hybridglitches']:
+        for ent_name in bunny_pocket_entrances:
+            bunny_exit = world.get_entrance(ent_name, player)
+            if bunny_exit.connected_region and is_bunny(bunny_exit.parent_region) and not can_bunny_pocket_to(world, ent_name, player):
+                add_rule(bunny_exit, lambda state: state.has_Pearl(player))
 
 
 drop_dungeon_entrances = {
