@@ -13,6 +13,7 @@ class EntrancePool(object):
         self.inverted = False
         self.coupled = True
         self.swapped = False
+        self.keep_drops_together = True
         self.default_map = {}
         self.one_way_map = {}
         self.skull_handled = False
@@ -93,6 +94,8 @@ def link_entrances_new(world, player):
             raise RuntimeError(f'Shuffle mode {mode} is not yet supported')
         mode_cfg = copy.deepcopy(modes[mode])
         avail_pool.swapped = mode_cfg['undefined'] == 'swap'
+        avail_pool.keep_drops_together = mode_cfg['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_cfg else True
+        avail_pool.coupled = mode_cfg['decoupled'] != 'on' if 'decoupled' in mode_cfg else True
         if avail_pool.is_standard():
             do_standard_connections(avail_pool)
         pool_list = mode_cfg['pools'] if 'pools' in mode_cfg else {}
@@ -106,8 +109,7 @@ def link_entrances_new(world, player):
                     connect_random(holes, targets, avail_pool)
             elif special_shuffle == 'normal_drops':
                 cross_world = mode_cfg['cross_world'] == 'on' if 'cross_world' in mode_cfg else False
-                keep_together = mode_cfg['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_cfg else True
-                do_holes_and_linked_drops(set(avail_pool.entrances), set(avail_pool.exits), avail_pool, cross_world, keep_together)
+                do_holes_and_linked_drops(set(avail_pool.entrances), set(avail_pool.exits), avail_pool, cross_world)
             elif special_shuffle == 'fixed_shuffle':
                 do_fixed_shuffle(avail_pool, pool['entrances'])
             elif special_shuffle == 'same_world':
@@ -191,10 +193,8 @@ def do_vanilla_connections(avail_pool):
 
 def do_main_shuffle(entrances, exits, avail, mode_def):
     cross_world = mode_def['cross_world'] == 'on' if 'cross_world' in mode_def else False
-    avail.coupled = mode_def['decoupled'] != 'on' if 'decoupled' in mode_def else True
     # drops and holes
-    keep_together = mode_def['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_def else True
-    do_holes_and_linked_drops(entrances, exits, avail, cross_world, keep_together)
+    do_holes_and_linked_drops(entrances, exits, avail, cross_world)
 
     if not avail.coupled:
         avail.decoupled_entrances.extend(entrances)
@@ -454,11 +454,21 @@ def do_blacksmith(entrances, exits, avail):
 
 
 def do_standard_connections(avail):
-    connect_two_way('Hyrule Castle Entrance (South)', 'Hyrule Castle Exit (South)', avail)
-    # cannot move uncle cave
-    connect_two_way('Hyrule Castle Secret Entrance Stairs', 'Hyrule Castle Secret Entrance Exit', avail)
-    connect_entrance('Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance', avail)
+    std_exits = ['Hyrule Castle Exit (South)', 'Hyrule Castle Secret Entrance Exit']
+    if not avail.keep_drops_together:
+        random.shuffle(std_exits)
     connect_two_way('Links House', 'Links House Exit', avail)
+    connect_entrance('Hyrule Castle Secret Entrance Drop', 'Hyrule Castle Secret Entrance', avail)
+    if avail.coupled:
+        connect_two_way('Hyrule Castle Entrance (South)', std_exits[0], avail)
+        # cannot move uncle cave
+        connect_two_way('Hyrule Castle Secret Entrance Stairs', std_exits[1], avail)
+    else:
+        connect_entrance('Hyrule Castle Entrance (South)', std_exits[0], avail)
+        connect_entrance('Hyrule Castle Secret Entrance Stairs', std_exits[1], avail)
+        random.shuffle(std_exits)
+        connect_exit(std_exits[0], 'Hyrule Castle Entrance (South)', avail)
+        connect_exit(std_exits[1], 'Hyrule Castle Secret Entrance Stairs', avail)
 
 
 def remove_from_list(t_list, removals):
@@ -466,7 +476,7 @@ def remove_from_list(t_list, removals):
         t_list.remove(r)
 
 
-def do_holes_and_linked_drops(entrances, exits, avail, cross_world, keep_together):
+def do_holes_and_linked_drops(entrances, exits, avail, cross_world):
     holes_to_shuffle = [x for x in entrances if x in drop_map]
 
     if not avail.world.shuffle_ganon:
@@ -483,7 +493,7 @@ def do_holes_and_linked_drops(entrances, exits, avail, cross_world, keep_togethe
             remove_from_list(entrances, ['Pyramid Hole', 'Pyramid Entrance'])
             remove_from_list(exits, ['Pyramid', 'Pyramid Exit'])
 
-    if not keep_together:
+    if not avail.keep_drops_together:
         targets = [avail.one_way_map[x] for x in holes_to_shuffle]
         connect_random(holes_to_shuffle, targets, avail)
         remove_from_list(entrances, holes_to_shuffle)
