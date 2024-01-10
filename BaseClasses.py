@@ -310,7 +310,7 @@ class World(object):
         return self.is_tile_swapped(0x03, player) and self.is_tile_swapped(0x1b, player)
 
     def is_bombshop_start(self, player):
-        return self.is_tile_swapped(0x2c, player) and (self.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull'] or not self.shufflelinks[player])
+        return self.is_tile_swapped(0x2c, player)
 
     def is_pyramid_open(self, player):
         if self.open_pyramid[player] == 'yes':

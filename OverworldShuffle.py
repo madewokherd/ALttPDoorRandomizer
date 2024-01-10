@@ -1620,10 +1620,11 @@ def validate_layout(world, player):
             # check if entrances in region could be used to access region
             if world.shuffle[player] != 'vanilla':
                 for entrance in [e for e in unreachable_regions[region_name].exits if e.spot_type == 'Entrance']:
-                    if (entrance.name == 'Links House' and (world.mode[player] == 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
-                            or (entrance.name == 'Big Bomb Shop' and (world.mode[player] != 'inverted' or not world.shufflelinks[player] or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
-                            or (entrance.name == 'Ganons Tower' and (world.mode[player] != 'inverted' and not world.shuffle_ganon[player])) \
                             or (entrance.name in ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)'] and world.shuffle[player] not in ['insanity']) \
+                    if (entrance.name == 'Links House' and ((not world.is_bombshop_start(player) and not world.shufflelinks[player]) or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
+                            or (entrance.name == 'Big Bomb Shop' and ((world.is_bombshop_start(player) and not world.shufflelinks[player]) or world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'lite', 'lean'])) \
+                            or (entrance.name == 'Ganons Tower' and (not world.is_atgt_swapped(player) and not world.shuffle_ganon[player])) \
+                            or (entrance.name == 'Agahnims Tower' and (world.is_atgt_swapped(player) and not world.shuffle_ganon[player])) \
                             or (entrance.name == 'Tavern North' and not world.shuffletavern[player]):
                         continue # these are fixed entrances and cannot be used for gaining access to region
                     if entrance.name not in drop_entrances \

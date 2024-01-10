@@ -129,7 +129,7 @@ def link_entrances_new(world, player):
             elif special_shuffle == 'skull':
                 entrances, exits = find_entrances_and_exits(avail_pool, pool['entrances'])
                 rem_ent = None
-                if avail_pool.world.shuffle[avail_pool.player] in ['dungeons-simple', 'simple', 'restricted'] \
+                if avail_pool.world.shuffle[avail_pool.player] in ['dungeonssimple', 'simple', 'restricted'] \
                         and not avail_pool.world.is_tile_swapped(0x00, avail_pool.player):
                     rem_ent = random.choice(['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)'])
                     entrances.remove(rem_ent)
@@ -1148,9 +1148,12 @@ def do_fixed_shuffle(avail, entrance_list):
                                 new_x = 'Agahnims Tower Exit'
                             elif x == 'Agahnims Tower Exit':
                                 new_x = 'Ganons Tower Exit'
+                        if avail.world.is_bombshop_start(avail.player):
+                            if x == 'Links House Exit':
+                                new_x = 'Big Bomb Shop'
+                            elif x == 'Big Bomb Shop':
+                                new_x = 'Links House Exit'
                         lw_exits.add(new_x)
-            if avail.world.shufflelinks[avail.player] or avail.world.shuffle[avail.player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull']:
-                lw_exits.update({'Big Bomb Shop'} if avail.world.is_bombshop_start(avail.player) else {'Links House Exit'})
             filtered_choices = {i: opt for i, opt in choices.items() if all(t in lw_exits for t in opt[2])}
             _, choice = random.choice(list(filtered_choices.items()))
         else:
@@ -2125,7 +2128,7 @@ drop_map = {
 }
 
 linked_drop_map = {
-    'Hyrule Castle Secret Entrance Drop':  'Hyrule Castle Secret Entrance Stairs',
+    'Hyrule Castle Secret Entrance Drop': 'Hyrule Castle Secret Entrance Stairs',
     'Kakariko Well Drop': 'Kakariko Well Cave',
     'Bat Cave Drop': 'Bat Cave Cave',
     'North Fairy Cave Drop': 'North Fairy Cave',
@@ -2169,7 +2172,7 @@ entrance_map = {
     'Links House': 'Links House Exit',
 
 
-    'Hyrule Castle Secret Entrance Stairs':  'Hyrule Castle Secret Entrance Exit',
+    'Hyrule Castle Secret Entrance Stairs': 'Hyrule Castle Secret Entrance Exit',
     'Kakariko Well Cave': 'Kakariko Well Exit',
     'Bat Cave Cave': 'Bat Cave Exit',
     'North Fairy Cave': 'North Fairy Cave Exit',
