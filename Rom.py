@@ -2542,9 +2542,15 @@ def write_strings(rom, world, player, team):
         rom.write_byte(0x04a52e, 0x06)  # follower set to blind maiden
 
     # inverted spawn menu changes
+    lh_text = "House"
+    if world.is_tile_swapped(0x2c, player):
+        lh_text = "Bomb Shop"
+    sanc_text = "Sanctuary"
     if world.mode[player] == 'inverted':
-        tt['menu_start_2'] = "{MENU}\n{SPEED0}\n≥@'s House\n Dark Chapel\n{CHOICE3}"
-        tt['menu_start_3'] = "{MENU}\n{SPEED0}\n≥@'s House\n Dark Chapel\n Mountain Cave\n{CHOICE2}"
+        sanc_text = "Dark Chapel"
+    tt['menu_start_2'] = "{MENU}\n{SPEED0}\n≥@'s " + lh_text + "\n " + sanc_text + "\n{CHOICE3}"
+    tt['menu_start_3'] = "{MENU}\n{SPEED0}\n≥@'s " + lh_text + "\n " + sanc_text + "\n Mountain Cave\n{CHOICE2}"
+    if world.mode[player] == 'inverted':
         tt['intro_main'] = CompressedTextMapper.convert(
                             "{INTRO}\n Episode  III\n{PAUSE3}\n A Link to\n   the Past\n"
                             + "{PAUSE3}\nInverted\n  Randomizer\n{PAUSE3}\nAfter mostly disregarding what happened in the first two games.\n"
