@@ -2193,9 +2193,9 @@ def write_strings(rom, world, player, team):
         # Now we write inconvenient locations for most shuffles and finish taking care of the less chaotic ones.
         if world.shuffle[player] not in ['lite', 'lean']:
             entrances_to_hint.update(InconvenientOtherEntrances)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean', 'district']:
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped']:
             hint_count = 0
-        elif world.shuffle[player] in ['simple', 'restricted']:
+        elif world.shuffle[player] in ['simple', 'restricted', 'lite', 'lean']:
             hint_count = 2
         else:
             hint_count = 4
@@ -2247,14 +2247,14 @@ def write_strings(rom, world, player, team):
         hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped'] else 0
         hint_count -= 2 if world.shuffle[player] not in ['simple', 'restricted'] else 0
         for entrance in all_entrances:
-            if entrance.name in entrances_to_hint:
-                if hint_count > 0:
+            if hint_count > 0:
+                if entrance.name in entrances_to_hint:
                     this_hint = entrances_to_hint[entrance.name] + ' leads to ' + hint_text(entrance.connected_region) + '.'
                     tt[hint_locations.pop(0)] = this_hint
                     entrances_to_hint.pop(entrance.name)
                     hint_count -= 1
-                else:
-                    break
+            else:
+                break
 
         # Next we write a few hints for specific inconvenient locations. We don't make many because in entrance this is highly unpredictable.
         locations_to_hint = InconvenientLocations.copy()
