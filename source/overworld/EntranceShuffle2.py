@@ -17,6 +17,7 @@ class EntrancePool(object):
         self.keep_drops_together = True
         self.default_map = {}
         self.one_way_map = {}
+        self.combine_map = {}
         self.skull_handled = False
         self.links_on_mountain = False
         self.decoupled_entrances = []
@@ -71,6 +72,7 @@ def link_entrances_new(world, player):
         default_map['Agahnims Tower'] = 'Ganons Tower Exit'
     avail_pool.default_map = default_map
     avail_pool.one_way_map = one_way_map
+    avail_pool.combine_map = {**default_map, **one_way_map}
 
     global LW_Entrances, DW_Entrances
     LW_Entrances = []
@@ -1129,7 +1131,7 @@ def do_cross_world_connectors(entrances, caves, avail):
                 avail.decoupled_entrances.remove(choice)
             else:
                 if avail.swapped and len(entrances) > 1:
-                    chosen_entrance = next(e for e in entrances if combine_map[e] != ext)
+                    chosen_entrance = next(e for e in entrances if avail.combine_map[e] != ext)
                     entrances.remove(chosen_entrance)
                 else:
                     chosen_entrance = entrances.pop()
@@ -1178,7 +1180,7 @@ def do_fixed_shuffle(avail, entrance_list):
             choice = choices[i]
         elif rules.must_exit_to_lw:
             lw_exits = set()
-            for e, x in combine_map.items():
+            for e, x in avail.combine_map.items():
                 if x in avail.exits:
                     region = avail.world.get_entrance(e, avail.player).parent_region
                     if region.type == RegionType.LightWorld:
@@ -1369,7 +1371,7 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
                 if entrance not in entrances:
                     entrances.append(entrance)
     if avail.swapped:
-        swap_forbidden = [e for e in entrances if combine_map[e] in must_exit]
+        swap_forbidden = [e for e in entrances if avail.combine_map[e] in must_exit]
         for e in swap_forbidden:
             entrances.remove(e)
     entrances.sort()  # sort these for consistency
@@ -1407,7 +1409,7 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
             allow_single = avail.assumed_loose_caves or len(candidate) > 1
             if not isinstance(candidate, str) and allow_single and (candidate in used_caves
                                                    or len(candidate) < len(entrances) - required_entrances):
-                if not avail.swapped or (combine_map[exit] not in candidate and not any(e for e in must_exit if combine_map[e] in candidate)): #maybe someday allow these, but we need to disallow mutual locks in Swapped
+                if not avail.swapped or (avail.combine_map[exit] not in candidate and not any(e for e in must_exit if avail.combine_map[e] in candidate)): #maybe someday allow these, but we need to disallow mutual locks in Swapped
                     candidates.append(candidate)
         cave = random.choice(candidates)
 
@@ -1436,10 +1438,10 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
         if len(cave) == 2:
             entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit]
                             and e not in invalid_cave_connections[tuple(cave)] and e not in must_exit
-                            and (not avail.swapped or rnd_cave[0] != combine_map[e]))
+                            and (not avail.swapped or rnd_cave[0] != avail.combine_map[e]))
             entrances.remove(entrance)
             connect_two_way(entrance, rnd_cave[0], avail)
-            if avail.swapped and combine_map[entrance] != rnd_cave[0]:
+            if avail.swapped and avail.combine_map[entrance] != rnd_cave[0]:
                 swap_ent, _ = connect_cave_swap(entrance, rnd_cave[0], cave)
                 entrances.remove(swap_ent)
             if cave in used_caves:
@@ -1460,11 +1462,11 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
                     cave_entrances.append(entrance)
                 else:
                     entrance = next(e for e in entrances[::-1] if e not in invalid_connections[exit] and e not in must_exit
-                                    and (not avail.swapped or cave_exit != combine_map[e]))
+                                    and (not avail.swapped or cave_exit != avail.combine_map[e]))
                     cave_entrances.append(entrance)
                     entrances.remove(entrance)
                     connect_two_way(entrance, cave_exit, avail)
-                    if avail.swapped and combine_map[entrance] != cave_exit:
+                    if avail.swapped and avail.combine_map[entrance] != cave_exit:
                         swap_ent, _ = connect_cave_swap(entrance, cave_exit, cave)
                         entrances.remove(swap_ent)
                 if entrance not in invalid_connections:
@@ -1491,11 +1493,11 @@ def do_mandatory_connections(avail, entrances, cave_options, must_exit):
                     continue
                 else:
                     entrance = next(e for e in entrances[::-1] if e not in invalid_cave_connections[tuple(cave)]
-                                    and (not avail.swapped or cave_exit != combine_map[e]))
+                                    and (not avail.swapped or cave_exit != avail.combine_map[e]))
                     invalid_cave_connections[tuple(cave)] = set()
                     entrances.remove(entrance)
                     connect_two_way(entrance, cave_exit, avail)
-                    if avail.swapped and combine_map[entrance] != cave_exit:
+                    if avail.swapped and avail.combine_map[entrance] != cave_exit:
                         swap_ent, _ = connect_cave_swap(entrance, cave_exit, cave)
                         entrances.remove(swap_ent)
             cave_options.remove(cave)
@@ -1613,11 +1615,11 @@ def connect_swapped(entrancelist, targetlist, avail, two_way=False):
     random.shuffle(entrancelist)
     sorted_targets = list()
     for ent in entrancelist:
-        if ent in combine_map:
-            if combine_map[ent] not in targetlist:
-                logging.getLogger('').error(f'{combine_map[ent]} not in target list, cannot swap entrance')
-                raise Exception(f'{combine_map[ent]} not in target list, cannot swap entrance')
-            sorted_targets.append(combine_map[ent])
+        if ent in avail.combine_map:
+            if avail.combine_map[ent] not in targetlist:
+                logging.getLogger('').error(f'{avail.combine_map[ent]} not in target list, cannot swap entrance')
+                raise Exception(f'{avail.combine_map[ent]} not in target list, cannot swap entrance')
+            sorted_targets.append(avail.combine_map[ent])
     if len(sorted_targets):
         targetlist = list(sorted_targets)
     else:
@@ -1638,9 +1640,9 @@ def connect_swapped(entrancelist, targetlist, avail, two_way=False):
 
 
 def connect_swap(entrance, exit, avail):
-    swap_exit = combine_map[entrance]
+    swap_exit = avail.combine_map[entrance]
     if swap_exit != exit:
-        swap_entrance = next(e for e, x in combine_map.items() if x == exit)
+        swap_entrance = next(e for e, x in avail.combine_map.items() if x == exit)
         if swap_entrance in ['Pyramid Entrance', 'Pyramid Hole'] and avail.world.is_tile_swapped(0x1b, avail.player):
             swap_entrance = 'Inverted ' + swap_entrance
         if entrance in entrance_map:
@@ -2456,7 +2458,6 @@ single_entrance_map = {
     'Blinds Hideout': 'Blinds Hideout', 'Waterfall of Wishing': 'Waterfall of Wishing'
 }
 
-combine_map = {**entrance_map, **single_entrance_map, **drop_map}
 combine_linked_drop_map = {**linked_drop_map, **sw_linked_drop_map}
 
 LW_Entrances = []
