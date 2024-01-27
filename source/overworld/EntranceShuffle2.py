@@ -223,10 +223,6 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
                 if not avail.coupled:
                     avail.decoupled_entrances.remove('Agahnims Tower')
                     avail.decoupled_exits.remove('Ganons Tower Exit')
-                if avail.swapped:
-                    connect_swap('Agahnims Tower', 'Ganons Tower Exit', avail)
-                    entrances.remove('Ganons Tower')
-                    exits.remove('Agahnims Tower Exit')
         elif 'Ganons Tower' in entrances:
             connect_two_way('Ganons Tower', 'Ganons Tower Exit', avail)
             entrances.remove('Ganons Tower')
