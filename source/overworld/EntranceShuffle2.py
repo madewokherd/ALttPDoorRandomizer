@@ -1316,6 +1316,22 @@ def do_limited_shuffle_exclude_drops(pool_def, avail, lw=True):
     must_exit = set(must_exit_lw if lw else must_exit_dw)
     base_set = LW_Entrances if lw else DW_Entrances
     entrance_pool = [x for x in base_set if x in avail.entrances and x not in reserved_drops]
+    if not avail.world.shuffle_ganon[avail.player]:
+        if avail.world.is_atgt_swapped(avail.player):
+            if 'Agahnims Tower' in entrance_pool:
+                connect_two_way('Agahnims Tower', 'Ganons Tower Exit', avail)
+                entrance_pool.remove('Agahnims Tower')
+                exits.remove('Ganons Tower Exit')
+                if not avail.coupled:
+                    avail.decoupled_entrances.remove('Agahnims Tower')
+                    avail.decoupled_exits.remove('Ganons Tower Exit')
+        elif 'Ganons Tower' in entrance_pool:
+            connect_two_way('Ganons Tower', 'Ganons Tower Exit', avail)
+            entrance_pool.remove('Ganons Tower')
+            exits.remove('Ganons Tower Exit')
+            if not avail.coupled:
+                avail.decoupled_entrances.remove('Ganons Tower')
+                avail.decoupled_exits.remove('Ganons Tower Exit')
     random.shuffle(entrance_pool)
     for next_exit in exits:
         if next_exit not in Connector_Exit_Set:
