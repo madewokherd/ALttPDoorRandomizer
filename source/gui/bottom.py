@@ -202,7 +202,7 @@ def bottom_frame(self, parent, args=None):
     def select_output():
         from tkinter import filedialog
         folder_selected = filedialog.askdirectory()
-        if folder_selected is not None:
+        if folder_selected is not None and folder_selected != '':
             args.outputpath = parent.settings["outputpath"] = folder_selected
 
     ## Output Button
