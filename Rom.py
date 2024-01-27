@@ -32,7 +32,7 @@ from EntranceShuffle import door_addresses, exit_ids, ow_prize_table
 from OverworldShuffle import default_flute_connections, flute_data
 from InitialSram import InitialSram
 
-from source.classes.SFX import randomize_sfx, randomize_songinstruments
+from source.classes.SFX import randomize_sfx, randomize_sfxinstruments, randomize_songinstruments
 from source.item.FillUtil import valid_pot_items
 from source.dungeon.RoomList import Room0127
 
@@ -1830,7 +1830,8 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
-                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx, shuffle_songinstruments, msu_resume):
+                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx,
+                       shuffle_sfxinstruments, shuffle_songinstruments, msu_resume):
 
     if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
@@ -1936,6 +1937,8 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
 
     if shuffle_sfx:
         randomize_sfx(rom)
+    if shuffle_sfxinstruments:
+        randomize_sfxinstruments(rom)
     if shuffle_songinstruments:
         randomize_songinstruments(rom)
 

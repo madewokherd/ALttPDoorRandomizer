@@ -311,6 +311,7 @@ def create_guiargs(parent):
       "uwpalettes": "uw_palettes",
       "reduce_flashing": "reduce_flashing",
       "shuffle_sfx": "shuffle_sfx",
+      "shuffle_sfxinstruments": "shuffle_sfxinstruments",
       "shuffle_songinstruments": "shuffle_songinstruments"
     }
     for adjustarg in adjustargs:

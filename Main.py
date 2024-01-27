@@ -338,7 +338,8 @@ def main(args, seed=None, fish=None):
                 apply_rom_settings(rom, args.heartbeep[player], args.heartcolor[player], args.quickswap[player],
                                    args.fastmenu[player], args.disablemusic[player], args.sprite[player],
                                    args.ow_palettes[player], args.uw_palettes[player], args.reduce_flashing[player],
-                                   args.shuffle_sfx[player], args.shuffle_songinstruments[player], args.msu_resume[player])
+                                   args.shuffle_sfx[player], args.shuffle_sfxinstruments[player], args.shuffle_songinstruments[player],
+                                   args.msu_resume[player])
 
                 if args.jsonout:
                     jsonout[f'patch_t{team}_p{player}'] = rom.patches

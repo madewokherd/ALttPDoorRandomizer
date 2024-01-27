@@ -186,6 +186,7 @@ class CustomSettings(object):
                 args.ow_palettes[p] = get_setting(settings['ow_palettes'], args.ow_palettes[p])
                 args.uw_palettes[p] = get_setting(settings['uw_palettes'], args.uw_palettes[p])
                 args.shuffle_sfx[p] = get_setting(settings['shuffle_sfx'], args.shuffle_sfx[p])
+                args.shuffle_sfxinstruments[p] = get_setting(settings['shuffle_sfxinstruments'], args.shuffle_sfxinstruments[p])
                 args.shuffle_songinstruments[p] = get_setting(settings['shuffle_songinstruments'], args.shuffle_songinstruments[p])
                 args.msu_resume[p] = get_setting(settings['msu_resume'], args.msu_resume[p])
 
