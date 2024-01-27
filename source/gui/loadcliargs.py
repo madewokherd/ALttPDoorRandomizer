@@ -225,6 +225,7 @@ def loadadjustargs(gui, settings):
                 "uwpalettes": "adjust.uwpalettes",
                 "reduce_flashing": "adjust.reduce_flashing",
                 "shuffle_sfx": "adjust.shuffle_sfx",
+                "shuffle_sfxinstruments": "adjust.shuffle_sfxinstruments",
                 "shuffle_songinstruments": "adjust.shuffle_songinstruments"
             }
         }

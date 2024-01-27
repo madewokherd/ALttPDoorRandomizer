@@ -349,6 +349,10 @@
     "action": "store_true",
     "type": "bool"
   },
+  "shuffle_sfxinstruments": {
+    "action": "store_true",
+    "type": "bool"
+  },
   "shuffle_songinstruments": {
     "action": "store_true",
     "type": "bool"

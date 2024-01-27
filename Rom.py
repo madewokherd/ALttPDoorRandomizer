@@ -32,7 +32,7 @@ from EntranceShuffle import door_addresses, exit_ids, ow_prize_table
 from OverworldShuffle import default_flute_connections, flute_data
 from InitialSram import InitialSram
 
-from source.classes.SFX import randomize_sfx, randomize_songinstruments
+from source.classes.SFX import randomize_sfx, randomize_sfxinstruments, randomize_songinstruments
 from source.item.FillUtil import valid_pot_items
 from source.dungeon.RoomList import Room0127
 
@@ -1830,7 +1830,8 @@ def hud_format_text(text):
 
 
 def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, sprite,
-                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx, shuffle_songinstruments, msu_resume):
+                       ow_palettes, uw_palettes, reduce_flashing, shuffle_sfx,
+                       shuffle_sfxinstruments, shuffle_songinstruments, msu_resume):
 
     if not os.path.exists("data/sprites/official/001.link.1.zspr") and rom.orig_buffer:
         dump_zspr(rom.orig_buffer[0x80000:0x87000], rom.orig_buffer[0xdd308:0xdd380],
@@ -1936,6 +1937,8 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
 
     if shuffle_sfx:
         randomize_sfx(rom)
+    if shuffle_sfxinstruments:
+        randomize_sfxinstruments(rom)
     if shuffle_songinstruments:
         randomize_songinstruments(rom)
 
@@ -2193,9 +2196,9 @@ def write_strings(rom, world, player, team):
         # Now we write inconvenient locations for most shuffles and finish taking care of the less chaotic ones.
         if world.shuffle[player] not in ['lite', 'lean']:
             entrances_to_hint.update(InconvenientOtherEntrances)
-        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'lite', 'lean', 'district']:
+        if world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped']:
             hint_count = 0
-        elif world.shuffle[player] in ['simple', 'restricted']:
+        elif world.shuffle[player] in ['simple', 'restricted', 'lite', 'lean']:
             hint_count = 2
         else:
             hint_count = 4
@@ -2247,14 +2250,14 @@ def write_strings(rom, world, player, team):
         hint_count = 4 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped'] else 0
         hint_count -= 2 if world.shuffle[player] not in ['simple', 'restricted'] else 0
         for entrance in all_entrances:
-            if entrance.name in entrances_to_hint:
-                if hint_count > 0:
+            if hint_count > 0:
+                if entrance.name in entrances_to_hint:
                     this_hint = entrances_to_hint[entrance.name] + ' leads to ' + hint_text(entrance.connected_region) + '.'
                     tt[hint_locations.pop(0)] = this_hint
                     entrances_to_hint.pop(entrance.name)
                     hint_count -= 1
-                else:
-                    break
+            else:
+                break
 
         # Next we write a few hints for specific inconvenient locations. We don't make many because in entrance this is highly unpredictable.
         locations_to_hint = InconvenientLocations.copy()
@@ -2542,9 +2545,15 @@ def write_strings(rom, world, player, team):
         rom.write_byte(0x04a52e, 0x06)  # follower set to blind maiden
 
     # inverted spawn menu changes
+    lh_text = "House"
+    if world.is_tile_swapped(0x2c, player):
+        lh_text = "Bomb Shop"
+    sanc_text = "Sanctuary"
     if world.mode[player] == 'inverted':
-        tt['menu_start_2'] = "{MENU}\n{SPEED0}\n≥@'s House\n Dark Chapel\n{CHOICE3}"
-        tt['menu_start_3'] = "{MENU}\n{SPEED0}\n≥@'s House\n Dark Chapel\n Mountain Cave\n{CHOICE2}"
+        sanc_text = "Dark Chapel"
+    tt['menu_start_2'] = "{MENU}\n{SPEED0}\n≥@'s " + lh_text + "\n " + sanc_text + "\n{CHOICE3}"
+    tt['menu_start_3'] = "{MENU}\n{SPEED0}\n≥@'s " + lh_text + "\n " + sanc_text + "\n Mountain Cave\n{CHOICE2}"
+    if world.mode[player] == 'inverted':
         tt['intro_main'] = CompressedTextMapper.convert(
                             "{INTRO}\n Episode  III\n{PAUSE3}\n A Link to\n   the Past\n"
                             + "{PAUSE3}\nInverted\n  Randomizer\n{PAUSE3}\nAfter mostly disregarding what happened in the first two games.\n"

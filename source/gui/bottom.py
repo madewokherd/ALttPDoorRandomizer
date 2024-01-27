@@ -202,7 +202,7 @@ def bottom_frame(self, parent, args=None):
     def select_output():
         from tkinter import filedialog
         folder_selected = filedialog.askdirectory()
-        if folder_selected is not None:
+        if folder_selected is not None and folder_selected != '':
             args.outputpath = parent.settings["outputpath"] = folder_selected
 
     ## Output Button
@@ -311,6 +311,7 @@ def create_guiargs(parent):
       "uwpalettes": "uw_palettes",
       "reduce_flashing": "reduce_flashing",
       "shuffle_sfx": "shuffle_sfx",
+      "shuffle_sfxinstruments": "shuffle_sfxinstruments",
       "shuffle_songinstruments": "shuffle_songinstruments"
     }
     for adjustarg in adjustargs:
