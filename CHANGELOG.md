@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4.2
+- Added Shuffle SFX Instruments as post-gen option
+- Fixed some issues with Swapped ER failing to place Old Man Cave
+- Changed Inverted 2.0 spawn prompt to display Bomb Shop
+- Fixed some minor issues with ER and Vanilla GT
+
 ## 0.3.4.1
 - Implemented new District ER mode option
 - Added alternate boss logic when in GT Ice Basement
