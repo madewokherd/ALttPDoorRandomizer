@@ -11,6 +11,7 @@ from PotShuffle import vanilla_pots
 from Tables import bonk_prize_lookup
 from Items import ItemFactory
 
+from source.dungeon.EnemyList import add_drop_contents
 from source.item.FillUtil import trash_items, pot_items
 
 import source.classes.constants as CONST
@@ -199,8 +200,7 @@ def generate_itempool(world, player):
         world.push_item(world.get_location('Ganon', player), ItemFactory('Triforce', player), False)
 
     if world.goal[player] in ['triforcehunt', 'trinity']:
-        region = world.get_region('Hyrule Castle Courtyard',player)
-
+        region = world.get_region('Hyrule Castle Courtyard', player)
         loc = Location(player, "Murahdahla", parent=region)
         region.locations.append(loc)
         world.dynamic_locations.append(loc)
@@ -468,7 +468,7 @@ def generate_itempool(world, player):
     if world.take_any[player] != 'none':
         set_up_take_anys(world, player, skip_pool_adjustments)
     if world.keyshuffle[player] == 'universal':
-        if world.dropshuffle[player] and not skip_pool_adjustments:
+        if world.dropshuffle[player] != 'none' and not skip_pool_adjustments:
             world.itempool += [ItemFactory('Small Key (Universal)', player)] * 13
         if world.pottery[player] not in ['none', 'cave'] and not skip_pool_adjustments:
             world.itempool += [ItemFactory('Small Key (Universal)', player)] * 19
@@ -481,6 +481,9 @@ def generate_itempool(world, player):
     if world.shuffle_bonk_drops[player]:
         create_dynamic_bonkdrop_locations(world, player)
         add_bonkdrop_contents(world, player)
+
+    if world.dropshuffle[player] == 'underworld' and not skip_pool_adjustments:
+        add_drop_contents(world, player)
 
     # modfiy based on start inventory, if any
     modify_pool_for_start_inventory(start_inventory, world, player)
@@ -511,6 +514,8 @@ def generate_itempool(world, player):
         for item in filler_additions:
             item_name = 'Rupees (5)' if retro_bow and item == 'Arrows (10)' else item
             world.itempool.append(ItemFactory(item_name, player))
+
+
 
 
 take_any_locations = [
@@ -815,6 +820,7 @@ def set_up_shops(world, player):
         else:
             cap_shop = world.get_region('Capacity Upgrade', player).shop
             cap_shop.inventory[0] = cap_shop.inventory[1]  # remove bomb capacity upgrades in bombbag
+            cap_shop.inventory[1] = None
 
 
 def customize_shops(world, player):
@@ -1369,20 +1375,19 @@ def make_custom_item_pool(world, player, progressive, shuffle, difficulty, timer
         pool.extend(['Nothing'] * nothings)
 
     start_inventory = [x for x in world.precollected_items if x.player == player]
-    if not start_inventory:
-        if world.logic[player] in ['owglitches', 'hybridglitches', 'nologic'] and all(x.name != 'Pegasus Boots' for x in start_inventory):
-            precollected_items.append('Pegasus Boots')
-            if 'Pegasus Boots' in pool:
-                pool.remove('Pegasus Boots')
-                pool.append('Rupees (20)')
-        if world.swords[player] == 'assured' and all(' Sword' not in x.name for x in start_inventory):
-            precollected_items.append('Progressive Sword')
-            if 'Progressive Sword' in pool:
-                pool.remove('Progressive Sword')
-                pool.append('Rupees (50)')
-            elif 'Fighter Sword' in pool:
-                pool.remove('Fighter Sword')
-                pool.append('Rupees (50)')
+    if world.logic[player] in ['owglitches', 'hybridglitches', 'nologic'] and all(x.name != 'Pegasus Boots' for x in start_inventory):
+        precollected_items.append('Pegasus Boots')
+        if 'Pegasus Boots' in pool:
+            pool.remove('Pegasus Boots')
+            pool.append('Rupees (20)')
+    if world.swords[player] == 'assured' and all(' Sword' not in x.name for x in start_inventory):
+        precollected_items.append('Progressive Sword')
+        if 'Progressive Sword' in pool:
+            pool.remove('Progressive Sword')
+            pool.append('Rupees (50)')
+        elif 'Fighter Sword' in pool:
+            pool.remove('Fighter Sword')
+            pool.append('Rupees (50)')
 
     return (pool, placed_items, precollected_items, clock_mode, treasure_hunt_count, treasure_hunt_total, treasure_hunt_icon, lamps_needed_for_dark_rooms)
 

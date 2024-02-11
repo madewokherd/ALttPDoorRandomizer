@@ -5,10 +5,9 @@ settings:
   1:
     shopsanity: true
     pseudoboots: true
-    mode: standard
-    swords: assured
     goal: crystals
     crystals_gt: random
+    bombbag: true
     shuffle: crossed
     shufflelinks: true
     keysanity: true
@@ -16,7 +15,7 @@ settings:
     intensity: 3
     door_type_mode: big
     pottery: keys
-    dropshuffle: true
+    dropshuffle: keys
     experimental: true
     dungeon_counters: 'on'
     hints: true

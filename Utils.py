@@ -7,11 +7,22 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from math import factorial
 from itertools import count
+import fileinput
+
+import urllib.request
+import urllib.parse
+import yaml
+from pathlib import Path
 
 
 def int16_as_bytes(value):
     value = value & 0xFFFF
     return [value & 0xFF, (value >> 8) & 0xFF]
+
+
+def int24_as_bytes(value):
+    value = value & 0xFFFFFF
+    return [value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF]
 
 
 def int32_as_bytes(value):
@@ -716,6 +727,42 @@ def stack_size3a(size=2):
         return size - 1
 
 
+def find_and_replace():
+    for data_line in fileinput.input('scratch.txt', inplace=True):
+        if '=' in data_line:
+            one, two = data_line.split(' = ')
+            number = int(two.strip())
+            print(data_line.replace(two, hex(number)))
+
+
+def load_yaml(path_list):
+    path = os.path.join(*path_list)
+    if os.path.exists(Path(path)):
+        with open(path, "r", encoding="utf-8") as f:
+            return yaml.load(f, Loader=yaml.SafeLoader)
+    elif urllib.parse.urlparse(path).scheme in ['http', 'https']:
+        return yaml.load(urllib.request.urlopen(path), Loader=yaml.FullLoader)
+
+
+yaml_cache = {}
+
+
+def load_cached_yaml(path_list):
+    path = os.path.join(*path_list)
+    if path in yaml_cache:
+        return yaml_cache[path]
+    else:
+        if os.path.exists(Path(path)):
+            with open(path, "r", encoding="utf-8") as f:
+                data = yaml.load(f, Loader=yaml.SafeLoader)
+                yaml_cache[path] = data
+                return data
+        elif urllib.parse.urlparse(path).scheme in ['http', 'https']:
+            data = yaml.load(urllib.request.urlopen(path), Loader=yaml.FullLoader)
+            yaml_cache[path] = data
+            return data
+
+
 class bidict(dict):
     def __init__(self, *args, **kwargs):
         super(bidict, self).__init__(*args, **kwargs)
@@ -750,4 +797,5 @@ if __name__ == '__main__':
     # room_palette_data(old_rom=sys.argv[1])
     # extract_data_from_us_rom(sys.argv[1])
     # extract_data_from_jp_rom(sys.argv[1])
-    check_pots()
+    # check_pots()
+    find_and_replace()

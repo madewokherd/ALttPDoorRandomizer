@@ -134,8 +134,10 @@
     "randomizer.enemizer.enemyhealth.hard": "Hard",
     "randomizer.enemizer.enemyhealth.expert": "Expert",
 
-    "randomizer.enemizer.enemizercli": "EnemizerCLI path: ",
-    "randomizer.enemizer.enemizercli.online": "(get online)",
+    "randomizer.enemizer.enemylogic": "Enemy Logic",
+    "randomizer.enemizer.enemylogic.none": "Forbid special enemies",
+    "randomizer.enemizer.enemylogic.allow_drops": "Item drops may have special enemies",
+    "randomizer.enemizer.enemylogic.allow_all": "Allow special enemies anywhere",
 
 
     "randomizer.overworld.overworldshuffle": "Layout Shuffle",
@@ -355,7 +357,10 @@
     "randomizer.item.colorizepots": "Colorize Randomized Pots",
     "randomizer.item.potshuffle": "Pot Shuffle (Legacy)",
 
-    "randomizer.item.dropshuffle": "Shuffle Enemy Key Drops",
+    "randomizer.item.dropshuffle": "Enemy Drops",
+    "randomizer.item.dropshuffle.none": "None",
+    "randomizer.item.dropshuffle.keys": "Small Key Enemies",
+    "randomizer.item.dropshuffle.underworld": "Underworld Enemies",
     "randomizer.item.keydropshuffle": "Enable Key Drop Shuffle (Legacy)",
 
     "randomizer.item.take_any": "Take Any Caves",

@@ -110,7 +110,7 @@ def parse_cli(argv, no_defaults=False):
         ret.keyshuffle = 'wild'
 
     if ret.keydropshuffle:
-        ret.dropshuffle = True
+        ret.dropshuffle = 'keys' if ret.dropshuffle == 'none' else ret.dropshuffle
         ret.pottery = 'keys' if ret.pottery == 'none' else ret.pottery
 
     if ret.retro or ret.mode == 'retro':
@@ -145,7 +145,7 @@ def parse_cli(argv, no_defaults=False):
                          'heartbeep', 'remote_items', 'shopsanity', 'dropshuffle', 'pottery', 'keydropshuffle',
                          'mixed_travel', 'standardize_palettes', 'code', 'reduce_flashing', 'shuffle_sfx', 'shuffle_sfxinstruments',
                          'shuffle_songinstruments', 'msu_resume', 'collection_rate', 'colorizepots', 'decoupledoors', 'door_type_mode',
-                         'bonk_drops', 'trap_door_mode', 'key_logic_algorithm', 'door_self_loops', 'aga_randomness']:
+                         'bonk_drops', 'trap_door_mode', 'key_logic_algorithm', 'door_self_loops', 'any_enemy_logic', 'aga_randomness']:
                 value = getattr(defaults, name) if getattr(playerargs, name) is None else getattr(playerargs, name)
                 if player == 1:
                     setattr(ret, name, {1: value})
@@ -211,11 +211,11 @@ def parse_settings():
         "shufflebosses": "none",
         "enemy_damage": "default",
         "enemy_health": "default",
-        "enemizercli": os.path.join(".", "EnemizerCLI", "EnemizerCLI.Core"),
+        'any_enemy_logic': 'allow_all',
 
         "shopsanity": False,
         "keydropshuffle": False,
-        "dropshuffle": False,
+        "dropshuffle": "none",
         "pottery": "none",
         "colorizepots": True,
         "shufflepots": False,
@@ -365,9 +365,6 @@ def parse_settings():
         "startinventoryarray": {},
         "notes": ""
     }
-
-    if sys.platform.lower().find("windows"):
-        settings["enemizercli"] += ".exe"
 
     # read saved settings file if it exists and set these
     settings_path = os.path.join(".", "resources", "user", "settings.json")
