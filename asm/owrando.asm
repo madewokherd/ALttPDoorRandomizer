@@ -446,6 +446,7 @@ OWBonkDropSparkle:
     LDA.l OWFlags+1 : AND.b #!FLAG_OW_BONKDROP : BEQ .nosparkle
     LDA.w $0E90,X : BEQ .nosparkle
     LDA.w SprRedrawFlag,X : BNE .nosparkle
+    LDA.b GameMode : CMP.b #$0E : BEQ .nosparkle
         JSL Sprite_SpawnSparkleGarnish
         ; move sparkle down 1 tile
         PHX : TYX : PLY
@@ -594,15 +595,13 @@ OWBonkDrops:
     PLX : BEQ + : LDA.b #$00 : STA.w SpriteAITable,Y : BRA .return ; S = FlagBitmask, X (row + 2)
         + PHA
 
-        LDA.b #$EB : STA.l MiniGameTime
+        LDA.b #$EB
         JSL Sprite_SpawnDynamically+15 ; +15 to skip finding a new slot, use existing sprite
 
-        LDA.b #$01 : STA.w SprRedrawFlag,Y
-
-        PLA
-        JSL AttemptItemSubstitution
-        STA.w SpriteItemType,Y
-        STA.w SpriteID,Y
+        PLA : STA.w SprSourceItemId, Y
+        PHX : TYX : PLY
+            JSL RequestStandingItemVRAMSlot
+        PHY : TXY : PLX
 
         ; affects the rate the item moves in the Y/X direction
         LDA.b #$00 : STA.w SpriteVelocityY,Y
@@ -667,7 +666,7 @@ OWBonkDropCollected:
     RTS
 }
 
-; A = SpriteID, Y = Sprite Slot Index, X = free/overwritten
+; A = SprItemReceipt, Y = Sprite Slot Index, X = free/overwritten
 OWBonkSpritePrep:
 {
     STA.w SpriteTypeTable,Y
