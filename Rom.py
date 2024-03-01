@@ -617,6 +617,13 @@ def patch_rom(world, rom, player, team, is_mystery=False):
 
         owFlags |= 0x0200
 
+        # setting spriteID to D9, a placeholder sprite we use to inform ROM to spawn a dynamic item
+        for address in [b for b in bonk_addresses if b != 0x4D0AE]: # temp fix for screen 1A murahdahla sprite replacement
+            rom.write_byte(address, 0xD9)
+        # temporary fix for screen 1A
+        rom.write_byte(snes_to_pc(0x09AE32), 0xD9)
+        rom.write_byte(snes_to_pc(0x09AE35), 0xD9)
+
         rom.write_byte(snes_to_pc(0x06918E), 0x80) # skip good bee bottle check
 
     write_int16(rom, 0x150002, owMode)
