@@ -13,16 +13,8 @@ This is a very new mode of LTTPR so the tools and info is very limited.
     - CodeTracker, an [EmoTracker](https://emotracker.net) package for LTTPR
 - There is an [OW OWG Reference Sheet](https://zelda.codemann8.com/images/shared/ow-owg-reference-sheet.png) that shows all the in-logic places where boots/mirror clips and fake flippers are expected from the player.
 
-# Known Issues
-(Updated 2021-11-06)
-
 ### If you want to playtest this, know these things:
 - If you fake flipper, beware of transitioning south. You could end up at the top of the waterfall in the southeast of either world. If you mistakenly drop down, it is important to know that altho the game may appear as frozen for a bit of time, the game is simply scrolling Link back to the original point of water entry. Upon "landing", you'll be able to S+Q properly. Falling from the waterfall is avoidable but it is super easy to do as it is super close to the transition.
-- In Crossed OW, there are some interesting bunny swimming situations that can occur, these ARE in logic currently, just be careful and avoid taking a hit from an enemy.
-
-### Known bugs:
-- Screens that loop on itself and also have free-standing items, the sprites are duplicated and can cause item duplication
-- When OWG are performed to enter mega-tile screens (large OW screens), there is a small chance that an incorrect VRAM reference value causes the map graphics to offset in increments of 16 pixels
 
 # Feedback and Bug Reports
 
@@ -137,7 +129,7 @@ Note: These changes do impact the logic. If you use `CodeTracker`, these Inverte
 Only settings specifically added by this Overworld Shuffle fork are found here. All door and entrance randomizer settings are supported. See their [readme](https://github.com/Aerinon/ALttPDoorRandomizer/blob/master/README.md)
 
 ## Overworld Layout Shuffle (--ow_shuffle)
-OW Edge Transitions are shuffled to create new world layouts. A brief visual representation of this can be viewed [here](https://media.discordapp.net/attachments/783989090017738753/857299555183362078/ow-modes.gif). (This graphic also includes combinations of Crossed and Tile Flip)
+OW Edge Transitions are shuffled to create new world layouts. A brief visual representation of this can be viewed [here](https://cdn.discordapp.com/attachments/783989090017738753/857299555183362078/ow-modes.gif?ex=66044c6d&is=65f1d76d&hm=b43ebd1b22e0a86c7caf3153c217ba14174bb92a2b168c15fe8e75364b5c8c15&). (This graphic also includes combinations of Crossed and Tile Flip)
 
 ### Vanilla
 
@@ -197,7 +189,7 @@ Being that this uses concepts from Inverted, it will be important to review the 
 
 During gameplay:
     - When on the OW, there will be an L or D in the upper left corner, indicating which world you are currently in. Mirroring still works the same, you must be in the DW to mirror to the LW.
-    - When doing a map check (pressing X while on the OW), the tiles shown will reflect the flipped tiles. This means that dungeon prizes will show the prizes for the dungeons that are now part of that world, beware of Desert/Mire and Eastern/PoD. Here is an image showing the difference of appearance when tiles are flipped on the [map check](https://media.discordapp.net/attachments/783989090017738753/970646558049714196/lttp-lw-mapcheck.gif) screen.
+    - When doing a map check (pressing X while on the OW), the tiles shown will reflect the flipped tiles. This means that dungeon prizes will show the prizes for the dungeons that are now part of that world, beware of Desert/Mire and Eastern/PoD. Here is an image showing the difference of appearance when tiles are flipped on the [map check](https://cdn.discordapp.com/attachments/783989090017738753/970646558049714196/lttp-lw-mapcheck.gif?ex=66015e8d&is=65eee98d&hm=b4d97c52d6aed593f0e6ec54924696ba969ce11109ce5ba1291b50a8a3e2dac8&) screen.
 
 Note: Tiles are put into Tile Groups (see `Terminology`) that must be shuffled together when certain settings are enabled. For instance, if ER is disabled, then any tiles that have a connector cave that leads to a different tile, then those tiles must flip together.
 
@@ -256,7 +248,7 @@ This adds 42 new item locations to the game. These bonk locations are limited to
     - Some screens are coded to change the "alternate tree color", some of them are strange (just how the vanilla game does it)
     - Rocks and statues are unable to be made to have a different color
 
-Here is a map that shows all the [Bonk Locations](https://cdn.discordapp.com/attachments/1105770688649895968/1105770806769877072/bonkdrops.png?width=1399&height=702). FYI, the numbers indicate how many bonk items there. The stars with a green square are all Bonk Locations that are unlocked after you kill Aga 1.
+Here is a map that shows all the [Bonk Locations](https://cdn.discordapp.com/attachments/1105770688649895968/1105770806769877072/bonkdrops.png?ex=6603d650&is=65f16150&hm=3576367abd636ba7723ef30e87a4bc407c5e1eb9a8be325e90b1e22c04c58401&). FYI, the numbers indicate how many bonk items there. The stars with a green square are all Bonk Locations that are unlocked after you kill Aga 1.
 
 As far as map trackers, Bonk Locations are supported on `CodeTracker` when the Bonk Drops option is enabled.
 
