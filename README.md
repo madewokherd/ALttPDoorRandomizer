@@ -315,6 +315,20 @@ This mode groups entrances into types and shuffles them freely within those grou
 
 Both Lite and Lean ER modes are supported in `CodeTracker`, showing only the entrances that are shuffled.
 
+### Swapped
+
+This mostly follows the rules of Crossed ER, but instead of entrances being randomly placed individually, random pairs of two entrances are chosen to swap with each other. This creates a unique experience where checking one entrance gives you information about another entrance, which can influence your future routing.
+
+If there is an odd amount of entrances being shuffled in the pool, the last remaining entrance will be vanilla. All other entrances are guaranteed to be non-vanilla.
+
+Here is a [Swapped ER Reference Sheet](http://zelda.codemann8.com/images/shared/swapped-reference-sheet.png) that shows some of the caves/houses that are less familiar to most people.
+
+### District
+
+This is an entrance shuffle that only shuffles entrances within their respective `Districts` (See Below). Also, dropdowns and the entrance that a dropdown normally exits are NOT kept together; this also means that the Skull Woods entrances are no longer guaranteed to lead to Skull Woods. Also, since there is no district that can span multiple worlds, this is NOT a cross-world entrance mode.
+
+Districts are a concept originally conceived by Aerinon in the Door Randomizer, where parts of the OW are split into areas and given a name. Here is a [District Map](https://cdn.discordapp.com/attachments/783989090017738753/1194615705027477534/districts.png?ex=66040e12&is=65f19912&hm=9ef382f004f7013e018f0b04d0bc98727f87b8b5da6499f34dbcf6e14bb0ac90&) showing how they are split up.
+
 # Command Line Options
 
 ```
