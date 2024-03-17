@@ -910,7 +910,7 @@ def must_exits_helper(avail):
         }
         for region_name in avail.world.inaccessible_regions[avail.player]:
             if (avail.world.logic[avail.player] in ['noglitches', 'minorglitches'] and region_name in glitch_regions) \
-                    or (region_name == 'Pyramid Exit Ledge' and (avail.world.shuffle[avail.player] != 'insanity' or avail.world.is_tile_swapped(0x1b, avail.player))) \
+                    or (region_name == 'Pyramid Exit Ledge' and (avail.keep_drops_together or avail.world.is_tile_swapped(0x1b, avail.player))) \
                     or (region_name == 'Spiral Mimic Ledge Extend' and not avail.world.is_tile_swapped(0x05, avail.player)):
                 # removing irrelevant and resolved regions
                 inaccessible_regions.remove(region_name)

@@ -1511,7 +1511,7 @@ def connect_inaccessible_regions(world, lw_entrances, dw_entrances, caves, playe
         }
         for region_name in world.inaccessible_regions[player]:
             if (world.logic[player] in ['noglitches', 'minorglitches'] and region_name in glitch_regions) \
-                    or (region_name == 'Pyramid Exit Ledge' and (world.shuffle[player] != 'insanity' or world.is_tile_swapped(0x1b, player))) \
+                    or (region_name == 'Pyramid Exit Ledge' and (world.shuffle[player] not in ['district', 'insanity'] or world.is_tile_swapped(0x1b, player))) \
                     or (region_name == 'Spiral Mimic Ledge Extend' and not world.is_tile_swapped(0x05, player)):
                 # removing irrelevant and resolved regions
                 inaccessible_regions.remove(region_name)
