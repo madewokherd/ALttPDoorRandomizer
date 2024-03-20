@@ -306,9 +306,9 @@ OWFluteCancel:
 {
     lda.l OWFlags+1 : and.b #$01 : bne +
         jsl FluteMenu_LoadTransport : rtl
-    + lda.l HexToDecDigit4 : cmp.b #$01 : beq +
+    + lda.w RandoOverworldTargetEdge : bne +
         jsl FluteMenu_LoadTransport
-    + lda.b #$00 : sta.l HexToDecDigit4 : rtl
+    + stz.w RandoOverworldTargetEdge : rtl
 }
 OWFluteCancel2:
 {
@@ -317,7 +317,7 @@ OWFluteCancel2:
     + inc.w SubModuleInterface
     lda.l OWFlags+1 : and.b #$01 : beq +
     lda.b Joy1B_All : cmp.b #$40 : bne +
-        lda.b #$01 : sta.l HexToDecDigit4
+        lda.b #$01 : sta.w RandoOverworldTargetEdge
     + rtl 
 }
 OWSmithAccept:
@@ -587,6 +587,7 @@ OWBonkDrops:
         .increment_collection
         REP #$20
             LDA.l TotalItemCounter : INC : STA.l TotalItemCounter
+            INC.w UpdateHUDFlag
         SEP #$20
     + BRA .return
 
