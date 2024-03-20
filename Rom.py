@@ -1080,6 +1080,11 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         0xFF, 0xFF, 0xFF, 0xFF, # end of table sentinel
     ])
 
+    # item GFX changes
+    if world.bombbag[player]:
+        rom.write_byte(snes_to_pc(0x22C8A4), 0xE0) # use new bomb bag gfx
+        rom.write_byte(snes_to_pc(0x22BD52), 0x02)
+
     # set Fountain bottle exchange items
     rom.write_byte(0x348FF, ItemFactory(world.bottle_refills[player][0], player).code)
     rom.write_byte(0x3493B, ItemFactory(world.bottle_refills[player][1], player).code)
