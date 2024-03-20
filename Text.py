@@ -106,7 +106,7 @@ Triforce_texts = [
     "    Whelp…\n      that  just\n       happened",
     "     Oh  hey…\n        it's you",
     "\n    Wheeeeee!!",
-    "     Time for\n      another one?",
+    "  Time for\n     another one?",
     "  And\n\n         scene",
     "\n     GOT EM!!",
     "\n  THE VALUUUE!!!",
