@@ -405,8 +405,14 @@ def generate_itempool(world, player):
 
     if world.logic[player] == 'hybridglitches' and world.pottery[player] not in ['none', 'cave']:
         # In HMG force swamp smalls in pots to allow getting out of swamp palace
-        placed_items['Swamp Palace - Trench 1 Pot Key'] = 'Small Key (Swamp Palace)'
-        placed_items['Swamp Palace - Pot Row Pot Key'] = 'Small Key (Swamp Palace)'
+        loc = world.get_location('Swamp Palace - Trench 1 Pot Key', player)
+        world.push_item(loc, ItemFactory('Small Key (Swamp Palace)', player), False)
+        loc.event = True
+        loc.locked = True
+        loc = world.get_location('Swamp Palace - Pot Row Pot Key', player)
+        world.push_item(loc, ItemFactory('Small Key (Swamp Palace)', player), False)
+        loc.event = True
+        loc.locked = True
         world.itempool.remove(ItemFactory('Small Key (Swamp Palace)', player))
         world.itempool.remove(ItemFactory('Small Key (Swamp Palace)', player))
 
