@@ -598,10 +598,10 @@ def copy_world(world):
         update_world_regions(ret, player)
         if world.logic[player] in ('owglitches', 'hybridglitches', 'nologic'):
             create_owg_connections(ret, player)
-        if world.logic[player] in ('nologic', 'hybridglitches'):
-            create_hybridmajor_connections(ret, player)
         create_dynamic_exits(ret, player)
         create_dungeon_regions(ret, player)
+        if world.logic[player] in ('nologic', 'hybridglitches'):
+            create_hybridmajor_connections(ret, player)
         create_owedges(ret, player)
         create_shops(ret, player)
         #create_doors(ret, player)
@@ -795,10 +795,10 @@ def copy_world_premature(world, player):
     update_world_regions(ret, player)
     if world.logic[player] in ('owglitches', 'hybridglitches', 'nologic'):
         create_owg_connections(ret, player)
-    if world.logic[player] in ('nologic', 'hybridglitches'):
-        create_hybridmajor_connections(ret, player)
     create_dynamic_exits(ret, player)
     create_dungeon_regions(ret, player)
+    if world.logic[player] in ('nologic', 'hybridglitches'):
+        create_hybridmajor_connections(ret, player)
     create_owedges(ret, player)
     create_shops(ret, player)
     create_doors(ret, player)

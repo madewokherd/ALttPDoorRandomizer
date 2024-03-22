@@ -66,6 +66,7 @@ def create_hybridmajor_connectors(world, player):
         specrock_connectors,
     ]:
         new_connectors = [(connector[0], connector[1], world.get_entrance(connector[2], player).connected_region) for connector in connectors]
+        new_connectors = [c for c in new_connectors if c[2] is not None]
         create_no_logic_connections(player, world, new_connectors)
 
 

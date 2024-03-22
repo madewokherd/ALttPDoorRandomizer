@@ -846,7 +846,7 @@ def global_rules(world, player):
 
     add_key_logic_rules(world, player)
 
-    if world.logic[player] == 'hybridglitches':
+    if world.logic[player] == 'hybridglitches' and not world.is_copied_world:
         add_hmg_key_logic_rules(world, player)
     # End of door rando rules.
 
