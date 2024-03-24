@@ -1403,7 +1403,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     # rupees replace arrows under pots for original and enemizer code
     rom.write_byte(0x301FC, 0xDA if world.bow_mode[player].startswith('retro') else 0xE1)
     rom.write_byte(snes_to_pc(0x36837D), 0xDA if world.bow_mode[player].startswith('retro') else 0xE1)
-    if world.bow_mode[player].startswith('retro'):
+    if world.bow_mode[player].startswith('retro') or world.keyshuffle[player] == 'universal':
         rom.write_byte(0x30052, 0xE4 if world.keyshuffle[player] == 'universal' else 0xDB) # replace arrows in fish prize from bottle merchant
     rom.write_bytes(0xECB4E, [0xA9, 0x00, 0xEA, 0xEA] if world.bow_mode[player].startswith('retro') else [0xAF, 0x77, 0xF3, 0x7E])  # Thief steals rupees instead of arrows
     rom.write_bytes(0xF0D96, [0xA9, 0x00, 0xEA, 0xEA] if world.bow_mode[player].startswith('retro') else [0xAF, 0x77, 0xF3, 0x7E])  # Pikit steals rupees instead of arrows
