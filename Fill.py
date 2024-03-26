@@ -10,7 +10,7 @@ from BaseClasses import CollectionState, FillError, LocationType
 from Items import ItemFactory
 from Regions import shop_to_location_table, retro_shops
 from source.item.FillUtil import filter_locations, classify_major_items, replace_trash_item, vanilla_fallback
-from source.item.FillUtil import filter_pot_locations, valid_pot_items
+from source.item.FillUtil import filter_special_locations, valid_pot_items
 
 
 def get_dungeon_item_pool(world):
@@ -284,9 +284,10 @@ def recovery_placement(item_to_place, locations, world, state, base_state, itemp
                     return spot_to_fill
             return None
     # explicitly fail these cases
-    elif world.algorithm in ['dungeon_only', 'major_only']:
+    elif world.algorithm in ['dungeon_only', 'major_only', 'district']:
         raise FillError(f'Rare placement for {world.algorithm} detected. {item_to_place} unable to be placed.'
                         f' Try a different seed')
+    # I don't think any algorithm uses fallback placement anymore, vanilla is special. Others simply fail.
     else:
         other_locations = [x for x in locations if x not in attempted]
         for location in other_locations:
@@ -386,28 +387,28 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
 
     # get items to distribute
     classify_major_items(world)
-    # handle pot shuffle
-    pots_used = False
-    pot_item_pool = collections.defaultdict(list)
+    # handle special case fast fill
+    locations_used = False
+    location_item_pool = collections.defaultdict(list)
 
     # guarantee one big magic in a bonk location
     for player in range(1, world.players + 1):
         if world.shuffle_bonk_drops[player]:
             for item in world.itempool:
                 if item.name in ['Big Magic'] and item.player == player:
-                    pot_item_pool[player].append(item)
+                    location_item_pool[player].append(item)
                     break
     from Regions import bonk_prize_table
-    for player, magic_pool in pot_item_pool.items():
+    for player, magic_pool in location_item_pool.items():
         if len(magic_pool) > 0:
             world.itempool.remove(magic_pool[0])
-            pot_locations = [location for location in fill_locations if location.player == player
+            bonk_locations = [location for location in fill_locations if location.player == player
                     and location.name in [n for n, (_, _, aga, _, _, _) in bonk_prize_table.items() if not aga]]
-            pot_locations = filter_pot_locations(pot_locations, world)
-            fast_fill_helper(world, magic_pool, pot_locations)
-            pots_used = True
+            bonk_locations = filter_special_locations(bonk_locations, world, lambda l: l.name == 'Kakariko Portal Tree')
+            fast_fill_helper(world, magic_pool, bonk_locations)
+            locations_used = True
     
-    if pots_used:
+    if locations_used:
         fill_locations = world.get_unfilled_locations()
         random.shuffle(fill_locations)
 
@@ -498,6 +499,7 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
 
     if world.players > 1:
         fast_fill_pot_for_multiworld(world, restitempool, fill_locations)
+        # todo: fast fill drops?
     if world.algorithm == 'vanilla_fill':
         fast_vanilla_fill(world, restitempool, fill_locations)
     else:
@@ -507,7 +509,7 @@ def distribute_items_restrictive(world, gftower_trash=False, fill_locations=None
     unfilled = [location.name for location in fill_locations]
     if unplaced or unfilled:
         logging.warning('Unplaced items: %s - Unfilled Locations: %s', unplaced, unfilled)
-    ensure_good_pots(world)
+    ensure_good_items(world)
 
 
 def config_sort(world):
@@ -537,36 +539,26 @@ def calc_trash_locations(world, player):
     return gt_count, total_count
 
 
-def ensure_good_pots(world, write_skips=False):
+def ensure_good_items(world, write_skips=False):
     for loc in world.get_locations():
         if loc.item is None:
             loc.item = ItemFactory('Nothing', loc.player)
         # convert Arrows 5 and Nothing when necessary
-        if (loc.item.name in {'Nothing'}
+        if (loc.item.name in {'Arrows (5)', 'Nothing'}
            and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
-        if (loc.item.name in {'Arrows (5)'}
-           and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
-            loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.item.player)
-        # # can be placed here by multiworld balancing or shop balancing
-        # # change it to something normal for the player it got swapped to
-        # elif (loc.item.name in {'Chicken', 'Big Magic'}
-        #       and (loc.type != LocationType.Pot or loc.item.player != loc.player)):
-        #         if loc.type == LocationType.Pot:
-        #             loc.item.player = loc.player
-        #         else:
-        #             loc.item = ItemFactory(invalid_location_replacement[loc.item.name], loc.player)
         # do the arrow retro check
         if world.bow_mode[loc.item.player].startswith('retro') and loc.item.name in {'Arrows (5)', 'Arrows (10)'}:
             loc.item = ItemFactory('Rupees (5)', loc.item.player)
         # don't write out all pots to spoiler
+        # todo: skip uninteresting enemy drops
         if write_skips:
             if loc.type in [LocationType.Pot, LocationType.Bonk] and loc.item.name in valid_pot_items:
                 loc.skip = True
 
 
 invalid_location_replacement = {'Arrows (5)': 'Arrows (10)', 'Nothing':  'Rupees (5)',
-                                'Chicken': 'Rupees (5)', 'Big Magic': 'Small Magic'}
+                                'Chicken': 'Rupees (5)', 'Big Magic': 'Small Magic', 'Fairy': 'Small Heart'}
 
 
 def fast_fill_helper(world, item_pool, fill_locations):
@@ -601,7 +593,7 @@ def fast_fill_pot_for_multiworld(world, item_pool, fill_locations):
         if loc.type == LocationType.Pot:
             pot_fill_locations[loc.player].append(loc)
     for player in range(1, world.players+1):
-        flex = 256 - world.pot_contents[player].multiworld_count
+        flex = 256 - world.data_tables[player].pot_secret_table.multiworld_count
         fill_count = len(pot_fill_locations[player]) - flex
         if fill_count > 0:
             fill_spots = random.sample(pot_fill_locations[player], fill_count)

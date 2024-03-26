@@ -96,8 +96,11 @@
     "type": "bool"
   },
   "dropshuffle" : {
-    "action": "store_true",
-    "type": "bool"
+    "choices" : [
+      "none",
+      "keys",
+      "underworld"
+    ]
   },
   "pottery" : {
     "choices" : [
@@ -535,9 +538,6 @@
   "bps": {
     "action": "store_true"
   },
-  "enemizercli": {
-    "setting": "enemizercli"
-  },
   "shufflebosses": {
     "choices": [
       "none",
@@ -550,9 +550,7 @@
   "shuffleenemies": {
     "choices": [
       "none",
-      "shuffled",
-      "random",
-      "legacy"
+      "shuffled"
     ]
   },
   "enemy_health": {
@@ -569,6 +567,13 @@
       "default",
       "shuffled",
       "random"
+    ]
+  },
+  "any_enemy_logic": {
+    "choices": [
+      "none",
+      "allow_drops",
+      "allow_all"
     ]
   },
   "remote_items": {

@@ -910,7 +910,7 @@ def must_exits_helper(avail):
         }
         for region_name in avail.world.inaccessible_regions[avail.player]:
             if (avail.world.logic[avail.player] in ['noglitches', 'minorglitches'] and region_name in glitch_regions) \
-                    or (region_name == 'Pyramid Exit Ledge' and (avail.world.shuffle[avail.player] != 'insanity' or avail.world.is_tile_swapped(0x1b, avail.player))) \
+                    or (region_name == 'Pyramid Exit Ledge' and (avail.keep_drops_together or avail.world.is_tile_swapped(0x1b, avail.player))) \
                     or (region_name == 'Spiral Mimic Ledge Extend' and not avail.world.is_tile_swapped(0x05, avail.player)):
                 # removing irrelevant and resolved regions
                 inaccessible_regions.remove(region_name)
@@ -2561,9 +2561,13 @@ mandatory_connections = [('Lost Woods Hideout (top to bottom)', 'Lost Woods Hide
                          ('Lumberjack Tree (top to bottom)', 'Lumberjack Tree (bottom)'),
                          ('Death Mountain Return Cave E', 'Death Mountain Return Cave (right)'),
                          ('Death Mountain Return Cave W', 'Death Mountain Return Cave (left)'),
-                         ('Old Man Cave Dropdown', 'Old Man Cave'),
-                         ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave (Bottom)'),
-                         ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave (Bottom)'),
+                         ('Old Man Cave Dropdown', 'Old Man Cave (East)'),
+                         ('Old Man Cave W', 'Old Man Cave (West)'),
+                         ('Old Man Cave E', 'Old Man Cave (East)'),
+                         ('Spectacle Rock Cave Drop', 'Spectacle Rock Cave Pool'),
+                         ('Spectacle Rock Cave Peak Drop', 'Spectacle Rock Cave Pool'),
+                         ('Spectacle Rock Cave West Edge', 'Spectacle Rock Cave (Bottom)'),
+                         ('Spectacle Rock Cave East Edge', 'Spectacle Rock Cave Pool'),
                          ('Old Man House Front to Back', 'Old Man House Back'),
                          ('Old Man House Back to Front', 'Old Man House'),
                          ('Spiral Cave (top to bottom)', 'Spiral Cave (Bottom)'),
@@ -2582,11 +2586,19 @@ mandatory_connections = [('Lost Woods Hideout (top to bottom)', 'Lost Woods Hide
                          ('Sewer Drop', 'Sewers Rat Path'),
                          ('Missing Smith', 'Missing Smith'),
                          ('Bat Cave Door', 'Bat Cave (left)'),
+                         ('Good Bee Cave Front to Back', 'Good Bee Cave (back)'),
+                         ('Good Bee Cave Back to Front', 'Good Bee Cave'),
+                         ('Capacity Upgrade East', 'Capacity Fairy Pool'),
+                         ('Capacity Fairy Pool West', 'Capacity Upgrade'),
+                         ('Bonk Fairy (Dark) Pool', 'Bonk Fairy Pool'),
+                         ('Bonk Fairy (Light) Pool', 'Bonk Fairy Pool'),
                          
                          ('Hookshot Cave Front to Middle', 'Hookshot Cave (Middle)'),
                          ('Hookshot Cave Middle to Front', 'Hookshot Cave (Front)'),
                          ('Hookshot Cave Middle to Back', 'Hookshot Cave (Back)'),
                          ('Hookshot Cave Back to Middle', 'Hookshot Cave (Middle)'),
+                         ('Hookshot Cave Back to Fairy', 'Hookshot Cave (Fairy Pool)'),
+                         ('Hookshot Cave Fairy to Back', 'Hookshot Cave (Back)'),
                          ('Hookshot Cave Bonk Path', 'Hookshot Cave (Bonk Islands)'),
                          ('Hookshot Cave Hook Path', 'Hookshot Cave (Hook Islands)'),
                          ('Superbunny Cave Climb', 'Superbunny Cave (Top)'),
@@ -2606,7 +2618,7 @@ default_connections = {'Lost Woods Gamble': 'Lost Woods Gamble',
                        'Lumberjack Tree Exit': 'Lumberjack Area',
                        'Death Mountain Return Cave (East)': 'Death Mountain Return Cave (right)',
                        'Death Mountain Return Cave Exit (East)': 'West Death Mountain (Bottom)',
-                       'Old Man Cave (East)': 'Old Man Cave',
+                       'Old Man Cave (East)': 'Old Man Cave (East)',
                        'Old Man Cave Exit (East)': 'West Death Mountain (Bottom)',
                        'Spectacle Rock Cave': 'Spectacle Rock Cave (Top)',
                        'Spectacle Rock Cave Exit (Top)': 'West Death Mountain (Bottom)',

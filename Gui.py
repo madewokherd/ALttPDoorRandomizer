@@ -46,7 +46,7 @@ def save_settings(gui, args, filename):
     output_args = {}
     settings = ["create_rom", "suppress_rom", "bps", "create_spoiler", "suppress_spoiler",
                 "calc_playthrough", "skip_playthrough", "print_custom_yaml",
-                "settingsonload", "rom", "enemizercli", "outputpath"]
+                "settingsonload", "rom", "outputpath"]
     if filename == "settings.json":
         for s in settings:
             output_args[s] = args[s]

@@ -216,6 +216,7 @@ def valid_connection(region, std_flag, world, player):
     return region and (region.type == RegionType.Dungeon or region.name in world.inaccessible_regions[player] or
                       (std_flag and region.name == 'Hyrule Castle Ledge'))
 
+
 def vanilla_key_logic(world, player):
     builders = []
     world.dungeon_layouts[player] = {}
@@ -263,7 +264,7 @@ def vanilla_key_logic(world, player):
             log_key_logic(builder.name, key_layout.key_logic)
     # special adjustments for vanilla
     if world.keyshuffle[player] != 'universal':
-        if world.mode[player] != 'standard' and not world.dropshuffle[player]:
+        if world.mode[player] != 'standard' and world.dropshuffle[player] == 'none' :
             # adjust hc doors
             def adjust_hc_door(door_rule):
                 if door_rule.new_rules[KeyRuleType.WorstCase] == 3:
@@ -903,10 +904,10 @@ def main_dungeon_pool(dungeon_pool, world, player):
     all_dungeon_items_cnt = len(list(y for x in world.dungeons if x.player == player for y in x.all_items))
     target_items = 34
     if world.keyshuffle[player] == 'universal':
-        target_items += 1 if world.dropshuffle[player] else 0  # the hc big key
+        target_items += 1 if world.dropshuffle[player] != 'none' else 0  # the hc big key
     else:
         target_items += 29  # small keys in chests
-        if world.dropshuffle[player]:
+        if world.dropshuffle[player] != 'none':
             target_items += 14  # 13 dropped smalls + 1 big
         if world.pottery[player] not in ['none', 'cave']:
             target_items += 19  # 19 pot keys
@@ -1314,10 +1315,10 @@ def cross_dungeon(world, player):
     all_dungeon_items_cnt = len(list(y for x in world.dungeons if x.player == player for y in x.all_items))
     target_items = 34
     if world.keyshuffle[player] == 'universal':
-        target_items += 1 if world.dropshuffle[player] else 0  # the hc big key
+        target_items += 1 if world.dropshuffle[player] != 'none' else 0  # the hc big key
     else:
         target_items += 29  # small keys in chests
-        if world.dropshuffle[player]:
+        if world.dropshuffle[player] != 'none':
             target_items += 14  # 13 dropped smalls + 1 big
         if world.pottery[player] not in ['none', 'cave']:
             target_items += 19  # 19 pot keys
@@ -1403,7 +1404,7 @@ def assign_cross_keys(dungeon_builders, world, player):
     start = time.process_time()
     if world.keyshuffle[player] == 'universal':
         remaining = 29
-        if world.dropshuffle[player]:
+        if world.dropshuffle[player] != 'none':
             remaining += 13
         if world.pottery[player] not in ['none', 'cave']:
             remaining += 19
@@ -2437,20 +2438,25 @@ def change_door_to_trap(d, world, player):
         if d.entrance.connected_region is not None and d.blocked:
             d.entrance.connected_region.entrances.remove(d.entrance)
             d.entrance.connected_region = None
+            if d.dependents:
+                for dep in d.dependents:
+                    if dep.entrance.connected_region is not None:
+                        dep.entrance.connected_region.remove(dep.entrance)
+                        dep.entrance.connected_region = None
 
 
 trap_door_exceptions = {
     'PoD Mimics 2 SW', 'TR Twin Pokeys NW', 'Thieves Blocked Entry SW', 'Hyrule Dungeon Armory Interior Key Door N',
     'Desert Compass Key Door WN', 'TR Tile Room SE', 'Mire Cross SW', 'Tower Circle of Pots ES',
-    'Eastern Single Eyegore ES', 'Eastern Duo Eyegores SE', 'Swamp Push Statue S',
+    'PoD Mimics 1 SW', 'Eastern Single Eyegore ES', 'Eastern Duo Eyegores SE', 'Swamp Push Statue S',
     'Skull 2 East Lobby WS', 'GT Hope Room WN', 'Eastern Courtyard Ledge S', 'Ice Lobby SE', 'GT Speed Torch WN',
     'Ice Switch Room ES', 'Ice Switch Room NE', 'Skull Torch Room WS', 'GT Speed Torch NE', 'GT Speed Torch WS',
     'GT Torch Cross WN', 'Mire Tile Room SW', 'Mire Tile Room ES', 'TR Torches WN', 'PoD Lobby N', 'PoD Middle Cage S',
-    'Ice Bomb Jump NW', 'GT Hidden Spikes SE', 'Ice Tall Hint EN', 'GT Conveyor Cross EN', 'Eastern Pot Switch WN',
+    'Ice Bomb Jump NW', 'GT Hidden Spikes SE', 'Ice Tall Hint EN', 'Ice Tall Hint SE', 'Eastern Pot Switch WN',
     'Thieves Conveyor Maze WN', 'Thieves Conveyor Maze SW', 'Eastern Dark Square Key Door WN', 'Eastern Lobby NW',
-    'Eastern Lobby NE', 'Ice Cross Bottom SE', 'Desert Back Lobby S', 'Desert West S',
+    'Eastern Lobby NE', 'Ice Cross Bottom SE', 'Ice Cross Right ES', 'Desert Back Lobby S', 'Desert West S',
     'Desert West Lobby ES', 'Mire Hidden Shooters SE', 'Mire Hidden Shooters ES', 'Mire Hidden Shooters WS',
-    'Tower Dark Pits EN', 'Tower Dark Maze ES', 'TR Tongue Pull WS',
+    'Tower Dark Pits EN', 'Tower Dark Maze ES', 'TR Tongue Pull WS', 'GT Conveyor Cross EN',
 }
 
 
@@ -3594,6 +3600,7 @@ class DROptions(Flag):
     Hide_Total = 0x100
     DarkWorld_Spawns = 0x200
     BigKeyDoor_Shuffle = 0x400
+    EnemyDropIndicator = 0x800  # if on, enemy drop indicator show, else it doesn't
 
 
 # DATA GOES DOWN HERE
@@ -3666,8 +3673,10 @@ logical_connections = [
     ('PoD Map Balcony to Ranged Crystal', 'PoD Map Balcony - Ranged Crystal'),
     ('PoD Map Balcony Ranged Crystal Exit', 'PoD Map Balcony'),
     ('PoD Basement Ledge Drop Down', 'PoD Stalfos Basement'),
-    ('PoD Falling Bridge Path N', 'PoD Falling Bridge Ledge'),
-    ('PoD Falling Bridge Path S', 'PoD Falling Bridge'),
+    ('PoD Falling Bridge Path N', 'PoD Falling Bridge Mid'),
+    ('PoD Falling Bridge Path S', 'PoD Falling Bridge Mid'),
+    ('PoD Falling Bridge Mid Path S', 'PoD Falling Bridge'),
+    ('PoD Falling Bridge Mid Path N', 'PoD Falling Bridge Ledge'),
     ('PoD Bow Statue Left to Right Barrier - Orange', 'PoD Bow Statue Right'),
     ('PoD Bow Statue Left to Right Bypass', 'PoD Bow Statue Right'),
     ('PoD Bow Statue Left to Crystal', 'PoD Bow Statue Left - Crystal'),
@@ -3755,11 +3764,14 @@ logical_connections = [
 
     ('Ice Cross Bottom Push Block Left', 'Ice Floor Switch'),
     ('Ice Cross Right Push Block Top', 'Ice Bomb Drop'),
+    ('Ice Bomb Drop Path', 'Ice Bomb Drop - Top'),
     ('Ice Conveyor to Crystal', 'Ice Conveyor - Crystal'),
     ('Ice Conveyor Crystal Exit', 'Ice Conveyor'),
     ('Ice Big Key Push Block', 'Ice Dead End'),
     ('Ice Bomb Jump Ledge Orange Barrier', 'Ice Bomb Jump Catwalk'),
     ('Ice Bomb Jump Catwalk Orange Barrier', 'Ice Bomb Jump Ledge'),
+    ('Ice Right H Path', 'Ice Hammer Block'),
+    ('Ice Hammer Block Path', 'Ice Right H'),
     ('Ice Hookshot Ledge Path', 'Ice Hookshot Balcony'),
     ('Ice Hookshot Balcony Path', 'Ice Hookshot Ledge'),
     ('Ice Crystal Right Orange Barrier', 'Ice Crystal Left'),
@@ -4130,6 +4142,7 @@ interior_doors = [
     ('PoD Lobby NE', 'PoD Middle Cage SE'),
     ('PoD Warp Hint SE', 'PoD Jelly Hall NE'),
     ('PoD Jelly Hall NW', 'PoD Mimics 1 SW'),
+    ('PoD Map Balcony ES', 'PoD Fairy Pool WS'),
     ('PoD Falling Bridge EN', 'PoD Compass Room WN'),
     ('PoD Compass Room SE', 'PoD Harmless Hellway NE'),
     ('PoD Mimics 2 NW', 'PoD Bow Statue SW'),
