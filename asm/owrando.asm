@@ -447,6 +447,7 @@ OWBonkDropSparkle:
     LDA.w $0E90,X : BEQ .nosparkle
     LDA.w SprRedrawFlag,X : BNE .nosparkle
     LDA.b GameMode : CMP.b #$0E : BEQ .nosparkle
+    LDA.b LinkState : CMP.b #$08 : BCC + : CMP.b #$0A+1 : BCS + : BRA .nosparkle : + ; skip if we're mid-medallion
         JSL Sprite_SpawnSparkleGarnish
         ; move sparkle down 1 tile
         PHX : TYX : PLY
