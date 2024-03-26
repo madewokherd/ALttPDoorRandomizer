@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0.0
+- Fully merged big base ROM changes from upstream, including FastROM
+- \~Merged up to date with DR v1.4.1.8~
+- Various GFX re-implementation including new GFX for bee traps, bomb bags, etc.
+
 ## 0.3.4.2
 - Added Shuffle SFX Instruments as post-gen option
 - Fixed some issues with Swapped ER failing to place Old Man Cave
