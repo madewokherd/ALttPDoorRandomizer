@@ -1570,6 +1570,7 @@ kill_chests = {
 
 
 
+
 def add_connection(parent_name, target_name, entrance_name, world, player):
     parent = world.get_region(parent_name, player)
     target = world.get_region(target_name, player)
@@ -2026,10 +2027,13 @@ def add_key_logic_rules(world, player):
     for d_name, d_logic in key_logic.items():
         for door_name, rule in d_logic.door_rules.items():
             door_entrance = world.get_entrance(door_name, player)
-            add_rule(door_entrance, eval_func(door_name, d_name, player))
-            if door_entrance.door.dependents:
-                for dep in door_entrance.door.dependents:
-                    add_rule(dep.entrance, eval_func(door_name, d_name, player))
+            if not door_entrance.door.smallKey and door_entrance.door.crystal == CrystalBarrier.Blue:
+                add_rule(door_entrance, eval_alternative_crystal(door_name, d_name, player), 'or')
+            else:
+                add_rule(door_entrance, eval_func(door_name, d_name, player))
+                if door_entrance.door.dependents:
+                    for dep in door_entrance.door.dependents:
+                        add_rule(dep.entrance, eval_func(door_name, d_name, player))
         for location in d_logic.bk_restricted:
             if not location.forced_item:
                 forbid_item(location, d_logic.bk_name, player)
@@ -2121,6 +2125,15 @@ def eval_small_key_door_strict_main(state, door_name, dungeon, player):
     return state.has_sm_key_strict(key_layout.key_logic.small_key_name, player, number)
 
 
+def eval_alternative_crystal_main(state, door_name, dungeon, player):
+    key_logic = state.world.key_logic[player][dungeon]
+    door_rule = key_logic.door_rules[door_name]
+    for ruleType, number in door_rule.new_rules.items():
+        if ruleType == KeyRuleType.CrystalAlternative:
+            return state.has_sm_key(key_logic.small_key_name, player, number)
+    return False
+
+
 def eval_small_key_door(door_name, dungeon, player):
     return lambda state: eval_small_key_door_main(state, door_name, dungeon, player)
 
@@ -2131,6 +2144,10 @@ def eval_small_key_door_partial(door_name, dungeon, player):
 
 def eval_small_key_door_strict(door_name, dungeon, player):
     return lambda state: eval_small_key_door_strict_main(state, door_name, dungeon, player)
+
+
+def eval_alternative_crystal(door_name, dungeon, player):
+    return lambda state: eval_alternative_crystal_main(state, door_name, dungeon, player)
 
 
 def allow_big_key_in_big_chest(bk_name, player):
