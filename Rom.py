@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '168c7d6e330a134e7565baedab79aa15'
+RANDOMIZERBASEHASH = 'ddbecd34e58b7fdf6bed48114b3124d5'
 
 
 class JsonRom(object):
@@ -631,7 +631,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
 
     from OverworldShuffle import can_reach_smith
     if not can_reach_smith(world, player):
-        rom.write_byte(0x18005d, 0x01) # patch for deleting smith on S+Q
+        rom.write_byte(0x180043, 0x01) # patch for deleting smith on S+Q
     
     # patch entrance/exits/holes
     for region in world.regions:
@@ -713,8 +713,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         rom.write_bytes(0xfb1fc, [0xc8, 0x9d, 0x69, 0xb4, 0xac, 0x5d])
     if world.standardize_palettes[player] == 'original':
         dr_flags |= DROptions.OriginalPalettes
-    if world.experimental[player]:
-        dr_flags |= DROptions.DarkWorld_Spawns
+    dr_flags |= DROptions.DarkWorld_Spawns  # no longer experimental
     if world.logic[player] not in ['owglitches', 'hybridglitches', 'nologic']:
         dr_flags |= DROptions.Fix_EG
     if world.door_type_mode[player] in ['big', 'all', 'chaos']:
@@ -1217,7 +1216,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     rom.initial_sram.set_starting_equipment(world, player)
 
     rom.write_byte(0x18004A, 0x00 if world.mode[player] != 'inverted' else 0x01)  # Inverted mode
-    rom.write_byte(0x180043, 0x00) # Hammer always breaks barrier
+    rom.write_byte(0x18005D, 0x00) # Hammer always breaks barrier
     rom.write_byte(0x02AF79, 0xD0 if world.mode[player] != 'inverted' else 0xF0) # vortexes: Normal  (D0=light to dark, F0=dark to light, 42 = both)
     rom.write_byte(0x03A943, 0xD0 if world.mode[player] != 'inverted' else 0xF0) # Mirror: Normal  (D0=Dark to Light, F0=light to dark, 42 = both)
     rom.write_byte(0x03A96D, 0xF0 if world.mode[player] != 'inverted' else 0xD0) # Residual Portal: Normal  (F0= Light Side, D0=Dark Side, 42 = both (Darth Vader))

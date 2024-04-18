@@ -125,7 +125,7 @@ Triforce_texts = [
     "    You get one\n   wish.  Choose\n   wisely, hero!",
     "  Can you please\n  break us three\n   up?  Thanks.",
     "    Pick us up\n    before we\n    get dizzy!",
-    "    Thank you,\n  Mikey. You’re\n  2 minutes late",
+    "    Thank you,\n  Mikey. You're\n  2 minutes late",
     "    This was a\n    7000 series\n      train.",
     "     I'd buy\n     that for\n     a rupee!",
     "   Did you like\n     that bow\n    placement?",
@@ -2027,6 +2027,8 @@ class TextTable(object):
         text['ganon_phase_3_alt'] = CompressedTextMapper.convert("Got wax in your ears? I cannot die!")
         # 190
         text['sign_east_death_mountain_bridge'] = CompressedTextMapper.convert("Glitched\ntournament\nwinners\n{HARP}\n"
+                                                                               "~~~HMG 2023~~~\ntam\n\n"
+                                                                               "~~~No Logic 2022~~~\nChexhuman\n\n"
                                                                                "~~~HMG 2021~~~\nKrithel\n\n"
                                                                                "~~~OWG 2019~~~\nGlan\n\n"
                                                                                "~~~OWG 2018~~~\nChristosOwen\nthe numpty")
