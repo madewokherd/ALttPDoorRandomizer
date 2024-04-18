@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0.1
+- \~Merged in DR v1.4.1.10~
+- Fixed issue with bonk items for MW players
+- Fixed fake world issues in Glitched modes
+- Fixed issue with Flute getting canceled in OWR Layout modes
+- Various GFX Fixes
+
 ## 0.4.0.0
 - Fully merged big base ROM changes from upstream, including FastROM
 - \~Merged up to date with DR v1.4.1.8~
