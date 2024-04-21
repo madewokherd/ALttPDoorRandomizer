@@ -106,17 +106,15 @@ def bottom_frame(self, parent, args=None):
             if guiargs.count is not None and guiargs.seed:
                 seed = guiargs.seed
                 for _ in range(guiargs.count):
-                    seeds.append(seed)
-                    main(seed=seed, args=guiargs, fish=parent.fish)
+                    world = main(seed=seed, args=guiargs, fish=parent.fish)
+                    seeds.append(world.seed)
                     seed = random.randint(0, 999999999)
             else:
-                if guiargs.seed:
-                    seeds.append(guiargs.seed)
-                else:
+                if not guiargs.seed:
                     random.seed(None)
                     guiargs.seed = random.randint(0, 999999999)
-                    seeds.append(guiargs.seed)
-                main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
+                world = main(seed=guiargs.seed, args=guiargs, fish=parent.fish)
+                seeds.append(world.seed)
         except (FillError, EnemizerError, Exception, RuntimeError) as e:
             logging.exception(e)
             messagebox.showerror(title="Error while creating seed", message=str(e))
@@ -172,7 +170,7 @@ def bottom_frame(self, parent, args=None):
             from tkinter import filedialog
             filename = filedialog.asksaveasfilename(initialdir=guiargs.outputpath, title="Save file", filetypes=(("Yaml Files", (".yaml", ".yml")), ("All Files", "*")))
             if filename is not None and filename != '':
-                guiargs.outputpath = parent.settings["outputpath"] = os.path.dirname(filename)
+                guiargs.outputpath = os.path.dirname(filename)
                 guiargs.outputname = os.path.splitext(os.path.basename(filename))[0]
                 export_yaml(args=guiargs, fish=parent.fish)
         except (FillError, EnemizerError, Exception, RuntimeError) as e:
@@ -206,7 +204,9 @@ def bottom_frame(self, parent, args=None):
         from tkinter import filedialog
         folder_selected = filedialog.askdirectory()
         if folder_selected is not None and folder_selected != '':
-            args.outputpath = parent.settings["outputpath"] = folder_selected
+            parent.settings["outputpath"] = folder_selected
+            if args:
+                args.outputpath = folder_selected
 
     ## Output Button
     widget = "outputdir"

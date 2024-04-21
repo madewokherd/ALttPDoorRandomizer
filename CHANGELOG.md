@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0.2
+- Fixed issue with Inverted GT entrance not opening
+- Potential fox for bonk items duplicating onto other OW items
+
 ## 0.4.0.1
 - \~Merged in DR v1.4.1.10~
 - Fixed issue with bonk items for MW players
