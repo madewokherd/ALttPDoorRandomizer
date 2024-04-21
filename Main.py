@@ -413,6 +413,8 @@ def export_yaml(args, fish):
     logger = logging.getLogger('')
 
     world = init_world(args, fish)
+    if args.seed and int(args.seed) > 0:
+        world.seed = int(args.seed)
 
     from OverworldShuffle import __version__ as ORVersion
     logger.info(
