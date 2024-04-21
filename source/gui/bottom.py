@@ -172,7 +172,7 @@ def bottom_frame(self, parent, args=None):
             from tkinter import filedialog
             filename = filedialog.asksaveasfilename(initialdir=guiargs.outputpath, title="Save file", filetypes=(("Yaml Files", (".yaml", ".yml")), ("All Files", "*")))
             if filename is not None and filename != '':
-                guiargs.outputpath = parent.settings["outputpath"] = os.path.dirname(filename)
+                guiargs.outputpath = os.path.dirname(filename)
                 guiargs.outputname = os.path.splitext(os.path.basename(filename))[0]
                 export_yaml(args=guiargs, fish=parent.fish)
         except (FillError, EnemizerError, Exception, RuntimeError) as e:
@@ -206,7 +206,9 @@ def bottom_frame(self, parent, args=None):
         from tkinter import filedialog
         folder_selected = filedialog.askdirectory()
         if folder_selected is not None and folder_selected != '':
-            args.outputpath = parent.settings["outputpath"] = folder_selected
+            parent.settings["outputpath"] = folder_selected
+            if args:
+                args.outputpath = folder_selected
 
     ## Output Button
     widget = "outputdir"
