@@ -20,7 +20,7 @@ from source.dungeon.RoomObject import RoomObject
 class World(object):
 
     def __init__(self, players, owShuffle, owCrossed, owMixed, shuffle, doorShuffle, logic, mode, swords, difficulty, difficulty_adjustments,
-                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, custom, customitemarray, hints):
+                 timer, progressive, goal, algorithm, accessibility, shuffle_ganon, custom, customitemarray, hints, spoiler_mode):
         self.players = players
         self.teams = 1
         self.owShuffle = owShuffle.copy()
@@ -78,6 +78,7 @@ class World(object):
         self.prizes = {}
         self.dynamic_regions = []
         self.dynamic_locations = []
+        self.spoiler_mode = spoiler_mode
         self.spoiler = Spoiler(self)
         self.lamps_needed_for_dark_rooms = 1
         self.owedges = []
@@ -105,6 +106,7 @@ class World(object):
         self.fish = BabelFish()
         self.data_tables = {}
         self.damage_table = {}
+
 
         for player in range(1, players + 1):
             def set_player_attr(attr, val):
@@ -2869,6 +2871,17 @@ class Spoiler(object):
         self.metadata = {}
         self.shops = []
         self.bosses = OrderedDict()
+        if world.spoiler_mode == 'settings':
+            self.settings = {'settings'}
+        elif world.spoiler_mode == 'semi':
+            self.settings = {'settings', 'entrances', 'requirements', 'prizes'}
+        elif world.spoiler_mode == 'full':
+            self.settings = {'all'}
+        elif world.spoiler_mode == 'debug':
+            self.settings = {'all', 'debug'}
+        else:
+            self.settings = {}
+
 
         self.suppress_spoiler_locations = ['Big Bomb', 'Frog', 'Dark Blacksmith Ruins', 'Middle Aged Man', 'Lost Old Man', 'Old Man Drop Off']
 
@@ -3012,27 +3025,29 @@ class Spoiler(object):
                 self.bottles[f'Waterfall Bottle ({self.world.get_player_names(player)})'] = self.world.bottle_refills[player][0]
                 self.bottles[f'Pyramid Bottle ({self.world.get_player_names(player)})'] = self.world.bottle_refills[player][1]
 
+        def include_item(item):
+            return 'all' in self.settings or ('items' in self.settings and not item.crystal) or ('prizes' in self.settings and item.crystal)
         self.locations = OrderedDict()
         listed_locations = set()
 
-        lw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.LightWorld and not loc.skip]
+        lw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.LightWorld and not loc.skip and include_item(loc.item)]
         self.locations['Light World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in lw_locations])
         listed_locations.update(lw_locations)
 
-        dw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.DarkWorld and not loc.skip]
+        dw_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.DarkWorld and not loc.skip and include_item(loc.item)]
         self.locations['Dark World'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dw_locations])
         listed_locations.update(dw_locations)
 
-        cave_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.Cave and not loc.skip]
+        cave_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.type == RegionType.Cave and not loc.skip and include_item(loc.item)]
         self.locations['Caves'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in cave_locations])
         listed_locations.update(cave_locations)
 
         for dungeon in self.world.dungeons:
-            dungeon_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.dungeon == dungeon and not loc.forced_item and not loc.skip]
+            dungeon_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and loc.parent_region and loc.parent_region.dungeon == dungeon and not loc.forced_item and not loc.skip and include_item(loc.item)]
             self.locations[str(dungeon)] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in dungeon_locations])
             listed_locations.update(dungeon_locations)
 
-        other_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and not loc.skip]
+        other_locations = [loc for loc in self.world.get_locations() if loc not in listed_locations and not loc.skip and include_item(loc.item)]
         if other_locations:
             self.locations['Other Locations'] = OrderedDict([(location.gen_name(), str(location.item) if location.item is not None else 'Nothing') for location in other_locations])
             listed_locations.update(other_locations)
@@ -3132,85 +3147,88 @@ class Spoiler(object):
                 outfile.write((k + ' Version:').ljust(line_width) + '%s\n' % v)
             if self.metadata['user_notes']:
                 outfile.write('User Notes:'.ljust(line_width) + '%s\n' % self.metadata['user_notes'])
-            outfile.write('Filling Algorithm:'.ljust(line_width) + '%s\n' % self.world.algorithm)
+            if 'all' in self.settings or 'settings' in self.settings:
+                outfile.write('Filling Algorithm:'.ljust(line_width) + '%s\n' % self.world.algorithm)
             outfile.write('Players:'.ljust(line_width) + '%d\n' % self.world.players)
             outfile.write('Teams:'.ljust(line_width) + '%d\n' % self.world.teams)
             for player in range(1, self.world.players + 1):
                 if self.world.players > 1:
                     outfile.write('\nPlayer %d: %s\n' % (player, self.world.get_player_names(player)))
-                outfile.write('Settings Code:'.ljust(line_width) + '%s\n' % self.metadata["code"][player])
+                if 'all' in self.settings or 'settings' in self.settings:
+                    outfile.write('Settings Code:'.ljust(line_width) + '%s\n' % self.metadata["code"][player])
                 outfile.write('\n')
-                outfile.write('Mode:'.ljust(line_width) + '%s\n' % self.metadata['mode'][player])
-                outfile.write('Logic:'.ljust(line_width) + '%s\n' % self.metadata['logic'][player])
-                outfile.write('Goal:'.ljust(line_width) + '%s\n' % self.metadata['goal'][player])
-                if self.metadata['goal'][player] in ['triforcehunt', 'trinity', 'ganonhunt']:
-                    outfile.write('Triforce Pieces Required:'.ljust(line_width) + '%s\n' % self.metadata['triforcegoal'][player])
-                    outfile.write('Triforce Pieces Total:'.ljust(line_width) + '%s\n' % self.metadata['triforcepool'][player])
-                outfile.write('Crystals Required for GT:'.ljust(line_width) + '%s\n' % str(self.world.crystals_gt_orig[player]))
-                outfile.write('Crystals Required for Ganon:'.ljust(line_width) + '%s\n' % str(self.world.crystals_ganon_orig[player]))
-                outfile.write('Swords:'.ljust(line_width) + '%s\n' % self.metadata['weapons'][player])
-                outfile.write('\n')
-                outfile.write('Accessibility:'.ljust(line_width) + '%s\n' % self.metadata['accessibility'][player])
-                outfile.write('Restricted Boss Items:'.ljust(line_width) + '%s\n' % self.metadata['restricted_boss_items'][player])
-                outfile.write('Item Functionality:'.ljust(line_width) + '%s\n' % self.metadata['item_functionality'][player])
-                outfile.write('Difficulty:'.ljust(line_width) + '%s\n' % self.metadata['item_pool'][player])
-                outfile.write('Flute Mode:'.ljust(line_width) + '%s\n' % self.metadata['flute_mode'][player])
-                outfile.write('Bow Mode:'.ljust(line_width) + '%s\n' % self.metadata['bow_mode'][player])
-                outfile.write('Beemizer:'.ljust(line_width) + '%s\n' % self.metadata['beemizer'][player])
-                outfile.write('Bombbag:'.ljust(line_width) + '%s\n' % yn(self.metadata['bombbag'][player]))
-                outfile.write('\n')
-                outfile.write('Shopsanity:'.ljust(line_width) + '%s\n' % yn(self.metadata['shopsanity'][player]))
-                outfile.write('Bonk Drops:'.ljust(line_width) + '%s\n' % yn(self.metadata['bonk_drops'][player]))
-                outfile.write('Pottery Mode:'.ljust(line_width) + '%s\n' % self.metadata['pottery'][player])
-                outfile.write('Pot Shuffle (Legacy):'.ljust(line_width) + '%s\n' % yn(self.metadata['potshuffle'][player]))
-                outfile.write('Enemy Drop Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['dropshuffle'][player])
-                outfile.write('Take Any Caves:'.ljust(line_width) + '%s\n' % self.metadata['take_any'][player])
-                outfile.write('\n')
-                outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
-                if self.metadata['ow_shuffle'][player] != 'vanilla':
-                    outfile.write('Free Terrain:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_terrain'][player]))
-                outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
-                if self.metadata['ow_shuffle'][player] != 'vanilla' or self.metadata['ow_crossed'][player] != 'none':
-                    outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))
-                outfile.write('OW Tile Flip (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
-                outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
-                outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
-                outfile.write('\n')
-                outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
-                if self.metadata['shuffle'][player] != 'vanilla':
-                    outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
-                    outfile.write('Shuffle Link\'s House:'.ljust(line_width) + '%s\n' % yn(self.metadata['shufflelinks'][player]))
-                    outfile.write('Shuffle Tavern:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffletavern'][player]))
-                outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % self.metadata['open_pyramid'][player])
-                if self.metadata['shuffle'][player] != 'vanilla' or self.metadata['ow_mixed'][player]:
-                    outfile.write('Overworld Map:'.ljust(line_width) + '%s\n' % self.metadata['overworld_map'][player])
-                outfile.write('\n')
-                outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['mapshuffle'][player]))
-                outfile.write('Compass Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['compassshuffle'][player]))
-                outfile.write('Small Key Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['keyshuffle'][player])
-                outfile.write('Big Key Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['bigkeyshuffle'][player]))
-                outfile.write('Key Logic Algorithm:'.ljust(line_width) + '%s\n' % self.metadata['key_logic'][player])
-                outfile.write('\n')
-                outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
-                if self.metadata['door_shuffle'][player] != 'vanilla':
-                    outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
-                    outfile.write('Door Type Mode:'.ljust(line_width) + '%s\n' % self.metadata['door_type_mode'][player])
-                    outfile.write('Trap Door Mode:'.ljust(line_width) + '%s\n' % self.metadata['trap_door_mode'][player])
-                    outfile.write('Decouple Doors:'.ljust(line_width) + '%s\n' % yn(self.metadata['decoupledoors'][player]))
-                    outfile.write('Spiral Stairs Self-Loop:'.ljust(line_width) + '%s\n' % yn(self.metadata['door_self_loops'][player]))
-                outfile.write('Experimental:'.ljust(line_width) + '%s\n' % yn(self.metadata['experimental'][player]))
-                outfile.write('Dungeon Counters:'.ljust(line_width) + '%s\n' % self.metadata['dungeon_counters'][player])
-                outfile.write('\n')
-                outfile.write('Boss Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['boss_shuffle'][player])
-                outfile.write('Enemy Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['enemy_shuffle'][player])
-                if self.metadata['enemy_shuffle'][player] != 'none':
-                    outfile.write('Enemy Logic:'.ljust(line_width) + '%s\n' % self.metadata['any_enemy_logic'][player])
-                outfile.write('Enemy Health:'.ljust(line_width) + '%s\n' % self.metadata['enemy_health'][player])
-                outfile.write('Enemy Damage:'.ljust(line_width) + '%s\n' % self.metadata['enemy_damage'][player])
-                outfile.write('\n')
-                outfile.write('Pseudoboots:'.ljust(line_width) + '%s\n' % yn(self.metadata['pseudoboots'][player]))
-                outfile.write('Hints:'.ljust(line_width) + '%s\n' % yn(self.metadata['hints'][player]))
-                outfile.write('Race:'.ljust(line_width) + '%s\n' % yn(self.world.settings.world_rep['meta']['race']))
+                if 'all' in self.settings or 'settings' in self.settings:
+                    outfile.write('Mode:'.ljust(line_width) + '%s\n' % self.metadata['mode'][player])
+                    outfile.write('Logic:'.ljust(line_width) + '%s\n' % self.metadata['logic'][player])
+                    outfile.write('Goal:'.ljust(line_width) + '%s\n' % self.metadata['goal'][player])
+                    if self.metadata['goal'][player] in ['triforcehunt', 'trinity', 'ganonhunt']:
+                        outfile.write('Triforce Pieces Required:'.ljust(line_width) + '%s\n' % self.metadata['triforcegoal'][player])
+                        outfile.write('Triforce Pieces Total:'.ljust(line_width) + '%s\n' % self.metadata['triforcepool'][player])
+                    outfile.write('Crystals Required for GT:'.ljust(line_width) + '%s\n' % str(self.world.crystals_gt_orig[player]))
+                    outfile.write('Crystals Required for Ganon:'.ljust(line_width) + '%s\n' % str(self.world.crystals_ganon_orig[player]))
+                    outfile.write('Swords:'.ljust(line_width) + '%s\n' % self.metadata['weapons'][player])
+                    outfile.write('\n')
+                    outfile.write('Accessibility:'.ljust(line_width) + '%s\n' % self.metadata['accessibility'][player])
+                    outfile.write('Restricted Boss Items:'.ljust(line_width) + '%s\n' % self.metadata['restricted_boss_items'][player])
+                    outfile.write('Item Functionality:'.ljust(line_width) + '%s\n' % self.metadata['item_functionality'][player])
+                    outfile.write('Difficulty:'.ljust(line_width) + '%s\n' % self.metadata['item_pool'][player])
+                    outfile.write('Flute Mode:'.ljust(line_width) + '%s\n' % self.metadata['flute_mode'][player])
+                    outfile.write('Bow Mode:'.ljust(line_width) + '%s\n' % self.metadata['bow_mode'][player])
+                    outfile.write('Beemizer:'.ljust(line_width) + '%s\n' % self.metadata['beemizer'][player])
+                    outfile.write('Bombbag:'.ljust(line_width) + '%s\n' % yn(self.metadata['bombbag'][player]))
+                    outfile.write('\n')
+                    outfile.write('Shopsanity:'.ljust(line_width) + '%s\n' % yn(self.metadata['shopsanity'][player]))
+                    outfile.write('Bonk Drops:'.ljust(line_width) + '%s\n' % yn(self.metadata['bonk_drops'][player]))
+                    outfile.write('Pottery Mode:'.ljust(line_width) + '%s\n' % self.metadata['pottery'][player])
+                    outfile.write('Pot Shuffle (Legacy):'.ljust(line_width) + '%s\n' % yn(self.metadata['potshuffle'][player]))
+                    outfile.write('Enemy Drop Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['dropshuffle'][player])
+                    outfile.write('Take Any Caves:'.ljust(line_width) + '%s\n' % self.metadata['take_any'][player])
+                    outfile.write('\n')
+                    outfile.write('Overworld Layout Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_shuffle'][player])
+                    if self.metadata['ow_shuffle'][player] != 'vanilla':
+                        outfile.write('Free Terrain:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_terrain'][player]))
+                    outfile.write('Crossed OW:'.ljust(line_width) + '%s\n' % self.metadata['ow_crossed'][player])
+                    if self.metadata['ow_shuffle'][player] != 'vanilla' or self.metadata['ow_crossed'][player] != 'none':
+                        outfile.write('Keep Similar OW Edges Together:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_keepsimilar'][player]))
+                    outfile.write('OW Tile Flip (Mixed):'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_mixed'][player]))
+                    outfile.write('Whirlpool Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['ow_whirlpool'][player]))
+                    outfile.write('Flute Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['ow_fluteshuffle'][player])
+                    outfile.write('\n')
+                    outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
+                    if self.metadata['shuffle'][player] != 'vanilla':
+                        outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
+                        outfile.write('Shuffle Link\'s House:'.ljust(line_width) + '%s\n' % yn(self.metadata['shufflelinks'][player]))
+                        outfile.write('Shuffle Tavern:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffletavern'][player]))
+                    outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % self.metadata['open_pyramid'][player])
+                    if self.metadata['shuffle'][player] != 'vanilla' or self.metadata['ow_mixed'][player]:
+                        outfile.write('Overworld Map:'.ljust(line_width) + '%s\n' % self.metadata['overworld_map'][player])
+                    outfile.write('\n')
+                    outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['mapshuffle'][player]))
+                    outfile.write('Compass Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['compassshuffle'][player]))
+                    outfile.write('Small Key Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['keyshuffle'][player])
+                    outfile.write('Big Key Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['bigkeyshuffle'][player]))
+                    outfile.write('Key Logic Algorithm:'.ljust(line_width) + '%s\n' % self.metadata['key_logic'][player])
+                    outfile.write('\n')
+                    outfile.write('Door Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['door_shuffle'][player])
+                    if self.metadata['door_shuffle'][player] != 'vanilla':
+                        outfile.write('Intensity:'.ljust(line_width) + '%s\n' % self.metadata['intensity'][player])
+                        outfile.write('Door Type Mode:'.ljust(line_width) + '%s\n' % self.metadata['door_type_mode'][player])
+                        outfile.write('Trap Door Mode:'.ljust(line_width) + '%s\n' % self.metadata['trap_door_mode'][player])
+                        outfile.write('Decouple Doors:'.ljust(line_width) + '%s\n' % yn(self.metadata['decoupledoors'][player]))
+                        outfile.write('Spiral Stairs Self-Loop:'.ljust(line_width) + '%s\n' % yn(self.metadata['door_self_loops'][player]))
+                    outfile.write('Experimental:'.ljust(line_width) + '%s\n' % yn(self.metadata['experimental'][player]))
+                    outfile.write('Dungeon Counters:'.ljust(line_width) + '%s\n' % self.metadata['dungeon_counters'][player])
+                    outfile.write('\n')
+                    outfile.write('Boss Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['boss_shuffle'][player])
+                    outfile.write('Enemy Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['enemy_shuffle'][player])
+                    if self.metadata['enemy_shuffle'][player] != 'none':
+                        outfile.write('Enemy Logic:'.ljust(line_width) + '%s\n' % self.metadata['any_enemy_logic'][player])
+                    outfile.write('Enemy Health:'.ljust(line_width) + '%s\n' % self.metadata['enemy_health'][player])
+                    outfile.write('Enemy Damage:'.ljust(line_width) + '%s\n' % self.metadata['enemy_damage'][player])
+                    outfile.write('\n')
+                    outfile.write('Pseudoboots:'.ljust(line_width) + '%s\n' % yn(self.metadata['pseudoboots'][player]))
+                    outfile.write('Hints:'.ljust(line_width) + '%s\n' % yn(self.metadata['hints'][player]))
+                    outfile.write('Race:'.ljust(line_width) + '%s\n' % yn(self.world.settings.world_rep['meta']['race']))
             
             if self.startinventory:
                 outfile.write('Starting Inventory:'.ljust(line_width))
@@ -3247,70 +3265,74 @@ class Spoiler(object):
         self.parse_data()
         with open(filename, 'a') as outfile:
             line_width = 35
-            outfile.write('\n\nRequirements:\n\n')
-            for dungeon, medallion in self.medallions.items():
-                outfile.write(f'{dungeon}:'.ljust(line_width) + '%s Medallion\n' % medallion)
-            for player in range(1, self.world.players + 1):
-                player_name = '' if self.world.players == 1 else str(' (Player ' + str(player) + ')')
-                if self.world.crystals_gt_orig[player] == 'random':
-                    outfile.write(str('Crystals Required for GT' + player_name + ':').ljust(line_width) + '%s\n' % (str(self.metadata['gt_crystals'][player])))
-                if self.world.crystals_ganon_orig[player] == 'random':
-                    outfile.write(str('Crystals Required for Ganon' + player_name + ':').ljust(line_width) + '%s\n' % (str(self.metadata['ganon_crystals'][player])))
+            if 'all' in self.settings or 'requirements' in self.settings:
+                outfile.write('\n\nRequirements:\n\n')
+                for dungeon, medallion in self.medallions.items():
+                    outfile.write(f'{dungeon}:'.ljust(line_width) + '%s Medallion\n' % medallion)
+                for player in range(1, self.world.players + 1):
+                    player_name = '' if self.world.players == 1 else str(' (Player ' + str(player) + ')')
+                    if self.world.crystals_gt_orig[player] == 'random':
+                        outfile.write(str('Crystals Required for GT' + player_name + ':').ljust(line_width) + '%s\n' % (str(self.metadata['gt_crystals'][player])))
+                    if self.world.crystals_ganon_orig[player] == 'random':
+                        outfile.write(str('Crystals Required for Ganon' + player_name + ':').ljust(line_width) + '%s\n' % (str(self.metadata['ganon_crystals'][player])))
             
-            outfile.write('\n\nBottle Refills:\n\n')
-            for fairy, bottle in self.bottles.items():
-                outfile.write(f'{fairy}: {bottle}\n')
+            if 'all' in self.settings or 'misc' in self.settings:
+                outfile.write('\n\nBottle Refills:\n\n')
+                for fairy, bottle in self.bottles.items():
+                    outfile.write(f'{fairy}: {bottle}\n')
 
             if self.maps:
-                # flute shuffle
-                for player in range(1, self.world.players + 1):
-                    if ('flute', player) in self.maps:
-                        outfile.write('\n\nFlute Spots:\n\n')
-                        break
-                for player in range(1, self.world.players + 1):
-                    if ('flute', player) in self.maps:
-                        if self.world.players > 1:
-                            outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('flute', player)]['text'])
+                if 'all' in self.settings or 'flute' in self.settings:
+                    # flute shuffle
+                    for player in range(1, self.world.players + 1):
+                        if ('flute', player) in self.maps:
+                            outfile.write('\n\nFlute Spots:\n\n')
+                            break
+                    for player in range(1, self.world.players + 1):
+                        if ('flute', player) in self.maps:
+                            if self.world.players > 1:
+                                outfile.write(str('(Player ' + str(player) + ')\n')) # player name
+                            outfile.write(self.maps[('flute', player)]['text'])
                 
-                # overworld tile flips
-                for player in range(1, self.world.players + 1):
-                    if ('swaps', player) in self.maps:
-                        outfile.write('\n\nOW Tile Flips:\n\n')
-                        break
-                for player in range(1, self.world.players + 1):
-                    if ('swaps', player) in self.maps:
-                        if self.world.players > 1:
-                            outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('swaps', player)]['text'])
-                
-                # crossed groups
-                for player in range(1, self.world.players + 1):
-                    if ('groups', player) in self.maps:
-                        outfile.write('\n\nOW Crossed Groups:\n\n')
-                        break
-                for player in range(1, self.world.players + 1):
-                    if ('groups', player) in self.maps:
-                        if self.world.players > 1:
-                            outfile.write(str('(Player ' + str(player) + ')\n')) # player name
-                        outfile.write(self.maps[('groups', player)]['text'])
+                if 'all' in self.settings or 'overworld' in self.settings:
+                    # overworld tile flips
+                    for player in range(1, self.world.players + 1):
+                        if ('swaps', player) in self.maps:
+                            outfile.write('\n\nOW Tile Flips:\n\n')
+                            break
+                    for player in range(1, self.world.players + 1):
+                        if ('swaps', player) in self.maps:
+                            if self.world.players > 1:
+                                outfile.write(str('(Player ' + str(player) + ')\n')) # player name
+                            outfile.write(self.maps[('swaps', player)]['text'])
+
+                    # crossed groups
+                    for player in range(1, self.world.players + 1):
+                        if ('groups', player) in self.maps:
+                            outfile.write('\n\nOW Crossed Groups:\n\n')
+                            break
+                    for player in range(1, self.world.players + 1):
+                        if ('groups', player) in self.maps:
+                            if self.world.players > 1:
+                                outfile.write(str('(Player ' + str(player) + ')\n')) # player name
+                            outfile.write(self.maps[('groups', player)]['text'])
             
-            if self.overworlds:
+            if self.overworlds and ('all' in self.settings or 'overworld' in self.settings):
                 outfile.write('\n\nOverworld Edges:\n\n')
                 # overworld transitions
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","overworlds",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","overworlds",entry['exit'])) for entry in self.overworlds.values()]))
             
-            if self.whirlpools:
+            if self.whirlpools and ('all' in self.settings or 'overworld' in self.settings):
                 outfile.write('\n\nWhirlpools:\n\n')
                 # whirlpools
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta","whirlpools",entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta","whirlpools",entry['exit'])) for entry in self.whirlpools.values()]))
             
-            if self.entrances:
+            if self.entrances and ('all' in self.settings or 'entrances' in self.settings):
                 # entrances: To/From overworld; Checking w/ & w/out "Exit" and translating accordingly
                 outfile.write('\n\nEntrances:\n\n')
                 outfile.write('\n'.join(['%s%s %s %s' % (f'{self.world.get_player_names(entry["player"])}: ' if self.world.players > 1 else '', self.world.fish.translate("meta", "entrances", entry['entrance']), '<=>' if entry['direction'] == 'both' else '<=' if entry['direction'] == 'exit' else '=>', self.world.fish.translate("meta", "entrances", entry['exit'])) for entry in self.entrances.values()]))
 
-            if self.doors:
+            if self.doors and ('all' in self.settings or 'doors' in self.settings):
                 outfile.write('\n\nDoors:\n\n')
                 outfile.write('\n'.join(
                     ['%s%s %s %s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '',
@@ -3319,33 +3341,37 @@ class Spoiler(object):
                                         self.world.fish.translate("meta", "doors", entry['exit']),
                                         '({0})'.format(entry['dname']) if self.world.doorShuffle[entry['player']] != 'basic' else '') for
                      entry in self.doors.values()]))
-            if self.lobbies:
+            if self.lobbies and ('all' in self.settings or 'doors' in self.settings):
                 outfile.write('\n\nDungeon Lobbies:\n\n')
                 outfile.write('\n'.join(
                     [f"{'Player {0}: '.format(entry['player']) if self.world.players > 1 else ''}{entry['lobby_name']}: {entry['door_name']}"
                      for
                      entry in self.lobbies.values()]))
-            if self.doorTypes:
+            if self.doorTypes  and ('all' in self.settings or 'doors' in self.settings):
                 # doorNames: For some reason these come in combined, somehow need to split on the thing to translate
                 # doorTypes: Small Key, Bombable, Bonkable
                 outfile.write('\n\nDoor Types:\n\n')
                 outfile.write('\n'.join(['%s%s %s' % ('Player {0}: '.format(entry['player']) if self.world.players > 1 else '', self.world.fish.translate("meta", "doors", entry['doorNames']), self.world.fish.translate("meta", "doorTypes", entry['type'])) for entry in self.doorTypes.values()]))
 
+
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names
             outfile.write('\n\nLocations:\n\n')
-            outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta", "locations", location), self.world.fish.translate("meta", "items", item)) for grouping in self.locations.values() for (location, item) in grouping.items()]))
+            outfile.write('\n'.join(['%s: %s' % (self.world.fish.translate("meta", "locations", location), self.world.fish.translate("meta", "items", item))
+                                     for grouping in self.locations.values() for (location, item) in grouping.items()]))
 
             # locations: Change up location names; in the instance of a location with multiple sections, it'll try to translate the room name
             # items: Item names
-            outfile.write('\n\nShops:\n\n')
-            outfile.write('\n'.join("{} [{}]\n    {}".format(self.world.fish.translate("meta", "locations", shop['location']), shop['type'], "\n    ".join(self.world.fish.translate("meta", "items", item) for item in [shop.get('item_0', None), shop.get('item_1', None), shop.get('item_2', None)] if item)) for shop in self.shops))
+            if 'all' in self.settings or 'shops' in self.settings:
+                outfile.write('\n\nShops:\n\n')
+                outfile.write('\n'.join("{} [{}]\n    {}".format(self.world.fish.translate("meta", "locations", shop['location']), shop['type'], "\n    ".join(self.world.fish.translate("meta", "items", item) for item in [shop.get('item_0', None), shop.get('item_1', None), shop.get('item_2', None)] if item)) for shop in self.shops))
 
-            for player in range(1, self.world.players + 1):
-                if self.world.boss_shuffle[player] != 'none':
-                    bossmap = self.bosses[str(player)] if self.world.players > 1 else self.bosses
-                    outfile.write(f'\n\nBosses ({self.world.get_player_names(player)}):\n\n')
-                    outfile.write('\n'.join([f'{x}: {y}' for x, y in bossmap.items() if y not in ['Agahnim', 'Agahnim 2', 'Ganon']]))
+            if 'all' in self.settings or 'bosses' in self.settings:
+                for player in range(1, self.world.players + 1):
+                    if self.world.boss_shuffle[player] != 'none':
+                        bossmap = self.bosses[str(player)] if self.world.players > 1 else self.bosses
+                        outfile.write(f'\n\nBosses ({self.world.get_player_names(player)}):\n\n')
+                        outfile.write('\n'.join([f'{x}: {y}' for x, y in bossmap.items() if y not in ['Agahnim', 'Agahnim 2', 'Ganon']]))
 
     def extras(self, filename):
         # todo: conditional on enemy shuffle mode

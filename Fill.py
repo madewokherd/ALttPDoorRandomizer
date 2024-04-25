@@ -1115,7 +1115,7 @@ def set_prize_drops(world, player):
             for player, drop_config in drops.items():
                 for pack_num in range(1, 8):
                     if f'Pack {pack_num}' in drop_config:
-                        for prize, idx in enumerate(drop_config[f'Pack {pack_num}']):
+                        for idx, prize in enumerate(drop_config[f'Pack {pack_num}']):
                             chosen = random.choice(uniform_prizes) if prize == 'Random' else possible_prizes[prize]
                             prizes[(pack_num-1)*8 + idx] = chosen
                 for tree_pull_tier in range(1, 4):

@@ -236,7 +236,7 @@ def parse_settings():
         "mixed_travel": "prevent",
         "standardize_palettes": "standardize",
         'aga_randomness': True,
-        
+
         "triforce_pool": 0,
         "triforce_goal": 0,
         "triforce_pool_min": 0,
@@ -267,10 +267,9 @@ def parse_settings():
         "msu_resume": False,
         "collection_rate": False,
 
-        # Spoiler     defaults to TRUE
+        'spoiler': 'full',
         # Playthrough defaults to TRUE
         # ROM         defaults to TRUE
-        "create_spoiler": True,
         "calc_playthrough": True,
         "create_rom": True,
         "bps": False,
