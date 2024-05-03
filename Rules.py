@@ -70,6 +70,8 @@ def set_rules(world, player):
             # require aga2 to beat ganon
             add_rule(world.get_location('Ganon', player), lambda state: state.has('Beat Agahnim 2', player))
     elif world.goal[player] in ['triforcehunt', 'trinity']:
+        if world.goal[player] == 'trinity':
+            add_rule(world.get_location('Ganon', player), lambda state: state.has_crystals(world.crystals_needed_for_ganon[player], player))
         for location in world.get_region('Hyrule Castle Courtyard', player).locations:
             if location.name == 'Murahdahla':
                 add_rule(location, lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
