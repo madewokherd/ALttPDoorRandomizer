@@ -3630,13 +3630,17 @@ logical_connections = [
     ('Hyrule Castle Throne Room Tapestry', 'Hyrule Castle Behind Tapestry'),
     ('Hyrule Castle Tapestry Backwards', 'Hyrule Castle Throne Room'),
     ('Sewers Secret Room Push Block', 'Sewers Secret Room Blocked Path'),
+
     ('Eastern Hint Tile Push Block', 'Eastern Hint Tile'),
     ('Eastern Map Balcony Hook Path', 'Eastern Map Room'),
     ('Eastern Map Room Drop Down', 'Eastern Map Balcony'),
+    ('Eastern Palace Boss', 'Eastern Boss Spoils'),
+
     ('Desert Main Lobby Left Path', 'Desert Left Alcove'),
     ('Desert Main Lobby Right Path', 'Desert Right Alcove'),
     ('Desert Left Alcove Path', 'Desert Main Lobby'),
     ('Desert Right Alcove Path', 'Desert Main Lobby'),
+    ('Desert Palace Boss', 'Desert Boss Spoils'),
 
     ('Hera Lobby to Front Barrier - Blue', 'Hera Front'),
     ('Hera Front to Lobby Barrier - Blue', 'Hera Lobby'),
@@ -3666,6 +3670,7 @@ logical_connections = [
     ('Hera Big Chest Hook Path', 'Hera Big Chest Landing'),
     ('Hera Big Chest Landing Exit', 'Hera 4F'),
     ('Hera 5F Orange Path', 'Hera 5F Pot Block'),
+    ('Tower of Hera Boss', 'Hera Boss Spoils'),
 
     ('PoD Pit Room Block Path N', 'PoD Pit Room Blocked'),
     ('PoD Pit Room Block Path S', 'PoD Pit Room'),
@@ -3717,6 +3722,8 @@ logical_connections = [
     ('PoD Dark Pegs Middle Ranged Crystal Exit', 'PoD Dark Pegs Middle'),
     ('PoD Dark Pegs Middle to Left Bypass', 'PoD Dark Pegs Left'),
     ('PoD Dark Pegs Left Ranged Crystal Exit', 'PoD Dark Pegs Left'),
+    ('Palace of Darkness Boss', 'PoD Boss Spoils'),
+
     ('Swamp Lobby Moat', 'Swamp Entrance'),
     ('Swamp Entrance Moat', 'Swamp Lobby'),
     ('Swamp Trench 1 Approach Dry', 'Swamp Trench 1 Nexus'),
@@ -3759,12 +3766,15 @@ logical_connections = [
     ('Swamp Drain Right Switch', 'Swamp Drain Left'),
     ('Swamp Flooded Spot Ladder', 'Swamp Flooded Room'),
     ('Swamp Flooded Room Ladder', 'Swamp Flooded Spot'),
+    ('Swamp Palace Boss', 'Swamp Boss Spoils'),
 
     ('Skull Pot Circle Star Path', 'Skull Map Room'),
     ('Skull Big Chest Hookpath', 'Skull 1 Lobby'),
     ('Skull Back Drop Star Path', 'Skull Small Hall'),
     ('Skull 2 West Lobby Pits', 'Skull 2 West Lobby Ledge'),
     ('Skull 2 West Lobby Ledge Pits', 'Skull 2 West Lobby'),
+    ('Skull Woods Boss', 'Skull Boss Spoils'),
+
     ('Thieves Rail Ledge Drop Down', 'Thieves BK Corner'),
     ('Thieves Hellway Orange Barrier', 'Thieves Hellway S Crystal'),
     ('Thieves Hellway Crystal Orange Barrier', 'Thieves Hellway'),
@@ -3780,6 +3790,7 @@ logical_connections = [
     ('Thieves Conveyor Block Path', 'Thieves Conveyor Bridge'),
     ("Thieves Blind's Cell Door", "Thieves Blind's Cell Interior"),
     ("Thieves Blind's Cell Exit", "Thieves Blind's Cell"),
+    ('Thieves Town Boss', 'Thieves Boss Spoils'),
 
     ('Ice Cross Bottom Push Block Left', 'Ice Floor Switch'),
     ('Ice Cross Right Push Block Top', 'Ice Bomb Drop'),
@@ -3800,6 +3811,7 @@ logical_connections = [
     ('Ice Big Chest Landing Push Blocks', 'Ice Big Chest View'),
     ('Ice Refill to Crystal', 'Ice Refill - Crystal'),
     ('Ice Refill Crystal Exit', 'Ice Refill'),
+    ('Ice Palace Boss', 'Ice Boss Spoils'),
 
     ('Mire Lobby Gap', 'Mire Post-Gap'),
     ('Mire Post-Gap Gap', 'Mire Lobby'),
@@ -3835,6 +3847,7 @@ logical_connections = [
     ('Mire South Fish Blue Barrier', 'Mire Fishbone'),
     ('Mire Fishbone Blue Barrier', 'Mire South Fish'),
     ('Mire Fishbone Blue Barrier Bypass', 'Mire South Fish'),
+    ('Misery Mire Boss', 'Mire Boss Spoils'),
 
     ('TR Main Lobby Gap', 'TR Lobby Ledge'),
     ('TR Lobby Ledge Gap', 'TR Main Lobby'),
@@ -3882,6 +3895,7 @@ logical_connections = [
     ('TR Crystal Maze End Ranged Crystal Exit', 'TR Crystal Maze End'),
     ('TR Final Abyss Balcony Path', 'TR Final Abyss Ledge'),
     ('TR Final Abyss Ledge Path', 'TR Final Abyss Balcony'),
+    ('Turtle Rock Boss', 'TR Boss Spoils'),
 
     ('GT Blocked Stairs Block Path', 'GT Big Chest'),
     ('GT Speed Torch South Path', 'GT Speed Torch'),

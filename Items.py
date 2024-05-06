@@ -177,6 +177,7 @@ item_table = {'Bow': (True, False, None, 0x0B, 200, 'You have\nchosen the\narche
               'Small Heart': (False, False, None, 0x42, 10, 'Just a little\npiece of love!', 'and the heart', 'the life-giving kid', 'little love for sale', 'fungus for life', 'life boy feels some love again', 'a heart'),
               'Apples': (False, False, None, 0xD1, 30, 'Just a few pieces of fruit!', 'and the juicy fruit', 'the fruity kid', 'the fruit stand', 'expired fruit', 'bottle boy has fruit again', 'an apple hoard'),
               'Fairy': (False, False, None, 0xD2, 50, 'Just a pixie!', 'and the pixie', 'the pixie kid', 'pixie for sale', 'pixie fungus', 'bottle boy has pixie again', 'a pixie'),
+              'Beat Boss': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Beat Agahnim 1': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Beat Agahnim 2': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),
               'Get Frog': (True, False, 'Event', 999, None, None, None, None, None, None, None, None),

@@ -194,10 +194,17 @@ def generate_itempool(world, player):
     if world.timer in ['ohko', 'timed-ohko']:
         world.can_take_damage = False
 
+    def set_event_item(location_name, item_name=None):
+        location = world.get_location(location_name, player)
+        if item_name:
+            world.push_item(location, ItemFactory(item_name, player), False)
+        location.event = True
+        location.locked = True
+
     if world.goal[player] in ['pedestal', 'triforcehunt']:
-        world.push_item(world.get_location('Ganon', player), ItemFactory('Nothing', player), False)
+        set_event_item('Ganon', 'Nothing')
     else:
-        world.push_item(world.get_location('Ganon', player), ItemFactory('Triforce', player), False)
+        set_event_item('Ganon', 'Triforce')
 
     if world.goal[player] in ['triforcehunt', 'trinity']:
         region = world.get_region('Hyrule Castle Courtyard', player)
@@ -233,75 +240,45 @@ def generate_itempool(world, player):
         old_man.forced_item = old_man.item
         old_man.skip = True
 
-    world.get_location('Ganon', player).event = True
-    world.get_location('Ganon', player).locked = True
-    world.push_item(world.get_location('Agahnim 1', player), ItemFactory('Beat Agahnim 1', player), False)
-    world.get_location('Agahnim 1', player).event = True
-    world.get_location('Agahnim 1', player).locked = True
-    world.push_item(world.get_location('Agahnim 2', player), ItemFactory('Beat Agahnim 2', player), False)
-    world.get_location('Agahnim 2', player).event = True
-    world.get_location('Agahnim 2', player).locked = True
-    world.push_item(world.get_location('Lost Old Man', player), ItemFactory('Escort Old Man', player), False)
-    world.get_location('Lost Old Man', player).event = True
-    world.get_location('Lost Old Man', player).locked = True
-    world.push_item(world.get_location('Old Man Drop Off', player), ItemFactory('Return Old Man', player), False)
-    world.get_location('Old Man Drop Off', player).event = True
-    world.get_location('Old Man Drop Off', player).locked = True
-    world.push_item(world.get_location('Dark Blacksmith Ruins', player), ItemFactory('Pick Up Purple Chest', player), False)
-    world.get_location('Dark Blacksmith Ruins', player).event = True
-    world.get_location('Dark Blacksmith Ruins', player).locked = True
-    world.push_item(world.get_location('Middle Aged Man', player), ItemFactory('Deliver Purple Chest', player), False)
-    world.get_location('Middle Aged Man', player).event = True
-    world.get_location('Middle Aged Man', player).locked = True
-    world.push_item(world.get_location('Frog', player), ItemFactory('Get Frog', player), False)
-    world.get_location('Frog', player).event = True
-    world.get_location('Frog', player).locked = True
-    world.push_item(world.get_location('Missing Smith', player), ItemFactory('Return Smith', player), False)
-    world.get_location('Missing Smith', player).event = True
-    world.get_location('Missing Smith', player).locked = True
-    world.push_item(world.get_location('Floodgate', player), ItemFactory('Open Floodgate', player), False)
-    world.get_location('Floodgate', player).event = True
-    world.get_location('Floodgate', player).locked = True
-    world.push_item(world.get_location('Big Bomb', player), ItemFactory('Pick Up Big Bomb', player), False)
-    world.get_location('Big Bomb', player).event = True
-    world.get_location('Big Bomb', player).locked = True
-    world.push_item(world.get_location('Pyramid Crack', player), ItemFactory('Detonate Big Bomb', player), False)
-    world.get_location('Pyramid Crack', player).event = True
-    world.get_location('Pyramid Crack', player).locked = True
-    world.push_item(world.get_location('Trench 1 Switch', player), ItemFactory('Trench 1 Filled', player), False)
-    world.get_location('Trench 1 Switch', player).event = True
-    world.get_location('Trench 1 Switch', player).locked = True
-    world.push_item(world.get_location('Trench 2 Switch', player), ItemFactory('Trench 2 Filled', player), False)
-    world.get_location('Trench 2 Switch', player).event = True
-    world.get_location('Trench 2 Switch', player).locked = True
-    world.push_item(world.get_location('Swamp Drain', player), ItemFactory('Drained Swamp', player), False)
-    world.get_location('Swamp Drain', player).event = True
-    world.get_location('Swamp Drain', player).locked = True
-    world.push_item(world.get_location('Turtle Medallion Pad', player), ItemFactory('Turtle Opened', player), False)
-    world.get_location('Turtle Medallion Pad', player).event = True
-    world.get_location('Turtle Medallion Pad', player).locked = True
-    world.push_item(world.get_location('Attic Cracked Floor', player), ItemFactory('Shining Light', player), False)
-    world.get_location('Attic Cracked Floor', player).event = True
-    world.get_location('Attic Cracked Floor', player).locked = True
-    world.push_item(world.get_location('Suspicious Maiden', player), ItemFactory('Maiden Rescued', player), False)
-    world.get_location('Suspicious Maiden', player).event = True
-    world.get_location('Suspicious Maiden', player).locked = True
-    world.push_item(world.get_location('Revealing Light', player), ItemFactory('Maiden Unmasked', player), False)
-    world.get_location('Revealing Light', player).event = True
-    world.get_location('Revealing Light', player).locked = True
-    world.push_item(world.get_location('Ice Block Drop', player), ItemFactory('Convenient Block', player), False)
-    world.get_location('Ice Block Drop', player).event = True
-    world.get_location('Ice Block Drop', player).locked = True
-    world.push_item(world.get_location('Skull Star Tile', player), ItemFactory('Hidden Pits', player), False)
-    world.get_location('Skull Star Tile', player).event = True
-    world.get_location('Skull Star Tile', player).locked = True
+    event_items = {
+        'Agahnim 1': 'Beat Agahnim 1',
+        'Agahnim 2': 'Beat Agahnim 2',
+        'Eastern Palace - Boss Kill': 'Beat Boss',
+        'Desert Palace - Boss Kill': 'Beat Boss',
+        'Tower of Hera - Boss Kill': 'Beat Boss',
+        'Palace of Darkness - Boss Kill': 'Beat Boss',
+        'Swamp Palace - Boss Kill': 'Beat Boss',
+        'Skull Woods - Boss Kill': 'Beat Boss',
+        'Thieves\' Town - Boss Kill': 'Beat Boss',
+        'Ice Palace - Boss Kill': 'Beat Boss',
+        'Misery Mire - Boss Kill': 'Beat Boss',
+        'Turtle Rock - Boss Kill': 'Beat Boss',
+        'Lost Old Man': 'Escort Old Man',
+        'Old Man Drop Off': 'Return Old Man',
+        'Floodgate': 'Open Floodgate',
+        'Big Bomb': 'Pick Up Big Bomb',
+        'Pyramid Crack': 'Detonate Big Bomb',
+        'Frog': 'Get Frog',
+        'Missing Smith': 'Return Smith',
+        'Dark Blacksmith Ruins': 'Pick Up Purple Chest',
+        'Middle Aged Man': 'Deliver Purple Chest',
+        'Trench 1 Switch': 'Trench 1 Filled',
+        'Trench 2 Switch': 'Trench 2 Filled',
+        'Swamp Drain': 'Drained Swamp',
+        'Turtle Medallion Pad': 'Turtle Opened',
+        'Attic Cracked Floor': 'Shining Light',
+        'Suspicious Maiden': 'Maiden Rescued',
+        'Revealing Light': 'Maiden Unmasked',
+        'Ice Block Drop': 'Convenient Block',
+        'Skull Star Tile': 'Hidden Pits'
+    }
+
+    for loc, item in event_items.items():
+        set_event_item(loc, item)
+    
     if world.mode[player] == 'standard':
-        world.push_item(world.get_location('Zelda Pickup', player), ItemFactory('Zelda Herself', player), False)
-        world.get_location('Zelda Pickup', player).event = True
-        world.get_location('Zelda Pickup', player).locked = True
-        world.push_item(world.get_location('Zelda Drop Off', player), ItemFactory('Zelda Delivered', player), False)
-        world.get_location('Zelda Drop Off', player).event = True
-        world.get_location('Zelda Drop Off', player).locked = True
+        set_event_item('Zelda Pickup', 'Zelda Herself')
+        set_event_item('Zelda Drop Off', 'Zelda Delivered')
 
     # set up item pool
     skip_pool_adjustments = False

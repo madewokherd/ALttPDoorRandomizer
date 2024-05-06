@@ -489,7 +489,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Eastern Cannonball Hell', 'Eastern Palace', None, ['Eastern Cannonball Hell ES', 'Eastern Cannonball Hell WS']),
         create_dungeon_region(player, 'Eastern Single Eyegore', 'Eastern Palace', None, ['Eastern Single Eyegore ES', 'Eastern Single Eyegore NE']),
         create_dungeon_region(player, 'Eastern Duo Eyegores', 'Eastern Palace', None, ['Eastern Duo Eyegores SE', 'Eastern Duo Eyegores NE']),
-        create_dungeon_region(player, 'Eastern Boss', 'Eastern Palace', ['Eastern Palace - Boss', 'Eastern Palace - Prize'], ['Eastern Boss SE']),
+        create_dungeon_region(player, 'Eastern Boss', 'Eastern Palace', None, ['Eastern Boss SE', 'Eastern Palace Boss']),
+        create_dungeon_region(player, 'Eastern Boss Spoils', 'Eastern Palace', ['Eastern Palace - Boss', 'Eastern Palace - Prize', 'Eastern Palace - Boss Kill']),
 
         # Desert Palace
         create_dungeon_region(player, 'Desert Main Lobby', 'Desert Palace', None, ['Desert Main Lobby S', 'Desert Main Lobby N Edge', 'Desert Main Lobby Left Path', 'Desert Main Lobby Right Path']),
@@ -518,7 +519,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Desert Beamos Hall', 'Desert Palace', ['Desert Palace - Beamos Hall Pot Key'], ['Desert Beamos Hall WS', 'Desert Beamos Hall NE']),
         create_dungeon_region(player, 'Desert Tiles 2', 'Desert Palace', ['Desert Palace - Desert Tiles 2 Pot Key'], ['Desert Tiles 2 SE', 'Desert Tiles 2 NE']),
         create_dungeon_region(player, 'Desert Wall Slide', 'Desert Palace', None, ['Desert Wall Slide SE', 'Desert Wall Slide NW']),
-        create_dungeon_region(player, 'Desert Boss', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize'], ['Desert Boss SW']),
+        create_dungeon_region(player, 'Desert Boss', 'Desert Palace', None, ['Desert Boss SW', 'Desert Palace Boss']),
+        create_dungeon_region(player, 'Desert Boss Spoils', 'Desert Palace', ['Desert Palace - Boss', 'Desert Palace - Prize', 'Desert Palace - Boss Kill']),
 
         # Hera
         create_dungeon_region(player, 'Hera Lobby', 'Tower of Hera', None, ['Hera Lobby S', 'Hera Lobby to Crystal', 'Hera Lobby to Front Barrier - Blue']),
@@ -546,7 +548,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Hera 5F', 'Tower of Hera', None, ['Hera 5F Down Stairs', 'Hera 5F Up Stairs', 'Hera 5F Star Hole', 'Hera 5F Pothole Chain', 'Hera 5F Normal Holes', 'Hera 5F Orange Path']),
         create_dungeon_region(player, 'Hera 5F Pot Block', 'Tower of Hera', None),
         create_dungeon_region(player, 'Hera Fairies', 'Tower of Hera', None, ['Hera Fairies\' Warp']),
-        create_dungeon_region(player, 'Hera Boss', 'Tower of Hera', ['Tower of Hera - Boss', 'Tower of Hera - Prize'], ['Hera Boss Down Stairs', 'Hera Boss Outer Hole', 'Hera Boss Inner Hole']),
+        create_dungeon_region(player, 'Hera Boss', 'Tower of Hera', None, ['Hera Boss Down Stairs', 'Hera Boss Outer Hole', 'Hera Boss Inner Hole', 'Tower of Hera Boss']),
+        create_dungeon_region(player, 'Hera Boss Spoils', 'Tower of Hera', ['Tower of Hera - Boss', 'Tower of Hera - Prize', 'Tower of Hera - Boss Kill']),
 
         # AgaTower
         create_dungeon_region(player, 'Tower Lobby', 'Castle Tower', None, ['Tower Lobby NW', 'Tower Lobby S']),
@@ -621,7 +624,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'PoD Turtle Party', 'Palace of Darkness', None, ['PoD Turtle Party ES', 'PoD Turtle Party NW']),
         create_dungeon_region(player, 'PoD Dark Alley', 'Palace of Darkness', None, ['PoD Dark Alley NE']),
         create_dungeon_region(player, 'PoD Callback', 'Palace of Darkness', None, ['PoD Callback WS', 'PoD Callback Warp']),
-        create_dungeon_region(player, 'PoD Boss', 'Palace of Darkness', ['Palace of Darkness - Boss', 'Palace of Darkness - Prize'], ['PoD Boss SE']),
+        create_dungeon_region(player, 'PoD Boss', 'Palace of Darkness', None, ['PoD Boss SE', 'Palace of Darkness Boss']),
+        create_dungeon_region(player, 'PoD Boss Spoils', 'Palace of Darkness', ['Palace of Darkness - Boss', 'Palace of Darkness - Prize', 'Palace of Darkness - Boss Kill']),
 
         # swamp
         create_dungeon_region(player, 'Swamp Lobby', 'Swamp Palace', None, ['Swamp Lobby S', 'Swamp Lobby Moat']),
@@ -674,7 +678,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Swamp Waterway', 'Swamp Palace', ['Swamp Palace - Waterway Pot Key'], ['Swamp Waterway NE', 'Swamp Waterway N', 'Swamp Waterway NW']),
         create_dungeon_region(player, 'Swamp I', 'Swamp Palace', None, ['Swamp I S']),
         create_dungeon_region(player, 'Swamp T', 'Swamp Palace', None, ['Swamp T SW', 'Swamp T NW']),
-        create_dungeon_region(player, 'Swamp Boss', 'Swamp Palace', ['Swamp Palace - Boss', 'Swamp Palace - Prize'], ['Swamp Boss SW']),
+        create_dungeon_region(player, 'Swamp Boss', 'Swamp Palace', None, ['Swamp Boss SW', 'Swamp Palace Boss']),
+        create_dungeon_region(player, 'Swamp Boss Spoils', 'Swamp Palace', ['Swamp Palace - Boss', 'Swamp Palace - Prize', 'Swamp Palace - Boss Kill']),
 
         # sw
         create_dungeon_region(player, 'Skull 1 Lobby', 'Skull Woods', None, ['Skull 1 Lobby S', 'Skull 1 Lobby WS', 'Skull 1 Lobby ES']),
@@ -702,7 +707,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Skull Vines', 'Skull Woods', None, ['Skull Vines EN', 'Skull Vines NW']),
         create_dungeon_region(player, 'Skull Spike Corner', 'Skull Woods', ['Skull Woods - Spike Corner Key Drop'], ['Skull Spike Corner SW', 'Skull Spike Corner ES']),
         create_dungeon_region(player, 'Skull Final Drop', 'Skull Woods', None, ['Skull Final Drop WS', 'Skull Final Drop Hole']),
-        create_dungeon_region(player, 'Skull Boss', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize']),
+        create_dungeon_region(player, 'Skull Boss', 'Skull Woods', None, ['Skull Woods Boss']),
+        create_dungeon_region(player, 'Skull Boss Spoils', 'Skull Woods', ['Skull Woods - Boss', 'Skull Woods - Prize', 'Skull Woods - Boss Kill']),
 
         # tt
         create_dungeon_region(player, 'Thieves Lobby', 'Thieves\' Town', ['Thieves\' Town - Map Chest'], ['Thieves Lobby S', 'Thieves Lobby N Edge', 'Thieves Lobby NE Edge', 'Thieves Lobby E']),
@@ -712,8 +718,9 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Thieves Compass Room', 'Thieves\' Town', ['Thieves\' Town - Compass Chest'], ['Thieves Compass Room NW Edge', 'Thieves Compass Room N Edge', 'Thieves Compass Room WS Edge', 'Thieves Compass Room W']),
         create_dungeon_region(player, 'Thieves Big Chest Nook', 'Thieves\' Town', ['Thieves\' Town - Big Key Chest'], ['Thieves Big Chest Nook ES Edge']),
         create_dungeon_region(player, 'Thieves Hallway', 'Thieves\' Town', ['Thieves\' Town - Hallway Pot Key'], ['Thieves Hallway SE', 'Thieves Hallway NE', 'Thieves Hallway WN', 'Thieves Hallway WS']),
-        create_dungeon_region(player, 'Thieves Boss', 'Thieves\' Town', ['Revealing Light', 'Thieves\' Town - Boss', 'Thieves\' Town - Prize'], ['Thieves Boss SE']),
         #create_dungeon_region(player, 'Thieves Boss', 'Thieves\' Town', ['Thieves\' Town - Boss', 'Thieves\' Town - Prize'], ['Revealing Light', 'Thieves Boss SE']),
+        create_dungeon_region(player, 'Thieves Boss', 'Thieves\' Town', ['Revealing Light'], ['Thieves Boss SE', 'Thieves Town Boss']),
+        create_dungeon_region(player, 'Thieves Boss Spoils', 'Thieves\' Town', ['Thieves\' Town - Boss', 'Thieves\' Town - Prize', 'Thieves\' Town - Boss Kill']),
         #create_dungeon_region(player, 'Thieves Revealing Light', 'Thieves\' Town', ['Revealing Light'], ['Thieves Boss Room']),
         create_dungeon_region(player, 'Thieves Pot Alcove Mid', 'Thieves\' Town', None, ['Thieves Pot Alcove Mid ES', 'Thieves Pot Alcove Mid WS']),
         create_dungeon_region(player, 'Thieves Pot Alcove Bottom', 'Thieves\' Town', None, ['Thieves Pot Alcove Bottom SW']),
@@ -791,7 +798,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Ice Refill - Crystal', 'Ice Palace', None, ['Ice Refill Crystal Exit']),
         create_dungeon_region(player, 'Ice Fairy', 'Ice Palace', None, ['Ice Fairy Warp']),
         create_dungeon_region(player, 'Ice Antechamber', 'Ice Palace', None, ['Ice Antechamber NE', 'Ice Antechamber Hole']),
-        create_dungeon_region(player, 'Ice Boss', 'Ice Palace', ['Ice Palace - Boss', 'Ice Palace - Prize']),
+        create_dungeon_region(player, 'Ice Boss', 'Ice Palace', None, ['Ice Palace Boss']),
+        create_dungeon_region(player, 'Ice Boss Spoils', 'Ice Palace', ['Ice Palace - Boss', 'Ice Palace - Prize', 'Ice Palace - Boss Kill']),
 
         # mire
         create_dungeon_region(player, 'Mire Lobby', 'Misery Mire', None, ['Mire Lobby S', 'Mire Lobby Gap']),
@@ -855,7 +863,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'Mire Falling Foes', 'Misery Mire', None, ['Mire Falling Foes ES', 'Mire Falling Foes Up Stairs']),
         create_dungeon_region(player, 'Mire Firesnake Skip', 'Misery Mire', None, ['Mire Firesnake Skip Down Stairs', 'Mire Firesnake Skip Orange Barrier']),
         create_dungeon_region(player, 'Mire Antechamber', 'Misery Mire', None, ['Mire Antechamber Orange Barrier', 'Mire Antechamber NW']),
-        create_dungeon_region(player, 'Mire Boss', 'Misery Mire', ['Misery Mire - Boss', 'Misery Mire - Prize'], ['Mire Boss SW']),
+        create_dungeon_region(player, 'Mire Boss', 'Misery Mire', None, ['Mire Boss SW', 'Misery Mire Boss']),
+        create_dungeon_region(player, 'Mire Boss Spoils', 'Misery Mire', ['Misery Mire - Boss', 'Misery Mire - Prize', 'Misery Mire - Boss Kill']),
 
         # tr
         create_dungeon_region(player, 'TR Main Lobby', 'Turtle Rock', None, ['TR Main Lobby Gap', 'TR Main Lobby SE']),
@@ -912,7 +921,8 @@ def create_dungeon_regions(world, player):
         create_dungeon_region(player, 'TR Crystal Maze End - Ranged Crystal', 'Turtle Rock', None, ['TR Crystal Maze End Ranged Crystal Exit']),
         create_dungeon_region(player, 'TR Final Abyss Balcony', 'Turtle Rock', None, ['TR Final Abyss South Stairs', 'TR Final Abyss Balcony Path']),
         create_dungeon_region(player, 'TR Final Abyss Ledge', 'Turtle Rock', None, ['TR Final Abyss NW', 'TR Final Abyss Ledge Path']),
-        create_dungeon_region(player, 'TR Boss', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize'], ['TR Boss SW']),
+        create_dungeon_region(player, 'TR Boss', 'Turtle Rock', None, ['TR Boss SW', 'Turtle Rock Boss']),
+        create_dungeon_region(player, 'TR Boss Spoils', 'Turtle Rock', ['Turtle Rock - Boss', 'Turtle Rock - Prize', 'Turtle Rock - Boss Kill']),
 
         # gt
         create_dungeon_region(player, 'GT Lobby', 'Ganon\'s Tower', None, ['GT Lobby Left Down Stairs', 'GT Lobby Up Stairs', 'GT Lobby Right Down Stairs', 'GT Lobby S']),
@@ -1235,7 +1245,10 @@ def adjust_locations(world, player):
     for l in ['Ganon', 'Agahnim 1', 'Agahnim 2', 'Frog', 'Missing Smith', 'Dark Blacksmith Ruins', 'Middle Aged Man',
               'Floodgate', 'Trench 1 Switch', 'Trench 2 Switch', 'Swamp Drain', 'Turtle Medallion Pad',
               'Attic Cracked Floor', 'Suspicious Maiden', 'Revealing Light', 'Big Bomb', 'Pyramid Crack',
-              'Ice Block Drop', 'Lost Old Man', 'Old Man Drop Off', 'Zelda Pickup', 'Zelda Drop Off', 'Skull Star Tile']:
+              'Ice Block Drop', 'Lost Old Man', 'Old Man Drop Off', 'Zelda Pickup', 'Zelda Drop Off', 'Skull Star Tile',
+              'Eastern Palace - Boss Kill', 'Desert Palace - Boss Kill', 'Tower of Hera - Boss Kill',
+              'Palace of Darkness - Boss Kill', 'Swamp Palace - Boss Kill', 'Skull Woods - Boss Kill',
+              'Thieves\' Town - Boss Kill', 'Ice Palace - Boss Kill', 'Misery Mire - Boss Kill', 'Turtle Rock - Boss Kill']:
         location = world.get_location_unsafe(l, player)
         if location:
             location.type = LocationType.Logical
@@ -1623,6 +1636,16 @@ location_table = {'Mushroom': (0x180013, 0x186df8, False, 'in the woods'),
                   'Ganon': (None, None, False, 'from me'),
                   'Agahnim 1': (None, None, False, 'from Ganon\'s wizardry form'),
                   'Agahnim 2': (None, None, False, 'from Ganon\'s wizardry form'),
+                  'Eastern Palace - Boss Kill': (None, None, False, None),
+                  'Desert Palace - Boss Kill': (None, None, False, None),
+                  'Tower of Hera - Boss Kill': (None, None, False, None),
+                  'Palace of Darkness - Boss Kill': (None, None, False, None),
+                  'Swamp Palace - Boss Kill': (None, None, False, None),
+                  'Thieves\' Town - Boss Kill': (None, None, False, None),
+                  'Skull Woods - Boss Kill': (None, None, False, None),
+                  'Ice Palace - Boss Kill': (None, None, False, None),
+                  'Misery Mire - Boss Kill': (None, None, False, None),
+                  'Turtle Rock - Boss Kill': (None, None, False, None),
                   'Lost Old Man': (None, None, False, None),
                   'Old Man Drop Off': (None, None, False, None),
                   'Floodgate': (None, None, False, None),

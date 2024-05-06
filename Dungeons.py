@@ -65,7 +65,7 @@ eastern_regions = [
     'Eastern Compass Room', 'Eastern Hint Tile', 'Eastern Hint Tile Blocked Path', 'Eastern Courtyard',
     'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Dark Pots', 'Eastern Big Key',
     'Eastern Darkness', 'Eastern Rupees', 'Eastern Attic Start', 'Eastern False Switches', 'Eastern Cannonball Hell',
-    'Eastern Single Eyegore', 'Eastern Duo Eyegores', 'Eastern Boss', 'Eastern Portal'
+    'Eastern Single Eyegore', 'Eastern Duo Eyegores', 'Eastern Boss', 'Eastern Boss Spoils', 'Eastern Portal'
 ]
 
 desert_regions = [
@@ -74,7 +74,7 @@ desert_regions = [
     'Desert North Hall', 'Desert Map Room', 'Desert Sandworm Corner', 'Desert Bonk Torch', 'Desert Circle of Pots',
     'Desert Big Chest Room', 'Desert West Wing', 'Desert West Lobby', 'Desert Fairy Fountain', 'Desert Back Lobby',
     'Desert Tiles 1', 'Desert Bridge', 'Desert Four Statues', 'Desert Beamos Hall', 'Desert Tiles 2',
-    'Desert Wall Slide', 'Desert Boss', 'Desert West Portal', 'Desert South Portal', 'Desert East Portal',
+    'Desert Wall Slide', 'Desert Boss', 'Desert Boss Spoils', 'Desert West Portal', 'Desert South Portal', 'Desert East Portal',
     'Desert Back Portal'
 ]
 
@@ -84,7 +84,7 @@ hera_regions = [
     'Hera Back - Ranged Crystal', 'Hera Basement Cage', 'Hera Basement Cage - Crystal', 'Hera Tile Room',
     'Hera Tridorm', 'Hera Tridorm - Crystal', 'Hera Torches', 'Hera Beetles', 'Hera Startile Corner',
     'Hera Startile Wide', 'Hera Startile Wide - Crystal', 'Hera 4F', 'Hera Big Chest Landing', 'Hera 5F',
-    'Hera 5F Pot Block', 'Hera Fairies', 'Hera Boss', 'Hera Portal'
+    'Hera 5F Pot Block', 'Hera Fairies', 'Hera Boss', 'Hera Boss Spoils', 'Hera Portal'
 ]
 
 tower_regions = [
@@ -105,7 +105,7 @@ pod_regions = [
     'PoD Bow Statue Left', 'PoD Bow Statue Left - Crystal', 'PoD Bow Statue Right', 'PoD Bow Statue Right - Ranged Crystal',
     'PoD Dark Pegs Landing', 'PoD Dark Pegs Right', 'PoD Dark Pegs Middle', 'PoD Dark Pegs Left', 'PoD Dark Pegs Landing - Ranged Crystal',
     'PoD Dark Pegs Middle - Ranged Crystal', 'PoD Dark Pegs Left - Ranged Crystal', 'PoD Lonely Turtle', 'PoD Turtle Party',
-    'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
+    'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'PoD Boss Spoils', 'Palace of Darkness Portal'
 ]
 
 swamp_regions = [
@@ -119,7 +119,7 @@ swamp_regions = [
     'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier', 'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters',
     'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left', 'Swamp Drain Right', 'Swamp Flooded Room',
     'Swamp Flooded Spot', 'Swamp Basement Shallows', 'Swamp Waterfall Room', 'Swamp Refill', 'Swamp Behind Waterfall',
-    'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss', 'Swamp Portal'
+    'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss', 'Swamp Boss Spoils', 'Swamp Portal'
 ]
 
 skull_regions = [
@@ -127,7 +127,7 @@ skull_regions = [
     'Skull Pot Prison', 'Skull Compass Room', 'Skull Left Drop', 'Skull 2 East Lobby', 'Skull Big Key',
     'Skull Lone Pot', 'Skull Small Hall', 'Skull Back Drop', 'Skull 2 West Lobby', 'Skull 2 West Lobby Ledge',
     'Skull X Room', 'Skull 3 Lobby', 'Skull East Bridge', 'Skull West Bridge Nook', 'Skull Star Pits',
-    'Skull Torch Room', 'Skull Vines', 'Skull Spike Corner', 'Skull Final Drop', 'Skull Boss',
+    'Skull Torch Room', 'Skull Vines', 'Skull Spike Corner', 'Skull Final Drop', 'Skull Boss', 'Skull Boss Spoils',
     'Skull 1 Portal', 'Skull 2 East Portal', 'Skull 2 West Portal', 'Skull 3 Portal'
 ]
 
@@ -139,7 +139,7 @@ thieves_regions = [
     'Thieves Attic', 'Thieves Attic Hint', 'Thieves Attic Switch', 'Thieves Cricket Hall Left',
     'Thieves Cricket Hall Right', 'Thieves Attic Window', 'Thieves Basement Block', 'Thieves Blocked Entry',
     'Thieves Lonely Zazak', "Thieves Blind's Cell", "Thieves Blind's Cell Interior", 'Thieves Conveyor Bridge',
-    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap', 'Thieves Town Portal'
+    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap', 'Thieves Boss Spoils', 'Thieves Town Portal'
 ]
 
 ice_regions = [
@@ -152,7 +152,7 @@ ice_regions = [
     'Ice Hookshot Balcony', 'Ice Spikeball', 'Ice Lonely Freezor', 'Iced T', 'Ice Catwalk', 'Ice Many Pots',
     'Ice Crystal Right', 'Ice Crystal Left', 'Ice Crystal Block', 'Ice Big Chest View', 'Ice Big Chest Landing',
     'Ice Backwards Room', 'Ice Anti-Fairy', 'Ice Switch Room', 'Ice Refill', 'Ice Refill - Crystal',
-    'Ice Fairy', 'Ice Antechamber', 'Ice Boss', 'Ice Portal'
+    'Ice Fairy', 'Ice Antechamber', 'Ice Boss', 'Ice Boss Spoils', 'Ice Portal'
 ]
 
 mire_regions = [
@@ -168,7 +168,7 @@ mire_regions = [
     'Mire Key Rupees', 'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Tall Dark and Roomy - Ranged Crystal',
     'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
     'Mire Crystal Top', 'Mire Shooter Rupees', 'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber',
-    'Mire Boss', 'Mire Portal'
+    'Mire Boss', 'Mire Boss Spoils', 'Mire Portal'
 ]
 
 tr_regions = [
@@ -182,7 +182,7 @@ tr_regions = [
     'TR Crystaroller Top - Crystal', 'TR Crystaroller Chest', 'TR Crystaroller Middle - Ranged Crystal',
     'TR Crystaroller Bottom - Ranged Crystal', 'TR Dark Ride', 'TR Dark Ride Ledges', 'TR Dash Bridge', 'TR Eye Bridge',
     'TR Crystal Maze Start', 'TR Crystal Maze Start - Crystal', 'TR Crystal Maze Interior', 'TR Crystal Maze End',
-    'TR Crystal Maze End - Ranged Crystal', 'TR Final Abyss Balcony', 'TR Final Abyss Ledge', 'TR Boss',
+    'TR Crystal Maze End - Ranged Crystal', 'TR Final Abyss Balcony', 'TR Final Abyss Ledge', 'TR Boss', 'TR Boss Spoils',
     'Turtle Rock Main Portal', 'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Chest Portal',
     'Turtle Rock Eye Bridge Portal'
 ]
