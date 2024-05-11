@@ -88,6 +88,7 @@ class World(object):
         self.owwhirlpools = {}
         self.owflutespots = {}
         self.owsectors = {}
+        self.allow_flip_sanc = {}
         self.doors = []
         self._door_cache = {}
         self.paired_doors = {}
@@ -118,6 +119,7 @@ class World(object):
             set_player_attr('owcrossededges', [])
             set_player_attr('owwhirlpools', [])
             set_player_attr('owsectors', None)
+            set_player_attr('allow_flip_sanc', False)
             set_player_attr('remote_items', False)
             set_player_attr('required_medallions', ['Ether', 'Quake'])
             set_player_attr('bottle_refills', ['Bottle (Green Potion)', 'Bottle (Green Potion)'])
@@ -319,7 +321,9 @@ class World(object):
         return self.is_tile_swapped(0x2c, player)
 
     def is_dark_chapel_start(self, player):
-        return self.is_tile_swapped(0x13, player)
+        if self.allow_flip_sanc[player]:
+            return self.is_tile_swapped(0x13, player)
+        return self.mode[player] == 'inverted'
 
     def is_pyramid_open(self, player):
         if self.open_pyramid[player] == 'yes':

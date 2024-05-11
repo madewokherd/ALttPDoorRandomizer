@@ -151,7 +151,8 @@ def link_overworld(world, player):
     # tile shuffle
     logging.getLogger('').debug('Flipping overworld tiles')
     if world.owMixed[player]:
-        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, False, player)
+        tile_groups, force_flipped, force_nonflipped, undefined_chance, allow_flip_sanc = define_tile_groups(world, False, player)
+        world.allow_flip_sanc[player] = allow_flip_sanc
         swapped_edges = shuffle_tiles(world, tile_groups, world.owswaps[player], False, (force_flipped, force_nonflipped, undefined_chance), player)
         
         update_world_regions(world, player)
@@ -241,7 +242,7 @@ def link_overworld(world, player):
         # the idea is to XOR the new flips with the ones from Mixed so that non-parallel edges still work
         # Polar corresponds to Grouped with no flips in ow_crossed_tiles_mask
         ow_crossed_tiles_mask = [[],[],[]]
-        tile_groups, force_flipped, force_nonflipped, undefined_chance = define_tile_groups(world, True, player)
+        tile_groups, force_flipped, force_nonflipped, undefined_chance, _ = define_tile_groups(world, True, player)
         world.owcrossededges[player] = shuffle_tiles(world, tile_groups, ow_crossed_tiles_mask, True, (force_flipped, force_nonflipped, undefined_chance), player)
         ow_crossed_tiles = [i for i in range(0x82) if (i in world.owswaps[player][0]) != (i in ow_crossed_tiles_mask[0])]
 
@@ -1184,7 +1185,7 @@ def define_tile_groups(world, do_grouped, player):
             tile_groups.append((group, lw_regions, dw_regions))
 
     random.shuffle(tile_groups)
-    return tile_groups, flipped_groups, nonflipped_groups, undefined_chance
+    return tile_groups, flipped_groups, nonflipped_groups, undefined_chance, allow_flip_sanc
 
 def remove_reserved(world, groupedlist, connected_edges, player):
     new_grouping = {}
