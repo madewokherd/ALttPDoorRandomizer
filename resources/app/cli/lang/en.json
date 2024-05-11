@@ -350,6 +350,7 @@
     "compassshuffle": [ "Compasses are no longer restricted to their dungeons, but can be anywhere. (default: %(default)s)" ],
     "keyshuffle": [ "Small Keys are no longer restricted to their dungeons, but can be anywhere. (default: %(default)s)" ],
     "bigkeyshuffle": [ "Big Keys are no longer restricted to their dungeons, but can be anywhere. (default: %(default)s)" ],
+    "prizeshuffle": [ "Prizes are no longer restricted to the bosses, but can be anywhere. (default: %(default)s)" ],
     "shopsanity": ["Shop contents are shuffle in the main item pool and other items can take their place. (default: %(default)s)"],
     "dropshuffle": [ "Controls how enemies drop items (default: %(default)s)",
       "None:        Enemies drops prize packs or keys as normal",

@@ -29,7 +29,7 @@ from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths
 from Text import LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts
 from Text import Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
 from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
-from Items import ItemFactory
+from Items import ItemFactory, prize_item_table
 from EntranceShuffle import door_addresses, exit_ids, ow_prize_table
 from OverworldShuffle import default_flute_connections, flute_data
 from InitialSram import InitialSram
@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'ddc8fd3a8c7265b8748c0df4382f8f0e'
+RANDOMIZERBASEHASH = '67eccbeb5a22f33bbb83c338214d984f'
 
 
 class JsonRom(object):
@@ -462,32 +462,31 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         if location.address is None or (type(location.address) is int and location.address >= 0x400000):
             continue
 
-        if not location.crystal:
-            if location.item is not None:
-                # Keys in their native dungeon should use the original item code for keys
-                itemid = handle_native_dungeon(location, itemid)
-                if world.remote_items[player]:
-                    itemid = list(location_table.keys()).index(location.name) + 1
-                    assert itemid < 0x100
-                    rom.write_byte(location.player_address, 0xFF)
-                elif location.item.player != player:
-                    if location.player_address is not None:
-                        rom.write_byte(location.player_address, location.item.player)
-                    else:
-                        itemid = 0x5A
-            rom.write_byte(location.address, itemid)
-        else:
+        if location.item is not None:
+            # Keys in their native dungeon should use the original item code for keys
+            itemid = handle_native_dungeon(location, itemid)
+            if world.remote_items[player]:
+                itemid = list(location_table.keys()).index(location.name) + 1
+                assert itemid < 0x100
+                rom.write_byte(location.player_address, 0xFF)
+            elif location.item.player != player:
+                if location.player_address is not None:
+                    rom.write_byte(location.player_address, location.item.player)
+                else:
+                    itemid = 0x5A
+        rom.write_byte(location.address, itemid)
+    for dungeon in [d for d in world.dungeons if d.player == player]:
+        if dungeon.prize:
             # crystals
-            for address, value in zip(location.address, itemid):
+            for address, value in zip(dungeon_table[dungeon.name].prize, prize_item_table[dungeon.prize.name]):
                 rom.write_byte(address, value)
 
             # patch music
-            music_addresses = dungeon_music_addresses[location.name]
             if world.mapshuffle[player]:
                 music = random.choice([0x11, 0x16])
             else:
                 music = 0x11 if 'Pendant' in location.item.name else 0x16
-            for music_address in music_addresses:
+            for music_address in dungeon_music_addresses[dungeon.name]:
                 rom.write_byte(music_address, music)
 
     if world.mapshuffle[player]:
@@ -724,7 +723,8 @@ def patch_rom(world, rom, player, team, is_mystery=False):
                                                    or (l.type == LocationType.Drop and not l.forced_item)
                                                    or (l.type == LocationType.Normal and not l.forced_item)
                                                    or (l.type == LocationType.Bonk and not l.forced_item)
-                                                   or (l.type == LocationType.Shop and world.shopsanity[player]))]
+                                                   or (l.type == LocationType.Shop and world.shopsanity[player])
+                                                   or (l.type == LocationType.Prize and not l.prize))]
     valid_loc_by_dungeon = valid_dungeon_locations(valid_locations)
 
     # fix hc big key problems (map and compass too)
@@ -1077,7 +1077,11 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         0xFF, 0xFF, 0xFF, 0xFF, # end of table sentinel
     ])
 
-    # item GFX changes
+    # item property changes
+    if world.prizeshuffle[player] != 'none':
+        # allows prizes to contribute to collection rate
+        write_int16s(rom, snes_to_pc(0x22C06E), [0x01]*3) # pendants
+        write_int16s(rom, snes_to_pc(0x22C160), [0x81]*7) # crystals
     if world.bombbag[player]:
         rom.write_byte(snes_to_pc(0x22C8A4), 0xE0) # use new bomb bag gfx
         rom.write_byte(snes_to_pc(0x22BD52), 0x02)
@@ -1207,6 +1211,8 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     rom.write_byte(0x1800A1, 0x01)  # enable overworld screen transition draining for water level inside swamp
     rom.write_byte(0x180174, 0x01 if world.fix_fake_world[player] else 0x00)
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
+    # fix for allowing prize itemgets being able to update the HUD (buying prizes in shops and updating rupees)
+    rom.write_bytes(snes_to_pc(0x0799FB), [0x80, 0x11, 0xEA])
 
     # Starting equipment
     if world.pseudoboots[player]:
@@ -1262,13 +1268,15 @@ def patch_rom(world, rom, player, team, is_mystery=False):
 
     # Bitfield - enable text box to show with free roaming items
     #
-    # ---o bmcs
+    # --po bmcs
+    # p - enabled for non-prize crystals
     # o - enabled for outside dungeon items
     # b - enabled for inside big keys
     # m - enabled for inside maps
     # c - enabled for inside compasses
     # s - enabled for inside small keys
-    rom.write_byte(0x18016A, 0x10 | ((0x01 if world.keyshuffle[player] == 'wild' else 0x00)
+    rom.write_byte(0x18016A, 0x10 | ((0x20 if world.prizeshuffle[player] == 'wild' else 0x00)
+                                     | (0x01 if world.keyshuffle[player] == 'wild' else 0x00)
                                      | (0x02 if world.compassshuffle[player] else 0x00)
                                      | (0x04 if world.mapshuffle[player] else 0x00)
                                      | (0x08 if world.bigkeyshuffle[player] else 0x00)))  # free roaming item text boxes
@@ -1284,63 +1292,85 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     elif (world.compassshuffle[player] or world.doorShuffle[player] != 'vanilla' or world.dropshuffle[player] != 'none'
           or world.dungeon_counters[player] == 'pickup' or world.pottery[player] not in ['none', 'cave']):
         compass_mode = 0x01  # show on pickup
-    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') or world.owMixed[player]:
-        compass_mode |= 0x80  # turn on locating dungeons
-        if world.overworld_map[player] == 'compass':
-            compass_mode |= 0x20  # show icon if compass is collected, 0x00 for maps
-            if world.compassshuffle[player]:
-                compass_mode |= 0x40  # dungeon item that enables icon is wild
-        elif world.overworld_map[player] == 'map' or world.owMixed[player]:
-            if world.mapshuffle[player]:
-                compass_mode |= 0x40  # dungeon item that enables icon is wild
-        
-        if world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default':
-            x_map_position_generic = [0x3c0, 0xbc0, 0x7c0, 0x1c0, 0x5c0, 0xdc0, 0x7c0, 0xbc0, 0x9c0, 0x3c0]
-            for idx, x_map in enumerate(x_map_position_generic):
-                rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
-                rom.write_bytes(0x53e16+idx*2, int16_as_bytes(0xFC0))
-        elif world.overworld_map[player] == 'default':
-            # disable HC/AT/GT icons
-            if not world.owMixed[player]:
-                rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
-                rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
-            rom.write_bytes(0x53E8E, int16_as_bytes(0xFF00)) # HC
-        for dungeon, portal_list in dungeon_portals.items():
-            ow_map_index = dungeon_table[dungeon].map_index
-            if world.shuffle[player] != 'vanilla' and world.overworld_map[player] == 'default':
-                vanilla_entrances = { 'Hyrule Castle': 'Hyrule Castle Entrance (South)',
-                                        'Desert Palace': 'Desert Palace Entrance (North)',
-                                        'Skull Woods': 'Skull Woods Final Section'
-                                    }
-                entrance_name = vanilla_entrances[dungeon] if dungeon in vanilla_entrances else dungeon
-                entrance = world.get_entrance(entrance_name, player)
-            else:
-                if world.shuffle[player] != 'vanilla':
-                    if len(portal_list) == 1:
-                        portal_idx = 0
-                    else:
-                        if world.doorShuffle[player] not in ['vanilla', 'basic']:
-                            # the random choice excludes sanctuary
-                            portal_idx = next((i for i, elem in enumerate(portal_list)
-                                            if world.get_portal(elem, player).chosen), random.choice([1, 2, 3]))
-                        else:
-                            portal_idx = {'Hyrule Castle': 0, 'Desert Palace': 0, 'Skull Woods': 3, 'Turtle Rock': 3}[dungeon]
+    if world.overworld_map[player] == 'compass':
+        compass_mode |= 0x20  # show icon if compass is collected, 0x00 for maps
+        if world.compassshuffle[player]:
+            compass_mode |= 0x40  # icon position revealed upon collecting dungeon item
+    elif world.overworld_map[player] == 'map':
+        if world.mapshuffle[player]:
+            compass_mode |= 0x40  # icon position revealed upon collecting dungeon item
+    elif world.prizeshuffle[player] == 'wild':
+        compass_mode |= 0x40  # icon position revealed upon collecting dungeon item
+    if world.prizeshuffle[player] == 'wild':
+        compass_mode |= 0x10  # show icon if boss is defeated, hide if collected
+
+    if (world.shuffle[player] != 'vanilla' and world.overworld_map[player] != 'default') or world.prizeshuffle[player] == 'wild':
+        x_map_position_generic = [0x3c0, 0xac0, 0x740, 0x1c0, 0x5c0, 0xdc0, 0x7c0, 0xbc0, 0x9c0, 0x3c0]
+        y_map_position_generic = [0xff00, 0xff00, 0xff00, 0xfc0, 0xfc0, 0xfc0, 0xfc0, 0xfc0, 0xfc0, 0xfc0]
+        for idx, x_map in enumerate(x_map_position_generic):
+            rom.write_bytes(0x53df6+idx*2, int16_as_bytes(x_map))
+            rom.write_bytes(0x53e16+idx*2, int16_as_bytes(y_map_position_generic[idx]))
+    if world.overworld_map[player] == 'default':
+        # disable HC/AT/GT icons
+        if not world.owMixed[player]:
+            rom.write_bytes(0x53E8A, int16_as_bytes(0xFF00)) # GT
+            rom.write_bytes(0x53E8C, int16_as_bytes(0xFF00)) # AT
+        rom.write_bytes(0x53E8E, int16_as_bytes(0xFF00)) # HC
+    for dungeon, portal_list in dungeon_portals.items():
+        ow_map_index = dungeon_table[dungeon].map_index
+        if world.prizeshuffle[player] == 'wild' and dungeon_table[dungeon].prize:
+            dungeon_obj = world.get_dungeon(dungeon, player)
+            entrance = dungeon_obj.prize.get_map_location()
+        elif world.shuffle[player] != 'vanilla' and world.overworld_map[player] == 'default':
+            # TODO: I think this is logically the same as some of the vanilla stuff below
+            vanilla_entrances = { 'Hyrule Castle': 'Hyrule Castle Entrance (South)',
+                                    'Desert Palace': 'Desert Palace Entrance (North)',
+                                    'Skull Woods': 'Skull Woods Final Section'
+                                }
+            entrance_name = vanilla_entrances[dungeon] if dungeon in vanilla_entrances else dungeon
+            entrance = world.get_entrance(entrance_name, player)
+        else:
+            if world.shuffle[player] != 'vanilla':
+                if len(portal_list) == 1:
+                    portal_idx = 0
                 else:
-                    if dungeon in ['Hyrule Castle', 'Agahnims Tower', 'Ganons Tower']:
-                        portal_idx = -1
-                    elif len(portal_list) == 1:
-                        portal_idx = 0
+                    if world.doorShuffle[player] not in ['vanilla', 'basic']:
+                        # the random choice excludes sanctuary
+                        portal_idx = next((i for i, elem in enumerate(portal_list)
+                                        if world.get_portal(elem, player).chosen), random.choice([1, 2, 3]))
                     else:
-                        portal_idx = {'Desert Palace': 1, 'Skull Woods': 3, 'Turtle Rock': 0}[dungeon]
-                portal = world.get_portal(portal_list[0 if portal_idx == -1 else portal_idx], player)
-                entrance = portal.find_portal_entrance()
-            world_indicator = 0x01 if entrance.parent_region.type == RegionType.DarkWorld else 0x00
+                        portal_idx = {'Hyrule Castle': 0, 'Desert Palace': 0, 'Skull Woods': 3, 'Turtle Rock': 3}[dungeon]
+            else:
+                if dungeon in ['Hyrule Castle', 'Agahnims Tower', 'Ganons Tower']:
+                    portal_idx = -1
+                elif len(portal_list) == 1:
+                    portal_idx = 0
+                else:
+                    portal_idx = {'Desert Palace': 1, 'Skull Woods': 3, 'Turtle Rock': 0}[dungeon]
+            portal = world.get_portal(portal_list[0 if portal_idx == -1 else portal_idx], player)
+            entrance = portal.find_portal_entrance()
+        if type(entrance) is Location:
+            from OverworldShuffle import OWTileRegions
+            if entrance.name == 'Hobo':
+                coords = (0xb80, 0xb80)
+            elif entrance.name == 'Master Sword Pedestal':
+                coords = (0x06d, 0x070)
+            else:
+                owid = OWTileRegions[entrance.parent_region.name]
+                if owid == 0x81:
+                    coords = (0x220, 0xf40)
+                else:
+                    owid = owid % 0x40
+                    coords = (0x200 * (owid % 0x08) + 0x100, 0x200 * int(owid / 0x08) + 0x100)
+                    if owid in [0x00, 0x03, 0x05, 0x18, 0x1b, 0x1e, 0x30, 0x35]:
+                        coords = (coords[0] + 0x100, coords[1] + 0x100)
+        else:
             coords = ow_prize_table[entrance.name]
-            # figure out compass entrances and what world (light/dark)
-            if world.overworld_map[player] != 'default' or world.owMixed[player]:
-                rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
-                rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
-            rom.write_byte(0x53EA6+ow_map_index, world_indicator)
+        world_indicator = 0x01 if entrance.parent_region.type == RegionType.DarkWorld else 0x00
+        # figure out compass entrances and what world (light/dark)
+        rom.write_bytes(0x53E36+ow_map_index*2, int16_as_bytes(coords[0]))
+        rom.write_bytes(0x53E56+ow_map_index*2, int16_as_bytes(coords[1]))
+        rom.write_byte(0x53EA6+ow_map_index, world_indicator)
 
     # in crossed doors - flip the compass exists flags
     if world.doorShuffle[player] not in ['vanilla', 'basic']:
@@ -2160,6 +2190,8 @@ def write_strings(rom, world, player, team):
             items_to_hint.extend(SmallKeys)
         if world.bigkeyshuffle[player]:
             items_to_hint.extend(BigKeys)
+        if world.prizeshuffle[player] == 'wild':
+            items_to_hint.extend(Prizes)
         random.shuffle(items_to_hint)
         hint_count = 5 if world.shuffle[player] not in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district', 'swapped'] else 8
         hint_count += 2 if world.doorShuffle[player] not in ['vanilla', 'basic'] else 0
@@ -2273,10 +2305,14 @@ def write_strings(rom, world, player, team):
 
     crystal5 = world.find_items('Crystal 5', player)[0]
     crystal6 = world.find_items('Crystal 6', player)[0]
-    tt['bomb_shop'] = 'Big Bomb?\nMy supply is blocked until you clear %s and %s.' % (crystal5.hint_text, crystal6.hint_text)
-
     greenpendant = world.find_items('Green Pendant', player)[0]
-    tt['sahasrahla_bring_courage'] = 'I lost my family heirloom in %s' % greenpendant.hint_text
+    if world.prizeshuffle[player] == 'none':
+        (crystal5, crystal6, greenpendant) = tuple([x.parent_region.dungeon.name for x in [crystal5, crystal6, greenpendant]])
+        tt['bomb_shop'] = 'Big Bomb?\nMy supply is blocked until you clear %s and %s.' % (crystal5, crystal6)
+        tt['sahasrahla_bring_courage'] = 'I lost my family heirloom in %s' % greenpendant
+    else:
+        tt['bomb_shop'] = 'Big Bomb?\nThe crystals can be found %s and %s.' % (crystal5.hint_text, crystal6.hint_text)
+        tt['sahasrahla_bring_courage'] = 'My family heirloom can be found %s' % greenpendant.hint_text
 
     tt['sign_ganons_tower'] = ('You need %d crystal to enter.' if world.crystals_needed_for_gt[player] == 1 else 'You need %d crystals to enter.') % world.crystals_needed_for_gt[player]
 
@@ -2964,6 +3000,18 @@ BigKeys = ['Big Key (Eastern Palace)',
            'Big Key (Misery Mire)',
            'Big Key (Turtle Rock)',
            'Big Key (Ganons Tower)'
+           ]
+
+Prizes = ['Green Pendant',
+          'Blue Pendant',
+          'Red Pendant',
+          'Crystal 1',
+          'Crystal 2',
+          'Crystal 3',
+          'Crystal 4',
+          'Crystal 5',
+          'Crystal 6',
+          'Crystal 7'
            ]
 
 hash_alphabet = [

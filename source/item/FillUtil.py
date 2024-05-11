@@ -59,6 +59,8 @@ def create_item_pool_config(world):
                 if info.prize:
                     d_name = "Thieves' Town" if dungeon.startswith('Thieves') else dungeon
                     config.reserved_locations[player].add(f'{d_name} - Boss')
+                    if world.prizeshuffle[player] != 'none':
+                        config.reserved_locations[player].add(f'{d_name} - Prize')
     for dungeon in world.dungeons:
         if world.restrict_boss_items[dungeon.player] != 'none':
             for item in dungeon.all_items:
@@ -118,6 +120,9 @@ def create_item_pool_config(world):
                 LocationGroup('bkgt').locs(mode_grouping['GT Trash'])]
             for loc_name in mode_grouping['Big Chests'] + mode_grouping['Heart Containers']:
                 config.reserved_locations[player].add(loc_name)
+            if world.prizeshuffle[player] != 'none':
+                for loc_name in mode_grouping['Prizes']:
+                    config.reserved_locations[player].add(loc_name)
     elif world.algorithm == 'major_only':
         config.location_groups = [
             LocationGroup('MajorItems'),
@@ -127,6 +132,8 @@ def create_item_pool_config(world):
         init_set = mode_grouping['Overworld Major'] + mode_grouping['Big Chests'] + mode_grouping['Heart Containers']
         for player in range(1, world.players + 1):
             groups = LocationGroup('Major').locs(init_set)
+            if world.prizeshuffle[player] != 'none':
+                groups.locations.extend(mode_grouping['Prizes'])
             if world.bigkeyshuffle[player]:
                 groups.locations.extend(mode_grouping['Big Keys'])
                 if world.dropshuffle[player] != 'none':
@@ -251,21 +258,33 @@ def location_prefilled(location, world, player):
 
 
 def previously_reserved(location, world, player):
-    if '- Boss' in location.name:
+    if '- Boss' in location.name or '- Prize' in location.name:
         if world.restrict_boss_items[player] == 'mapcompass' and (not world.compassshuffle[player]
                                                                   or not world.mapshuffle[player]):
             return True
         if world.restrict_boss_items[player] == 'dungeon' and (not world.compassshuffle[player]
                                                                or not world.mapshuffle[player]
                                                                or not world.bigkeyshuffle[player]
-                                                               or world.keyshuffle[player] == 'none'):
+                                                               or world.keyshuffle[player] == 'none'
+                                                               or world.prizeshuffle[player] in ['none', 'dungeon']):
             return True
     return False
 
 
 def massage_item_pool(world):
     player_pool = defaultdict(list)
+    dungeon_pool = defaultdict(list)
+    for dungeon in world.dungeons:
+        if dungeon_table[dungeon.name].prize:
+            dungeon_pool[dungeon.player].append(dungeon)
+    for player in dungeon_pool:
+        dungeons = list(dungeon_pool[player])
+        random.shuffle(dungeons)
+        dungeon_pool[player] = dungeons
     for item in world.itempool:
+        if item.prize:
+            dungeon = dungeon_pool[item.player].pop()
+            dungeon.prize = item
         player_pool[item.player].append(item)
     for dungeon in world.dungeons:
         for item in dungeon.all_items:
@@ -273,7 +292,7 @@ def massage_item_pool(world):
                 player_pool[item.player].append(item)
     player_locations = defaultdict(list)
     for player in player_pool:
-        player_locations[player] = [x for x in world.get_unfilled_locations(player) if '- Prize' not in x.name]
+        player_locations[player] = [x for x in world.get_unfilled_locations(player) if not x.prize]
         discrepancy = len(player_pool[player]) - len(player_locations[player])
         if discrepancy:
             trash_options = [x for x in player_pool[player] if x.name in trash_items]
@@ -342,6 +361,8 @@ def determine_major_items(world, player):
     major_item_set = set(major_items)
     if world.progressive == 'off':
         pass  # now what?
+    if world.prizeshuffle[player] not in ['none', 'dungeon']:
+        major_item_set.update({x for x, y in item_table.items() if y[2] == 'Prize'})
     if world.bigkeyshuffle[player]:
         major_item_set.update({x for x, y in item_table.items() if y[2] == 'BigKey'})
     if world.keyshuffle[player] != 'none':
@@ -686,6 +707,11 @@ mode_grouping = {
         'Sunken Treasure', 'Spectacle Rock Cave', 'Lost Woods Hideout', 'Checkerboard Cave', 'Peg Cave', 'Cave 45',
         'Graveyard Cave', 'Kakariko Well - Top', "Blind's Hideout - Top", 'Bonk Rock Cave', "Aginah's Cave",
         'Chest Game', 'Digging Game', 'Mire Shed - Left', 'Mimic Cave'
+    ],
+    'Prizes': [
+        'Eastern Palace - Prize', 'Desert Palace - Prize', 'Tower of Hera - Prize',
+        'Palace of Darkness - Prize', 'Swamp Palace - Prize', 'Skull Woods - Prize',
+        "Thieves' Town - Prize", 'Ice Palace - Prize', 'Misery Mire - Prize', 'Turtle Rock - Prize',
     ],
     'Big Keys': [
         'Eastern Palace - Big Key Chest', 'Ganons Tower - Big Key Chest',

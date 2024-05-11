@@ -34,16 +34,16 @@ def create_dungeons(world, player):
     world.dungeons += [ES, EP, DP, ToH, AT, PoD, TT, SW, SP, IP, MM, TR, GT]
 
 
-dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],
-                           'Desert Palace - Prize': [0x1559B, 0x1559C, 0x1559D, 0x1559E],
-                           'Tower of Hera - Prize': [0x155C5, 0x1107A, 0x10B8C],
-                           'Palace of Darkness - Prize': [0x155B8],
-                           'Swamp Palace - Prize': [0x155B7],
-                           'Thieves\' Town - Prize': [0x155C6],
-                           'Skull Woods - Prize': [0x155BA, 0x155BB, 0x155BC, 0x155BD, 0x15608, 0x15609, 0x1560A, 0x1560B],
-                           'Ice Palace - Prize': [0x155BF],
-                           'Misery Mire - Prize': [0x155B9],
-                           'Turtle Rock - Prize': [0x155C7, 0x155A7, 0x155AA, 0x155AB]}
+dungeon_music_addresses = {'Eastern Palace': [0x1559A],
+                           'Desert Palace': [0x1559B, 0x1559C, 0x1559D, 0x1559E],
+                           'Tower of Hera': [0x155C5, 0x1107A, 0x10B8C],
+                           'Palace of Darkness': [0x155B8],
+                           'Swamp Palace': [0x155B7],
+                           'Thieves Town': [0x155C6],
+                           'Skull Woods': [0x155BA, 0x155BB, 0x155BC, 0x155BD, 0x15608, 0x15609, 0x1560A, 0x1560B],
+                           'Ice Palace': [0x155BF],
+                           'Misery Mire': [0x155B9],
+                           'Turtle Rock': [0x155C7, 0x155A7, 0x155AA, 0x155AB]}
 
 hyrule_castle_regions = [
     'Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall',
@@ -284,19 +284,19 @@ class DungeonInfo:
         self.map_index = midx
 
 
-dungeon_table = {
+dungeon_table = { 
     'Hyrule Castle': DungeonInfo(6, 1, False, True, False, True, 3, None, 0xc),
-    'Eastern Palace': DungeonInfo(3, 0, True, True, True, False, 2, 'Eastern Palace - Prize', 0x0),
-    'Desert Palace': DungeonInfo(2, 1, True, True, True, False, 3, 'Desert Palace - Prize', 0x2),
-    'Tower of Hera': DungeonInfo(2, 1, True, True, True, False, 0, 'Tower of Hera - Prize', 0x1),
+    'Eastern Palace': DungeonInfo(3, 0, True, True, True, False, 2, [0x1209D, 0x53E76, 0x53E77, 0x180052, 0x180070, 0x186FE2], 0x0),
+    'Desert Palace': DungeonInfo(2, 1, True, True, True, False, 3, [0x1209E, 0x53E7A, 0x53E7B, 0x180053, 0x180072, 0x186FE3], 0x2),
+    'Tower of Hera': DungeonInfo(2, 1, True, True, True, False, 0, [0x120A5, 0x53E78, 0x53E79, 0x18005A, 0x180071, 0x186FEA], 0x1),
     'Agahnims Tower': DungeonInfo(0, 2, False, False, False, False, 2, None, 0xb),
-    'Palace of Darkness': DungeonInfo(5, 6, True, True, True, False, 0, 'Palace of Darkness - Prize', 0x3),
-    'Swamp Palace': DungeonInfo(6, 1, True, True, True, False, 5, 'Swamp Palace - Prize', 0x9),
-    'Skull Woods': DungeonInfo(2, 3, True, True, True, False, 2, 'Skull Woods - Prize', 0x4),
-    'Thieves Town': DungeonInfo(4, 1, True, True, True, False, 2, "Thieves' Town - Prize", 0x6),
-    'Ice Palace': DungeonInfo(3, 2, True, True, True, False, 4, 'Ice Palace - Prize', 0x8),
-    'Misery Mire': DungeonInfo(2, 3, True, True, True, False, 3, 'Misery Mire - Prize', 0x7),
-    'Turtle Rock': DungeonInfo(5, 4, True, True, True, False, 2, 'Turtle Rock - Prize', 0x5),
+    'Palace of Darkness': DungeonInfo(5, 6, True, True, True, False, 0, [0x120A1, 0x53E7C, 0x53E7D, 0x180056, 0x180073, 0x186FE6], 0x3),
+    'Swamp Palace': DungeonInfo(6, 1, True, True, True, False, 5, [0x120A0, 0x53E88, 0x53E89, 0x180055, 0x180079, 0x186FE5], 0x9),
+    'Skull Woods': DungeonInfo(2, 3, True, True, True, False, 2, [0x120A3, 0x53E7E, 0x53E7F, 0x180058, 0x180074, 0x186FE8], 0x4),
+    'Thieves Town': DungeonInfo(4, 1, True, True, True, False, 2, [0x120A6, 0x53E82, 0x53E83, 0x18005B, 0x180076, 0x186FEB], 0x6),
+    'Ice Palace': DungeonInfo(3, 2, True, True, True, False, 4, [0x120A4, 0x53E86, 0x53E87, 0x180059, 0x180078, 0x186FE9], 0x8),
+    'Misery Mire': DungeonInfo(2, 3, True, True, True, False, 3, [0x120A2, 0x53E84, 0x53E85, 0x180057, 0x180077, 0x186FE7], 0x7),
+    'Turtle Rock': DungeonInfo(5, 4, True, True, True, False, 2, [0x120A7, 0x53E80, 0x53E81, 0x18005C, 0x180075, 0x186FEC], 0x5),
     'Ganons Tower': DungeonInfo(20, 4, True, True, True, False, 4, None, 0xa),
 }
 

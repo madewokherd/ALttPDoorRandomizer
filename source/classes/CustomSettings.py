@@ -138,6 +138,7 @@ class CustomSettings(object):
                 args.experimental[p] = get_setting(settings['experimental'], args.experimental[p])
                 args.collection_rate[p] = get_setting(settings['collection_rate'], args.collection_rate[p])
                 args.openpyramid[p] = get_setting(settings['openpyramid'], args.openpyramid[p])
+                args.prizeshuffle[p] = get_setting(settings['prizeshuffle'], args.prizeshuffle[p])
                 args.bigkeyshuffle[p] = get_setting(settings['bigkeyshuffle'], args.bigkeyshuffle[p])
                 args.keyshuffle[p] = get_setting(settings['keyshuffle'], args.keyshuffle[p])
                 args.mapshuffle[p] = get_setting(settings['mapshuffle'], args.mapshuffle[p])
@@ -320,6 +321,7 @@ class CustomSettings(object):
             settings_dict[p]['experimental'] = world.experimental[p]
             settings_dict[p]['collection_rate'] = world.collection_rate[p]
             settings_dict[p]['openpyramid'] = world.open_pyramid[p]
+            settings_dict[p]['prizeshuffle'] = world.prizeshuffle[p]
             settings_dict[p]['bigkeyshuffle'] = world.bigkeyshuffle[p]
             settings_dict[p]['keyshuffle'] = world.keyshuffle[p]
             settings_dict[p]['mapshuffle'] = world.mapshuffle[p]
