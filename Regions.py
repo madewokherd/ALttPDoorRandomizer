@@ -1162,8 +1162,8 @@ def create_shops(world, player):
     world.shops[player] = []
     for region_name, (room_id, type, shopkeeper, custom, locked, inventory, sram) in shop_table.items():
         if world.mode[player] == 'inverted':
-            if (0x35 not in world.owswaps[player][0] and region_name == 'Dark Lake Hylia Shop') \
-                    or (0x35 in world.owswaps[player][0] and region_name == 'Lake Hylia Shop'):
+            if (not world.is_tile_swapped(0x35, player) and region_name == 'Dark Lake Hylia Shop') \
+                    or (not world.is_tile_swapped(0x35, player) and region_name == 'Lake Hylia Shop'):
                 locked = True
                 inventory = [('Blue Potion', 160), ('Blue Shield', 50), ('Bombs (10)', 50)]
                 custom = True

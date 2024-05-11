@@ -1537,7 +1537,7 @@ def check_entrance_fixes(world, player):
             'Turtle Rock': 'tr',
             'Ganons Tower': 'gt',
         }
-        if world.mode[player] == 'inverted':
+        if world.is_atgt_swapped(player):
             del checks['Ganons Tower']
         for ent_name, key in checks.items():
             entrance = world.get_entrance(ent_name, player)

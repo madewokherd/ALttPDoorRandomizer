@@ -1142,7 +1142,7 @@ def simple_shuffle_dungeons(world, player):
 
     # shuffle multi-entrance dungeons
     multi_dungeons = ['Desert Palace', 'Turtle Rock']
-    if world.mode[player] == 'standard' or (world.mode[player] == 'inverted' and not world.shuffle_ganon):
+    if world.mode[player] == 'standard' or (world.is_atgt_swapped(player) and not world.shuffle_ganon):
         hc_target = 'Hyrule Castle'
         random.shuffle(multi_dungeons)
     else:
