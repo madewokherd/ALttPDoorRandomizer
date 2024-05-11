@@ -1076,7 +1076,7 @@ def shuffle_tiles(world, groups, result_list, do_grouped, forced_flips, player):
             attempts -= 1
             continue
         # ensure sanc can be placed in LW in certain modes
-        if not do_grouped and world.shuffle[player] in ['simple', 'restricted', 'full', 'district'] and world.mode[player] != 'inverted' and (world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3 or world.mode[player] == 'standard'):
+        if not do_grouped and world.shuffle[player] in ['simple', 'restricted', 'full', 'district'] and not world.is_dark_chapel_start(player) and (world.doorShuffle[player] != 'crossed' or world.intensity[player] < 3 or world.mode[player] == 'standard'):
             free_dw_drops = parity[5] + (1 if world.shuffle_ganon[player] else 0)
             free_drops = 6 + (1 if world.mode[player] != 'standard' else 0) + (1 if world.shuffle_ganon[player] else 0)
             if free_dw_drops == free_drops:
@@ -1130,7 +1130,7 @@ def define_tile_groups(world, do_grouped, player):
         # sanctuary/chapel should not be flipped if S+Q guaranteed to output on that screen
         if 0x13 in group and not allow_flip_sanc and ((world.shuffle[player] in ['vanilla', 'dungeonssimple', 'dungeonsfull', 'district'] \
                     and (world.mode[player] in ['standard', 'inverted'] or world.doorShuffle[player] not in ['partitioned', 'crossed'] \
-                        or world.intensity[player] < 3)) or (world.shuffle[player] in ['lite', 'lean'] and world.mode[player] == 'inverted')):
+                        or world.intensity[player] < 3)) or (world.shuffle[player] in ['lite', 'lean'] and world.is_dark_chapel_start(player))):
             return False
         
         return True

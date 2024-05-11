@@ -200,7 +200,10 @@ def do_vanilla_connections(avail_pool):
             connect_vanilla_two_way(ent, avail_pool.default_map[ent], avail_pool)
         if ent in avail_pool.one_way_map and avail_pool.one_way_map[ent] in avail_pool.exits:
             connect_vanilla(ent, avail_pool.one_way_map[ent], avail_pool)
-        if avail_pool.inverted:
+        if avail_pool.world.is_bombshop_start(avail_pool.player):
+            ext = avail_pool.world.get_entrance('Big Bomb Shop Exit', avail_pool.player)
+            ext.connect(avail_pool.world.get_region('Big Bomb Shop Area', avail_pool.player))
+        if avail_pool.world.is_dark_chapel_start(avail_pool.player):
             ext = avail_pool.world.get_entrance('Dark Sanctuary Hint Exit', avail_pool.player)
             ext.connect(avail_pool.world.get_region('Dark Chapel Area', avail_pool.player))
 

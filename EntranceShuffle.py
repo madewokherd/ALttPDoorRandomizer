@@ -1348,17 +1348,16 @@ def full_shuffle_dungeons(world, Dungeon_Exits, player):
 
 
 def place_links_house(world, player, ignore_list=[]):
-    invFlag = world.mode[player] == 'inverted'
     if world.mode[player] == 'standard' or not world.shufflelinks[player]:
         links_house = 'Links House' if not world.is_bombshop_start(player) else 'Big Bomb Shop'
     else:
-        if invFlag:
+        if world.is_dark_chapel_start(player):
             for dark_sanc in world.get_entrance('Dark Sanctuary Hint Exit', player).connected_region.exits:
                 if dark_sanc.connected_region and dark_sanc.connected_region.name == 'Dark Sanctuary Hint':
                     dark_sanc = dark_sanc.name
                     break
         
-        if invFlag and isinstance(dark_sanc, str):
+        if world.is_dark_chapel_start(player) and isinstance(dark_sanc, str):
             links_house_doors = [i for i in get_distant_entrances(world, dark_sanc, player) if i in entrance_pool]
         else:
             links_house_doors = [i for i in get_starting_entrances(world, player, world.shuffle[player] != 'insanity') if i in entrance_pool]
@@ -1399,16 +1398,14 @@ def place_dark_sanc(world, player, ignore_list=[]):
 
 
 def place_blacksmith(world, links_house, player):
-    invFlag = world.mode[player] == 'inverted'
-    
     assumed_inventory = list()
-    if world.logic[player] in ['noglitches', 'minorglitches'] and (world.is_tile_swapped(0x29, player) == invFlag):
+    if world.logic[player] in ['noglitches', 'minorglitches'] and (world.is_tile_swapped(0x29, player) == world.is_dark_chapel_start(player)):
         assumed_inventory.append('Titans Mitts')
     
     links_region = world.get_entrance(links_house, player).parent_region.name
     blacksmith_doors = list(build_accessible_entrance_list(world, links_region, player, assumed_inventory, False, True, True))
     
-    if invFlag:
+    if world.is_dark_chapel_start(player):
         dark_sanc = world.get_entrance('Dark Sanctuary Hint Exit', player).connected_region.name
         blacksmith_doors = list(OrderedDict.fromkeys(blacksmith_doors + list(build_accessible_entrance_list(world, dark_sanc, player, assumed_inventory, False, True, True))))
     elif world.doorShuffle[player] == 'vanilla' or world.intensity[player] < 3:

@@ -383,7 +383,6 @@ def create_regions(world, player):
 
 def create_dungeon_regions(world, player):
     std_flag = world.mode[player] == 'standard'
-    inv_flag = world.mode[player] == 'inverted'
     world.regions += [
         create_dungeon_region(player, 'Sanctuary Portal', 'Hyrule Castle', None, ['Sanctuary Exit', 'Enter HC (Sanc)']),
         create_dungeon_region(player, 'Hyrule Castle West Portal', 'Hyrule Castle', None, ['Hyrule Castle Exit (West)', 'Enter HC (West)']),

@@ -517,7 +517,7 @@ fixed_take_anys = [
 
 
 def set_up_take_anys(world, player, skip_adjustments=False):
-    if world.mode[player] == 'inverted':
+    if world.is_dark_chapel_start(player):
         if 'Dark Sanctuary Hint' in take_any_locations:
             take_any_locations.remove('Dark Sanctuary Hint')
     if world.is_tile_swapped(0x29, player):
