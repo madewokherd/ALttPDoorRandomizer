@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'dfa4b2238586c6897a7c47a65590b6ef'
+RANDOMIZERBASEHASH = 'fbfeeabb2f0d00a2985daf471c44b557'
 
 
 class JsonRom(object):
@@ -1356,6 +1356,10 @@ def patch_rom(world, rom, player, team, is_mystery=False):
                                     'Desert Palace': 'Desert Palace Entrance (North)',
                                     'Skull Woods': 'Skull Woods Final Section' }
             entrance_name = vanilla_entrances[dungeon] if dungeon in vanilla_entrances else dungeon
+            if world.is_atgt_swapped(player):
+                swap_entrances = { 'Agahnims Tower': 'Ganons Tower',
+                                    'Ganons Tower': 'Agahnims Tower' }
+                entrance_name = swap_entrances[dungeon] if dungeon in swap_entrances else entrance_name
             entrance = world.get_entrance(entrance_name, player)
         else:
             if len(portal_list) == 1:
@@ -1404,7 +1408,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     # b - Big Key
     # a - Small Key
     #
-    enable_menu_map_check = world.overworld_map[player] != 'default' and world.shuffle[player] != 'vanilla'
+    enable_menu_map_check = (world.overworld_map[player] != 'default' and world.shuffle[player] != 'vanilla') or world.prizeshuffle[player] == 'wild'
     rom.write_byte(0x180045, ((0x01 if world.keyshuffle[player] == 'wild' else 0x00)
                               | (0x02 if world.bigkeyshuffle[player] else 0x00)
                               | (0x04 if world.mapshuffle[player] or enable_menu_map_check else 0x00)
@@ -1429,12 +1433,13 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     }
 
     def get_reveal_bytes(itemName):
-        locations = world.find_items(itemName, player)
-        if len(locations) < 1:
-            return 0x0000
-        location = locations[0]
-        if location.item.dungeon:
-            return reveal_bytes.get(location.item.dungeon.name, 0x0000)
+        # locations = world.find_items(itemName, player)
+        # if len(locations) < 1:
+        #     return 0x0000
+        # location = locations[0]
+        for dungeon in world.dungeons:
+            if dungeon.player == player and dungeon.prize and dungeon.prize.name == itemName:
+                return reveal_bytes.get(dungeon.name, 0x0000)
         return 0x0000
 
     write_int16(rom, 0x18017A, get_reveal_bytes('Green Pendant') if world.mapshuffle[player] else 0x0000) # Sahasrahla reveal
