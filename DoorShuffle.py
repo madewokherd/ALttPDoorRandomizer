@@ -1629,7 +1629,7 @@ def refine_hints(dungeon_builders):
     for name, builder in dungeon_builders.items():
         for region in builder.master_sector.regions:
             for location in region.locations:
-                if not location.event and '- Boss' not in location.name and '- Prize' not in location.name and location.name != 'Sanctuary':
+                if not location.event and '- Boss' not in location.name and not location.prize and location.name != 'Sanctuary':
                     if location.type == LocationType.Pot and location.pot:
                         hint_text = ('under a block' if location.pot.flags & PotFlags.Block else 'in a pot')
                         location.hint_text = f'{hint_text} {dungeon_hints[name]}'

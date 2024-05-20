@@ -1,5 +1,17 @@
 {
   "widgets": {
+    "prizeshuffle": {
+      "type": "selectbox",
+      "default": "default",
+      "options": [
+        "none",
+        "dungeon",
+        "wild"
+      ],
+      "config": {
+        "padx": [20,0]
+      }
+    },
     "key_logic_algorithm": {
       "type": "selectbox",
       "default": "default",

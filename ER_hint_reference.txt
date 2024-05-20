@@ -316,7 +316,7 @@ Library: near books
 Potion Shop: near potions
 Spike Cave: beyond spikes
 Mimic Cave: in a cave of mimicry
-Chest Game: as a prize
+Chest Game: as a game reward
 Chicken House: near poultry
 Aginah's Cave: with Aginah
 Ice Rod Cave: in a frozen cave
