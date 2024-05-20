@@ -1433,10 +1433,6 @@ def patch_rom(world, rom, player, team, is_mystery=False):
                               | (0x10 if world.logic[player] == 'nologic' else 0)))  # boss icon
 
     def get_reveal_bytes(itemName):
-        # locations = world.find_items(itemName, player)
-        # if len(locations) < 1:
-        #     return 0x0000
-        # location = locations[0]
         for dungeon in world.dungeons:
             if dungeon.player == player and dungeon.prize and dungeon.prize.name == itemName:
                 return reveal_bytes.get(dungeon.name, 0x0000)
