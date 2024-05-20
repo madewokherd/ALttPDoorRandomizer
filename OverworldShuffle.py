@@ -1049,9 +1049,13 @@ def shuffle_tiles(world, groups, result_list, do_grouped, forced_flips, player):
 
         # tile shuffle happens here
         removed = []
-        if 0 < undefined_chance < 100:
-            for group in groups:
-                if group[0] in nonflipped_groups or (group[0] not in flipped_groups and random.randint(1, 100) > undefined_chance):
+        for group in groups:
+            if group[0] in nonflipped_groups:
+                removed.append(group)
+            else:
+                if group[0] in flipped_groups or undefined_chance >= 100:
+                    continue
+                if undefined_chance == 0 or random.randint(1, 100) > undefined_chance:
                     removed.append(group)
 
         # save shuffled tiles to list
