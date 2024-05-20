@@ -1388,6 +1388,23 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             # prize location
             write_int16s(rom, snes_to_pc(0x0ABE2E)+(map_index*6)+8, coords)
 
+    # Map reveals
+    reveal_bytes = {
+        "Hyrule Castle": 0xC000,
+        "Eastern Palace": 0x2000,
+        "Desert Palace": 0x1000,
+        "Tower of Hera": 0x0020,
+        "Agahnims Tower": 0x800,
+        "Palace of Darkness": 0x0200,
+        "Thieves Town": 0x0010,
+        "Skull Woods": 0x0080,
+        "Swamp Palace": 0x0400,
+        "Ice Palace": 0x0040,
+        "Misery Mire'": 0x0100,
+        "Turtle Rock": 0x0008,
+        "Ganons Tower": 0x0004,
+    }
+
     # in crossed doors - flip the compass exists flags
     if world.doorShuffle[player] not in ['vanilla', 'basic']:
         compass_exists = 0x0000
@@ -1414,23 +1431,6 @@ def patch_rom(world, rom, player, team, is_mystery=False):
                               | (0x04 if world.mapshuffle[player] or enable_menu_map_check else 0x00)
                               | (0x08 if world.compassshuffle[player] else 0x00)  # free roaming items in menu
                               | (0x10 if world.logic[player] == 'nologic' else 0)))  # boss icon
-
-    # Map reveals
-    reveal_bytes = {
-        "Hyrule Castle": 0xC000,
-        "Eastern Palace": 0x2000,
-        "Desert Palace": 0x1000,
-        "Tower of Hera": 0x0020,
-        "Agahnims Tower": 0x800,
-        "Palace of Darkness": 0x0200,
-        "Thieves Town": 0x0010,
-        "Skull Woods": 0x0080,
-        "Swamp Palace": 0x0400,
-        "Ice Palace": 0x0040,
-        "Misery Mire'": 0x0100,
-        "Turtle Rock": 0x0008,
-        "Ganons Tower": 0x0004,
-    }
 
     def get_reveal_bytes(itemName):
         # locations = world.find_items(itemName, player)
