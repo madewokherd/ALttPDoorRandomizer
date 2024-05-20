@@ -1411,7 +1411,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         for dungeon, portal_list in dungeon_portals.items():
             dungeon_index = dungeon_table[dungeon].dungeon_index
             if any(x for x in world.get_dungeon(dungeon, player).dungeon_items if x.type == 'Compass'):
-                compass_exists |= reveal_bytes.get(dungeon.name, 0x0000)
+                compass_exists |= reveal_bytes.get(dungeon, 0x0000)
         write_int16(rom, snes_to_pc(0x0ABF6E), compass_exists)
 
     rom.write_byte(0x18003C, compass_mode)
