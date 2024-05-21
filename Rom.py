@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'fbfeeabb2f0d00a2985daf471c44b557'
+RANDOMIZERBASEHASH = '040105d89f267ab8726105e05a4d254e'
 
 
 class JsonRom(object):
@@ -1297,6 +1297,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         compass_mode |= 0x20  # show icon if compass is collected
     if world.prizeshuffle[player] == 'wild':
         compass_mode |= 0x40  # show icon if boss is defeated, hide if collected
+    rom.write_byte(0x18003C, compass_mode)
 
     def get_entrance_coords(ent):
         if type(ent) is Location:
@@ -1331,7 +1332,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
 
         # write out dislocated coords
         if map_index >= 0x02 and map_index < 0x18 and (world.overworld_map[player] != 'default' or world.prizeshuffle[player] == 'wild'):
-            owid_map =               [0x1E,   0x30,   0xFF,   0x7B,   0x5E,   0x70,   0x40,   0x75,   0x03,   0x48,   0x47]
+            owid_map =               [0x1E,   0x30,   0xFF,   0x7B,   0x5E,   0x70,   0x40,   0x75,   0x03,   0x58,   0x47]
             x_map_position_generic = [0x03c0, 0x0740, 0xff00, 0x03c0, 0x01c0, 0x0bc0, 0x05c0, 0x09c0, 0x0ac0, 0x07c0, 0x0dc0]
             y_map_position_generic = [0xff00, 0xff00, 0xff00, 0x0fc0, 0x0fc0, 0x0fc0, 0x0fc0, 0x0fc0, 0xff00, 0x0fc0, 0x0fc0]
             world_indicator = 0x0000
@@ -1400,9 +1401,9 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         "Skull Woods": 0x0080,
         "Swamp Palace": 0x0400,
         "Ice Palace": 0x0040,
-        "Misery Mire'": 0x0100,
+        "Misery Mire": 0x0100,
         "Turtle Rock": 0x0008,
-        "Ganons Tower": 0x0004,
+        "Ganons Tower": 0x0004
     }
 
     # in crossed doors - flip the compass exists flags
@@ -1413,8 +1414,6 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             if any(x for x in world.get_dungeon(dungeon, player).dungeon_items if x.type == 'Compass'):
                 compass_exists |= reveal_bytes.get(dungeon, 0x0000)
         write_int16(rom, snes_to_pc(0x0ABF6E), compass_exists)
-
-    rom.write_byte(0x18003C, compass_mode)
 
     # Bitfield - enable free items to show up in menu
     #
