@@ -5,7 +5,7 @@ import time
 
 from BaseClasses import CrystalBarrier, DoorType, Hook, RegionType, Sector
 from BaseClasses import hook_from_door, flooded_keys
-from Regions import dungeon_events, flooded_keys_reverse
+from Regions import location_events, flooded_keys_reverse
 
 
 def pre_validate(builder, entrance_region_names, split_dungeon, world, player):
@@ -556,7 +556,7 @@ class ExplorationState(object):
                 if key_checks and location not in self.found_locations:
                     if location.forced_item and 'Small Key' in location.item.name:
                         self.key_locations += 1
-                    if location.name not in dungeon_events and '- Prize' not in location.name and location.name not in ['Agahnim 1', 'Agahnim 2']:
+                    if location.name not in location_events and not ('- Prize' in location.name and location.prize) and location.name not in ['Agahnim 1', 'Agahnim 2']:
                         self.ttl_locations += 1
                 if location not in self.found_locations:
                     self.found_locations.append(location)
@@ -568,13 +568,13 @@ class ExplorationState(object):
                         else:
                             self.bk_found.add(location)
                             self.re_add_big_key_doors()
-                if location.name in dungeon_events and location.name not in self.events:
+                if location.name in location_events and location.name not in self.events:
                     if self.flooded_key_check(location):
                         self.perform_event(location.name, key_region)
                 if location.name in flooded_keys_reverse.keys() and self.location_found(
                      flooded_keys_reverse[location.name]):
                     self.perform_event(flooded_keys_reverse[location.name], key_region)
-                if '- Prize' in location.name:
+                if location.prize:
                     self.prize_received = True
 
     def flooded_key_check(self, location):
@@ -837,7 +837,7 @@ def count_locations_exclude_big_chest(locations, world, player):
 
 
 def prize_or_event(loc):
-    return loc.name in dungeon_events or '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']
+    return loc.name in location_events or loc.prize
 
 
 def reserved_location(loc, world, player):

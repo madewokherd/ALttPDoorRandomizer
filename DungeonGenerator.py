@@ -11,7 +11,7 @@ from typing import List
 
 from BaseClasses import DoorType, Direction, CrystalBarrier, RegionType, Polarity, PolSlot, flooded_keys, Sector
 from BaseClasses import Hook, hook_from_door, Door
-from Regions import dungeon_events, flooded_keys_reverse
+from Regions import location_events, flooded_keys_reverse
 from Dungeons import split_region_starts
 from RoomData import DoorKind
 
@@ -884,19 +884,19 @@ class ExplorationState(object):
                 if key_checks and location not in self.found_locations:
                     if location.forced_item and 'Small Key' in location.item.name:
                         self.key_locations += 1
-                    if location.name not in dungeon_events and '- Prize' not in location.name and location.name not in ['Agahnim 1', 'Agahnim 2']:
+                    if location.name not in location_events and not location.prize:
                         self.ttl_locations += 1
                 if location not in self.found_locations:
                     self.found_locations.append(location)
                     if not bk_flag and (not location.forced_item or 'Big Key' in location.item.name):
                         self.bk_found.add(location)
-                if location.name in dungeon_events and location.name not in self.events:
+                if location.name in location_events and location.name not in self.events:
                     if self.flooded_key_check(location):
                         self.perform_event(location.name, key_region)
                 if location.name in flooded_keys_reverse.keys() and self.location_found(
                      flooded_keys_reverse[location.name]):
                     self.perform_event(flooded_keys_reverse[location.name], key_region)
-                if '- Prize' in location.name:
+                if location.prize:
                     self.prize_received = True
 
     def flooded_key_check(self, location):
@@ -1096,7 +1096,7 @@ def count_locations_exclude_big_chest(locations, world, player):
 
 
 def prize_or_event(loc):
-    return loc.name in dungeon_events or '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']
+    return loc.name in location_events or loc.prize
 
 
 def reserved_location(loc, world, player):
@@ -1557,13 +1557,13 @@ def define_sector_features(sectors):
     for sector in sectors:
         for region in sector.regions:
             for loc in region.locations:
-                if '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']:
+                if loc.prize or loc.name in ['Agahnim 1', 'Agahnim 2']:
                     pass
                 elif loc.forced_item and 'Small Key' in loc.item.name:
                     sector.key_only_locations += 1
                 elif loc.forced_item and loc.forced_item.bigkey:
                     sector.bk_provided = True
-                elif loc.name not in dungeon_events and not loc.forced_item:
+                elif loc.name not in location_events and not loc.forced_item:
                     sector.chest_locations += 1
                     sector.chest_location_set.add(loc.name)
                     if '- Big Chest' in loc.name or loc.name in ["Hyrule Castle - Zelda's Chest",
@@ -1773,6 +1773,8 @@ def build_orig_location_set(dungeon_map):
 
 def requested_dungeon_items(world, player):
     num = 0
+    if world.prizeshuffle[player] == 'dungeon':
+        num += 1
     if not world.bigkeyshuffle[player]:
         num += 1
     if not world.compassshuffle[player]:
@@ -4055,7 +4057,7 @@ def calc_door_equation(door, sector, look_for_entrance, sewers_flag=None):
                 crystal_barrier = CrystalBarrier.Either
             # todo: backtracking from double switch with orange on--
             for loc in region.locations:
-                if loc.name in dungeon_events:
+                if loc.name in location_events:
                     found_events.add(loc.name)
                     for d in event_doors:
                         if loc.name == d.req_event:

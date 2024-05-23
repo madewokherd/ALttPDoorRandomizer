@@ -14,14 +14,19 @@ from source.item.FillUtil import filter_special_locations, valid_pot_items
 
 
 def get_dungeon_item_pool(world):
-    return [item for dungeon in world.dungeons for item in dungeon.all_items if item.location is None]
+    dungeon_items = [item for dungeon in world.dungeons for item in dungeon.all_items if item.location is None]
+    for player in range(1, world.players+1):
+        if world.prizeshuffle[player] != 'none':
+            dungeon_items.extend(ItemFactory(['Red Pendant', 'Blue Pendant', 'Green Pendant', 'Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 7', 'Crystal 5', 'Crystal 6'], player))
+
+    return dungeon_items
 
 
 def promote_dungeon_items(world):
     world.itempool += get_dungeon_item_pool(world)
 
     for item in world.get_items():
-        if item.smallkey or item.bigkey:
+        if item.smallkey or item.bigkey or item.prize:
             item.advancement = True
         elif item.map or item.compass:
             item.priority = True
@@ -38,36 +43,62 @@ def fill_dungeons_restrictive(world, shuffled_locations):
 
     # with shuffled dungeon items they are distributed as part of the normal item pool
     for item in world.get_items():
-        if ((item.smallkey and world.keyshuffle[item.player] != 'none')
+        if ((item.prize and world.prizeshuffle[item.player] != 'none')
+           or (item.smallkey and world.keyshuffle[item.player] != 'none')
            or (item.bigkey and world.bigkeyshuffle[item.player])):
             item.advancement = True
         elif (item.map and world.mapshuffle[item.player]) or (item.compass and world.compassshuffle[item.player]):
             item.priority = True
 
     dungeon_items = [item for item in get_dungeon_item_pool(world) if item.is_inside_dungeon_item(world)]
-    bigs, smalls, others = [], [], []
+    bigs, smalls, prizes, others = [], [], [], []
     for i in dungeon_items:
-        (bigs if i.bigkey else smalls if i.smallkey else others).append(i)
+        (bigs if i.bigkey else smalls if i.smallkey else prizes if i.prize else others).append(i)
     unplaced_smalls = list(smalls)
     for i in world.itempool:
         if i.smallkey and world.keyshuffle[i.player] != 'none':
             unplaced_smalls.append(i)
 
-    def fill(base_state, items, key_pool):
-        fill_restrictive(world, base_state, shuffled_locations, items, key_pool, True)
+    def fill(base_state, items, locations, key_pool=None):
+        fill_restrictive(world, base_state, locations, items, key_pool, True)
 
     all_state_base = world.get_all_state()
     big_state_base = all_state_base.copy()
-    for x in smalls + others:
+    for x in smalls + prizes + others:
         big_state_base.collect(x, True)
-    fill(big_state_base, bigs, unplaced_smalls)
+    fill(big_state_base, bigs, shuffled_locations, unplaced_smalls)
     random.shuffle(shuffled_locations)
     small_state_base = all_state_base.copy()
-    for x in others:
+    for x in prizes + others:
         small_state_base.collect(x, True)
-    fill(small_state_base, smalls, unplaced_smalls)
+    fill(small_state_base, smalls, shuffled_locations, unplaced_smalls)
+
+    prizes_copy = prizes.copy()
+    for attempt in range(15):
+        try:
+            random.shuffle(prizes)
+            random.shuffle(shuffled_locations)
+            prize_state_base = all_state_base.copy()
+            for x in others:
+                prize_state_base.collect(x, True)
+            fill(prize_state_base, prizes, shuffled_locations)
+        except FillError as e:
+            logging.getLogger('').info("Failed to place dungeon prizes (%s). Will retry %s more times", e, 14 - attempt)
+            prizes = prizes_copy.copy()
+            for dungeon in world.dungeons:
+                if world.prizeshuffle[dungeon.player] == 'dungeon':
+                    dungeon.prize = None
+            for prize in prizes:
+                if prize.location:
+                    prize.location.item = None
+                    prize.location = None
+            continue
+        break
+    else:
+        raise FillError(f'Unable to place dungeon prizes {", ".join(list(map(lambda d: d.hint_text, prize_locs)))}')
+
     random.shuffle(shuffled_locations)
-    fill(all_state_base, others, None)
+    fill(all_state_base, others, shuffled_locations)
 
 
 def fill_restrictive(world, base_state, locations, itempool, key_pool=None, single_player_placement=False,
@@ -141,7 +172,7 @@ def fill_restrictive(world, base_state, locations, itempool, key_pool=None, sing
 
 def verify_spot_to_fill(location, item_to_place, max_exp_state, single_player_placement, perform_access_check,
                         key_pool, world):
-    if item_to_place.smallkey or item_to_place.bigkey:  # a better test to see if a key can go there
+    if item_to_place.smallkey or item_to_place.bigkey or item_to_place.prize:  # a better test to see if a key can go there
         location.item = item_to_place
         location.event = True
         if item_to_place.smallkey:
@@ -155,9 +186,9 @@ def verify_spot_to_fill(location, item_to_place, max_exp_state, single_player_pl
         test_state.sweep_for_events()
         if location.can_fill(test_state, item_to_place, perform_access_check):
             if valid_key_placement(item_to_place, location, key_pool, test_state, world):
-                if item_to_place.crystal or valid_dungeon_placement(item_to_place, location, world):
+                if item_to_place.prize or valid_dungeon_placement(item_to_place, location, world):
                     return location
-    if item_to_place.smallkey or item_to_place.bigkey:
+    if item_to_place.smallkey or item_to_place.bigkey or item_to_place.prize:
         location.item = None
         location.event = False
         if item_to_place.smallkey:
@@ -181,8 +212,8 @@ def valid_key_placement(item, location, key_pool, collection_state, world):
         key_logic = world.key_logic[item.player][dungeon.name]
         unplaced_keys = len([x for x in key_pool if x.name == key_logic.small_key_name and x.player == item.player])
         prize_loc = None
-        if key_logic.prize_location:
-            prize_loc = world.get_location(key_logic.prize_location, location.player)
+        if key_logic.prize_location and dungeon.prize and dungeon.prize.location and dungeon.prize.location.player == item.player:
+            prize_loc = dungeon.prize.location
         cr_count = world.crystals_needed_for_gt[location.player]
         wild_keys = world.keyshuffle[item.player] != 'none'
         if wild_keys:
@@ -193,7 +224,7 @@ def valid_key_placement(item, location, key_pool, collection_state, world):
         self_locking_keys = sum(1 for d, rule in key_logic.door_rules.items() if rule.allow_small
                                 and rule.small_location.item and rule.small_location.item.name == key_logic.small_key_name)
         return key_logic.check_placement(unplaced_keys, wild_keys, reached_keys, self_locking_keys,
-                                         location if item.bigkey else None,  prize_loc, cr_count)
+                                         location if item.bigkey else None, prize_loc, cr_count)
     else:
         return not item.is_inside_dungeon_item(world)
 
@@ -228,16 +259,19 @@ def track_outside_keys(item, location, world):
 
 
 def track_dungeon_items(item, location, world):
-    if location.parent_region.dungeon and not item.crystal:
+    if location.parent_region.dungeon and (not item.prize or world.prizeshuffle[item.player] == 'dungeon'):
         layout = world.dungeon_layouts[location.player][location.parent_region.dungeon.name]
         if is_dungeon_item(item, world) and item.player == location.player:
             layout.dungeon_items -= 1
         else:
             layout.free_items -= 1
+        if item.prize:
+            location.parent_region.dungeon.prize = item
 
 
 def is_dungeon_item(item, world):
-    return ((item.smallkey and world.keyshuffle[item.player] == 'none')
+    return ((item.prize and world.prizeshuffle[item.player] == 'none')
+            or (item.smallkey and world.keyshuffle[item.player] == 'none')
             or (item.bigkey and not world.bigkeyshuffle[item.player])
             or (item.compass and not world.compassshuffle[item.player])
             or (item.map and not world.mapshuffle[item.player]))
@@ -250,8 +284,8 @@ def recovery_placement(item_to_place, locations, world, state, base_state, itemp
         return last_ditch_placement(item_to_place, locations, world, state, base_state, itempool, key_pool,
                                     single_player_placement)
     elif world.algorithm == 'vanilla_fill':
-        if item_to_place.type == 'Crystal':
-            possible_swaps = [x for x in state.locations_checked if x.item.type == 'Crystal']
+        if item_to_place.prize:
+            possible_swaps = [x for x in state.locations_checked if x.item.prize]
             return try_possible_swaps(possible_swaps, item_to_place, locations, world, base_state, itempool,
                                       key_pool, single_player_placement)
         else:
@@ -310,11 +344,15 @@ def last_ditch_placement(item_to_place, locations, world, state, base_state, ite
                 return 3
         return 4
 
-    if item_to_place.type == 'Crystal':
-        possible_swaps = [x for x in state.locations_checked if x.item.type == 'Crystal']
+    # TODO: Verify correctness in using item player in multiworld situations
+    if item_to_place.prize and world.prizeshuffle[item_to_place.player] == 'none':
+        possible_swaps = [x for x in state.locations_checked if x.item.prize]
     else:
+        ignored_types = ['Event']
+        if world.prizeshuffle[item_to_place.player] == 'none':
+            ignored_types.append('Prize')
         possible_swaps = [x for x in state.locations_checked
-                          if x.item.type not in ['Event', 'Crystal'] and not x.forced_item and not x.locked]
+                          if x.item.type not in ignored_types and not x.forced_item and not x.locked]
     swap_locations = sorted(possible_swaps, key=location_preference)
     return try_possible_swaps(swap_locations, item_to_place, locations, world, base_state, itempool,
                               key_pool, single_player_placement)

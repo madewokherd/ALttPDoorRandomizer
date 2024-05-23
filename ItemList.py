@@ -5,7 +5,7 @@ import RaceRandom as random
 
 from BaseClasses import LocationType, Region, RegionType, Shop, ShopType, Location, CollectionState, PotItem
 from EntranceShuffle import connect_entrance
-from Regions import shop_to_location_table, retro_shops, shop_table_by_location, valid_pot_location
+from Regions import location_events, shop_to_location_table, retro_shops, shop_table_by_location, valid_pot_location
 from Fill import FillError, fill_restrictive, get_dungeon_item_pool, track_dungeon_items, track_outside_keys
 from PotShuffle import vanilla_pots
 from Tables import bonk_prize_lookup
@@ -240,41 +240,9 @@ def generate_itempool(world, player):
         old_man.forced_item = old_man.item
         old_man.skip = True
 
-    event_items = {
-        'Agahnim 1': 'Beat Agahnim 1',
-        'Agahnim 2': 'Beat Agahnim 2',
-        'Eastern Palace - Boss Kill': 'Beat Boss',
-        'Desert Palace - Boss Kill': 'Beat Boss',
-        'Tower of Hera - Boss Kill': 'Beat Boss',
-        'Palace of Darkness - Boss Kill': 'Beat Boss',
-        'Swamp Palace - Boss Kill': 'Beat Boss',
-        'Skull Woods - Boss Kill': 'Beat Boss',
-        'Thieves\' Town - Boss Kill': 'Beat Boss',
-        'Ice Palace - Boss Kill': 'Beat Boss',
-        'Misery Mire - Boss Kill': 'Beat Boss',
-        'Turtle Rock - Boss Kill': 'Beat Boss',
-        'Lost Old Man': 'Escort Old Man',
-        'Old Man Drop Off': 'Return Old Man',
-        'Floodgate': 'Open Floodgate',
-        'Big Bomb': 'Pick Up Big Bomb',
-        'Pyramid Crack': 'Detonate Big Bomb',
-        'Frog': 'Get Frog',
-        'Missing Smith': 'Return Smith',
-        'Dark Blacksmith Ruins': 'Pick Up Purple Chest',
-        'Middle Aged Man': 'Deliver Purple Chest',
-        'Trench 1 Switch': 'Trench 1 Filled',
-        'Trench 2 Switch': 'Trench 2 Filled',
-        'Swamp Drain': 'Drained Swamp',
-        'Turtle Medallion Pad': 'Turtle Opened',
-        'Attic Cracked Floor': 'Shining Light',
-        'Suspicious Maiden': 'Maiden Rescued',
-        'Revealing Light': 'Maiden Unmasked',
-        'Ice Block Drop': 'Convenient Block',
-        'Skull Star Tile': 'Hidden Pits'
-    }
-
-    for loc, item in event_items.items():
-        set_event_item(loc, item)
+    for loc, item in location_events.items():
+        if item:
+            set_event_item(loc, item)
     
     if world.mode[player] == 'standard':
         set_event_item('Zelda Pickup', 'Zelda Herself')
@@ -375,7 +343,8 @@ def generate_itempool(world, player):
         world.treasure_hunt_icon[player] = 'Triforce Piece'
 
     world.itempool.extend([item for item in get_dungeon_item_pool(world) if item.player == player
-                           and ((item.smallkey and world.keyshuffle[player] != 'none')
+                           and ((item.prize and world.prizeshuffle[player] == 'wild')
+                                or (item.smallkey and world.keyshuffle[player] != 'none')
                                 or (item.bigkey and world.bigkeyshuffle[player])
                                 or (item.map and world.mapshuffle[player])
                                 or (item.compass and world.compassshuffle[player]))])
@@ -486,7 +455,7 @@ def generate_itempool(world, player):
         world.itempool = [beemizer(item) for item in world.itempool]
 
     # increase pool if not enough items
-    ttl_locations = sum(1 for x in world.get_unfilled_locations(player) if '- Prize' not in x.name)
+    ttl_locations = sum(1 for x in world.get_unfilled_locations(player) if world.prizeshuffle[player] != 'none' or not x.prize)
     pool_size = count_player_dungeon_item_pool(world, player)
     pool_size += sum(1 for x in world.itempool if x.player == player)
 
@@ -725,9 +694,12 @@ def create_dynamic_bonkdrop_locations(world, player):
 
 
 def fill_prizes(world, attempts=15):
+    from Items import prize_item_table
     all_state = world.get_all_state(keys=True)
     for player in range(1, world.players + 1):
-        crystals = ItemFactory(['Red Pendant', 'Blue Pendant', 'Green Pendant', 'Crystal 1', 'Crystal 2', 'Crystal 3', 'Crystal 4', 'Crystal 7', 'Crystal 5', 'Crystal 6'], player)
+        if world.prizeshuffle[player] != 'none':
+            continue
+        crystals = ItemFactory(list(prize_item_table.keys()), player)
         crystal_locations = [world.get_location('Turtle Rock - Prize', player), world.get_location('Eastern Palace - Prize', player), world.get_location('Desert Palace - Prize', player), world.get_location('Tower of Hera - Prize', player), world.get_location('Palace of Darkness - Prize', player),
                              world.get_location('Thieves\' Town - Prize', player), world.get_location('Skull Woods - Prize', player), world.get_location('Swamp Palace - Prize', player), world.get_location('Ice Palace - Prize', player),
                              world.get_location('Misery Mire - Prize', player)]
@@ -742,6 +714,8 @@ def fill_prizes(world, attempts=15):
                 random.shuffle(prizepool)
                 random.shuffle(prize_locs)
                 fill_restrictive(world, all_state, prize_locs, prizepool, single_player_placement=True)
+                for prize_loc in crystal_locations:
+                    prize_loc.parent_region.dungeon.prize = prize_loc.item
             except FillError as e:
                 logging.getLogger('').info("Failed to place dungeon prizes (%s). Will retry %s more times", e, attempts - attempt - 1)
                 for location in empty_crystal_locations:
@@ -1419,9 +1393,11 @@ def make_customizer_pool(world, player):
                     target_amount = max(amount, len(dungeon.small_keys))
                     additional_amount = target_amount - len(dungeon.small_keys)
                     dungeon.small_keys.extend([d_item] * additional_amount)
-            elif item_name.startswith('Big Key') or item_name.startswith('Map') or item_name.startswith('Compass'):
+            elif (item_name.startswith('Big Key') or item_name.startswith('Map') or item_name.startswith('Compass')
+                    or item_name.startswith('Crystal') or item_name.endswith('Pendant')):
                 d_item = ItemFactory(item_name, player)
-                if ((d_item.bigkey and not world.bigkeyshuffle[player])
+                if ((d_item.prize and world.prizeshuffle[player] in ['none', 'dungeon'])
+                   or (d_item.bigkey and not world.bigkeyshuffle[player])
                    or (d_item.compass and not world.compassshuffle[player])
                    or (d_item.map and not world.mapshuffle[player])):
                     d_name = d_item.dungeon
@@ -1566,11 +1542,11 @@ def set_default_triforce(goal, custom_goal, custom_total):
 
 def fill_specific_items(world):
     if world.customizer:
+        from Items import prize_item_table
         placements = world.customizer.get_placements()
         dungeon_pool = get_dungeon_item_pool(world)
         prize_pool = []
-        prize_set = {'Red Pendant', 'Blue Pendant', 'Green Pendant', 'Crystal 1', 'Crystal 2',
-                     'Crystal 3', 'Crystal 4', 'Crystal 7', 'Crystal 5', 'Crystal 6'}
+        prize_set = set(prize_item_table.keys())
         for p in range(1, world.players + 1):
             prize_pool.extend(prize_set)
         if placements:
@@ -1672,7 +1648,8 @@ def get_item_and_event_flag(item, world, player, dungeon_pool, prize_set, prize_
 
 
 def is_dungeon_item(item, world, player):
-    return ((item.startswith('Small Key') and world.keyshuffle[player] == 'none')
+    return (((item.startswith('Crystal') or item.endswith('Pendant')) and world.prizeshuffle[player] in ['none', 'dungeon'])
+            or (item.startswith('Small Key') and world.keyshuffle[player] == 'none')
             or (item.startswith('Big Key') and not world.bigkeyshuffle[player])
             or (item.startswith('Compass') and not world.compassshuffle[player])
             or (item.startswith('Map') and not world.mapshuffle[player]))

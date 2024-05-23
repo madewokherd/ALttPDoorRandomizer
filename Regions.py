@@ -1124,8 +1124,8 @@ def _create_region(player, name, type, hint='Hyrule', locations=None, exits=None
             ko_hint = key_drop_data[location][2]
             ret.locations.append(Location(player, location, None, False, ko_hint, ret, key_drop_data[location][3]))
         else:
-            address, player_address, crystal, hint_text = location_table[location]
-            ret.locations.append(Location(player, location, address, crystal, hint_text, ret, None, player_address))
+            address, player_address, prize, hint_text = location_table[location]
+            ret.locations.append(Location(player, location, address, prize, hint_text, ret, None, player_address))
     return ret
 
 def mark_light_dark_world_regions(world, player):
@@ -1240,14 +1240,14 @@ def adjust_locations(world, player):
                 # player address? it is in the shop table
                 index += 1
     setup_enemy_locations(world, player)
+    # disable forced prize locations
+    if world.prizeshuffle[player] != 'none':
+        for l in [name for name, data in location_table.items() if data[2]]:
+            location = world.get_location_unsafe(l, player)
+            if location:
+                location.prize = False
     # unreal events:
-    for l in ['Ganon', 'Agahnim 1', 'Agahnim 2', 'Frog', 'Missing Smith', 'Dark Blacksmith Ruins', 'Middle Aged Man',
-              'Floodgate', 'Trench 1 Switch', 'Trench 2 Switch', 'Swamp Drain', 'Turtle Medallion Pad',
-              'Attic Cracked Floor', 'Suspicious Maiden', 'Revealing Light', 'Big Bomb', 'Pyramid Crack',
-              'Ice Block Drop', 'Lost Old Man', 'Old Man Drop Off', 'Zelda Pickup', 'Zelda Drop Off', 'Skull Star Tile',
-              'Eastern Palace - Boss Kill', 'Desert Palace - Boss Kill', 'Tower of Hera - Boss Kill',
-              'Palace of Darkness - Boss Kill', 'Swamp Palace - Boss Kill', 'Skull Woods - Boss Kill',
-              'Thieves\' Town - Boss Kill', 'Ice Palace - Boss Kill', 'Misery Mire - Boss Kill', 'Turtle Rock - Boss Kill']:
+    for l in ['Ganon', 'Zelda Pickup', 'Zelda Drop Off'] + list(location_events):
         location = world.get_location_unsafe(l, player)
         if location:
             location.type = LocationType.Logical
@@ -1397,18 +1397,42 @@ shop_table_by_location_id = {0x400000+cnt: x for cnt, x in enumerate(flat_normal
 shop_table_by_location_id = {**shop_table_by_location_id, **{0x400020+cnt: x for cnt, x in enumerate(flat_retro_shops)}}
 shop_table_by_location = {y: x for x, y in shop_table_by_location_id.items()}
 
-dungeon_events = [
-    'Trench 1 Switch',
-    'Trench 2 Switch',
-    'Swamp Drain',
-    'Attic Cracked Floor',
-    'Suspicious Maiden',
-    'Revealing Light',
-    'Ice Block Drop',
-    'Skull Star Tile',
-    'Zelda Pickup',
-    'Zelda Drop Off'
-]
+
+location_events = {
+    'Agahnim 1': 'Beat Agahnim 1',
+    'Agahnim 2': 'Beat Agahnim 2',
+    'Eastern Palace - Boss Kill': 'Beat Boss',
+    'Desert Palace - Boss Kill': 'Beat Boss',
+    'Tower of Hera - Boss Kill': 'Beat Boss',
+    'Palace of Darkness - Boss Kill': 'Beat Boss',
+    'Swamp Palace - Boss Kill': 'Beat Boss',
+    'Skull Woods - Boss Kill': 'Beat Boss',
+    'Thieves\' Town - Boss Kill': 'Beat Boss',
+    'Ice Palace - Boss Kill': 'Beat Boss',
+    'Misery Mire - Boss Kill': 'Beat Boss',
+    'Turtle Rock - Boss Kill': 'Beat Boss',
+    'Lost Old Man': 'Escort Old Man',
+    'Old Man Drop Off': 'Return Old Man',
+    'Floodgate': 'Open Floodgate',
+    'Big Bomb': 'Pick Up Big Bomb',
+    'Pyramid Crack': 'Detonate Big Bomb',
+    'Frog': 'Get Frog',
+    'Missing Smith': 'Return Smith',
+    'Dark Blacksmith Ruins': 'Pick Up Purple Chest',
+    'Middle Aged Man': 'Deliver Purple Chest',
+    'Trench 1 Switch': 'Trench 1 Filled',
+    'Trench 2 Switch': 'Trench 2 Filled',
+    'Swamp Drain': 'Drained Swamp',
+    'Turtle Medallion Pad': 'Turtle Opened',
+    'Attic Cracked Floor': 'Shining Light',
+    'Suspicious Maiden': 'Maiden Rescued',
+    'Revealing Light': 'Maiden Unmasked',
+    'Ice Block Drop': 'Convenient Block',
+    'Skull Star Tile': 'Hidden Pits',
+    'Zelda Pickup': None,
+    'Zelda Drop Off': None
+}
+
 
 flooded_keys_reverse = {
     'Swamp Palace - Trench 1 Pot Key': 'Trench 1 Switch',
@@ -1524,7 +1548,7 @@ location_table = {'Mushroom': (0x180013, 0x186df8, False, 'in the woods'),
                   'Pyramid Fairy - Right': (0xe983, 0x186c17, False, 'near a fairy'),
                   'Brewery': (0xe9ec, 0x186c80, False, 'alone in a home'),
                   'C-Shaped House': (0xe9ef, 0x186c83, False, 'alone in a home'),
-                  'Chest Game': (0xeda8, 0x186e2b, False, 'as a prize'),
+                  'Chest Game': (0xeda8, 0x186e2b, False, 'as a game reward'),
                   'Bumper Cave Ledge': (0x180146, 0x186e15, False, 'on a ledge'),
                   'Mire Shed - Left': (0xea73, 0x186d07, False, 'near sparks'),
                   'Mire Shed - Right': (0xea76, 0x186d0a, False, 'near sparks'),
@@ -1665,16 +1689,16 @@ location_table = {'Mushroom': (0x180013, 0x186df8, False, 'in the woods'),
                   'Skull Star Tile': (None, None, False, None),
                   'Zelda Pickup': (None, None, False, None),
                   'Zelda Drop Off': (None, None, False, None),
-                  'Eastern Palace - Prize': ([0x1209D, 0x53E76, 0x53E77, 0x180052, 0x180070, 0xC6FE, 0x186FE2], None, True, 'Eastern Palace'),
-                  'Desert Palace - Prize': ([0x1209E, 0x53E7A, 0x53E7B, 0x180053, 0x180072, 0xC6FF, 0x186FE3], None, True, 'Desert Palace'),
-                  'Tower of Hera - Prize': ([0x120A5, 0x53E78, 0x53E79, 0x18005A, 0x180071, 0xC706, 0x186FEA], None, True, 'Tower of Hera'),
-                  'Palace of Darkness - Prize': ([0x120A1, 0x53E7C, 0x53E7D, 0x180056, 0x180073, 0xC702, 0x186FE6], None, True, 'Palace of Darkness'),
-                  'Swamp Palace - Prize': ([0x120A0, 0x53E88, 0x53E89, 0x180055, 0x180079, 0xC701, 0x186FE5], None, True, 'Swamp Palace'),
-                  'Thieves\' Town - Prize': ([0x120A6, 0x53E82, 0x53E83, 0x18005B, 0x180076, 0xC707, 0x186FEB], None, True, 'Thieves Town'),
-                  'Skull Woods - Prize': ([0x120A3, 0x53E7E, 0x53E7F, 0x180058, 0x180074, 0xC704, 0x186FE8], None, True, 'Skull Woods'),
-                  'Ice Palace - Prize': ([0x120A4, 0x53E86, 0x53E87, 0x180059, 0x180078, 0xC705, 0x186FE9], None, True, 'Ice Palace'),
-                  'Misery Mire - Prize': ([0x120A2, 0x53E84, 0x53E85, 0x180057, 0x180077, 0xC703, 0x186FE7], None, True, 'Misery Mire'),
-                  'Turtle Rock - Prize': ([0x120A7, 0x53E80, 0x53E81, 0x18005C, 0x180075, 0xC708, 0x186FEC], None, True, 'Turtle Rock'),
+                  'Eastern Palace - Prize': (0xC6FE, 0x186E2C, True, 'with the Armos'),
+                  'Desert Palace - Prize': (0xC6FF, 0x186E2D, True, 'with Lanmolas'),
+                  'Tower of Hera - Prize': (0xC706, 0x186E2E, True, 'with Moldorm'),
+                  'Palace of Darkness - Prize': (0xC702, 0x186E2F, True, 'with Helmasaur King'),
+                  'Swamp Palace - Prize': (0xC701, 0x186E30, True, 'with Arrghus'),
+                  'Skull Woods - Prize': (0xC704, 0x186E31, True, 'with Mothula'),
+                  'Thieves\' Town - Prize': (0xC707, 0x186E32, True, 'with Blind'),
+                  'Ice Palace - Prize': (0xC705, 0x186E33, True, 'with Kholdstare'),
+                  'Misery Mire - Prize': (0xC703, 0x186E34, True, 'with Vitreous'),
+                  'Turtle Rock - Prize': (0xC708, 0x186E35, True, 'with Trinexx'),
                   'Kakariko Shop - Left': (None, None, False, 'for sale in Kakariko'),
                   'Kakariko Shop - Middle': (None, None, False, 'for sale in Kakariko'),
                   'Kakariko Shop - Right': (None, None, False, 'for sale in Kakariko'),

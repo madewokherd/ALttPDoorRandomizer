@@ -387,6 +387,13 @@
     "action": "store_true",
     "type": "bool"
   },
+  "prizeshuffle": {
+    "choices": [
+      "none",
+      "dungeon",
+      "wild"
+    ]
+  },
   "keysanity": {
     "action": "store_true",
     "type": "bool",

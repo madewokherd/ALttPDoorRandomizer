@@ -340,6 +340,16 @@ location_table_uw = {"Blind's Hideout - Top": (0x11d, 0x10),
                      'Ganons Tower - Mini Helmasaur Key Drop': (0x3d, 0x400),
                      'Ganons Tower - Pre-Moldorm Chest': (0x3d, 0x40),
                      'Ganons Tower - Validation Chest': (0x4d, 0x10)}
+location_table_boss = {'Eastern Palace - Prize': 0x2000,
+                       'Desert Palace - Prize': 0x1000,
+                       'Tower of Hera - Prize': 0x0020,
+                       'Palace of Darkness - Prize': 0x0200,
+                       'Thieves Town - Prize': 0x0010,
+                       'Skull Woods - Prize': 0x0080,
+                       'Swamp Palace - Prize': 0x0400,
+                       'Ice Palace - Prize': 0x0040,
+                       'Misery Mire - Prize': 0x0100,
+                       'Turtle Rock - Prize': 0x0008}
 location_table_npc = {'Mushroom': 0x1000,
                       'King Zora': 0x2,
                       'Sahasrahla': 0x10,
@@ -947,6 +957,14 @@ async def track_locations(ctx : Context, roomid, roomdata):
                 offset = (roomid - uw_begin) * 2
                 roomdata = uw_data[offset] | (uw_data[offset + 1] << 8)
                 if roomdata & mask != 0:
+                    new_check(location)
+
+    if not all([location in ctx.locations_checked for location in location_table_boss.keys()]):
+        boss_data = await snes_read(ctx, SAVEDATA_START + 0x472, 2)
+        if boss_data is not None:
+            boss_value = boss_data[0] | (boss_data[1] << 8)
+            for location, mask in location_table_boss.items():
+                if boss_value & mask != 0 and location not in ctx.locations_checked:
                     new_check(location)
 
     ow_begin = 0x82
