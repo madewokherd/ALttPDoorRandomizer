@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '040105d89f267ab8726105e05a4d254e'
+RANDOMIZERBASEHASH = 'd0d67e62722fc7c2192c1f3b1cd8284b'
 
 
 class JsonRom(object):
@@ -485,7 +485,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             if world.mapshuffle[player]:
                 music = random.choice([0x11, 0x16])
             else:
-                music = 0x11 if 'Pendant' in location.item.name else 0x16
+                music = 0x11 if 'Pendant' in dungeon.prize.name else 0x16
             for music_address in dungeon_music_addresses[dungeon.name]:
                 rom.write_byte(music_address, music)
 
