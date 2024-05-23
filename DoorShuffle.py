@@ -3405,7 +3405,7 @@ def find_accessible_entrances(world, player, builder):
     visited_entrances = []
 
     # Add Sanctuary as an additional entrance in open mode, since you can save and quit to there
-    if world.mode[player] == 'open' and world.get_region('Sanctuary', player).dungeon.name == builder.name and 'Sanctuary' not in entrances:
+    if not world.is_dark_chapel_start(player) and world.get_region('Sanctuary', player).dungeon.name == builder.name and 'Sanctuary' not in entrances:
         entrances.append('Sanctuary')
         visited_entrances.append('Sanctuary')
         regs.remove(world.get_region('Sanctuary', player))
