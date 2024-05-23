@@ -30,6 +30,7 @@ def main():
     parser.add_argument('--teams', default=1, type=lambda value: max(int(value), 1))
     parser.add_argument('--spoiler', default='none', choices=['none', 'settings', 'semi', 'full', 'debug'])
     parser.add_argument('--no_race', action='store_true')
+    parser.add_argument('--print_template_yaml', action='store_true')
     parser.add_argument('--suppress_rom', action='store_true')
     parser.add_argument('--suppress_meta', action='store_true')
     parser.add_argument('--bps', action='store_true')
@@ -67,6 +68,7 @@ def main():
     erargs.spoiler = args.spoiler
     erargs.suppress_rom = args.suppress_rom
     erargs.suppress_meta = args.suppress_meta
+    erargs.print_template_yaml = args.print_template_yaml
     erargs.bps = args.bps
     erargs.race = not args.no_race
     erargs.outputname = seedname
