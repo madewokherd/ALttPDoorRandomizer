@@ -15,6 +15,7 @@ from Utils import int16_as_bytes
 from Tables import normal_offset_table, spiral_offset_table, multiply_lookup, divisor_lookup
 from RoomData import Room
 from source.dungeon.RoomObject import RoomObject
+from source.overworld.EntranceData import door_addresses
 
 
 class World(object):
@@ -701,7 +702,7 @@ class CollectionState(object):
                                 bc[conn] = door_crystal_state
                                 queue.append((conn, door_crystal_state))
                         elif door is None:
-                            # note: no door in dungeon indicates what exactly? (always traversable)?
+                            bc[conn] = new_crystal_state
                             queue.append((conn, new_crystal_state))
                 else:
                     new_crystal_state = CrystalBarrier.Orange
@@ -2847,7 +2848,6 @@ class Shop(object):
         # [id][roomID-low][roomID-high][doorID][zero][shop_config][shopkeeper_config][sram_index]
         entrances = self.region.entrances
         config = self.item_count
-        from EntranceShuffle import door_addresses
         if len(entrances) == 1 and entrances[0].name in door_addresses:
             door_id = door_addresses[entrances[0].name][0] + 1
         else:
@@ -3240,12 +3240,11 @@ class Spoiler(object):
                     outfile.write('\n')
                     outfile.write('Entrance Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['shuffle'][player])
                     if self.metadata['shuffle'][player] != 'vanilla':
-                        outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
                         outfile.write('Shuffle Link\'s House:'.ljust(line_width) + '%s\n' % yn(self.metadata['shufflelinks'][player]))
-                        outfile.write('Shuffle Tavern:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffletavern'][player]))
+                        outfile.write('Shuffle Back of Tavern:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffletavern'][player]))
+                        outfile.write('Shuffle GT/Ganon:'.ljust(line_width) + '%s\n' % yn(self.metadata['shuffleganon'][player]))
                     outfile.write('Pyramid Hole Pre-opened:'.ljust(line_width) + '%s\n' % self.metadata['open_pyramid'][player])
-                    if self.metadata['shuffle'][player] != 'vanilla' or self.metadata['ow_mixed'][player]:
-                        outfile.write('Overworld Map:'.ljust(line_width) + '%s\n' % self.metadata['overworld_map'][player])
+                    outfile.write('Overworld Map:'.ljust(line_width) + '%s\n' % self.metadata['overworld_map'][player])
                     outfile.write('\n')
                     outfile.write('Map Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['mapshuffle'][player]))
                     outfile.write('Compass Shuffle:'.ljust(line_width) + '%s\n' % yn(self.metadata['compassshuffle'][player]))
@@ -3266,10 +3265,10 @@ class Spoiler(object):
                     outfile.write('\n')
                     outfile.write('Boss Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['boss_shuffle'][player])
                     outfile.write('Enemy Shuffle:'.ljust(line_width) + '%s\n' % self.metadata['enemy_shuffle'][player])
-                    if self.metadata['enemy_shuffle'][player] != 'none':
-                        outfile.write('Enemy Logic:'.ljust(line_width) + '%s\n' % self.metadata['any_enemy_logic'][player])
                     outfile.write('Enemy Health:'.ljust(line_width) + '%s\n' % self.metadata['enemy_health'][player])
                     outfile.write('Enemy Damage:'.ljust(line_width) + '%s\n' % self.metadata['enemy_damage'][player])
+                    if self.metadata['enemy_shuffle'][player] != 'none':
+                        outfile.write('Enemy Logic:'.ljust(line_width) + '%s\n' % self.metadata['any_enemy_logic'][player])
                     outfile.write('\n')
                     outfile.write('Pseudoboots:'.ljust(line_width) + '%s\n' % yn(self.metadata['pseudoboots'][player]))
                     outfile.write('Hints:'.ljust(line_width) + '%s\n' % yn(self.metadata['hints'][player]))

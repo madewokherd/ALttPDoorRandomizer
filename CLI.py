@@ -202,7 +202,7 @@ def parse_settings():
         "bonk_drops": False,
         "shuffle": "vanilla",
         "shufflelinks": False,
-        "shuffletavern": False,
+        "shuffletavern": True,
         "overworld_map": "default",
         "take_any": "none",
         "pseudoboots": False,

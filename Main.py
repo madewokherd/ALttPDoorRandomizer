@@ -18,7 +18,6 @@ from PotShuffle import shuffle_pots, shuffle_pot_switches
 from Regions import create_regions, create_shops, mark_light_dark_world_regions, create_dungeon_regions, adjust_locations
 from OWEdges import create_owedges
 from OverworldShuffle import link_overworld, update_world_regions, create_dynamic_exits
-from EntranceShuffle import link_entrances
 from Rom import patch_rom, patch_race_rom, apply_rom_settings, LocalRom, JsonRom, get_hash_string
 from Doors import create_doors
 from DoorShuffle import link_doors, connect_portal, link_doors_prep
@@ -33,7 +32,7 @@ from UnderworldGlitchRules import create_hybridmajor_connections, create_hybridm
 from Utils import output_path, parse_player_names
 
 from source.item.District import init_districts
-from source.item.FillUtil import create_item_pool_config, massage_item_pool, district_item_pool_config
+from source.item.FillUtil import create_item_pool_config, massage_item_pool, district_item_pool_config, verify_item_pool_config
 from source.overworld.EntranceShuffle2 import link_entrances_new
 from source.tools.BPS import create_bps_from_data
 from source.classes.CustomSettings import CustomSettings
@@ -41,7 +40,7 @@ from source.enemizer.DamageTables import DamageTable
 from source.enemizer.Enemizer import randomize_enemies
 from source.rom.DataTables import init_data_tables
 
-version_number = '1.4.1.11'
+version_number = '1.4.1.12'
 version_branch = '-u'
 __version__ = f'{version_number}{version_branch}'
 
@@ -230,6 +229,7 @@ def main(args, seed=None, fish=None):
     for player in range(1, world.players + 1):
         generate_itempool(world, player)
 
+    verify_item_pool_config(world)
     logger.info(world.fish.translate("cli","cli","calc.access.rules"))
 
     for player in range(1, world.players + 1):
@@ -521,7 +521,9 @@ def set_starting_inventory(world, args):
         for p, inv_list in world.customizer.get_start_inventory().items():
             if inv_list:
                 for inv_item in inv_list:
-                    item = ItemFactory(inv_item.strip(), p)
+                    name = inv_item.strip()
+                    name = name if name != 'Ocarina' or world.flute_mode[player] != 'active' else 'Ocarina (Activated)'
+                    item = ItemFactory(name, p)
                     if item:
                         world.push_precollected(item)
 

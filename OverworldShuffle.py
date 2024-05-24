@@ -1550,7 +1550,8 @@ def validate_layout(world, player):
 
     from Main import copy_world_premature
     from Utils import stack_size3a
-    from EntranceShuffle import default_dungeon_connections, default_connector_connections, default_item_connections, default_shop_connections, default_drop_connections, default_dropexit_connections
+    # TODO: Find a better source for the below lists, original sourced was deprecated
+    from source.overworld.EntranceData import default_dungeon_connections, default_connector_connections, default_item_connections, default_shop_connections, default_drop_connections, default_dropexit_connections
     
     dungeon_entrances = list(zip(*default_dungeon_connections + [('Ganons Tower', '')]))[0]
     connector_entrances = list(zip(*default_connector_connections))[0]

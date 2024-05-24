@@ -10,7 +10,6 @@ import Items
 import RaceRandom as random
 import struct
 import sys
-import subprocess
 try:
     import bps.apply
     import bps.io
@@ -28,9 +27,10 @@ from Text import Triforce_texts, Blind_texts, BombShop2_texts, junk_texts
 from Text import KingsReturn_texts, Sanctuary_texts, Kakariko_texts, Blacksmiths_texts, DeathMountain_texts
 from Text import LostWoods_texts, WishingWell_texts, DesertPalace_texts, MountainTower_texts, LinksHouse_texts
 from Text import Lumberjacks_texts, SickKid_texts, FluteBoy_texts, Zora_texts, MagicShop_texts, Sahasrahla_names
-from Utils import output_path, local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
+from Utils import local_path, int16_as_bytes, int32_as_bytes, snes_to_pc
 from Items import ItemFactory, prize_item_table
-from EntranceShuffle import door_addresses, exit_ids, ow_prize_table
+from source.overworld.EntranceData import door_addresses, ow_prize_table
+from source.overworld.EntranceShuffle2 import exit_ids
 from OverworldShuffle import default_flute_connections, flute_data
 from InitialSram import InitialSram
 
@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'd0d67e62722fc7c2192c1f3b1cd8284b'
+RANDOMIZERBASEHASH = '361d9f67bfd927c7993426cacd778e8f'
 
 
 class JsonRom(object):
@@ -728,8 +728,8 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     valid_loc_by_dungeon = valid_dungeon_locations(valid_locations)
 
     # fix hc big key problems (map and compass too)
-    if (world.doorShuffle[player] not in  ['vanilla', 'basic'] or world.dropshuffle[player] != 'none'
-         or world.pottery[player] not in ['none', 'cave']):
+    if (world.doorShuffle[player] != 'vanilla' or world.dropshuffle[player] != 'none'
+            or world.pottery[player] not in ['none', 'cave']):
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
         sanctuary = world.get_region('Sanctuary', player)

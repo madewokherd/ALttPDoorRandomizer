@@ -4,7 +4,6 @@ import math
 import RaceRandom as random
 
 from BaseClasses import LocationType, Region, RegionType, Shop, ShopType, Location, CollectionState, PotItem
-from EntranceShuffle import connect_entrance
 from Regions import location_events, shop_to_location_table, retro_shops, shop_table_by_location, valid_pot_location
 from Fill import FillError, fill_restrictive, get_dungeon_item_pool, track_dungeon_items, track_outside_keys
 from PotShuffle import vanilla_pots
@@ -12,6 +11,7 @@ from Tables import bonk_prize_lookup
 from Items import ItemFactory
 
 from source.dungeon.EnemyList import add_drop_contents
+from source.overworld.EntranceShuffle2 import connect_entrance
 from source.item.FillUtil import trash_items, pot_items
 
 import source.classes.constants as CONST
@@ -1606,11 +1606,17 @@ def fill_specific_items(world):
                         item_name = item_parts[0]
                         world.item_pool_config.restricted[(item_name, item_player)] = placement['locations']
                     elif placement['type'] == 'PreferredLocationGroup':
-                        item = placement['item']
-                        item_parts = item.split('#')
-                        item_player = player if len(item_parts) < 2 else int(item_parts[1])
-                        item_name = item_parts[0]
-                        world.item_pool_config.preferred[(item_name, item_player)] = placement['locations']
+                        items = []
+                        if 'item' in placement:
+                            items.append(placement['item'])
+                        elif 'items' in placement:
+                            items.extend(placement['items'])
+                        for item in items:
+                            item_parts = item.split('#')
+                            item_player = player if len(item_parts) < 2 else int(item_parts[1])
+                            item_name = item_parts[0]
+                            world.item_pool_config.preferred[(item_name, item_player)] = placement['locations']
+                        world.item_pool_config.reserved_locations[player].update(placement['locations'])
                     elif placement['type'] == 'Verification':
                         item = placement['item']
                         item_parts = item.split('#')
