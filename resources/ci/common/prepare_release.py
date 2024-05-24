@@ -101,7 +101,8 @@ if len(BUILD_FILENAMES) > 0:
 	# .zip if windows
 	# .tar.gz otherwise
   if len(BUILD_FILENAMES) > 1:
-    ZIP_FILENAME = os.path.join("..","deploy",env["REPO_NAME"])
+    # ZIP_FILENAME = os.path.join("..","deploy",env["REPO_NAME"])
+    ZIP_FILENAME = os.path.join("..","deploy","ALttPOverworldRandomizer")
   else:
     ZIP_FILENAME = os.path.join("..","deploy",os.path.splitext(BUILD_FILENAME)[0])
   if env["OS_NAME"] == "windows":
@@ -124,15 +125,15 @@ for BUILD_FILENAME in BUILD_FILENAMES:
     print("Build Filename: " + BUILD_FILENAME)
     print("Build Filesize: " + common.file_size(BUILD_FILENAME))
   else:
-    print("No Build to prepare: " + BUILD_FILENAME)
+    print("🟡No Build to prepare: " + BUILD_FILENAME)
 
 if not ZIP_FILENAME == "":
   print("Zip Filename:   " + ZIP_FILENAME)
   print("Zip Filesize:   " + common.file_size(ZIP_FILENAME))
 else:
-  print("No Zip to prepare: " + ZIP_FILENAME)
+  print("🟡No Zip to prepare: " + ZIP_FILENAME)
 
-print("Git tag:        " + env["GITHUB_TAG"])
+print("App Version:    " + env["GITHUB_TAG"])
 
 if (len(BUILD_FILENAMES) == 0) or (ZIP_FILENAME == ""):
   exit(1)
