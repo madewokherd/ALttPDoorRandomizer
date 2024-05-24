@@ -2627,6 +2627,8 @@ mandatory_connections = [('Lost Woods Hideout (top to bottom)', 'Lost Woods Hide
                          ('Paradox Cave Push Block', 'Paradox Cave Front'),
                          ('Paradox Cave Chest Area NE', 'Paradox Cave Bomb Area'),
                          ('Paradox Cave Bomb Jump', 'Paradox Cave'),
+                         ('Paradox Cave Climb', 'Paradox Cave (Top)'),
+                         ('Paradox Cave Descent', 'Paradox Cave'),
                          ('Paradox Cave Drop', 'Paradox Cave Chest Area'),
                          ('Paradox Shop', 'Paradox Shop'),
                          ('Fairy Ascension Cave Climb', 'Fairy Ascension Cave (Top)'),
