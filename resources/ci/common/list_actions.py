@@ -104,7 +104,7 @@ for r, d, f in os.walk(os.path.join(".", ".github")):
                                     apiRes = json.loads(
                                         apiReq.read().decode("utf-8"))
                                 except JSONDecodeError as e:
-                                    raise ValueError("🔴API Request failed: " + apiURL)
+                                    raise ValueError("API Request failed: " + apiURL)
                                 if apiRes:
                                     latest = apiRes["tag_name"] if "tag_name" in apiRes else ""
                                     if latest != "":
@@ -143,7 +143,7 @@ for action, actionData in allACTIONS.items():
                     filename_line +
                     " "
                 )
-                print("| 🔴Outdated |")
+                print("| Outdated |")
                 print(
                     "|" +
                     filename_line +
