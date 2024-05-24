@@ -270,7 +270,7 @@ def track_dungeon_items(item, location, world):
 
 
 def is_dungeon_item(item, world):
-    return ((item.prize and world.prizeshuffle[item.player] == 'none')
+    return ((item.prize and world.prizeshuffle[item.player] in ['none', 'dungeon'])
             or (item.smallkey and world.keyshuffle[item.player] == 'none')
             or (item.bigkey and not world.bigkeyshuffle[item.player])
             or (item.compass and not world.compassshuffle[item.player])

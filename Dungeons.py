@@ -291,7 +291,7 @@ dungeon_table = {
     'Desert Palace': DungeonInfo(2, 1, True, True, True, False, 3, [0x1209E, 0x53F3C, 0x53F3D, 0x180053, 0x180072, 0x186FE3], 0x06, 0x12),
     'Tower of Hera': DungeonInfo(2, 1, True, True, True, False, 0, [0x120A5, 0x53F4A, 0x53F4B, 0x18005A, 0x180071, 0x186FEA], 0x14, None),
     'Agahnims Tower': DungeonInfo(0, 2, False, False, False, False, 2, None, 0x08, None),
-    'Palace of Darkness': DungeonInfo(5, 6, True, True, True, False, 0, [0x120A1, 0x53F22, 0x53F43, 0x180056, 0x180073, 0x186FE6], 0x0C, None),
+    'Palace of Darkness': DungeonInfo(5, 6, True, True, True, False, 0, [0x120A1, 0x53F42, 0x53F43, 0x180056, 0x180073, 0x186FE6], 0x0C, None),
     'Swamp Palace': DungeonInfo(6, 1, True, True, True, False, 5, [0x120A0, 0x53F40, 0x53F41, 0x180055, 0x180079, 0x186FE5], 0x0A, None),
     'Skull Woods': DungeonInfo(2, 3, True, True, True, False, 2, [0x120A3, 0x53F46, 0x53F47, 0x180058, 0x180074, 0x186FE8], 0x10, 0x20),
     'Thieves Town': DungeonInfo(4, 1, True, True, True, False, 2, [0x120A6, 0x53F4C, 0x53F4D, 0x18005B, 0x180076, 0x186FEB], 0x16, None),

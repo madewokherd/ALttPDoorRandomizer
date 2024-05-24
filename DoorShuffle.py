@@ -2696,6 +2696,8 @@ def calc_used_dungeon_items(builder, world, player):
         base += 1
     if not world.mapshuffle[player] and (builder.name != 'Agahnims Tower' or not basic_flag):
         base += 1
+    if world.prizeshuffle[player] == 'dungeon' and builder.name not in ['Hyrule Castle', 'Agahnims Tower', 'Ganons Tower']:
+        base += 1
     return base
 
 

@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '361d9f67bfd927c7993426cacd778e8f'
+RANDOMIZERBASEHASH = '096e6adebfa630e827c662f12f79b4cd'
 
 
 class JsonRom(object):
@@ -477,7 +477,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
         rom.write_byte(location.address, itemid)
     for dungeon in [d for d in world.dungeons if d.player == player]:
         if dungeon.prize:
-            # crystals
+            # prizes
             for address, value in zip(dungeon_table[dungeon.name].prize, prize_item_table[dungeon.prize.name]):
                 rom.write_byte(address, value)
 
@@ -1211,8 +1211,6 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     rom.write_byte(0x1800A1, 0x01)  # enable overworld screen transition draining for water level inside swamp
     rom.write_byte(0x180174, 0x01 if world.fix_fake_world[player] else 0x00)
     rom.write_byte(0x18017E, 0x01) # Fairy fountains only trade in bottles
-    # fix for allowing prize itemgets being able to update the HUD (buying prizes in shops and updating rupees)
-    rom.write_bytes(snes_to_pc(0x0799FB), [0x80, 0x11, 0xEA])
 
     # Starting equipment
     if world.pseudoboots[player]:
@@ -1437,8 +1435,8 @@ def patch_rom(world, rom, player, team, is_mystery=False):
                 return reveal_bytes.get(dungeon.name, 0x0000)
         return 0x0000
 
-    write_int16(rom, 0x18017A, get_reveal_bytes('Green Pendant') if world.mapshuffle[player] else 0x0000) # Sahasrahla reveal
-    write_int16(rom, 0x18017C, get_reveal_bytes('Crystal 5')|get_reveal_bytes('Crystal 6') if world.mapshuffle[player] else 0x0000) # Bomb Shop Reveal
+    write_int16(rom, 0x18017A, get_reveal_bytes('Green Pendant')) # Sahasrahla reveal
+    write_int16(rom, 0x18017C, get_reveal_bytes('Crystal 5')|get_reveal_bytes('Crystal 6')) # Bomb Shop Reveal
 
     rom.write_byte(0x180172, 0x01 if world.keyshuffle[player] == 'universal' else 0x00)  # universal keys
     rom.write_byte(0x180175, 0x01 if world.bow_mode[player].startswith('retro') else 0x00)  # rupee bow
