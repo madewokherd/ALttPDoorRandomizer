@@ -214,7 +214,7 @@ As you can see, things get pretty complicated when mixing modes together. Doing 
 
 ## Whirlpool Shuffle (--ow_whirlpool)
 
-When enabled, the whirlpool connections are shuffled. If Crossed OW is enabled, the whirlpools can also be cross-world as well. For Limited Crossed OW, this doesn't count towards the limited number of crossed edge transitions.
+When enabled, the whirlpool connections are shuffled. If Crossed OW is enabled, the whirlpools can also be cross-world as well. When the number of crossed edges are limited thru Customizer, this doesn't count towards the limited number of crossed edge transitions.
 
 ## Flute Shuffle (--ow_fluteshuffle)
 
