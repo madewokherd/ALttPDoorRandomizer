@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0.0
+- Overworld Map Check has been overhauled
+- Dungeon Prize Indicators have changed: P/C no longer display, replaced by G/B/R/1-7
+- New Mode: Prize Shuffle
+- Death Mountain Return Cave and Paradox Cave (Top) are no longer bunny passable
+- \~Merged in DR v1.4.1.12~
+
 ## 0.4.0.2
 - Fixed issue with Inverted GT entrance not opening
 - Potential fox for bonk items duplicating onto other OW items
