@@ -135,7 +135,7 @@ def parse_cli(argv, no_defaults=False):
                          'ow_terrain', 'ow_crossed', 'ow_keepsimilar', 'ow_mixed', 'ow_whirlpool', 'ow_fluteshuffle',
                          'flute_mode', 'bow_mode', 'take_any', 'boots_hint',
                          'shuffle', 'door_shuffle', 'intensity', 'crystals_ganon', 'crystals_gt', 'openpyramid',
-                         'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'startinventory',
+                         'mapshuffle', 'compassshuffle', 'keyshuffle', 'bigkeyshuffle', 'prizeshuffle', 'startinventory',
                          'usestartinventory', 'bombbag', 'shuffleganon', 'overworld_map', 'restrict_boss_items',
                          'triforce_pool_min', 'triforce_pool_max', 'triforce_goal_min', 'triforce_goal_max', 'triforce_max_difference',
                          'triforce_min_difference', 'triforce_goal', 'triforce_pool', 'shufflelinks', 'shuffletavern',
@@ -202,7 +202,7 @@ def parse_settings():
         "bonk_drops": False,
         "shuffle": "vanilla",
         "shufflelinks": False,
-        "shuffletavern": False,
+        "shuffletavern": True,
         "overworld_map": "default",
         "take_any": "none",
         "pseudoboots": False,
@@ -223,6 +223,7 @@ def parse_settings():
         "compassshuffle": False,
         "keyshuffle": "none",
         "bigkeyshuffle": False,
+        "prizeshuffle": "none",
         "keysanity": False,
         "door_shuffle": "vanilla",
         "intensity": 3,
@@ -236,7 +237,7 @@ def parse_settings():
         "mixed_travel": "prevent",
         "standardize_palettes": "standardize",
         'aga_randomness': True,
-        
+
         "triforce_pool": 0,
         "triforce_goal": 0,
         "triforce_pool_min": 0,
@@ -267,10 +268,9 @@ def parse_settings():
         "msu_resume": False,
         "collection_rate": False,
 
-        # Spoiler     defaults to TRUE
+        'spoiler': 'full',
         # Playthrough defaults to TRUE
         # ROM         defaults to TRUE
-        "create_spoiler": True,
         "calc_playthrough": True,
         "create_rom": True,
         "bps": False,

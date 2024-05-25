@@ -141,6 +141,30 @@ These are now independent of retro mode and have three options: None, Random, an
 
 # Patch Notes
 
+* 1.4.1.12u
+  * New Entrance Shuffle Algorithm no longer experimental
+  * Back of Tavern Shuffle now on by default
+  * Enemizer: Wallmasters banned from tiles where spiral staircases are. (Softlock issue)
+  * Packaged build of unstable now available
+  * Customizer: New PreferredLocationGroup for putting a set of items in a set of locations. See customizer docs.
+  * Customizer: Fixed an issue with starting with `Ocarina` and flute_mode is active
+  * Spoiler: Some reformatting. Crystal req. for GT/Ganon moved to requirements section so randomized requirements don't show up in the meta section
+  * Algorithm: Major_Only. Supports up to 16 extra locations (the visible heart pieces) for when major item count exceeds major location count. Examples: Triforce Hunt, Trinity (Triforce on Ped), Bombbag shuffle
+  * Fix: HC Big Key drop doesn't count on Basic Doors
+  * Fix: Small Key for this dungeon in Hera Basement doesn't count twice for the key counter
+  * Fix: All cross-dungeon modes with restrict boss items should require map/compass for the boss
+  * Fixed a small bug with traversal algorithm
+  * Enemizer: Enemy bans+
+* 1.4.1.11u
+  * New Feature: Several spoiler levels added: None, Settings-only, Semi, Full, Debug
+    * Semi includes only entrances, prizes, and medallions (potential new spoiler mode being worked on, definition may change)
+  * Entrance: Lite/Lean support enemy drop shuffle
+  * Standard: Re-added tutorial guard near large rock
+  * Enemizer
+    * Fixed the overwriting of bonk fairies
+    * Fixed broken graphics on hyrule castle
+    * Enemy bans
+  * Customizer: Fixed bug with customizing prize packs
 * 1.4.1.10u
   * Vanilla key logic: Fix for vanilla layout Misery Mire which allows more complex key logic. Locations blocked by crystal switch access are only locked by 2 keys thanks to that being the minimum in Mire to reach one of two crystal switches. 
   * Autotracking: Fix for chest turn counter with chest containing multiworld items (Thanks Hiimcody)

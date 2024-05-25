@@ -111,6 +111,7 @@ SETTINGSTOPROCESS = {
       "mapshuffle": "mapshuffle",
       "compassshuffle": "compassshuffle",
       "bigkeyshuffle": "bigkeyshuffle",
+      "prizeshuffle": "prizeshuffle",
       "key_logic_algorithm": "key_logic_algorithm",
       "dungeondoorshuffle": "door_shuffle",
       "dungeonintensity": "intensity",
@@ -146,7 +147,7 @@ SETTINGSTOPROCESS = {
     },
     "generation": {
       "bps": "bps",
-      "createspoiler": "create_spoiler",
+      "spoiler": "spoiler",
       "createrom": "create_rom",
       "calcplaythrough": "calc_playthrough",
       "print_custom_yaml": "print_custom_yaml",

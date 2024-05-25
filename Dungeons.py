@@ -34,16 +34,16 @@ def create_dungeons(world, player):
     world.dungeons += [ES, EP, DP, ToH, AT, PoD, TT, SW, SP, IP, MM, TR, GT]
 
 
-dungeon_music_addresses = {'Eastern Palace - Prize': [0x1559A],
-                           'Desert Palace - Prize': [0x1559B, 0x1559C, 0x1559D, 0x1559E],
-                           'Tower of Hera - Prize': [0x155C5, 0x1107A, 0x10B8C],
-                           'Palace of Darkness - Prize': [0x155B8],
-                           'Swamp Palace - Prize': [0x155B7],
-                           'Thieves\' Town - Prize': [0x155C6],
-                           'Skull Woods - Prize': [0x155BA, 0x155BB, 0x155BC, 0x155BD, 0x15608, 0x15609, 0x1560A, 0x1560B],
-                           'Ice Palace - Prize': [0x155BF],
-                           'Misery Mire - Prize': [0x155B9],
-                           'Turtle Rock - Prize': [0x155C7, 0x155A7, 0x155AA, 0x155AB]}
+dungeon_music_addresses = {'Eastern Palace': [0x1559A],
+                           'Desert Palace': [0x1559B, 0x1559C, 0x1559D, 0x1559E],
+                           'Tower of Hera': [0x155C5, 0x1107A, 0x10B8C],
+                           'Palace of Darkness': [0x155B8],
+                           'Swamp Palace': [0x155B7],
+                           'Thieves Town': [0x155C6],
+                           'Skull Woods': [0x155BA, 0x155BB, 0x155BC, 0x155BD, 0x15608, 0x15609, 0x1560A, 0x1560B],
+                           'Ice Palace': [0x155BF],
+                           'Misery Mire': [0x155B9],
+                           'Turtle Rock': [0x155C7, 0x155A7, 0x155AA, 0x155AB]}
 
 hyrule_castle_regions = [
     'Hyrule Castle Lobby', 'Hyrule Castle West Lobby', 'Hyrule Castle East Lobby', 'Hyrule Castle East Hall',
@@ -65,7 +65,7 @@ eastern_regions = [
     'Eastern Compass Room', 'Eastern Hint Tile', 'Eastern Hint Tile Blocked Path', 'Eastern Courtyard',
     'Eastern Fairies', 'Eastern Map Valley', 'Eastern Dark Square', 'Eastern Dark Pots', 'Eastern Big Key',
     'Eastern Darkness', 'Eastern Rupees', 'Eastern Attic Start', 'Eastern False Switches', 'Eastern Cannonball Hell',
-    'Eastern Single Eyegore', 'Eastern Duo Eyegores', 'Eastern Boss', 'Eastern Portal'
+    'Eastern Single Eyegore', 'Eastern Duo Eyegores', 'Eastern Boss', 'Eastern Boss Spoils', 'Eastern Portal'
 ]
 
 desert_regions = [
@@ -74,7 +74,7 @@ desert_regions = [
     'Desert North Hall', 'Desert Map Room', 'Desert Sandworm Corner', 'Desert Bonk Torch', 'Desert Circle of Pots',
     'Desert Big Chest Room', 'Desert West Wing', 'Desert West Lobby', 'Desert Fairy Fountain', 'Desert Back Lobby',
     'Desert Tiles 1', 'Desert Bridge', 'Desert Four Statues', 'Desert Beamos Hall', 'Desert Tiles 2',
-    'Desert Wall Slide', 'Desert Boss', 'Desert West Portal', 'Desert South Portal', 'Desert East Portal',
+    'Desert Wall Slide', 'Desert Boss', 'Desert Boss Spoils', 'Desert West Portal', 'Desert South Portal', 'Desert East Portal',
     'Desert Back Portal'
 ]
 
@@ -84,7 +84,7 @@ hera_regions = [
     'Hera Back - Ranged Crystal', 'Hera Basement Cage', 'Hera Basement Cage - Crystal', 'Hera Tile Room',
     'Hera Tridorm', 'Hera Tridorm - Crystal', 'Hera Torches', 'Hera Beetles', 'Hera Startile Corner',
     'Hera Startile Wide', 'Hera Startile Wide - Crystal', 'Hera 4F', 'Hera Big Chest Landing', 'Hera 5F',
-    'Hera 5F Pot Block', 'Hera Fairies', 'Hera Boss', 'Hera Portal'
+    'Hera 5F Pot Block', 'Hera Fairies', 'Hera Boss', 'Hera Boss Spoils', 'Hera Portal'
 ]
 
 tower_regions = [
@@ -105,7 +105,7 @@ pod_regions = [
     'PoD Bow Statue Left', 'PoD Bow Statue Left - Crystal', 'PoD Bow Statue Right', 'PoD Bow Statue Right - Ranged Crystal',
     'PoD Dark Pegs Landing', 'PoD Dark Pegs Right', 'PoD Dark Pegs Middle', 'PoD Dark Pegs Left', 'PoD Dark Pegs Landing - Ranged Crystal',
     'PoD Dark Pegs Middle - Ranged Crystal', 'PoD Dark Pegs Left - Ranged Crystal', 'PoD Lonely Turtle', 'PoD Turtle Party',
-    'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'Palace of Darkness Portal'
+    'PoD Dark Alley', 'PoD Callback', 'PoD Boss', 'PoD Boss Spoils', 'Palace of Darkness Portal'
 ]
 
 swamp_regions = [
@@ -119,7 +119,7 @@ swamp_regions = [
     'Swamp West Ledge', 'Swamp Barrier Ledge', 'Swamp Barrier', 'Swamp Attic', 'Swamp Push Statue', 'Swamp Shooters',
     'Swamp Left Elbow', 'Swamp Right Elbow', 'Swamp Drain Left', 'Swamp Drain Right', 'Swamp Flooded Room',
     'Swamp Flooded Spot', 'Swamp Basement Shallows', 'Swamp Waterfall Room', 'Swamp Refill', 'Swamp Behind Waterfall',
-    'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss', 'Swamp Portal'
+    'Swamp C', 'Swamp Waterway', 'Swamp I', 'Swamp T', 'Swamp Boss', 'Swamp Boss Spoils', 'Swamp Portal'
 ]
 
 skull_regions = [
@@ -127,7 +127,7 @@ skull_regions = [
     'Skull Pot Prison', 'Skull Compass Room', 'Skull Left Drop', 'Skull 2 East Lobby', 'Skull Big Key',
     'Skull Lone Pot', 'Skull Small Hall', 'Skull Back Drop', 'Skull 2 West Lobby', 'Skull 2 West Lobby Ledge',
     'Skull X Room', 'Skull 3 Lobby', 'Skull East Bridge', 'Skull West Bridge Nook', 'Skull Star Pits',
-    'Skull Torch Room', 'Skull Vines', 'Skull Spike Corner', 'Skull Final Drop', 'Skull Boss',
+    'Skull Torch Room', 'Skull Vines', 'Skull Spike Corner', 'Skull Final Drop', 'Skull Boss', 'Skull Boss Spoils',
     'Skull 1 Portal', 'Skull 2 East Portal', 'Skull 2 West Portal', 'Skull 3 Portal'
 ]
 
@@ -139,7 +139,7 @@ thieves_regions = [
     'Thieves Attic', 'Thieves Attic Hint', 'Thieves Attic Switch', 'Thieves Cricket Hall Left',
     'Thieves Cricket Hall Right', 'Thieves Attic Window', 'Thieves Basement Block', 'Thieves Blocked Entry',
     'Thieves Lonely Zazak', "Thieves Blind's Cell", "Thieves Blind's Cell Interior", 'Thieves Conveyor Bridge',
-    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap', 'Thieves Town Portal'
+    'Thieves Conveyor Block', 'Thieves Big Chest Room', 'Thieves Trap', 'Thieves Boss Spoils', 'Thieves Town Portal'
 ]
 
 ice_regions = [
@@ -152,7 +152,7 @@ ice_regions = [
     'Ice Hookshot Balcony', 'Ice Spikeball', 'Ice Lonely Freezor', 'Iced T', 'Ice Catwalk', 'Ice Many Pots',
     'Ice Crystal Right', 'Ice Crystal Left', 'Ice Crystal Block', 'Ice Big Chest View', 'Ice Big Chest Landing',
     'Ice Backwards Room', 'Ice Anti-Fairy', 'Ice Switch Room', 'Ice Refill', 'Ice Refill - Crystal',
-    'Ice Fairy', 'Ice Antechamber', 'Ice Boss', 'Ice Portal'
+    'Ice Fairy', 'Ice Antechamber', 'Ice Boss', 'Ice Boss Spoils', 'Ice Portal'
 ]
 
 mire_regions = [
@@ -168,7 +168,7 @@ mire_regions = [
     'Mire Key Rupees', 'Mire Block X', 'Mire Tall Dark and Roomy', 'Mire Tall Dark and Roomy - Ranged Crystal',
     'Mire Crystal Right', 'Mire Crystal Mid', 'Mire Crystal Left',
     'Mire Crystal Top', 'Mire Shooter Rupees', 'Mire Falling Foes', 'Mire Firesnake Skip', 'Mire Antechamber',
-    'Mire Boss', 'Mire Portal'
+    'Mire Boss', 'Mire Boss Spoils', 'Mire Portal'
 ]
 
 tr_regions = [
@@ -182,7 +182,7 @@ tr_regions = [
     'TR Crystaroller Top - Crystal', 'TR Crystaroller Chest', 'TR Crystaroller Middle - Ranged Crystal',
     'TR Crystaroller Bottom - Ranged Crystal', 'TR Dark Ride', 'TR Dark Ride Ledges', 'TR Dash Bridge', 'TR Eye Bridge',
     'TR Crystal Maze Start', 'TR Crystal Maze Start - Crystal', 'TR Crystal Maze Interior', 'TR Crystal Maze End',
-    'TR Crystal Maze End - Ranged Crystal', 'TR Final Abyss Balcony', 'TR Final Abyss Ledge', 'TR Boss',
+    'TR Crystal Maze End - Ranged Crystal', 'TR Final Abyss Balcony', 'TR Final Abyss Ledge', 'TR Boss', 'TR Boss Spoils',
     'Turtle Rock Main Portal', 'Turtle Rock Lazy Eyes Portal', 'Turtle Rock Chest Portal',
     'Turtle Rock Eye Bridge Portal'
 ]
@@ -270,7 +270,7 @@ flexible_starts = {
 
 class DungeonInfo:
 
-    def __init__(self, free, keys, bk, map, compass, bk_drop, drops, prize, midx):
+    def __init__(self, free, keys, bk, map, compass, bk_drop, drops, prize, dungeon_idx, extra_map_idx):
          # todo reduce static maps  ideas: prize, bk_name, sm_name, cmp_name, map_name):
         self.free_items = free
         self.key_num = keys
@@ -281,23 +281,24 @@ class DungeonInfo:
         self.key_drops = drops
         self.prize = prize
 
-        self.map_index = midx
+        self.dungeon_index = dungeon_idx
+        self.extra_map_index = extra_map_idx
 
 
 dungeon_table = {
-    'Hyrule Castle': DungeonInfo(6, 1, False, True, False, True, 3, None, 0xc),
-    'Eastern Palace': DungeonInfo(3, 0, True, True, True, False, 2, 'Eastern Palace - Prize', 0x0),
-    'Desert Palace': DungeonInfo(2, 1, True, True, True, False, 3, 'Desert Palace - Prize', 0x2),
-    'Tower of Hera': DungeonInfo(2, 1, True, True, True, False, 0, 'Tower of Hera - Prize', 0x1),
-    'Agahnims Tower': DungeonInfo(0, 2, False, False, False, False, 2, None, 0xb),
-    'Palace of Darkness': DungeonInfo(5, 6, True, True, True, False, 0, 'Palace of Darkness - Prize', 0x3),
-    'Swamp Palace': DungeonInfo(6, 1, True, True, True, False, 5, 'Swamp Palace - Prize', 0x9),
-    'Skull Woods': DungeonInfo(2, 3, True, True, True, False, 2, 'Skull Woods - Prize', 0x4),
-    'Thieves Town': DungeonInfo(4, 1, True, True, True, False, 2, "Thieves' Town - Prize", 0x6),
-    'Ice Palace': DungeonInfo(3, 2, True, True, True, False, 4, 'Ice Palace - Prize', 0x8),
-    'Misery Mire': DungeonInfo(2, 3, True, True, True, False, 3, 'Misery Mire - Prize', 0x7),
-    'Turtle Rock': DungeonInfo(5, 4, True, True, True, False, 2, 'Turtle Rock - Prize', 0x5),
-    'Ganons Tower': DungeonInfo(20, 4, True, True, True, False, 4, None, 0xa),
+    'Hyrule Castle': DungeonInfo(6, 1, False, True, False, True, 3, None, 0x00, 0x00),
+    'Eastern Palace': DungeonInfo(3, 0, True, True, True, False, 2, [0x1209D, 0x53F3A, 0x53F3B, 0x180052, 0x180070, 0x186FE2], 0x04, None),
+    'Desert Palace': DungeonInfo(2, 1, True, True, True, False, 3, [0x1209E, 0x53F3C, 0x53F3D, 0x180053, 0x180072, 0x186FE3], 0x06, 0x12),
+    'Tower of Hera': DungeonInfo(2, 1, True, True, True, False, 0, [0x120A5, 0x53F4A, 0x53F4B, 0x18005A, 0x180071, 0x186FEA], 0x14, None),
+    'Agahnims Tower': DungeonInfo(0, 2, False, False, False, False, 2, None, 0x08, None),
+    'Palace of Darkness': DungeonInfo(5, 6, True, True, True, False, 0, [0x120A1, 0x53F42, 0x53F43, 0x180056, 0x180073, 0x186FE6], 0x0C, None),
+    'Swamp Palace': DungeonInfo(6, 1, True, True, True, False, 5, [0x120A0, 0x53F40, 0x53F41, 0x180055, 0x180079, 0x186FE5], 0x0A, None),
+    'Skull Woods': DungeonInfo(2, 3, True, True, True, False, 2, [0x120A3, 0x53F46, 0x53F47, 0x180058, 0x180074, 0x186FE8], 0x10, 0x20),
+    'Thieves Town': DungeonInfo(4, 1, True, True, True, False, 2, [0x120A6, 0x53F4C, 0x53F4D, 0x18005B, 0x180076, 0x186FEB], 0x16, None),
+    'Ice Palace': DungeonInfo(3, 2, True, True, True, False, 4, [0x120A4, 0x53F48, 0x53F49, 0x180059, 0x180078, 0x186FE9], 0x12, None),
+    'Misery Mire': DungeonInfo(2, 3, True, True, True, False, 3, [0x120A2, 0x53F44, 0x53F45, 0x180057, 0x180077, 0x186FE7], 0x0E, None),
+    'Turtle Rock': DungeonInfo(5, 4, True, True, True, False, 2, [0x120A7, 0x53F4E, 0x53F4F, 0x18005C, 0x180075, 0x186FEC], 0x18, 0x3E),
+    'Ganons Tower': DungeonInfo(20, 4, True, True, True, False, 4, None, 0x1A, None),
 }
 
 

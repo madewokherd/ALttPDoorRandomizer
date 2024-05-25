@@ -44,7 +44,7 @@ def save_settings(gui, args, filename):
     if not os.path.exists(settings_path):
         os.makedirs(settings_path)
     output_args = {}
-    settings = ["create_rom", "suppress_rom", "bps", "create_spoiler", "suppress_spoiler",
+    settings = ["create_rom", "suppress_rom", "bps", "spoiler",
                 "calc_playthrough", "skip_playthrough", "print_custom_yaml",
                 "settingsonload", "rom", "outputpath"]
     if filename == "settings.json":

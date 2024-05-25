@@ -2,6 +2,8 @@
 from collections import OrderedDict
 import logging
 import re
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 text_addresses = {'Pedestal': (0x180300, 256),
                   'Triforce': (0x180400, 256),
@@ -96,9 +98,9 @@ Triforce_texts = [
     "\n       G G",
     "   All your base\n    are belong\n      to us.",
     "  You have ended\n  the domination\n    of Dr. Wily",
-    "    Thanks for\n      playing!!!",
+    "   Thanks for\n      playing!!!",
     "\n     You Win!",
-    "    Thank you!\n      Your quest\n       is over.",
+    "    Thank you!\n   Your quest\n       is over.",
     "    A winner\n        is you!",
     "\n     WINNER!!",
     "\n    I'm  sorry\n\nbut our princess is\n in another castle",
@@ -645,7 +647,7 @@ class MultiByteCoreTextMapper(object):
             linespace = wrap
             line = lines.pop(0)
 
-            match = re.search('^\{[A-Z0-9_:]+\}$', line)
+            match = re.search(r'^\{[A-Z0-9_:]+\}$', line)
             if match:
                 if line == '{PAGEBREAK}':
                     if lineindex % 3 != 0:
@@ -664,13 +666,13 @@ class MultiByteCoreTextMapper(object):
             while words:
                 word = words.pop(0)
 
-                match = re.search('^(\{[A-Z0-9_:]+\}).*', word)
+                match = re.search(r'^(\{[A-Z0-9_:]+\}).*', word)
                 if match:
                     start_command = match.group(1)
                     outbuf.extend(cls.special_commands[start_command])
                     word = word.replace(start_command, '')
 
-                match = re.search('(\{[A-Z0-9_:]+\})\.?$', word)
+                match = re.search(r'(\{[A-Z0-9_:]+\})\.?$', word)
                 if match:
                     end_command = match.group(1)
                     word = word.replace(end_command, '')

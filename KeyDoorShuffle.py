@@ -3,7 +3,7 @@ import logging
 from collections import defaultdict, deque
 
 from BaseClasses import DoorType, dungeon_keys, KeyRuleType, RegionType
-from Regions import dungeon_events
+from Regions import location_events
 from Dungeons import dungeon_keys, dungeon_bigs, dungeon_table
 from DungeonGenerator import ExplorationState, get_special_big_key_doors, count_locations_exclude_big_chest, prize_or_event
 from DungeonGenerator import reserved_location, blind_boss_unavail
@@ -1116,7 +1116,7 @@ def location_is_bk_locked(loc, key_logic):
 
 # todo: verfiy this code is defunct
 # def prize_or_event(loc):
-#     return loc.name in dungeon_events or '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']
+#     return loc.name in location_events or '- Prize' in loc.name or loc.name in ['Agahnim 1', 'Agahnim 2']
 #
 #
 # def reserved_location(loc, world, player):
@@ -1504,7 +1504,7 @@ def validate_key_layout_sub_loop(key_layout, state, checked_states, flat_proposa
     bk_done = state.big_key_opened or num_bigs == 0 or (available_big_locations == 0 and not found_forced_bk)
     # prize door should not be opened if the boss is reachable - but not reached yet
     allow_for_prize_lock = (key_layout.prize_can_lock and
-                            not any(x for x in state.found_locations if '- Prize' in x.name))
+                            not any(x for x in state.found_locations if x.prize))
     prize_done = not key_layout.prize_relevant or state.prize_doors_opened or allow_for_prize_lock
     if smalls_done and bk_done and prize_done:
         return False
@@ -1623,7 +1623,7 @@ def determine_prize_lock(key_layout, world, player):
         elif len(state.small_doors) > 0:
             open_a_door(state.small_doors[0].door, state, flat_proposal, world, player)
         expand_key_state(state, flat_proposal, world, player)
-    if any(x for x in state.found_locations if '- Prize' in x.name):
+    if any(x for x in state.found_locations if x.prize):
         key_layout.prize_can_lock = True
 
 
@@ -1776,7 +1776,7 @@ def create_key_counter(state, key_layout, world, player):
             key_counter.key_only_locations[loc] = None
         elif loc.forced_item and loc.item.name == key_layout.key_logic.bk_name:
             key_counter.other_locations[loc] = None
-        elif loc.name not in dungeon_events:
+        elif loc.name not in location_events:
             key_counter.free_locations[loc] = None
         else:
             key_counter.other_locations[loc] = None
@@ -1785,7 +1785,7 @@ def create_key_counter(state, key_layout, world, player):
     key_counter.big_key_opened = state.big_key_opened
     if len(state.prize_door_set) > 0 and state.prize_doors_opened:
         key_counter.prize_doors_opened = True
-    if any(x for x in key_counter.important_locations if '- Prize' in x.name):
+    if any(x for x in key_counter.important_locations if x.prize):
         key_counter.prize_received = True
     return key_counter
 
@@ -1805,7 +1805,7 @@ def imp_locations_factory(world, player):
 
 
 def important_location(loc, world, player):
-    return '- Prize' in loc.name or loc.name in imp_locations_factory(world, player) or (loc.forced_big_key())
+    return loc.prize or loc.name in imp_locations_factory(world, player) or (loc.forced_big_key())
 
 
 def create_odd_key_counter(door, parent_counter, key_layout, world, player):
@@ -2135,9 +2135,9 @@ def validate_key_placement(key_layout, world, player):
         found_keys = sum(1 for i in found_locations if i.item is not None and i.item.name == smallkey_name and i.item.player == player) + \
                      len(counter.key_only_locations) + keys_outside
         if key_layout.prize_relevant:
-            found_prize = any(x for x in counter.important_locations if '- Prize' in x.name)
+            found_prize = any(x for x in counter.important_locations if x.prize)
             if not found_prize and dungeon_table[key_layout.sector.name].prize:
-                prize_loc = world.get_location(dungeon_table[key_layout.sector.name].prize, player)
+                prize_loc = dungeon_table[key_layout.sector.name].prize.location
                 if key_layout.prize_relevant == 'BigBomb':
                     found_prize = prize_loc.item.name not in ['Crystal 5', 'Crystal 6']
                 elif key_layout.prize_relevant == 'GT':

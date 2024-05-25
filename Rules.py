@@ -63,13 +63,15 @@ def set_rules(world, player):
 
     if world.goal[player] == 'dungeons':
         # require all dungeons to beat ganon
-        add_rule(world.get_location('Ganon', player), lambda state: state.can_reach('Master Sword Pedestal', 'Location', player) and state.has_beaten_aga(player) and state.has('Beat Agahnim 2', player) and state.has_crystals(7, player))
+        add_rule(world.get_location('Ganon', player), lambda state: state.has_beaten_aga(player) and state.has('Beat Agahnim 2', player) and state.has('Beat Boss', player, 10))
     elif world.goal[player] in ['crystals', 'ganon']:
         add_rule(world.get_location('Ganon', player), lambda state: state.has_crystals(world.crystals_needed_for_ganon[player], player))
         if world.goal[player] == 'ganon':
             # require aga2 to beat ganon
             add_rule(world.get_location('Ganon', player), lambda state: state.has('Beat Agahnim 2', player))
     elif world.goal[player] in ['triforcehunt', 'trinity']:
+        if world.goal[player] == 'trinity':
+            add_rule(world.get_location('Ganon', player), lambda state: state.has_crystals(world.crystals_needed_for_ganon[player], player))
         for location in world.get_region('Hyrule Castle Courtyard', player).locations:
             if location.name == 'Murahdahla':
                 add_rule(location, lambda state: state.item_count('Triforce Piece', player) + state.item_count('Power Star', player) >= int(state.world.treasure_hunt_count[player]))
@@ -146,9 +148,11 @@ def set_rule(spot, rule):
     spot.access_rule = rule
 
 
-def set_defeat_dungeon_boss_rule(location):
-    # Lambda required to defer evaluation of dungeon.boss since it will change later if boos shuffle is used
-    set_rule(location, lambda state: location.parent_region.dungeon.boss.can_defeat(state))
+def set_defeat_dungeon_boss_rule(entrance):
+    # Lambda required to defer evaluation of dungeon.boss since it will change later if boss shuffle is used
+    set_rule(entrance, lambda state: entrance.parent_region.dungeon.boss.can_defeat(state))
+    if entrance.parent_region.dungeon.name == 'Thieves Town':
+        add_rule(entrance, lambda state: entrance.parent_region.dungeon.boss.name != 'Blind' or state.has('Maiden Unmasked', entrance.player))
 
 
 def set_always_allow(spot, rule):
@@ -422,20 +426,17 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Eastern Map Balcony Hook Path', player), lambda state: state.has('Hookshot', player))
 
     # Boss rules. Same as below but no BK or arrow requirement.
-    set_defeat_dungeon_boss_rule(world.get_location('Eastern Palace - Prize', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Eastern Palace - Boss', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Eastern Palace Boss', player))
 
     # Desert
     set_rule(world.get_location('Desert Palace - Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('Desert Wall Slide NW', player), lambda state: state.has_fire_source(player))
-    set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Prize', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Desert Palace - Boss', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Desert Palace Boss', player))
 
     # Tower of Hera
     set_rule(world.get_location('Tower of Hera - Big Key Chest', player), lambda state: state.has_fire_source(player))
     set_rule(world.get_entrance('Hera Big Chest Hook Path', player), lambda state: state.has('Hookshot', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Tower of Hera - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Tower of Hera Boss', player))
 
     # Castle Tower
     set_rule(world.get_entrance('Tower Altar NW', player), lambda state: state.has_sword(player))
@@ -450,8 +451,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('PoD Dark Pegs Right to Landing', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('PoD Turtle Party NW', player), lambda state: state.has('Hammer', player))
     set_rule(world.get_entrance('PoD Turtle Party ES', player), lambda state: state.has('Hammer', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Palace of Darkness - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Palace of Darkness Boss', player))
 
     set_rule(world.get_entrance('Swamp Lobby Moat', player), lambda state: state.has('Flippers', player) and state.has('Open Floodgate', player))
     set_rule(world.get_entrance('Swamp Entrance Moat', player), lambda state: state.has('Flippers', player) and state.has('Open Floodgate', player))
@@ -487,8 +487,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Swamp Waterway N', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_entrance('Swamp Waterway NE', player), lambda state: state.has('Flippers', player))
     set_rule(world.get_location('Swamp Palace - Waterway Pot Key', player), lambda state: state.has('Flippers', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Swamp Palace - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Swamp Palace Boss', player))
 
     set_rule(world.get_entrance('Skull Big Chest Hookpath', player), lambda state: state.has('Hookshot', player))
     set_rule(world.get_entrance('Skull Torch Room WN', player), lambda state: state.has('Fire Rod', player))
@@ -511,8 +510,7 @@ def global_rules(world, player):
     set_rule(world.get_entrance('Skull 2 West Lobby Pits', player), lambda state: state.has_Boots(player)
              or hidden_pits_rule(state))
     set_rule(world.get_entrance('Skull 2 West Lobby Ledge Pits', player), hidden_pits_rule)
-    set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Skull Woods - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Skull Woods Boss', player))
 
     # blind can't have the small key? - not necessarily true anymore - but likely still
 
@@ -527,8 +525,7 @@ def global_rules(world, player):
     # for location in ['Suspicious Maiden', 'Thieves\' Town - Blind\'s Cell']:
     #     set_rule(world.get_location(location, player), lambda state: state.has('Big Key (Thieves Town)', player))
     set_rule(world.get_location('Revealing Light', player), lambda state: state.has('Shining Light', player) and state.has('Maiden Rescued', player))
-    set_rule(world.get_location('Thieves\' Town - Boss', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Boss', player).parent_region.dungeon.boss.can_defeat(state))
-    set_rule(world.get_location('Thieves\' Town - Prize', player), lambda state: state.has('Maiden Unmasked', player) and world.get_location('Thieves\' Town - Prize', player).parent_region.dungeon.boss.can_defeat(state))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Thieves Town Boss', player))
 
     set_rule(world.get_entrance('Ice Lobby WS', player), lambda state: state.can_melt_things(player))
     if is_trapped('Ice Lobby SE'):
@@ -554,8 +551,7 @@ def global_rules(world, player):
     if is_trapped('Ice Switch Room NE'):
         set_rule(world.get_entrance('Ice Switch Room NE', player),
                  lambda state: state.has('Cane of Somaria', player) or state.has('Convenient Block', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Ice Palace - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Ice Palace Boss', player))
 
     set_rule(world.get_entrance('Mire Lobby Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
     set_rule(world.get_entrance('Mire Post-Gap Gap', player), lambda state: state.has_Boots(player) or state.has('Hookshot', player))
@@ -585,8 +581,7 @@ def global_rules(world, player):
     #     set_rule(world.get_entrance('Mire Dark Shooters SE', player),
     #              lambda state: state.has('Cane of Somaria', player))
 
-    set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Misery Mire - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Misery Mire Boss', player))
 
     set_rule(world.get_entrance('TR Main Lobby Gap', player), lambda state: state.has('Cane of Somaria', player))
     set_rule(world.get_entrance('TR Lobby Ledge Gap', player), lambda state: state.has('Cane of Somaria', player))
@@ -616,8 +611,7 @@ def global_rules(world, player):
     set_rule(world.get_location('Turtle Rock - Eye Bridge - Bottom Right', player), lambda state: state.can_avoid_lasers(player))
     set_rule(world.get_location('Turtle Rock - Eye Bridge - Top Left', player), lambda state: state.can_avoid_lasers(player))
     set_rule(world.get_location('Turtle Rock - Eye Bridge - Top Right', player), lambda state: state.can_avoid_lasers(player))
-    set_defeat_dungeon_boss_rule(world.get_location('Turtle Rock - Boss', player))
-    set_defeat_dungeon_boss_rule(world.get_location('Turtle Rock - Prize', player))
+    set_defeat_dungeon_boss_rule(world.get_entrance('Turtle Rock Boss', player))
 
     set_rule(world.get_location('Ganons Tower - Bob\'s Torch', player), lambda state: state.has_Boots(player))
     set_rule(world.get_entrance('GT Hope Room EN', player), lambda state: state.has('Cane of Somaria', player))
@@ -863,7 +857,7 @@ def global_rules(world, player):
                 d_name = "Thieves' Town" if dungeon.startswith('Thieves') else dungeon
                 for loc in [info.prize, f'{d_name} - Boss']:
                     add_mc_rule(loc)
-        if world.doorShuffle[player] == 'crossed':
+        if world.doorShuffle[player] not in ['vanilla', 'basic']:
             add_mc_rule('Agahnim 1')
         add_mc_rule('Agahnim 2')
 
@@ -1687,7 +1681,8 @@ def set_bunny_rules(world, player, inverted):
     all_single_exit_dungeons = ['Eastern Palace', 'Tower of Hera', 'Castle Tower', 'Palace of Darkness', 'Swamp Palace', 'Thieves Town', 'Ice Palace', 'Misery Mire', 'Ganons Tower']
     hmg_single_exit_dungeons = [d for d in all_single_exit_dungeons if d not in ['Tower of Hera', 'Misery Mire', 'Thieves Town']]
     bunny_impassable_caves = ['Bumper Cave (top)', 'Bumper Cave (bottom)', 'Two Brothers House',
-                              'Hookshot Cave (Middle)', 'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)']
+                              'Hookshot Cave (Middle)', 'Pyramid', 'Spiral Cave (Top)', 'Fairy Ascension Cave (Drop)',
+                              'Death Mountain Return Cave (right)', 'Paradox Cave (Top)']
     bunny_accessible_locations = ['Link\'s Uncle', 'Sahasrahla', 'Sick Kid', 'Lost Woods Hideout', 'Lumberjack Tree',
                                   'Checkerboard Cave', 'Potion Shop', 'Spectacle Rock Cave', 'Pyramid', 'Old Man',
                                   'Hype Cave - Generous Guy', 'Peg Cave', 'Bumper Cave Ledge', 'Dark Blacksmith Ruins',
