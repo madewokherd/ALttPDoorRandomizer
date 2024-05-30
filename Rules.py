@@ -855,7 +855,7 @@ def global_rules(world, player):
         for dungeon, info in dungeon_table.items():
             if info.prize:
                 d_name = "Thieves' Town" if dungeon.startswith('Thieves') else dungeon
-                for loc in [info.prize, f'{d_name} - Boss']:
+                for loc in [f'{d_name} - Prize', f'{d_name} - Boss']:
                     add_mc_rule(loc)
         if world.doorShuffle[player] not in ['vanilla', 'basic']:
             add_mc_rule('Agahnim 1')
