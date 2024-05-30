@@ -10,6 +10,7 @@ settings:
     dropshuffle: keys
     experimental: true
     goal: ganon
+    prizeshuffle: dungeon
     hints: true
     intensity: 3
     overworld_map: compass
