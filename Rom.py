@@ -729,7 +729,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
 
     # fix hc big key problems (map and compass too)
     if (world.doorShuffle[player] != 'vanilla' or world.dropshuffle[player] != 'none'
-            or world.pottery[player] not in ['none', 'cave']):
+            or world.pottery[player] not in ['none', 'cave'] or world.prizeshuffle[player] != 'none'):
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
         sanctuary = world.get_region('Sanctuary', player)
