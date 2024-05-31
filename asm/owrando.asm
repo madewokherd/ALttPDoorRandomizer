@@ -78,6 +78,8 @@ org $8ab7af ;LDA $F2 : ORA $F0 : AND #$C0
 jml OWFluteCancel2 : nop
 org $8ab90d ;JSL $02E99D
 jsl OWFluteCancel
+org $8ab816
+JSL OWMapFluteCancelIcon
 
 ; allows Frog sprite to spawn in LW and also allows his friend to spawn in their house
 org $868a76 ; < 30a76 - sprite_prep.asm:785 (LDA $7EF3CA : AND.w #$40)
@@ -333,6 +335,20 @@ OWFluteCancel2:
     lda.b Joy1B_All : cmp.b #$40 : bne +
         lda.b #$01 : sta.w RandoOverworldTargetEdge
     + rtl 
+}
+OWMapFluteCancelIcon:
+{
+    STA.b Scrap0B : LDX.b #$10 ; what we wrote over
+    LDA.l OWFlags+1 : AND.b #$01 : BEQ .return
+	LDA.b GameSubMode : CMP.b #$0A : BNE .return
+    LDA.b FrameCounter : AND.b #$10 : BNE .return
+        LDA.b #$7E : STA.b Scrap0D
+        LDA.b #$34 : STA.b Scrap0C
+        STZ.b Scrap0B
+        LDA.b Scrap0E : CLC : ADC.b #$04 : STA.b Scrap0E
+        LDA.b Scrap0F : CLC : ADC.b #$04 : STA.b Scrap0F
+    .return
+    RTL
 }
 OWSmithAccept:
 {
