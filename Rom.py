@@ -507,6 +507,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     else:
         flute_spots = world.owflutespots[player]
         owFlags |= 0x0100
+        write_int16(rom, snes_to_pc(0x0AB7F7), 0xEAEA)
 
     flute_writes = sorted([(f, flute_data[f][1]) for f in flute_spots], key = lambda f: f[1])
     for o in range(0, len(flute_writes)):
