@@ -1240,11 +1240,12 @@ def adjust_locations(world, player):
                 index += 1
     setup_enemy_locations(world, player)
     # disable forced prize locations
-    if world.prizeshuffle[player] != 'none':
-        for l in [name for name, data in location_table.items() if data[2]]:
-            location = world.get_location_unsafe(l, player)
-            if location:
-                location.prize = False
+    prize_on_boss = world.prizeshuffle[player] == 'none'
+    for l in [name for name, data in location_table.items() if data[2]]:
+        location = world.get_location_unsafe(l, player)
+        if location:
+            location.prize = prize_on_boss
+            location.real = not prize_on_boss
     # unreal events:
     for l in ['Ganon', 'Zelda Pickup', 'Zelda Drop Off'] + list(location_events):
         location = world.get_location_unsafe(l, player)

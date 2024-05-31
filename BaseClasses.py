@@ -2651,7 +2651,7 @@ class Location(object):
         self.recursion_count = 0
         self.staleness_count = 0
         self.locked = False
-        self.real = not prize
+        self.real = True
         self.always_allow = lambda item, state: False
         self.access_rule = lambda state: True
         self.verbose_rule = None
