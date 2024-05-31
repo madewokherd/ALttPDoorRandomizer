@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0.1
+- Fixed HP refill interrupting boss cutscenes
+- Fixed incorrect compass counts in Prize Shuffle
+- Various QoL to Prize Shuffle for less confusion on map checks
+- Color-blind support for red crystals (item receipt and map check)
+- Added X icon on flute map to indicate you can cancel out of flute menu (Flute Shuffle only)
+
 ## 0.5.0.0
 - Overworld Map Check has been overhauled
 - Dungeon Prize Indicators have changed: P/C no longer display, replaced by G/B/R/1-7
