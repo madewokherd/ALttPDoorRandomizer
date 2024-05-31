@@ -367,7 +367,7 @@ jobs:
         with:
           tag_name: ${{ steps.debug_info.outputs.github_tag }}
           release_name: ${{ steps.debug_info.outputs.release_name }}
-          body_path: RELEASENOTES.md
+          body_path: CHANGELOG.md
           # draft: true
         if: contains(github.ref, 'OverworldShuffle') && contains(github.event.head_commit.message, 'Version bump')  # branch/tag name and commit message
 
