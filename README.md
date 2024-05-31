@@ -107,7 +107,7 @@ Similar edges are used when `Keep Similar Edges Together` is enabled and have me
 
 # Overworld Map Changes
 
-The overworld map check screen has been completely overhauled in this OWR fork. In other LTTP forks, there are numbered icons to indicate the crystal number of the crystal and those are shown alongside crystal prizes. OWR has changed this so the numbers instead correspond to dungeon numbers. In the LW, you have the 3 pendant dungeons, these are indicated by a blue 1, 2, and 3. In the DW, you have the 7 crystal dungeon, these are indicated by red numbers (1-7). In addition, there may be some mode combinations where HC, AT, and GT may be visible via icon, indicated by a white H, a white A, and a skull. An example of what you can expect to see on a map check can be found [here](https://cdn.discordapp.com/attachments/783989090017738753/1243839950663847936/newmapcheck.gif?ex=6652efb9&is=66519e39&hm=8be1d514458c09d6881a0d6ae0e539adf1f6227374a7d61a8f3a1831e18f0395&).
+The overworld map check screen has been completely overhauled in this OWR fork. In other LTTP forks, there are numbered icons to indicate the crystal number of the crystal and those are shown alongside crystal prizes. OWR has changed this so the numbers instead correspond to dungeon numbers. In the LW, you have the 3 pendant dungeons, these are indicated by a blue 1, 2, and 3. In the DW, you have the 7 crystal dungeon, these are indicated by red numbers (1-7). In addition, there may be some mode combinations where HC, AT, and GT may be visible via icon, indicated by a white H, a white A, and a skull. An example of what you can expect to see on a map check can be found [here](https://zelda.codemann8.com/images/shared/newmapcheck.gif).
 
 # Inverted Changes
 
@@ -133,7 +133,7 @@ Note: These changes do impact the logic. If you use `CodeTracker`, these Inverte
 Only settings specifically added by this Overworld Shuffle fork are found here. All door and entrance randomizer settings are supported. See their [readme](https://github.com/Aerinon/ALttPDoorRandomizer/blob/master/README.md)
 
 ## Overworld Layout Shuffle (--ow_shuffle)
-OW Edge Transitions are shuffled to create new world layouts. A brief visual representation of this can be viewed [here](https://cdn.discordapp.com/attachments/783989090017738753/857299555183362078/ow-modes.gif?ex=66044c6d&is=65f1d76d&hm=b43ebd1b22e0a86c7caf3153c217ba14174bb92a2b168c15fe8e75364b5c8c15&). (This graphic also includes combinations of Crossed and Tile Flip)
+OW Edge Transitions are shuffled to create new world layouts. A brief visual representation of this can be viewed [here](https://zelda.codemann8.com/images/shared/ow-modes.gif). (This graphic also includes combinations of Crossed and Tile Flip)
 
 ### Vanilla
 
@@ -193,7 +193,7 @@ Being that this uses concepts from Inverted, it will be important to review the 
 
 During gameplay:
     - When on the OW, there will be an L or D in the upper left corner, indicating which world you are currently in. Mirroring still works the same, you must be in the DW to mirror to the LW.
-    - When doing a map check (pressing X while on the OW), the tiles shown will reflect the flipped tiles. This means that dungeon prizes will show the prizes for the dungeons that are now part of that world. Here is an image showing the difference of appearance when tiles are flipped on the [map check](https://cdn.discordapp.com/attachments/783989090017738753/970646558049714196/lttp-lw-mapcheck.gif?ex=665272cd&is=6651214d&hm=6962fe0b16a7919a91066e96fea29d28fbecd404e6c0dc344146f17553425296&) screen.
+    - When doing a map check (pressing X while on the OW), the tiles shown will reflect the flipped tiles. This means that dungeon prizes will show the prizes for the dungeons that are now part of that world. Here is an image showing the difference of appearance when tiles are flipped on the [map check](https://zelda.codemann8.com/images/shared/lttp-lw-mapcheck.gif) screen.
 
 Note: Tiles are put into Tile Groups (see `Terminology`) that must be shuffled together when certain settings are enabled. For instance, if ER is disabled, then any tiles that have a connector cave that leads to a different tile, then those tiles must flip together.
 
@@ -252,7 +252,7 @@ This adds 42 new item locations to the game. These bonk locations are limited to
     - Some screens are coded to change the "alternate tree color", some of them are strange (just how the vanilla game does it)
     - Rocks and statues are unable to be made to have a different color
 
-Here is a map that shows all the [Bonk Locations](https://cdn.discordapp.com/attachments/1105770688649895968/1105770806769877072/bonkdrops.png?ex=66524790&is=6650f610&hm=7c16f009d514256d3fdd02667f9876fae4178ec2989e5f1e0cfd32c7207e144e&). FYI, the numbers indicate how many bonk items there. The stars with a green square are all Bonk Locations that are unlocked after you kill Aga 1.
+Here is a map that shows all the [Bonk Locations](https://zelda.codemann8.com/images/shared/bonkdrops.png). FYI, the numbers indicate how many bonk items there. The stars with a green square are all Bonk Locations that are unlocked after you kill Aga 1.
 
 As far as map trackers, Bonk Locations are supported on `CodeTracker` when the Bonk Drops option is enabled.
 
@@ -282,7 +282,7 @@ This option shuffles the prize into a location somewhere within the dungeon that
 
 ### Randomized
 
-This option freely shuffles the prizes throughout the world. While the dungeon prizes can end up anywhere, they still are assigned to a specific dungeon. When you defeat the boss of a certain dungeon, checking the map on the overworld will reveal the location WHERE you can find the prize, an example shown [here](https://cdn.discordapp.com/attachments/783989090017738753/1243840288867487754/prizemap-all.gif?ex=6652f00a&is=66519e8a&hm=a49ef2c84d9862349e331ae87c99c3ce34ae5cd0690073521423d7e61c5429dc&). Finding the map will still reveal WHAT the prize is. If you defeated a boss but haven't collected the map for that dungeon, the prize will be indicated by a red X, example shown [here](https://cdn.discordapp.com/attachments/783989090017738753/1243840289278263316/prizemap-boss.gif?ex=6652f00a&is=66519e8a&hm=f1d75388b2ca039f5c35f244109ff659b34235d6ce2f76516ad46f978ec49f91&). If you collected a map but haven't defeated the boss yet, the icon indicator on the map will be shown on the top edge (for LW dungeons) or the bottom edge (for DW dungeons), but it will show you WHAT the prize is for that dungeon, an example of that is shown [here](https://cdn.discordapp.com/attachments/783989090017738753/1243840289718669372/prizemap-map.gif?ex=6652f00a&is=66519e8a&hm=47fa004f493c63842bec3a54b7703d95d9a6a05067fa3fb539d48de9c0cb1698&).
+This option freely shuffles the prizes throughout the world. While the dungeon prizes can end up anywhere, they still are assigned to a specific dungeon. When you defeat the boss of a certain dungeon, checking the map on the overworld will reveal the location WHERE you can find the prize, an example shown [here](https://zelda.codemann8.com/images/shared/prizemap-all.gif). Finding the map will still reveal WHAT the prize is. If you defeated a boss but haven't collected the map for that dungeon, the prize will be indicated by a red X, example shown [here](https://zelda.codemann8.com/images/shared/prizemap-boss.gif). If you collected a map but haven't defeated the boss yet, the icon indicator on the map will be shown on the top edge (for LW dungeons) or the bottom edge (for DW dungeons), but it will show you WHAT the prize is for that dungeon, an example of that is shown [here](https://zelda.codemann8.com/images/shared/prizemap-map.gif).
 
 - It is important to note that the overworld map check has changed: the numbered icons that are displayed are NO LONGER indicating the crystal number like they have in the past. They are now indicating the dungeon that it belongs to; a blue 1-3 indicates the 3 LW dungeons (EP, DP, and ToH) and a red 1-7 indicate the 7 DW dungeons
 
@@ -349,7 +349,7 @@ Here is a [Swapped ER Reference Sheet](http://zelda.codemann8.com/images/shared/
 
 This is an entrance shuffle that only shuffles entrances within their respective `Districts` (See Below). Also, dropdowns and the entrance that a dropdown normally exits are NOT kept together; this also means that the Skull Woods entrances are no longer guaranteed to lead to Skull Woods. Also, since there is no district that can span multiple worlds, this is NOT a cross-world entrance mode.
 
-Districts are a concept originally conceived by Aerinon in the Door Randomizer, where parts of the OW are split into areas and given a name. Here is a [District Map](https://cdn.discordapp.com/attachments/783989090017738753/1194615705027477534/districts.png?ex=66527f52&is=66512dd2&hm=6f29d8df27eea6a3489b3bb74381e02fb9706158c2f00bcef652f156a53c1268&) showing how they are split up.
+Districts are a concept originally conceived by Aerinon in the Door Randomizer, where parts of the OW are split into areas and given a name. Here is a [District Map](https://zelda.codemann8.com/images/shared/ow-districts-reference-sheet.png) showing how they are split up.
 
 # Command Line Options
 

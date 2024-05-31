@@ -42,6 +42,8 @@ get-pip.py
 venv
 /test
 test_games/
+docs/issues/*
+docs/ideas/*
 data/sprites/official/selan.1.zspr
 *.zspr
 

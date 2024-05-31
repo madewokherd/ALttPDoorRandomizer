@@ -148,6 +148,10 @@
     none: 1
     mapcompass: 1
     dungeon: 1
+  prize_shuffle:
+    none: 1
+    dungeon: 1
+    wild: 1
   dungeon_items:
     standard: 10
     mc: 3

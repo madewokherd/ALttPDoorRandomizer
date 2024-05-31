@@ -1,0 +1,8 @@
+# Even though Lamp is Flipper-locked, this logic considers that a key could be wasted in the dark in mire
+# Only fire locked mire is off limits
+meta:
+  players: 1
+settings:
+  1:
+    key_logic_algorithm: partial
+    keysanity: true

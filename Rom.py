@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '096e6adebfa630e827c662f12f79b4cd'
+RANDOMIZERBASEHASH = '87be9d9bd56b6ad8e4b9697ecfc31841'
 
 
 class JsonRom(object):
@@ -507,6 +507,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     else:
         flute_spots = world.owflutespots[player]
         owFlags |= 0x0100
+        write_int16(rom, snes_to_pc(0x0AB7F7), 0xEAEA)
 
     flute_writes = sorted([(f, flute_data[f][1]) for f in flute_spots], key = lambda f: f[1])
     for o in range(0, len(flute_writes)):
@@ -729,7 +730,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
 
     # fix hc big key problems (map and compass too)
     if (world.doorShuffle[player] != 'vanilla' or world.dropshuffle[player] != 'none'
-            or world.pottery[player] not in ['none', 'cave']):
+            or world.pottery[player] not in ['none', 'cave'] or world.prizeshuffle[player] != 'none'):
         rom.write_byte(0x151f1, 2)
         rom.write_byte(0x15270, 2)
         sanctuary = world.get_region('Sanctuary', player)

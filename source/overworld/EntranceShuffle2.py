@@ -304,9 +304,12 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
     if not avail.world.is_bombshop_start(avail.player):
         bomb_shop = 'Big Bomb Shop'
         if bomb_shop in rem_exits:
-            bomb_shop_options = [x for x in rem_entrances]
+            bomb_shop_forbidden = []
+            if avail.world.logic[avail.player] in ['noglitches', 'minorglitches']:
+                bomb_shop_forbidden.append('Pyramid Fairy')
             if avail.world.is_tile_swapped(0x03, avail.player):
-                bomb_shop_options = [x for x in bomb_shop_options if x not in ['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)']]
+                bomb_shop_forbidden.extend(['Spectacle Rock Cave', 'Spectacle Rock Cave (Bottom)'])
+            bomb_shop_options = [x for x in rem_entrances if x not in bomb_shop_forbidden]
             if avail.swapped and len(bomb_shop_options) > 1:
                 bomb_shop_options = [x for x in bomb_shop_options if x != 'Big Bomb Shop']
 
