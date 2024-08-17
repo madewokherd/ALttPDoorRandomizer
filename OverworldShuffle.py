@@ -1499,7 +1499,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
                 elif exit.connected_region.name not in explored_regions \
                         and (exit.connected_region.type == region.type 
                             or exit.name in OWExitTypes['OWEdge'] or (cross_world and exit.name in (OWExitTypes['Portal'] + OWExitTypes['Mirror']))) \
-                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.name not in OWExitTypes['Ledge', 'OWG']):
+                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.name not in (OWExitTypes['Ledge'] + OWExitTypes['OWG'])):
                     explore_region(exit.connected_region.name, exit.connected_region)
     
     if build_copy_world:
