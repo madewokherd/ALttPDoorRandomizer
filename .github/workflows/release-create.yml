@@ -36,7 +36,6 @@ jobs:
         os-name: [
           # ubuntu-latest,  # ubuntu-22.04
           ubuntu-22.04,
-          ubuntu-20.04,
           macos-latest,  # macos-12
           windows-latest # windows-2022
         ]
@@ -95,7 +94,6 @@ jobs:
         os-name: [
           # ubuntu-latest,  # ubuntu-22.04
           ubuntu-22.04,
-          ubuntu-20.04,
           macos-latest,  # macos-12
           windows-latest # windows-2022
         ]
@@ -171,7 +169,6 @@ jobs:
         os-name: [
           # ubuntu-latest,  # ubuntu-22.04
           ubuntu-22.04,
-          ubuntu-20.04,
           macos-latest,  # macos-12
           windows-latest # windows-2022
         ]
@@ -213,7 +210,6 @@ jobs:
         os-name: [
           # ubuntu-latest,  # ubuntu-22.04
           ubuntu-22.04,
-          ubuntu-20.04,
           macos-latest,  # macos-12
           windows-latest # windows-2022
         ]
@@ -351,8 +347,10 @@ jobs:
           echo "MacOS Asset:   ${{ steps.identify-macos-asset.outputs.asset_macos }}"
           echo "Windows Asset: ${{ steps.identify-windows-asset.outputs.asset_windows }}"
 
-      # create a release (MASTER)
-      - name: 📀->🚀Create a Release (MASTER)
+      # create a release (OverworldShuffle)
+      # if: contains(github.ref, 'OverworldShuffle') # branch or tag name
+      # if: contains(github.event.head_commit.message, 'Version bump') # commit message
+      - name: 📀->🚀Create a Release (OverworldShuffle)
         id: create_release
         uses: actions/create-release@v1.1.4
         env:
@@ -364,9 +362,9 @@ jobs:
           # draft: true
         if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
 
-      # upload linux archive asset (MASTER)
+      # upload linux archive asset (OverworldShuffle)
       #TODO: Make sure we're firing on the proper branches
-      - name: 🔼Upload Linux Archive Asset (MASTER)
+      - name: 🔼Upload Linux Archive Asset (OverworldShuffle)
         id: upload-linux-asset
         uses: actions/upload-release-asset@v1.0.2
         env:
@@ -378,9 +376,9 @@ jobs:
           asset_content_type: application/gzip
         if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
 
-      # upload macos archive asset (MASTER)
+      # upload macos archive asset (OverworldShuffle)
       #TODO: Make sure we're firing on the proper branches
-      - name: 🔼Upload MacOS Archive Asset (MASTER)
+      - name: 🔼Upload MacOS Archive Asset (OverworldShuffle)
         id: upload-macos-asset
         uses: actions/upload-release-asset@v1.0.2
         env:
@@ -392,9 +390,9 @@ jobs:
           asset_content_type: application/gzip
         if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
 
-      # upload windows archive asset (MASTER)
+      # upload windows archive asset (OverworldShuffle)
       #TODO: Make sure we're firing on the proper branches
-      - name: 🔼Upload Windows Archive Asset (MASTER)
+      - name: 🔼Upload Windows Archive Asset (OverworldShuffle)
         id: upload-windows-asset
         uses: actions/upload-release-asset@v1.0.2
         env:

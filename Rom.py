@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '23be89a3b206df54fcc5df664b0ca5a3'
+RANDOMIZERBASEHASH = 'f3d6ac83d5d2ee0e3fb96f7ef5128e61'
 
 
 class JsonRom(object):
@@ -889,7 +889,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             rom.write_byte(cr_pc+0x1e, 0xEE)  # slash
             rom.write_byte(cr_pc+0x1f, thousands_bot)
             # modify stat config
-            stat_address = 0x23978C
+            stat_address = 0x23983E
             stat_pc = snes_to_pc(stat_address)
             rom.write_byte(stat_pc, 0xa9)  # change to pos 21 (from b1)
             rom.write_byte(stat_pc+2, 0xc0)  # change to 12 bits (from a0)

@@ -92,7 +92,7 @@
     "randomizer.dungeon.trap_door_mode.oneway": "Remove All Annoying Traps",
 
     "randomizer.dungeon.key_logic_algorithm": "Key Logic Algorithm",
-    "randomizer.dungeon.key_logic_algorithm.default": "Default",
+    "randomizer.dungeon.key_logic_algorithm.dangerous": "Dangerous",
     "randomizer.dungeon.key_logic_algorithm.partial": "Partial Protection",
     "randomizer.dungeon.key_logic_algorithm.strict": "Strict",
 
@@ -194,6 +194,17 @@
     "randomizer.entrance.entranceshuffle.insanity": "Insanity",
     "randomizer.entrance.entranceshuffle.dungeonsfull": "Dungeons + Full",
     "randomizer.entrance.entranceshuffle.dungeonssimple": "Dungeons + Simple",
+
+    "randomizer.entrance.skullwoods": "Skull Woods Shuffle",
+    "randomizer.entrance.skullwoods.original": "Original",
+    "randomizer.entrance.skullwoods.restricted": "Vanilla Drops, Entrances Restricted",
+    "randomizer.entrance.skullwoods.loose": "Vanilla Drops, Entrances use Shuffle",
+    "randomizer.entrance.skullwoods.followlinked": "Follow Linked Drops Setting",
+
+    "randomizer.entrance.linked_drops": "Linked Drops Override",
+    "randomizer.entrance.linked_drops.unset": "Determined by Shuffle",
+    "randomizer.entrance.linked_drops.linked": "Always Linked",
+    "randomizer.entrance.linked_drops.independent": "Independent",
 
     "randomizer.gameoptions.nobgm": "Disable Music & MSU-1",
     "randomizer.gameoptions.quickswap": "L/R Quickswapping",

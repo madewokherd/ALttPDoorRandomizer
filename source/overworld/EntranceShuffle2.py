@@ -26,6 +26,7 @@ class EntrancePool(object):
         self.decoupled_exits = []
         self.original_entrances = set()
         self.original_exits = set()
+        self.same_world_restricted = {}
 
         self.world = world
         self.player = player
@@ -59,7 +60,6 @@ def link_entrances_new(world, player):
     avail_pool.entrances = set(i_drop_map.keys()).union(i_entrance_map.keys()).union(i_single_ent_map.keys())
     avail_pool.exits = set(i_entrance_map.values()).union(i_drop_map.values()).union(i_single_ent_map.values())
     avail_pool.inverted = world.mode[player] == 'inverted'
-    avail_pool.assumed_loose_caves = world.shuffle[player] == 'district'
     inverted_substitution(avail_pool, avail_pool.entrances, True, True)
     inverted_substitution(avail_pool, avail_pool.exits, False, True)
     avail_pool.original_entrances.update(avail_pool.entrances)
@@ -99,8 +99,13 @@ def link_entrances_new(world, player):
         if mode not in modes:
             raise RuntimeError(f'Shuffle mode {mode} is not yet supported')
         mode_cfg = copy.deepcopy(modes[mode])
+
+        if world.linked_drops[player] != 'unset':
+            mode_cfg['keep_drops_together'] = 'on' if world.linked_drops[player] == 'linked' else 'off'
+
         avail_pool.swapped = mode_cfg['undefined'] == 'swap'
         avail_pool.keep_drops_together = mode_cfg['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_cfg else True
+        avail_pool.assumed_loose_caves = not avail_pool.keep_drops_together and world.shuffle[player] == 'district'
         avail_pool.coupled = mode_cfg['decoupled'] != 'on' if 'decoupled' in mode_cfg else True
         if avail_pool.is_standard():
             do_standard_connections(avail_pool)
@@ -108,11 +113,7 @@ def link_entrances_new(world, player):
         for pool_name, pool in pool_list.items():
             special_shuffle = pool['special'] if 'special' in pool else None
             if special_shuffle == 'drops':
-                holes, targets = find_entrances_and_targets_drops(avail_pool, pool['entrances'])
-                if avail_pool.swapped:
-                    connect_swapped(holes, targets, avail_pool)
-                else:
-                    connect_random(holes, targets, avail_pool)
+                handle_skull_woods_drops(avail_pool, pool['entrances'], mode_cfg)
             elif special_shuffle == 'normal_drops':
                 cross_world = mode_cfg['cross_world'] == 'on' if 'cross_world' in mode_cfg else False
                 do_holes_and_linked_drops(set(avail_pool.entrances), set(avail_pool.exits), avail_pool, cross_world)
@@ -143,20 +144,7 @@ def link_entrances_new(world, player):
                 entrances, exits = find_entrances_and_exits(avail_pool, entrances+drops)
                 do_main_shuffle(entrances, exits, avail_pool, mode_cfg)
             elif special_shuffle == 'skull':
-                entrances, exits = find_entrances_and_exits(avail_pool, pool['entrances'])
-                rem_ent = None
-                if avail_pool.world.shuffle[avail_pool.player] in ['dungeonssimple', 'simple', 'restricted'] \
-                        and not avail_pool.world.is_tile_swapped(0x00, avail_pool.player):
-                    rem_ent = random.choice(['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)'])
-                    entrances.remove(rem_ent)
-                    exits.remove('Skull Woods First Section Exit')
-                    connect_random(entrances, exits, avail_pool, True)
-                    entrances, exits = [rem_ent], ['Skull Woods First Section Exit']
-                if avail_pool.swapped:
-                    connect_swapped(entrances, exits, avail_pool, True)
-                else:
-                    connect_random(entrances, exits, avail_pool, True)
-                avail_pool.skull_handled = True
+                handle_skull_woods_entrances(avail_pool, pool['entrances'])
             else:
                 entrances, exits = find_entrances_and_exits(avail_pool, pool['entrances'])
                 do_main_shuffle(entrances, exits, avail_pool, mode_cfg)
@@ -253,12 +241,21 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
     # mandatory exits
     rem_entrances, rem_exits = set(), set()
     if not cross_world:
+        determine_dungeon_restrictions(avail)
         mand_exits = figure_out_must_exits_same_world(entrances, exits, avail)
         must_exit_lw, must_exit_dw, lw_entrances, dw_entrances, multi_exit_caves = mand_exits
+        
+        def do_world_mandatory(world_entrances, world_must_exits, restriction):
+            nonlocal multi_exit_caves
+            candidates = filter_restricted_caves(multi_exit_caves, restriction, avail)
+            other_candidates = [x for x in multi_exit_caves if x not in candidates]  # remember those not passed in
+            do_mandatory_connections(avail, world_entrances, candidates, world_must_exits)
+            multi_exit_caves = (other_candidates + candidates) if other_candidates else candidates  # rebuild list from the candidates and those not passed
+        
         if not avail.inverted:
-            do_mandatory_connections(avail, lw_entrances, multi_exit_caves, must_exit_lw)
+            do_world_mandatory(lw_entrances, must_exit_lw, 'LightWorld')
         else:
-            do_mandatory_connections(avail, dw_entrances, multi_exit_caves, must_exit_dw)
+            do_world_mandatory(dw_entrances, must_exit_dw, 'DarkWorld')
 
         new_mec = []
         for cave_option in multi_exit_caves:
@@ -272,9 +269,9 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
         multi_exit_caves = new_mec
 
         if not avail.inverted:
-            do_mandatory_connections(avail, dw_entrances, multi_exit_caves, must_exit_dw)
+            do_world_mandatory(dw_entrances, must_exit_dw, 'DarkWorld')
         else:
-            do_mandatory_connections(avail, lw_entrances, multi_exit_caves, must_exit_lw)
+            do_world_mandatory(lw_entrances, must_exit_lw, 'LightWorld')
         rem_entrances.update(lw_entrances)
         rem_entrances.update(dw_entrances)
     else:
@@ -367,6 +364,10 @@ def do_main_shuffle(entrances, exits, avail, mode_def):
             if bonk_fairy_exception(x):
                 lw_entrances.append(x) if x in LW_Entrances else dw_entrances.append(x)
         do_same_world_connectors(lw_entrances, dw_entrances, multi_exit_caves, avail)
+        if avail.world.doorShuffle[avail.player] != 'vanilla':
+            determine_dungeon_restrictions(avail)
+            possibles = figure_out_possible_exits(rem_exits)
+            do_same_world_possible_connectors(lw_entrances, dw_entrances, possibles, avail)
         unused_entrances.update(lw_entrances)
         unused_entrances.update(dw_entrances)
     else:
@@ -519,12 +520,16 @@ def do_holes_and_linked_drops(entrances, exits, avail, cross_world):
 
     if not avail.keep_drops_together:
         targets = [avail.one_way_map[x] for x in holes_to_shuffle]
-        connect_random(holes_to_shuffle, targets, avail)
+        if avail.swapped:
+            connect_swapped(holes_to_shuffle, targets, avail)
+        else:
+            connect_random(holes_to_shuffle, targets, avail)
         remove_from_list(entrances, holes_to_shuffle)
         remove_from_list(exits, targets)
         return  # we're done here
 
     hole_entrances, hole_targets = [], []
+    leftover_hole_entrances, leftover_hole_targets = [], []
     for hole in drop_map:
         if hole in avail.original_entrances and hole in linked_drop_map:
             linked_entrance = linked_drop_map[hole]
@@ -534,39 +539,44 @@ def do_holes_and_linked_drops(entrances, exits, avail, cross_world):
             target_drop = avail.one_way_map[hole]
             if target_exit in exits and target_drop in exits:
                 hole_targets.append((target_exit, target_drop))
+        else:
+            if hole in avail.original_entrances and hole in entrances:
+                leftover_hole_entrances.append(hole)
+            if drop_map[hole] in exits:
+                leftover_hole_targets.append(drop_map[hole])
 
     random.shuffle(hole_entrances)
-    if not cross_world and 'Sanctuary Grave' in holes_to_shuffle:
-        hc = avail.world.get_entrance('Hyrule Castle Exit (South)', avail.player)
-        is_hc_in_dw = avail.world.mode[avail.player] == 'inverted'
-        if hc.connected_region:
-            is_hc_in_dw = hc.connected_region.type == RegionType.DarkWorld
-        chosen_entrance = None
-        if is_hc_in_dw:
-            if avail.swapped:
-                chosen_entrance = next(e for e in hole_entrances if e[0] in DW_Entrances and e[0] != 'Sanctuary')
+    if not cross_world:
+        if 'Sanctuary Grave' in holes_to_shuffle:
+            hc = avail.world.get_entrance('Hyrule Castle Exit (South)', avail.player)
+            is_hc_in_opp_world = avail.inverted
+            if hc.connected_region:
+                opp_world = RegionType.LightWorld if avail.inverted else RegionType.DarkWorld
+                is_hc_in_opp_world = hc.connected_region.type == opp_world
+            start_world_entrances = DW_Entrances if avail.inverted else LW_Entrances
+            opp_world_entrances = LW_Entrances if avail.inverted else DW_Entrances
+            chosen_entrance = None
+            if is_hc_in_opp_world:
+                if avail.swapped:
+                    chosen_entrance = next(e for e in hole_entrances if e[0] in opp_world_entrances and e[0] != 'Sanctuary')
+                if not chosen_entrance:
+                    chosen_entrance = next((e for e in hole_entrances if e[0] in opp_world_entrances), None)
             if not chosen_entrance:
-                chosen_entrance = next(e for e in hole_entrances if e[0] in DW_Entrances)
-        if not chosen_entrance:
-            if avail.swapped:
-                chosen_entrance = next(e for e in hole_entrances if e[0] in LW_Entrances and e[0] != 'Sanctuary')
-            if not chosen_entrance:
-                chosen_entrance = next(e for e in hole_entrances if e[0] in LW_Entrances)
-        if chosen_entrance:
-            hole_entrances.remove(chosen_entrance)
-            sanc_interior = next(target for target in hole_targets if target[0] == 'Sanctuary Exit')
-            hole_targets.remove(sanc_interior)
-            connect_two_way(chosen_entrance[0], sanc_interior[0], avail)  # two-way exit
-            connect_entrance(chosen_entrance[1], sanc_interior[1], avail)  # hole
-            remove_from_list(entrances, [chosen_entrance[0], chosen_entrance[1]])
-            remove_from_list(exits, [sanc_interior[0], sanc_interior[1]])
-            if avail.swapped and drop_map[chosen_entrance[1]] != sanc_interior[1]:
-                swap_ent, swap_ext = connect_swap(chosen_entrance[0], sanc_interior[0], avail)
-                swap_drop, swap_tgt = connect_swap(chosen_entrance[1], sanc_interior[1], avail)
-                hole_entrances.remove((swap_ent, swap_drop))
-                hole_targets.remove((swap_ext, swap_tgt))
-                remove_from_list(entrances, [swap_ent, swap_drop])
-                remove_from_list(exits, [swap_ext, swap_tgt])
+                if avail.swapped:
+                    chosen_entrance = next(e for e in hole_entrances if e[0] in start_world_entrances and e[0] != 'Sanctuary')
+                if not chosen_entrance:
+                    chosen_entrance = next(e for e in hole_entrances if e[0] in start_world_entrances)
+
+            if chosen_entrance:
+                connect_hole_via_interior(chosen_entrance, 'Sanctuary Exit', hole_entrances, hole_targets, entrances, exits, avail)
+                
+        sw_world_entrances = DW_Entrances if not avail.world.is_tile_swapped(0x00, avail.player) else LW_Entrances
+        if 'Skull Woods First Section Hole (North)' in holes_to_shuffle:
+            chosen_entrance = next(e for e in hole_entrances if e[0] in sw_world_entrances)
+            connect_hole_via_interior(chosen_entrance, 'Skull Woods First Section Exit', hole_entrances, hole_targets, entrances, exits, avail)
+        if 'Skull Woods Second Section Hole' in holes_to_shuffle:
+            chosen_entrance = next(e for e in hole_entrances if e[0] in sw_world_entrances)
+            connect_hole_via_interior(chosen_entrance, 'Skull Woods Second Section Exit (East)', hole_entrances, hole_targets, entrances, exits, avail)
 
     random.shuffle(hole_targets)
     while len(hole_entrances):
@@ -587,6 +597,31 @@ def do_holes_and_linked_drops(entrances, exits, avail, cross_world):
             hole_targets.remove((swap_ext, swap_tgt))
             remove_from_list(entrances, [swap_ent, swap_drop])
             remove_from_list(exits, [swap_ext, swap_tgt])
+
+    if leftover_hole_entrances and leftover_hole_targets:
+        remove_from_list(entrances, leftover_hole_entrances)
+        remove_from_list(exits, leftover_hole_targets)
+        if avail.swapped:
+            connect_swapped(leftover_hole_entrances, leftover_hole_targets, avail)
+        else:
+            connect_random(leftover_hole_entrances, leftover_hole_targets, avail)
+
+
+def connect_hole_via_interior(chosen_entrance, interior, hole_entrances, hole_targets, entrances, exits, avail):
+    hole_entrances.remove(chosen_entrance)
+    interior = next(target for target in hole_targets if target[0] == interior)
+    hole_targets.remove(interior)
+    connect_two_way(chosen_entrance[0], interior[0], avail)
+    connect_entrance(chosen_entrance[1], interior[1], avail)
+    remove_from_list(entrances, [chosen_entrance[0], chosen_entrance[1]])
+    remove_from_list(exits, [interior[0], interior[1]])
+    if avail.swapped and drop_map[chosen_entrance[1]] != interior[1]:
+        swap_ent, swap_ext = connect_swap(chosen_entrance[0], interior[0], avail)
+        swap_drop, swap_tgt = connect_swap(chosen_entrance[1], interior[1], avail)
+        hole_entrances.remove((swap_ent, swap_drop))
+        hole_targets.remove((swap_ext, swap_tgt))
+        remove_from_list(entrances, [swap_ent, swap_drop])
+        remove_from_list(exits, [swap_ext, swap_tgt])
 
 
 def do_dark_sanc(entrances, exits, avail):
@@ -867,14 +902,15 @@ def get_accessible_entrances(start_region, avail, assumed_inventory=[], cross_wo
     return found_entrances
 
 
-def figure_out_connectors(exits, avail):
+def figure_out_connectors(exits, avail, cross_world=True):
     multi_exit_caves = []
     cave_list = list(Connector_List)
-    if avail.assumed_loose_caves:
-        sw_list = ['Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)']
-        random.shuffle(sw_list)
-        cave_list.extend([sw_list])
-        cave_list.extend([[entrance_map[e]] for e in linked_drop_map.values() if 'Inverted ' not in e])
+    if avail.assumed_loose_caves or (not avail.skull_handled and (cross_world or not avail.world.is_tile_swapped(0x00, avail.player))):
+        skull_connector = [x for x in ['Skull Woods Second Section Exit (West)', 'Skull Woods Second Section Exit (East)'] if x in exits]
+        cave_list.extend(skull_connector)
+    if avail.assumed_loose_caves or not avail.keep_drops_together:
+        cave_list.extend([[entrance_map[e]] for e in linked_drop_map.values() if 'Inverted ' not in e and 'Skull Woods ' not in e])
+
     for item in cave_list:
         if all(x in exits for x in item):
             remove_from_list(exits, item)
@@ -1055,12 +1091,49 @@ def must_exits_helper(avail):
     return must_exit_lw, must_exit_dw
 
 
+def figure_out_possible_exits(exits):
+    possible_multi_exit_caves = []
+    for item in doors_possible_connectors:
+        if item in exits:
+            remove_from_list(exits, item)
+            possible_multi_exit_caves.append(item)
+    return possible_multi_exit_caves
+
+
+def determine_dungeon_restrictions(avail):
+    check_for_hc = (avail.is_standard() or avail.world.doorShuffle[avail.player] != 'vanilla')
+    for check in dungeon_restriction_checks:
+        dungeon_exits, drop_regions = check
+        if check_for_hc and any('Hyrule Castle' in x for x in dungeon_exits):
+            avail.same_world_restricted.update({x: 'LightWorld' for x in dungeon_exits})
+        else:
+            restriction = None
+            for x in dungeon_exits:
+                ent = avail.world.get_entrance(x, avail.player)
+                if ent.connected_region:
+                    if ent.connected_region.type == RegionType.LightWorld:
+                        restriction = 'LightWorld'
+                    elif ent.connected_region.type == RegionType.DarkWorld:
+                        restriction = 'DarkWorld'
+            # Holes only restrict
+            for x in drop_regions:
+                region = avail.world.get_region(x, avail.player)
+                ent = next((ent for ent in region.entrances if ent.parent_region and ent.parent_region.type in [RegionType.LightWorld, RegionType.DarkWorld]), None)
+                if ent:
+                    if ent.parent_region.type == RegionType.LightWorld and not avail.inverted:
+                        restriction = 'LightWorld'
+                    elif ent.parent_region.type == RegionType.DarkWorld and avail.inverted:
+                        restriction = 'DarkWorld'
+            if restriction:
+                avail.same_world_restricted.update({x: restriction for x in dungeon_exits})
+
+
 def figure_out_must_exits_same_world(entrances, exits, avail):
     lw_entrances, dw_entrances = [], []
 
     for x in entrances:
         lw_entrances.append(x) if x in LW_Entrances else dw_entrances.append(x)
-    multi_exit_caves = figure_out_connectors(exits, avail)
+    multi_exit_caves = figure_out_connectors(exits, avail, False)
 
     must_exit_lw, must_exit_dw = must_exits_helper(avail)
     must_exit_lw = must_exit_filter(avail, must_exit_lw, lw_entrances)
@@ -1069,8 +1142,26 @@ def figure_out_must_exits_same_world(entrances, exits, avail):
     return must_exit_lw, must_exit_dw, lw_entrances, dw_entrances, multi_exit_caves
 
 
+def filter_restricted_caves(multi_exit_caves, restriction, avail):
+    candidates = []
+    for cave in multi_exit_caves:
+        if all(x not in avail.same_world_restricted or avail.same_world_restricted[x] == restriction for x in cave):
+            candidates.append(cave)
+    return candidates
+
+
+def flatten(list_to_flatten):
+    ret = []
+    for item in list_to_flatten:
+        if isinstance(item, tuple):
+            ret.extend(item)
+        else:
+            ret.append(item)
+    return ret
+
+
 def figure_out_must_exits_cross_world(entrances, exits, avail):
-    multi_exit_caves = figure_out_connectors(exits, avail)
+    multi_exit_caves = figure_out_connectors(exits, avail, True)
 
     must_exit_lw, must_exit_dw = must_exits_helper(avail)
     must_exit = must_exit_filter(avail, must_exit_lw + must_exit_dw, entrances)
@@ -1083,7 +1174,7 @@ def do_same_world_connectors(lw_entrances, dw_entrances, caves, avail):
     random.shuffle(dw_entrances)
     random.shuffle(caves)
     while caves:
-        # connect highest exit count caves first, prevent issue where we have 2 or 3 exits across worlds left to fill
+        # connect highest-exit-count caves first, prevent issue where we have 2 or 3 exits across worlds left to fill
         cave_candidate = (None, 0)
         for i, cave in enumerate(caves):
             if isinstance(cave, str):
@@ -1092,12 +1183,19 @@ def do_same_world_connectors(lw_entrances, dw_entrances, caves, avail):
                 cave_candidate = (i, len(cave))
         cave = caves.pop(cave_candidate[0])
 
-        target = lw_entrances if random.randint(0, 1) == 0 else dw_entrances
         if isinstance(cave, str):
             cave = (cave,)
+        target, restriction = None, None
+        if any(x in avail.same_world_restricted for x in cave):
+            restriction = next(avail.same_world_restricted[x] for x in cave if x in avail.same_world_restricted)
+            target = lw_entrances if restriction == 'LightWorld' else dw_entrances
+        if target is None:
+            target = lw_entrances if random.randint(0, 1) == 0 else dw_entrances
 
         # check if we can still fit the cave into our target group
         if len(target) < len(cave):
+            if restriction:
+                raise Exception('Not enough entrances for restricted cave, algorithm needs revision (main)')
             # need to use other set
             target = lw_entrances if target is dw_entrances else dw_entrances
 
@@ -1110,6 +1208,18 @@ def do_same_world_connectors(lw_entrances, dw_entrances, caves, avail):
             # else:
             connect_two_way(target.pop(), ext, avail)
 
+
+def do_same_world_possible_connectors(lw_entrances, dw_entrances, possibles, avail):
+    random.shuffle(possibles)
+    while possibles:
+        possible = possibles.pop()
+        target = None
+        if possible in avail.same_world_restricted:
+            target = lw_entrances if avail.same_world_restricted[possible] == 'LightWorld' else dw_entrances
+        if target is None:
+            target = lw_entrances if random.randint(0, 1) == 0 else dw_entrances
+        connect_two_way(target.pop(), possible, avail)
+        determine_dungeon_restrictions(avail)
 
 def do_cross_world_connectors(entrances, caves, avail):
     random.shuffle(entrances)
@@ -1156,6 +1266,44 @@ def do_cross_world_connectors(entrances, caves, avail):
                                         if len(c) == 0:
                                             caves.remove(c)
                                         break
+
+
+def handle_skull_woods_drops(avail, pool, mode_cfg):
+    skull_woods = avail.world.skullwoods[avail.player]
+    if skull_woods in ['restricted', 'loose']:
+        for drop in pool:
+            target = drop_map[drop]
+            connect_entrance(drop, target, avail)
+    elif skull_woods == 'original':
+        holes, targets = find_entrances_and_targets_drops(avail, pool)
+        if avail.swapped:
+            connect_swapped(holes, targets, avail)
+        else:
+            connect_random(holes, targets, avail)
+    elif skull_woods == 'followlinked':
+        keep_together = mode_cfg['keep_drops_together'] == 'on' if 'keep_drops_together' in mode_cfg else True
+        if keep_together:
+            for drop in ['Skull Woods First Section Hole (East)', 'Skull Woods First Section Hole (West)']:
+                target = drop_map[drop]
+                connect_entrance(drop, target, avail)
+
+
+def handle_skull_woods_entrances(avail, pool):
+    skull_woods = avail.world.skullwoods[avail.player]
+    if skull_woods in ['restricted', 'original']:
+        entrances, exits = find_entrances_and_exits(avail, pool)
+        if avail.world.shuffle[avail.player] in ['dungeonssimple', 'simple', 'restricted'] \
+                and not avail.world.is_tile_swapped(0x00, avail.player):
+            rem_ent = random.choice(['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)'])
+            entrances.remove(rem_ent)
+            exits.remove('Skull Woods First Section Exit')
+            connect_random(entrances, exits, avail, True)
+            entrances, exits = [rem_ent], ['Skull Woods First Section Exit']
+        if avail.swapped:
+            connect_swapped(entrances, exits, avail, True)
+        else:
+            connect_random(entrances, exits, avail, True)
+        avail.skull_handled = True
 
 
 def do_fixed_shuffle(avail, entrance_list):
@@ -1214,7 +1362,6 @@ def do_same_world_shuffle(avail, pool_def):
     multi_exit = pool_def['connectors']
     # complete_entrance_set = set()
     lw_entrances, dw_entrances, multi_exits_caves, other_exits = [], [], [], []
-    hyrule_forced = None
 
     single_entrances, single_exits = find_entrances_and_exits(avail, single_exit)
     other_exits.extend(single_exits)
@@ -1224,11 +1371,8 @@ def do_same_world_shuffle(avail, pool_def):
     for option in multi_exit:
         multi_entrances, multi_exits = find_entrances_and_exits(avail, option)
         # complete_entrance_set.update(multi_entrances)
-        if avail.is_sanc_forced_in_hc() and any(x in multi_entrances for x in ['Hyrule Castle Entrance (South)',
-                                                               'Hyrule Castle Entrance (East)',
-                                                               'Hyrule Castle Entrance (West)']):
-            hyrule_forced = [multi_exits]
-        multi_exits_caves.append(multi_exits)
+        if multi_exits:
+            multi_exits_caves.append(multi_exits)
         for x in multi_entrances:
             (dw_entrances, lw_entrances)[x in LW_Entrances].append(x)
 
@@ -1236,13 +1380,16 @@ def do_same_world_shuffle(avail, pool_def):
     must_exit_lw = must_exit_filter(avail, must_exit_lw, lw_entrances)
     must_exit_dw = must_exit_filter(avail, must_exit_dw, dw_entrances)
 
-    do_mandatory_connections(avail, lw_entrances, multi_exits_caves, must_exit_lw)
-    if hyrule_forced and hyrule_forced[0] in multi_exits_caves:
-        remove_from_list(multi_exits_caves, hyrule_forced)
-        do_mandatory_connections(avail, dw_entrances, multi_exits_caves, must_exit_dw)
-        multi_exits_caves.append(hyrule_forced[0])
-    else:
-        do_mandatory_connections(avail, dw_entrances, multi_exits_caves, must_exit_dw)
+    def do_world_mandatory(world_entrances, world_must_exits, restriction):
+        nonlocal multi_exits_caves
+        candidates = filter_restricted_caves(multi_exits_caves, restriction, avail)
+        other_candidates = [x for x in multi_exits_caves if x not in candidates]  # remember those not passed in
+        do_mandatory_connections(avail, world_entrances, candidates, world_must_exits)
+        multi_exits_caves = (other_candidates + candidates) if other_candidates else candidates  # rebuild list from the candidates and those not passed
+
+    determine_dungeon_restrictions(avail)
+    do_world_mandatory(lw_entrances, must_exit_lw, 'LightWorld')
+    do_world_mandatory(dw_entrances, must_exit_dw, 'DarkWorld')
 
     # connect caves
     random.shuffle(lw_entrances)
@@ -1250,19 +1397,20 @@ def do_same_world_shuffle(avail, pool_def):
     random.shuffle(multi_exits_caves)
     while multi_exits_caves:
         cave_candidate = (None, 0)
-        if hyrule_forced and hyrule_forced[0] in multi_exits_caves:
-            multi_exits_caves.remove(hyrule_forced[0])
-            cave = hyrule_forced[0]
-            hyrule_forced = None
-            target = lw_entrances 
-        else:
-            for i, cave in enumerate(multi_exits_caves):
-                if len(cave) > cave_candidate[1]:
-                    cave_candidate = (i, len(cave))
-            cave = multi_exits_caves.pop(cave_candidate[0])
-            target = lw_entrances if random.randint(0, 1) == 0 else dw_entrances
+        for i, cave in enumerate(multi_exits_caves):
+            if len(cave) > cave_candidate[1]:
+                cave_candidate = (i, len(cave))
+        cave = multi_exits_caves.pop(cave_candidate[0])
 
+        target, restriction = None, None
+        if any(x in avail.same_world_restricted for x in cave):
+            restriction = next(avail.same_world_restricted[x] for x in cave if x in avail.same_world_restricted)
+            target = lw_entrances if restriction == 'LightWorld' else dw_entrances
+        if target is None:
+            target = lw_entrances if random.randint(0, 1) == 0 else dw_entrances
         if len(target) < len(cave):  # swap because we ran out of entrances in that world
+            if restriction:
+                raise Exception('Not enough entrances for restricted cave, algorithm needs revision (dungeonsfull)')
             target = lw_entrances if target is dw_entrances else dw_entrances
 
         for ext in cave:
@@ -1670,7 +1818,7 @@ def connect_swap(entrance, exit, avail):
         swap_entrance = next(e for e, x in avail.combine_map.items() if x == exit)
         if swap_entrance in ['Pyramid Entrance', 'Pyramid Hole'] and avail.world.is_tile_swapped(0x1b, avail.player):
             swap_entrance = 'Inverted ' + swap_entrance
-        if entrance in entrance_map:
+        if swap_exit in entrance_map.values():
             connect_two_way(swap_entrance, swap_exit, avail)
         else:
             connect_entrance(swap_entrance, swap_exit, avail)
@@ -1816,6 +1964,12 @@ modes = {
                 'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
                               'Skull Woods Second Section Door (West)']
             },
+            'skull_layout': {
+                'special': 'vanilla',
+                'condition': '',
+                'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
+                              'Skull Woods Second Section Door (West)']
+            },
             'single_entrance_dungeon': {
                 'entrances': ['Eastern Palace', 'Tower of Hera', 'Thieves Town', 'Skull Woods Final Section',
                               'Palace of Darkness', 'Ice Palace', 'Misery Mire', 'Swamp Palace', 'Ganons Tower']
@@ -1849,13 +2003,15 @@ modes = {
                 'sanc_flag': 'light_world',  # always light world flag
                 'entrances': ['Eastern Palace', 'Tower of Hera', 'Thieves Town', 'Skull Woods Final Section',
                               'Agahnims Tower', 'Palace of Darkness', 'Ice Palace', 'Misery Mire', 'Swamp Palace',
-                              'Ganons Tower'],
+                              'Ganons Tower', 'Desert Palace Entrance (North)', 'Dark Death Mountain Ledge (East)'],
                 'connectors': [['Hyrule Castle Entrance (South)', 'Hyrule Castle Entrance (East)',
                                 'Hyrule Castle Entrance (West)'],
                                ['Desert Palace Entrance (South)', 'Desert Palace Entrance (East)',
-                                'Desert Palace Entrance (West)', 'Desert Palace Entrance (North)'],
+                                'Desert Palace Entrance (West)'],
                                ['Turtle Rock', 'Turtle Rock Isolated Ledge Entrance',
-                                'Dark Death Mountain Ledge (West)', 'Dark Death Mountain Ledge (East)']]
+                                'Dark Death Mountain Ledge (West)'],
+                               ['Skull Woods Second Section Door (East)', 'Skull Woods Second Section Door (West)',
+                                'Skull Woods First Section Door']]
             },
         }
     },
@@ -1878,7 +2034,8 @@ modes = {
                 'special': 'normal_drops',
                 'entrances': ['Hyrule Castle Secret Entrance Drop', 'Kakariko Well Drop', 'Bat Cave Drop',
                               'North Fairy Cave Drop', 'Lost Woods Hideout Drop', 'Lumberjack Tree Tree',
-                              'Sanctuary Grave', 'Pyramid Hole']
+                              'Sanctuary Grave', 'Pyramid Hole',
+                              'Skull Woods First Section Hole (North)', 'Skull Woods Second Section Hole']
             },
             'fixed_non_items': {
                 'special': 'vanilla',
@@ -1990,7 +2147,8 @@ modes = {
                 'special': 'normal_drops',
                 'entrances': ['Hyrule Castle Secret Entrance Drop', 'Kakariko Well Drop', 'Bat Cave Drop',
                               'North Fairy Cave Drop', 'Lost Woods Hideout Drop', 'Lumberjack Tree Tree',
-                              'Sanctuary Grave', 'Pyramid Hole']
+                              'Sanctuary Grave', 'Pyramid Hole',
+                              'Skull Woods First Section Hole (North)', 'Skull Woods Second Section Hole']
             },
             'fixed_non_items': {
                 'special': 'vanilla',
@@ -2081,6 +2239,12 @@ modes = {
                 'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
                               'Skull Woods Second Section Door (West)']
             },
+            'skull_layout': {
+                'special': 'vanilla',
+                'condition': '',
+                'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
+                              'Skull Woods Second Section Door (West)']
+            },
             'single_entrance_dungeon': {
                 'entrances': ['Eastern Palace', 'Tower of Hera', 'Thieves Town', 'Skull Woods Final Section',
                               'Palace of Darkness', 'Ice Palace', 'Misery Mire', 'Swamp Palace', 'Ganons Tower']
@@ -2153,6 +2317,12 @@ modes = {
             },
             'skull_doors': {
                 'special': 'skull',
+                'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
+                              'Skull Woods Second Section Door (West)']
+            },
+            'skull_layout': {
+                'special': 'vanilla',
+                'condition': '',
                 'entrances': ['Skull Woods First Section Door', 'Skull Woods Second Section Door (East)',
                               'Skull Woods Second Section Door (West)']
             },
@@ -2408,11 +2578,14 @@ linked_drop_map = {
     'Lumberjack Tree Tree': 'Lumberjack Tree Cave',
     'Sanctuary Grave': 'Sanctuary',
     'Pyramid Hole': 'Pyramid Entrance',
-    'Inverted Pyramid Hole': 'Inverted Pyramid Entrance'
+    'Inverted Pyramid Hole': 'Inverted Pyramid Entrance',
+
+    'Skull Woods First Section Hole (North)': 'Skull Woods First Section Door',
+    'Skull Woods Second Section Hole': 'Skull Woods Second Section Door (East)',
 }
 
 sw_linked_drop_map = {
-    'Skull Woods Second Section Hole': 'Skull Woods Second Section Door (West)',
+    'Skull Woods Second Section Hole': 'Skull Woods Second Section Door (East)',
     'Skull Woods First Section Hole (North)': 'Skull Woods First Section Door',
     'Skull Woods First Section Hole (West)': 'Skull Woods First Section Door',
     'Skull Woods First Section Hole (East)': 'Skull Woods First Section Door'
@@ -2489,7 +2662,6 @@ entrance_map = {
     'Paradox Cave (Middle)': 'Paradox Cave Exit (Middle)',
     'Paradox Cave (Top)': 'Paradox Cave Exit (Top)'
 }
-
 
 single_entrance_map = {
     'Mimic Cave': 'Mimic Cave', 'Dark Death Mountain Fairy': 'Dark Death Mountain Healer Fairy',
@@ -2600,6 +2772,19 @@ Dungeon_Exit_Set = {
     'Desert Palace Exit (South)', 'Desert Palace Exit (East)', 'Desert Palace Exit (West)',
     'Turtle Rock Exit (Front)', 'Turtle Rock Isolated Ledge Exit', 'Turtle Rock Ledge Exit (West)'
 }
+
+dungeon_restriction_checks = [
+    (['Hyrule Castle Exit (South)', 'Hyrule Castle Exit (West)', 'Hyrule Castle Exit (East)', 'Sanctuary Exit'], ['Sewer Drop']),
+    (['Desert Palace Exit (South)', 'Desert Palace Exit (East)', 'Desert Palace Exit (West)', 'Desert Palace Exit (North)'], []),
+    (['Turtle Rock Exit (Front)', 'Turtle Rock Isolated Ledge Exit', 'Turtle Rock Ledge Exit (West)', 'Turtle Rock Ledge Exit (East)'], []),
+    (['Skull Woods First Section Exit', 'Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)', 'Skull Woods Final Section Exit'],
+     ['Skull Pinball', 'Skull Left Drop', 'Skull Pot Circle', 'Skull Back Drop'])
+ ]
+
+doors_possible_connectors = [
+    'Sanctuary Exit', 'Desert Palace Exit (North)', 'Skull Woods First Section Exit',
+    'Skull Woods Second Section Exit (East)', 'Skull Woods Second Section Exit (West)', 'Skull Woods Final Section Exit'
+]
 
 # Entrances that cannot be used to access a must_exit entrance - symmetrical to allow reverse lookups
 Must_Exit_Invalid_Connections = defaultdict(set)

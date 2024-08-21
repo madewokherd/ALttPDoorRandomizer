@@ -1151,7 +1151,7 @@ def define_tile_groups(world, do_grouped, player):
         merge_groups([[0x13, 0x14, 0x1b]])
 
     # sanctuary and grave connector
-    if world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'simple', 'restricted', 'full', 'lite']:
+    if world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'simple', 'restricted', 'full', 'lite', 'district']:
         merge_groups([[0x13, 0x14]])
 
     # cross-screen connector
