@@ -492,6 +492,9 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     if world.mapshuffle[player]:
         rom.write_byte(0x155C9, random.choice([0x11, 0x16]))  # Randomize GT music too with map shuffle
 
+    if world.doorShuffle[player] != 'vanilla':
+        rom.write_bytes(snes_to_pc(0x0293FE), [0x80, 0x15])  # skip pre-Aga music change
+
     # fix for swamp drains if necessary
     swamp1location = world.get_location('Swamp Palace - Trench 1 Pot Key', player)
     if not swamp1location.pot.indicator:
