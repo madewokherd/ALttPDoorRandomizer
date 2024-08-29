@@ -404,12 +404,12 @@ jobs:
           asset_content_type: application/zip
         if: contains(github.event.head_commit.message, 'Merge branch')  # branch/tag name and commit message
 
-      - name: 🖳Tag Baserom
-        uses: ./.github/actions/tag-repo
-        env:
-          FINE_PAT: ${{ secrets.ALTTPER_TAGGER }}
-        with:
-          repository: ${{ github.repository_owner }}/z3randomizer
-          ref-name:   heads/OWMain
-          github-tag: ${{ github.event.release.tag_name }}
-        if: contains(github.event.head_commit.message, 'Merge branch')
+      # - name: 🖳Tag Baserom
+      #   uses: ./.github/actions/tag-repo
+      #   env:
+      #     FINE_PAT: ${{ secrets.ALTTPER_TAGGER }}
+      #   with:
+      #     repository: ${{ github.repository_owner }}/z3randomizer
+      #     ref-name:   heads/OWMain
+      #     github-tag: ${{ github.event.release.tag_name }}
+      #   if: contains(github.event.head_commit.message, 'Merge branch')
