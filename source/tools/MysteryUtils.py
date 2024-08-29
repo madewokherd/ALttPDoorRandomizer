@@ -173,6 +173,8 @@ def roll_settings(weights):
     ret.shuffleganon = get_choice_bool('shuffleganon')
     ret.shufflelinks = get_choice_bool('shufflelinks')
     ret.shuffletavern = get_choice_bool('shuffletavern')
+    ret.skullwoods = get_choice('skullwoods')
+    ret.linked_drops = get_choice('linked_drops')
     
     ret.crystals_gt = get_choice('tower_open')
     ret.crystals_ganon = get_choice('ganon_open')

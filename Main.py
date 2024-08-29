@@ -40,7 +40,7 @@ from source.enemizer.DamageTables import DamageTable
 from source.enemizer.Enemizer import randomize_enemies
 from source.rom.DataTables import init_data_tables
 
-version_number = '1.4.1.12'
+version_number = '1.4.5'
 version_branch = '-u'
 __version__ = f'{version_number}{version_branch}'
 
@@ -161,7 +161,7 @@ def main(args, seed=None, fish=None):
     if world.spoiler_mode != 'none' and not args.jsonout:
         logger.info(world.fish.translate("cli", "cli", "create.meta"))
         world.spoiler.meta_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
-    if args.mystery and not (args.suppress_meta or args.create_spoiler):
+    if args.mystery and not (args.suppress_meta or args.spoiler != 'none'):
         world.spoiler.mystery_meta_to_file(output_path(f'{outfilebase}_meta.txt'))
 
     for player in range(1, world.players + 1):
@@ -362,7 +362,7 @@ def main(args, seed=None, fish=None):
                 with open(output_path('%s_multidata' % outfilebase), 'wb') as f:
                     f.write(multidata)
 
-    if args.mystery and not (args.suppress_meta or args.create_spoiler):
+    if args.mystery and not (args.suppress_meta or args.spoiler not in ['full']):
         world.spoiler.hashes_to_file(output_path(f'{outfilebase}_meta.txt'))
     elif world.spoiler_mode != 'none' and not args.jsonout:
         world.spoiler.hashes_to_file(output_path(f'{outfilebase}_Spoiler.txt'))
@@ -495,6 +495,8 @@ def init_world(args, fish):
     world.standardize_palettes = args.standardize_palettes.copy()
     world.shufflelinks = args.shufflelinks.copy()
     world.shuffletavern = args.shuffletavern.copy()
+    world.skullwoods = args.skullwoods.copy()
+    world.linked_drops = args.linked_drops.copy()
     world.pseudoboots = args.pseudoboots.copy()
     world.overworld_map = args.overworld_map.copy()
     world.take_any = args.take_any.copy()
@@ -522,7 +524,18 @@ def set_starting_inventory(world, args):
             if inv_list:
                 for inv_item in inv_list:
                     name = inv_item.strip()
-                    name = name if name != 'Ocarina' or world.flute_mode[player] != 'active' else 'Ocarina (Activated)'
+                    if inv_item == 'RandomWeapon':
+                        name = random.choice(['Progressive Bow', 'Hammer', 'Progressive Sword', 'Cane of Somaria', 'Cane of Byrna', 'Fire Rod'])
+                        extra = []
+                        if name in ['Cane of Somaria', 'Cane of Byrna', 'Fire Rod']:
+                            extra.append('Big Magic')
+                        if name == 'Progressive Bow':
+                            extra.extend(['Arrows (10)'] * 3)
+                        for e in extra:
+                            item = ItemFactory(e, p)
+                            if item:
+                                world.push_precollected(item)
+                    name = name if name != 'Ocarina' or world.flute_mode[p] != 'active' else 'Ocarina (Activated)'
                     item = ItemFactory(name, p)
                     if item:
                         world.push_precollected(item)

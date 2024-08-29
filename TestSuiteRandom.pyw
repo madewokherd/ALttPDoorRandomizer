@@ -25,7 +25,7 @@ def main(args=None):
     alive = 0
 
     
-    basecommand = f'py Mystery.py --suppress_rom --suppress_meta --create_spoiler --outputpath L:/_Work/Zelda/ROMs/Bug/Automate/{datetime.now().strftime("%y%m%d")} --weights L:/_Work/Zelda/ROMs/Bug/Automate/_test.yml'
+    basecommand = f'py Mystery.py --suppress_rom --suppress_meta --spoiler full --outputpath L:/_Work/Zelda/ROMs/Bug/Automate/{datetime.now().strftime("%y%m%d")} --weights L:/_Work/Zelda/ROMs/Bug/Automate/_test.yml'
         
     def gen_seed():
         return subprocess.run(basecommand, capture_output=True, shell=True, text=True)

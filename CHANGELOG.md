@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0.2
+- \~Merged in DR v1.4.5~
+  - ER - SW Shuffle Options
+  - ER - Linked Drops Options
+- Many GFX fixes
+- Fixes to MSU/music
+- No longer delete smith with prize shuffle
+- Fixed screen scroll issue in Zora's Domain
+- Fixed HUD when drawing A items on DR menu
+
 ## 0.5.0.1
 - Fixed HP refill interrupting boss cutscenes
 - Fixed incorrect compass counts in Prize Shuffle

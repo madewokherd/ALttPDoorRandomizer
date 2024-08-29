@@ -2137,11 +2137,11 @@ def validate_key_placement(key_layout, world, player):
         if key_layout.prize_relevant:
             found_prize = any(x for x in counter.important_locations if x.prize)
             if not found_prize and dungeon_table[key_layout.sector.name].prize:
-                prize_loc = dungeon_table[key_layout.sector.name].prize.location
+                prize_dungeon = [d for d in world.dungeons if d.name == key_layout.sector.name][0]
                 if key_layout.prize_relevant == 'BigBomb':
-                    found_prize = prize_loc.item.name not in ['Crystal 5', 'Crystal 6']
+                    found_prize = prize_dungeon.prize.name not in ['Crystal 5', 'Crystal 6']
                 elif key_layout.prize_relevant == 'GT':
-                    found_prize = 'Crystal' not in prize_loc.item.name or world.crystals_needed_for_gt[player] < 7
+                    found_prize = 'Crystal' not in prize_dungeon.prize.name or world.crystals_needed_for_gt[player] < 7
         else:
             found_prize = False
         can_progress = (not counter.big_key_opened and big_found and any(d.bigKey for d in counter.child_doors)) or \

@@ -136,7 +136,7 @@ if __name__ == "__main__":
                 error[2] = error[2].split("\n")
                 results["errors"].append(error)
 
-    with open("new-test-suite-success.txt", "w") as stream:
+    with open(os.path.join(LOGPATH, "new-test-suite-success.txt"), 'w') as stream:
         stream.write(str.join("\n", successes))
         results["success"] = successes
 

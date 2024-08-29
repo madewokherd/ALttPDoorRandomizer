@@ -95,7 +95,7 @@ def fill_dungeons_restrictive(world, shuffled_locations):
             continue
         break
     else:
-        raise FillError(f'Unable to place dungeon prizes {", ".join(list(map(lambda d: d.hint_text, prize_locs)))}')
+        raise FillError(f'Unable to place dungeon prizes: {", ".join(list(map(lambda d: d.name, prizes)))}')
 
     random.shuffle(shuffled_locations)
     fill(all_state_base, others, shuffled_locations)

@@ -87,7 +87,7 @@ def main(args):
     outfilebase = 'Plando_%s_%s' % (os.path.splitext(os.path.basename(args.plando))[0], world.seed)
 
     rom.write_to_file('%s.sfc' % outfilebase)
-    if args.create_spoiler:
+    if args.spoiler != 'none':
         world.spoiler.to_file('%s_Spoiler.txt' % outfilebase)
 
     logger.info('Done. Enjoy.')
@@ -178,7 +178,7 @@ def prefill_world(world, plando, text_patches):
                     world.fix_trock_exit = {1: trfstr.strip().lower() == 'true'}
                 elif line.startswith('!fix_gtower_exit'):
                     _, gtfstr = line.split(':', 1)
-                    world.fix_gtower_exit = gtfstr.strip().lower() == 'true'
+                    world.fix_gtower_exit = {1: gtfstr.strip().lower() == 'true'}
                 elif line.startswith('!fix_pod_exit'):
                     _, podestr = line.split(':', 1)
                     world.fix_palaceofdarkness_exit = {1: podestr.strip().lower() == 'true'}
@@ -223,7 +223,7 @@ def prefill_world(world, plando, text_patches):
 
 def start():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--create_spoiler', help='Output a Spoiler File', action='store_true')
+    parser.add_argument('--spoiler', default='none', help='Output a Spoiler File')
     parser.add_argument('--ignore_unsolvable', help='Do not abort if seed is deemed unsolvable.', action='store_true')
     parser.add_argument('--rom', default='Zelda no Densetsu - Kamigami no Triforce (Japan).sfc', help='Path to an ALttP JAP(1.0) rom to use as a base.')
     parser.add_argument('--loglevel', default='info', const='info', nargs='?', choices=['error', 'info', 'warning', 'debug'], help='Select level of logging for output.')

@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = '87be9d9bd56b6ad8e4b9697ecfc31841'
+RANDOMIZERBASEHASH = 'c0c4b8166fbe9b637a0aaa82e3f4cb8d'
 
 
 class JsonRom(object):
@@ -492,6 +492,9 @@ def patch_rom(world, rom, player, team, is_mystery=False):
     if world.mapshuffle[player]:
         rom.write_byte(0x155C9, random.choice([0x11, 0x16]))  # Randomize GT music too with map shuffle
 
+    if world.doorShuffle[player] != 'vanilla':
+        rom.write_bytes(snes_to_pc(0x0293FE), [0x80, 0x15])  # skip pre-Aga music change
+
     # fix for swamp drains if necessary
     swamp1location = world.get_location('Swamp Palace - Trench 1 Pot Key', player)
     if not swamp1location.pot.indicator:
@@ -664,7 +667,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
                         write_int16(rom, 0x15DB5 + 2 * offset, 0x0640)
                     elif room_id == 0x00d6 and world.fix_trock_exit[player]:
                         write_int16(rom, 0x15DB5 + 2 * offset, 0x0134)
-                    elif room_id == 0x000c and world.fix_gtower_exit: # fix ganons tower exit point
+                    elif room_id == 0x000c and world.fix_gtower_exit[player]: # fix ganons tower exit point
                         write_int16(rom, 0x15DB5 + 2 * offset, 0x00A4)
                     else:
                         write_int16(rom, 0x15DB5 + 2 * offset, link_y)
@@ -889,7 +892,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             rom.write_byte(cr_pc+0x1e, 0xEE)  # slash
             rom.write_byte(cr_pc+0x1f, thousands_bot)
             # modify stat config
-            stat_address = 0x23978C
+            stat_address = 0x23983E
             stat_pc = snes_to_pc(stat_address)
             rom.write_byte(stat_pc, 0xa9)  # change to pos 21 (from b1)
             rom.write_byte(stat_pc+2, 0xc0)  # change to 12 bits (from a0)
@@ -2704,6 +2707,8 @@ def patch_shuffled_dark_sanc(world, rom, player):
     dark_sanc = world.get_region('Dark Sanctuary Hint', player)
     dark_sanc_entrance = str([i for i in dark_sanc.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[dark_sanc_entrance][1]
+    if dark_sanc_entrance == 'Tavern North':
+        link_y -= 0x10  # rom code assumes south-facing doors and adds $10 to the y-coordinate
     door_index = door_addresses[str(dark_sanc_entrance)][0]
     rom.initial_sram.pre_set_overworld_flag(ow_area, door_addresses[dark_sanc_entrance][2])
 
@@ -2719,6 +2724,8 @@ def patch_shuffled_bomb_shop(world, rom, player):
     bomb_shop = world.get_region('Big Bomb Shop', player)
     bomb_shop_entrance = str([i for i in bomb_shop.entrances if i.parent_region.name != 'Menu'][0].name)
     room_id, ow_area, vram_loc, scroll_y, scroll_x, link_y, link_x, camera_y, camera_x, unknown_1, unknown_2, door_1, door_2 = door_addresses[bomb_shop_entrance][1]
+    if bomb_shop_entrance == 'Tavern North':
+        link_y -= 0x10  # rom code assumes south-facing doors and adds $10 to the y-coordinate
     door_index = door_addresses[str(bomb_shop_entrance)][0]
     rom.initial_sram.pre_set_overworld_flag(ow_area, door_addresses[bomb_shop_entrance][2])
 

@@ -8,7 +8,7 @@ from OWEdges import OWTileRegions, OWEdgeGroups, OWEdgeGroupsTerrain, OWExitType
 from OverworldGlitchRules import create_owg_connections
 from Utils import bidict
 
-version_number = '0.5.0.1'
+version_number = '0.5.0.2'
 # branch indicator is intentionally different across branches
 version_branch = ''
 
@@ -1151,7 +1151,7 @@ def define_tile_groups(world, do_grouped, player):
         merge_groups([[0x13, 0x14, 0x1b]])
 
     # sanctuary and grave connector
-    if world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'simple', 'restricted', 'full', 'lite']:
+    if world.shuffle[player] in ['dungeonssimple', 'dungeonsfull', 'simple', 'restricted', 'full', 'lite', 'district']:
         merge_groups([[0x13, 0x14]])
 
     # cross-screen connector
@@ -1499,7 +1499,7 @@ def build_accessible_region_list(world, start_region, player, build_copy_world=F
                 elif exit.connected_region.name not in explored_regions \
                         and (exit.connected_region.type == region.type 
                             or exit.name in OWExitTypes['OWEdge'] or (cross_world and exit.name in (OWExitTypes['Portal'] + OWExitTypes['Mirror']))) \
-                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.name not in OWExitTypes['Ledge', 'OWG']):
+                        and (not region_rules or exit.access_rule(blank_state)) and (not ignore_ledges or exit.name not in (OWExitTypes['Ledge'] + OWExitTypes['OWG'])):
                     explore_region(exit.connected_region.name, exit.connected_region)
     
     if build_copy_world:
