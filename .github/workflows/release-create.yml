@@ -360,7 +360,7 @@ jobs:
           release_name: ${{ steps.debug_info.outputs.release_name }}
           body_path: CHANGELOG.md
           # draft: true
-        if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
+        if: contains(github.event.head_commit.message, 'Merge \'OverworldShuffleDev\' into OverworldShuffle')  # branch/tag name and commit message
 
       # upload linux archive asset (OverworldShuffle)
       #TODO: Make sure we're firing on the proper branches
@@ -374,7 +374,7 @@ jobs:
           asset_path: ${{ steps.parentDir.outputs.parentDir }}/deploy/linux/${{ steps.identify-linux-asset.outputs.asset_linux }}
           asset_name: ${{ steps.debug_info.outputs.asset_prefix }}-linux-focal.tar.gz
           asset_content_type: application/gzip
-        if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
+        if: contains(github.event.head_commit.message, 'Merge \'OverworldShuffleDev\' into OverworldShuffle')  # branch/tag name and commit message
 
       # upload macos archive asset (OverworldShuffle)
       #TODO: Make sure we're firing on the proper branches
@@ -388,7 +388,7 @@ jobs:
           asset_path: ${{ steps.parentDir.outputs.parentDir }}/deploy/macos/${{ steps.identify-macos-asset.outputs.asset_macos }}
           asset_name: ${{ steps.debug_info.outputs.asset_prefix }}-osx.tar.gz
           asset_content_type: application/gzip
-        if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
+        if: contains(github.event.head_commit.message, 'Merge \'OverworldShuffleDev\' into OverworldShuffle')  # branch/tag name and commit message
 
       # upload windows archive asset (OverworldShuffle)
       #TODO: Make sure we're firing on the proper branches
@@ -402,7 +402,7 @@ jobs:
           asset_path: ${{ steps.parentDir.outputs.parentDir }}/deploy/windows/${{ steps.identify-windows-asset.outputs.asset_windows }}
           asset_name: ${{ steps.debug_info.outputs.asset_prefix }}-windows.zip
           asset_content_type: application/zip
-        if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")  # branch/tag name and commit message
+        if: contains(github.event.head_commit.message, 'Merge \'OverworldShuffleDev\' into OverworldShuffle')  # branch/tag name and commit message
 
       - name: 🖳Tag Baserom
         uses: ./.github/actions/tag-repo
@@ -412,4 +412,4 @@ jobs:
           repository: ${{ github.repository_owner }}/z3randomizer
           ref-name:   heads/OWMain
           github-tag: ${{ github.event.release.tag_name }}
-        if: contains(github.event.head_commit.message, "Merge 'OverworldShuffleDev' into OverworldShuffle")
+        if: contains(github.event.head_commit.message, 'Merge \'OverworldShuffleDev\' into OverworldShuffle')
