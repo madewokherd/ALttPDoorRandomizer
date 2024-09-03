@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.0.3
+- Fixed crash on pedestal
+
 ## 0.5.0.2
 - \~Merged in DR v1.4.5~
   - ER - SW Shuffle Options
