@@ -558,8 +558,6 @@ class Sprite(object):
         if self.location is not None:
             item_id = self.location.item.code if self.location.item is not None else 0x5A
             code = 0xF9 if self.location.item.player != self.location.player else 0xF8
-            if code == 0xF8:
-                item_id = handle_native_dungeon(self.location, item_id)
             data.append(item_id)
             data.append(0 if code == 0xF8 else self.location.item.player)
             data.append(code)
