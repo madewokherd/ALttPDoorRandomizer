@@ -43,7 +43,7 @@ from source.enemizer.Enemizer import write_enemy_shuffle_settings
 
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-RANDOMIZERBASEHASH = 'df80fc581f947c944f1bf558e9791d07'
+RANDOMIZERBASEHASH = 'f943d3d9b542d59dfed768b3f89646c9'
 
 
 class JsonRom(object):
@@ -438,7 +438,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             if location.item.name in valid_pot_items and location.item.player == player:
                 location.pot.item = valid_pot_items[location.item.name]
             else:
-                code = handle_native_dungeon(location, itemid)
+                code = itemid
                 standing_item_flag = 0x80
                 if location.item.player != player:
                     standing_item_flag |= 0x40
@@ -453,7 +453,7 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             continue
         elif location.type == LocationType.Bonk:
             address = snes_to_pc(location.address)
-            rom.write_byte(address, handle_native_dungeon(location, itemid))
+            rom.write_byte(address, itemid)
             if location.item.player != player:
                 rom.write_byte(address+1, location.item.player)
             else:
@@ -463,8 +463,6 @@ def patch_rom(world, rom, player, team, is_mystery=False):
             continue
 
         if location.item is not None:
-            # Keys in their native dungeon should use the original item code for keys
-            itemid = handle_native_dungeon(location, itemid)
             if world.remote_items[player]:
                 itemid = list(location_table.keys()).index(location.name) + 1
                 assert itemid < 0x100

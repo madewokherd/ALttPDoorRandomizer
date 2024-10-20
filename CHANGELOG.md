@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0.4
+- Fixed dark room item gfx
+- Fixed dungeon item pickup behavior in cross-dungeon glitched scenarios
+- \~Merged in DR v1.4.6~
+  - Fixed Sanc & Quit behavior
+
 ## 0.5.0.3
 - Fixed crash on pedestal
 
