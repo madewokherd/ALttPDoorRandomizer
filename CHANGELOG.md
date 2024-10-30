@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.0.5
+- Fixed issue with vanilla HCBK acting like a small key
+
 ## 0.5.0.4
 - Fixed dark room item gfx
 - Fixed dungeon item pickup behavior in cross-dungeon glitched scenarios
